@@ -1,0 +1,5 @@
+.obsidian-initiative-tracker .initiative-tracker-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
