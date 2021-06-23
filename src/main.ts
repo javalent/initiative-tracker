@@ -27,14 +27,13 @@ export default class InitiativeTracker extends Plugin {
     private view: TrackerView;
     async onload() {
         console.log("Loading Initiative Tracker v" + this.manifest.version);
-
         this.registerIcons();
 
         await this.loadSettings();
 
         this.registerView(
             INTIATIVE_TRACKER_VIEW,
-            (leaf: WorkspaceLeaf) => (this.view = new TrackerView(leaf))
+            (leaf: WorkspaceLeaf) => (this.view = new TrackerView(leaf, this))
         );
 
         this.addCommand({
@@ -74,7 +73,8 @@ export default class InitiativeTracker extends Plugin {
             return;
         }
         this.app.workspace.getRightLeaf(false).setViewState({
-            type: INTIATIVE_TRACKER_VIEW
+            type: INTIATIVE_TRACKER_VIEW,
+            active: true //TODO: CHANGE BEFORE BUILD
         });
     }
 
