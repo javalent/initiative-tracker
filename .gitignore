@@ -13,3 +13,4 @@ main.js
 # obsidian
 data.json
 .DS_Store
+rollup.config-dev.js
