@@ -27,8 +27,8 @@ export default {
     external: ["obsidian"],
     plugins: [
         /* vue(), */
-        svelte({ emitCss: false, preprocess: process() }),
         typescript(),
+        svelte({ emitCss: false, preprocess: process() }),
         nodeResolve({ browser: true, dedupe: ["svelte"] }),
         commonjs(),
         css({ output: "styles.css" })

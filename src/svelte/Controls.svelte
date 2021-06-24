@@ -1,34 +1,37 @@
 <script lang="ts">
-    import { onMount } from "svelte";
     import { ExtraButtonComponent } from "obsidian";
-    import {
-        INITIATIVE_TRACKER_PLAY,
-        INITIATIVE_TRACKER_STOP
-    } from "src/utils";
 
-    export let creatures: any[] = [];
-    export let state = false;
+    import { view } from "./store";
+    import type TrackerView from "src/view";
 
-    let top: HTMLElement;
-    const stateButton = new ExtraButtonComponent(createDiv())
-        .setIcon(state ? INITIATIVE_TRACKER_STOP : INITIATIVE_TRACKER_PLAY)
-        .setTooltip(state ? "Stop" : "Play")
-        .setDisabled(creatures.length == 0)
-        .onClick(() => {
-            state = !state;
-        });
-    onMount(() => top.appendChild(stateButton.extraSettingsEl));
+    let TrackerView: TrackerView;
+    view.subscribe((view) => {
+        TrackerView = view;
+    });
+
+    let button: ExtraButtonComponent;
+    const stateButton = (node: HTMLElement) => {
+        button = new ExtraButtonComponent(node)
+            .setIcon(TrackerView.stateIcon)
+            .setTooltip(TrackerView.stateMessage)
+            /* .setDisabled(creatures.length == 0) */
+            .onClick(() => {
+                TrackerView.state = !TrackerView.state;
+            });
+    };
 
     $: {
-        console.log(creatures);
-        stateButton
-            .setIcon(state ? INITIATIVE_TRACKER_STOP : INITIATIVE_TRACKER_PLAY)
-            .setTooltip(state ? "Stop" : "Play")
-            .setDisabled(creatures.length == 0);
+        if (button) {
+            button
+                .setIcon(TrackerView.stateIcon)
+                .setTooltip(TrackerView.stateMessage);
+        }
     }
 </script>
 
-<div bind:this={top} class="buttons" />
+<div class="buttons">
+    <div use:stateButton />
+</div>
 
 <style>
     .buttons {

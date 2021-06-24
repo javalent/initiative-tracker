@@ -1,6 +1,6 @@
 <script lang="ts">
     import { ExtraButtonComponent, Notice } from "obsidian";
-    import { INITIATIVE_TRACKER_SAVE } from "src/utils";
+    import { SAVE } from "src/utils";
 
     import { creatures } from "./store";
 
@@ -21,7 +21,7 @@
     const saveButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Add Creature")
-            .setIcon(INITIATIVE_TRACKER_SAVE)
+            .setIcon(SAVE)
             .onClick(() => {
                 if (!name.length) {
                     new Notice("Enter a name!");
@@ -33,7 +33,21 @@
                     c.push({ name: name, hp: hp, initiative: initiative });
                     return c;
                 });
+                name = undefined;
+                hp = undefined;
+                initiative = undefined;
                 console.log("Save", creatures);
+            });
+    };
+    const cancelButton = (node: HTMLElement) => {
+        new ExtraButtonComponent(node)
+            .setTooltip("Cancel")
+            .setIcon("cross")
+            .onClick(() => {
+                addNew = false;
+                name = undefined;
+                hp = undefined;
+                initiative = undefined;
             });
     };
 </script>
@@ -64,7 +78,10 @@
                 />
             </div>
         </div>
-        <div class="add-button" use:saveButton />
+        <div class="context-buttons">
+            <div class="add-button" use:saveButton />
+            <div use:cancelButton class="add-button cancel-button" />
+        </div>
     {:else}
         <div use:addButton class="add-button" />
     {/if}
@@ -85,5 +102,14 @@
         display: flex;
         justify-content: space-between;
         margin-bottom: 0.5rem;
+    }
+    .context-buttons {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        grid-gap: 0.125rem;
+    }
+    .cancel-button {
+        color: var(--text-faint);
     }
 </style>
