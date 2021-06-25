@@ -5,14 +5,14 @@ import {
     Modal,
     Notice,
     PluginSettingTab,
-    setIcon,
     Setting
 } from "obsidian";
 import type InitiativeTracker from "./main";
-import type { Creature } from "./view";
+
 import { FileSuggestionModal } from "./utils/suggester";
-import { AC, EDIT, HP, INITIATIVE, REMOVE } from "./utils";
+import { AC, DEFAULT_UNDEFINED, EDIT, HP, INITIATIVE, REMOVE } from "./utils";
 import type { InputValidate } from "@types";
+import { Creature } from "./utils/creature";
 
 export default class InitiativeTrackerSettings extends PluginSettingTab {
     constructor(private plugin: InitiativeTracker) {
@@ -47,7 +47,9 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                             modal.onClose = async () => {
                                 if (!modal.saved) return;
 
-                                this.plugin.players.push({ ...modal.player });
+                                this.plugin.players.push(
+                                    new Creature({ ...modal.player })
+                                );
                                 await this.plugin.saveSettings();
 
                                 this.display();
@@ -76,9 +78,16 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             );
 
             headers.createDiv({ text: "Name" });
-            setIcon(headers.createDiv(), HP);
-            setIcon(headers.createDiv(), AC);
-            setIcon(headers.createDiv(), INITIATIVE);
+            new ExtraButtonComponent(headers.createDiv())
+                .setIcon(HP)
+                .setTooltip("Max HP");
+            new ExtraButtonComponent(headers.createDiv())
+                .setIcon(AC)
+                .setTooltip("Armor Class");
+            new ExtraButtonComponent(headers.createDiv())
+                .setIcon(INITIATIVE)
+                .setTooltip("Initiative Modifier");
+
             headers.createDiv();
 
             for (let player of this.plugin.players) {
@@ -86,9 +95,15 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     "initiative-tracker-player"
                 );
                 playerDiv.createDiv({ text: player.name });
-                playerDiv.createDiv({ text: `${player.hp}` });
-                playerDiv.createDiv({ text: `${player.ac}` });
-                playerDiv.createDiv({ text: `${player.modifier}` });
+                playerDiv.createDiv({
+                    text: `${player.hp ?? DEFAULT_UNDEFINED}`
+                });
+                playerDiv.createDiv({
+                    text: `${player.ac ?? DEFAULT_UNDEFINED}`
+                });
+                playerDiv.createDiv({
+                    text: `${player.modifier ?? DEFAULT_UNDEFINED}`
+                });
                 const icons = playerDiv.createDiv(
                     "initiative-tracker-player-icon"
                 );
@@ -100,13 +115,11 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         modal.open();
                         modal.onClose = async () => {
                             if (!modal.saved) return;
+
                             Object.assign(player, modal.player);
-                            console.log(
-                                "🚀 ~ file: settings.ts ~ line 104 ~ player",
-                                player,
-                                ...this.plugin.players
-                            );
+
                             await this.plugin.saveSettings();
+
                             this.display();
                         };
                     });
@@ -130,16 +143,16 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
 }
 
 class NewPlayerModal extends Modal {
-    player: Creature = {};
+    player: Creature = new Creature({});
     saved: boolean;
     constructor(
         private plugin: InitiativeTracker,
-        private original: Creature = {}
+        private original: Creature = new Creature({})
     ) {
         super(plugin.app);
-        this.player = { ...original };
+        this.player = new Creature({ ...original });
     }
-    async display() {
+    async display(load?: boolean) {
         let { contentEl } = this;
 
         contentEl.addClass("initiative-tracker-add-player-modal");
@@ -169,10 +182,10 @@ class NewPlayerModal extends Modal {
                     if (!metaData || !metaData.frontmatter) return;
 
                     const { ac, hp, modifier } = metaData.frontmatter;
-                    this.player = {
+                    this.player = new Creature({
                         ...this.player,
                         ...{ ac, hp, modifier }
-                    };
+                    });
                     this.display();
                 };
             });
@@ -191,10 +204,11 @@ class NewPlayerModal extends Modal {
                     validate: (i: HTMLInputElement) => {
                         let error = false;
                         if (
-                            this.plugin.players.find(
+                            (!i.value.length && !load) ||
+                            (this.plugin.players.find(
                                 (p) => p.name === i.value
                             ) &&
-                            this.player.name != this.original.name
+                                this.player.name != this.original.name)
                         ) {
                             i.addClass("has-error");
                             error = true;
@@ -310,6 +324,6 @@ class NewPlayerModal extends Modal {
         return error;
     }
     onOpen() {
-        this.display();
+        this.display(true);
     }
 }

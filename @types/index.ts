@@ -1,4 +1,4 @@
-import type { Creature } from "../src/view";
+import type { Creature } from "../src/utils/creature";
 
 export interface InputValidate {
     input: HTMLInputElement;

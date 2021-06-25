@@ -1,6 +1,7 @@
 <script lang="ts">
     import { ExtraButtonComponent, Notice } from "obsidian";
     import { SAVE } from "src/utils";
+    import { Creature } from "src/utils/creature";
 
     import { creatures } from "./store";
 
@@ -31,12 +32,15 @@
 
                 addNew = false;
                 creatures.update((c) => {
-                    c.push({
-                        name,
-                        hp,
-                        initiative,
-                        ac
-                    });
+                    Number(hp);
+                    c.push(
+                        new Creature({
+                            name,
+                            hp: Number(hp),
+                            initiative: Number(initiative),
+                            ac: Number(ac)
+                        })
+                    );
                     return c;
                 });
                 name = undefined;

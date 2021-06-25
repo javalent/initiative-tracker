@@ -1,11 +1,12 @@
 import { Plugin, WorkspaceLeaf } from "obsidian";
 
 import { INTIATIVE_TRACKER_VIEW, registerIcons } from "./utils";
-import TrackerView, { Creature } from "./view";
+import TrackerView from "./view";
 import type { InitiativeTrackerData } from "../@types/index";
 
 import "./main.css";
 import InitiativeTrackerSettings from "./settings";
+import type { Creature } from "./utils/creature";
 
 export default class InitiativeTracker extends Plugin {
     private view: TrackerView;

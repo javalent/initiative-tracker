@@ -2,9 +2,17 @@
     import { onMount } from "svelte";
 
     import { ExtraButtonComponent } from "obsidian";
-    import { DISABLE, EDIT, ENABLE, HAMBURGER, REMOVE, TAG } from "src/utils";
+    import {
+        DEFAULT_UNDEFINED,
+        DISABLE,
+        EDIT,
+        ENABLE,
+        HAMBURGER,
+        REMOVE,
+        TAG
+    } from "src/utils";
     import store from "./store";
-    import type { Creature } from "src/view";
+    import type { Creature } from "src/utils/creature";
 
     export let creature: Creature;
     export let remove: (creature: Creature) => void = () => {};
@@ -19,10 +27,11 @@
         creature.name = (evt.target as HTMLInputElement).value;
         editing = null;
     };
+    export let show: boolean;
+    export let active: boolean;
 
-    export let hamburger: boolean = false;
     store.show.subscribe((value) => {
-        hamburger = value;
+        show = value;
     });
 
     const deleteButton = (node: HTMLElement) => {
@@ -80,8 +89,26 @@
     }
 </script>
 
-<div class="initiative-tracker-creature">
+<div class="initiative-tracker-creature" class:active>
     <!-- <div class="grip-handle" use:gripHandle /> -->
+    <span class="active-holder">
+        {#if active}
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+                focusable="false"
+                data-prefix="fas"
+                data-icon="angle-right"
+                class="svg-inline--fa fa-angle-right fa-w-8"
+                role="img"
+                viewBox="0 0 256 512"
+                ><path
+                    fill="currentColor"
+                    d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"
+                /></svg
+            >
+        {/if}
+    </span>
     <span
         class="editable initiative tree-item-flair"
         contenteditable="true"
@@ -94,18 +121,18 @@
             }
             if (!/^(\d*\.?\d*|Backspace|Delete|Arrow\w+)$/.test(evt.key)) {
                 evt.preventDefault();
-                console.log(evt.key);
+
                 return;
             }
         }}
         >{creature.initiative}
     </span>
     {#if editing != "name"}
-        <span
+        <small
             class="editable"
             on:click={(evt) => {
                 editing = "name";
-            }}>{creature.name}</span
+            }}>{creature.name}</small
         >
     {:else}
         <input
@@ -124,23 +151,15 @@
                 console.log(evt.key);
                 return;
             }
-        }}>{creature.hp}</span
+        }}>{creature.hp ?? DEFAULT_UNDEFINED}</span
     >
-    <span class="center">{creature.ac}</span>
+    <span class="center">{creature.ac ?? DEFAULT_UNDEFINED}</span>
     <div class="controls">
-        <div class="add-button icon" class:show={hamburger} use:hamburgerIcon />
-        <div class="add-button edit" class:show={!hamburger} use:editButton />
-        <div class="add-button tags" class:show={!hamburger} use:tagButton />
-        <div
-            class="add-button enable"
-            class:show={!hamburger}
-            use:disableButton
-        />
-        <div
-            class="add-button delete"
-            class:show={!hamburger}
-            use:deleteButton
-        />
+        <div class="add-button icon" class:show use:hamburgerIcon />
+        <div class="add-button edit" class:show={!show} use:editButton />
+        <div class="add-button tags" class:show={!show} use:tagButton />
+        <div class="add-button enable" class:show={!show} use:disableButton />
+        <div class="add-button delete" class:show={!show} use:deleteButton />
     </div>
 </div>
 
@@ -151,6 +170,9 @@
         display: contents;
     }
 
+    .active-holder {
+        margin-left: -0.5rem;
+    }
     .initiative-tracker-creature .initiative {
         display: block;
         padding: 0;
@@ -166,11 +188,15 @@
         text-align: center;
     }
 
+    .right {
+        margin-left: auto;
+    }
     .editable {
         cursor: pointer;
     }
     .controls {
         display: flex;
+        justify-content: flex-end;
     }
     .add-button {
         display: none;

@@ -1,3 +1,5 @@
+<svelte:options accessors={true} />
+
 <script lang="ts">
     import Controls from "./Controls.svelte";
     import Table from "./Table.svelte";
@@ -6,31 +8,38 @@
     import store from "./store";
     import type TrackerView from "src/view";
     import { MIN_WIDTH_FOR_HAMBURGER } from "src/utils";
-    import type { Creature } from "src/view";
+    import type { Creature } from "src/utils/creature";
 
     export let creatures: Creature[] = [];
     export let view: TrackerView;
 
     store.creatures.set(creatures);
-    store.view.set(view);
-    let show =
-        view.contentEl.getBoundingClientRect().width < MIN_WIDTH_FOR_HAMBURGER;
+
+    export let show =
+        view.parentEl.getBoundingClientRect().width < MIN_WIDTH_FOR_HAMBURGER;
+    console.log("🚀 ~ file: App.svelte ~ line 17 ~ show", show);
+    store.show.set(show);
     store.show.subscribe((value) => {
+        console.log("🚀 ~ file: App.svelte ~ line 19 ~ value", value);
         show = value;
     });
-    store.show.set(show);
+    console.log("🚀 ~ file: App.svelte ~ line 24 ~ show", show);
 
     view.onResize = () => {
-        console.log();
+        console.log(
+            " resize ",
+            view.parentEl.getBoundingClientRect().width <
+                MIN_WIDTH_FOR_HAMBURGER
+        );
 
         if (
-            view.contentEl.getBoundingClientRect().width <
+            view.parentEl.getBoundingClientRect().width <
                 MIN_WIDTH_FOR_HAMBURGER &&
             !show
         ) {
             store.show.set(true);
         } else if (
-            view.contentEl.getBoundingClientRect().width >=
+            view.containerEl.getBoundingClientRect().width >=
                 MIN_WIDTH_FOR_HAMBURGER &&
             show
         ) {
@@ -43,7 +52,7 @@
 
 <div class="obsidian-initiative-tracker">
     <Controls />
-    <Table />
+    <Table {show} />
     <Create />
 </div>
 

@@ -32,3 +32,15 @@
     .initiative-tracker-player.headers {
     font-weight: bolder;
 }
+.initiative-tracker-additional-container
+    .initiative-tracker-players
+    .initiative-tracker-player.headers
+    .clickable-icon {
+    color: var(--text-normal);
+}
+.initiative-tracker-additional-container
+    .initiative-tracker-players
+    .initiative-tracker-player.headers
+    .clickable-icon:hover {
+    color: var(--text-normal);
+}
