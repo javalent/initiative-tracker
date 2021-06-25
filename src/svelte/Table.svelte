@@ -3,6 +3,7 @@
     import { AC, HP } from "src/utils";
 
     import Creature from "./Creature.svelte";
+    import type { Creature as CreatureClass } from "src/view";
 
     import { creatures } from "./store";
 
@@ -14,15 +15,15 @@
         creaturesArray.sort((a, b) => b.initiative - a.initiative);
     });
 
-    const remove = (creature: any) => {
+    const remove = (creature: CreatureClass) => {
         creatures.set([...creaturesArray.filter((c) => c != creature)]);
     };
 
-    const updateInitiative = (node: HTMLElement, creature: any) => {
-        creature.initiative = node.textContent;
+    const updateInitiative = (node: HTMLElement, creature: CreatureClass) => {
+        creature.initiative = Number(node.textContent);
         creatures.set([
             ...creaturesArray.filter((c) => c != creature),
-            creature
+            { ...creature }
         ]);
     };
 
@@ -52,9 +53,9 @@
 
 <style>
     .initiative-tracker-table {
-        margin: 0.5rem;
+        padding: 0.5rem;
         display: grid;
-        grid-template-columns: /* auto */ 12px 1fr auto auto auto;
+        grid-template-columns: auto /* 12px */ 1fr auto auto auto;
         align-items: center;
         gap: 0.5rem;
         width: 100%;

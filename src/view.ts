@@ -1,11 +1,5 @@
 import { ExtraButtonComponent, ItemView, WorkspaceLeaf } from "obsidian";
-import {
-    BASE,
-    PLAY,
-    REMOVE,
-    STOP,
-    INTIATIVE_TRACKER_VIEW
-} from "./utils";
+import { BASE, PLAY, REMOVE, STOP, INTIATIVE_TRACKER_VIEW } from "./utils";
 
 import type InitiativeTracker from "./main";
 
@@ -16,11 +10,12 @@ import App from "./svelte/App.svelte";
 
 export default class TrackerView extends ItemView {
     public state: boolean = false;
-    public creatures: any[] = [
+    public creatures: Creature[] = [
         {
             name: "auto",
             initiative: Math.floor(20 * Math.random() + 1),
-            hp: 20
+            hp: 20,
+            ac: 15
         }
     ];
 
@@ -63,6 +58,13 @@ export default class TrackerView extends ItemView {
     }
 }
 
-class Creature {
-    constructor(public name?: string, public initiative?: number) {}
+export class Creature {
+    constructor(
+        public name?: string,
+        public initiative?: number,
+        public modifier?: number,
+        public hp?: number,
+        public ac?: number,
+        public note?: string
+    ) {}
 }

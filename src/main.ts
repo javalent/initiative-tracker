@@ -1,43 +1,28 @@
-import { addIcon, Plugin, WorkspaceLeaf } from "obsidian";
+import { Plugin, WorkspaceLeaf } from "obsidian";
 
-import {
-    HAMBURGER,
-    HAMBURGER_ICON,
-    AC,
-    AC_ICON,
-    BACKWARD,
-    BACKWARD_ICON,
-    BASE,
-    FORWARD,
-    FORWARD_ICON,
-    GRIP,
-    GRIP_ICON,
-    HP,
-    HP_ICON,
-    ICON,
-    PLAY,
-    PLAY_ICON,
-    REMOVE,
-    REMOVE_ICON,
-    RESTART,
-    RESTART_ICON,
-    SAVE,
-    SAVE_ICON,
-    STOP,
-    STOP_ICON,
-    INTIATIVE_TRACKER_VIEW
-} from "./utils";
-import TrackerView from "./view";
+import { INTIATIVE_TRACKER_VIEW, registerIcons } from "./utils";
+import TrackerView, { Creature } from "./view";
+import type { InitiativeTrackerData } from "../@types/index";
 
 import "./main.css";
+import InitiativeTrackerSettings from "./settings";
 
 export default class InitiativeTracker extends Plugin {
     private view: TrackerView;
+    public data: InitiativeTrackerData;
+    get players(): Creature[] {
+        return this.data.players;
+    }
+    set players(players) {
+        this.data.players = players;
+    }
     async onload() {
         console.log("Loading Initiative Tracker v" + this.manifest.version);
-        this.registerIcons();
+        registerIcons();
 
         await this.loadSettings();
+
+        this.addSettingTab(new InitiativeTrackerSettings(this));
 
         this.registerView(
             INTIATIVE_TRACKER_VIEW,
@@ -86,23 +71,16 @@ export default class InitiativeTracker extends Plugin {
         });
     }
 
-    async loadSettings() {}
+    async loadSettings() {
+        const data = Object.assign(
+            {},
+            { players: [], version: this.manifest.version },
+            await this.loadData()
+        );
+        this.data = data;
+    }
 
-    async saveSettings() {}
-
-    private registerIcons() {
-        addIcon(BASE, ICON);
-
-        addIcon(SAVE, SAVE_ICON);
-        addIcon(REMOVE, REMOVE_ICON);
-        addIcon(RESTART, RESTART_ICON);
-        addIcon(PLAY, PLAY_ICON);
-        addIcon(FORWARD, FORWARD_ICON);
-        addIcon(BACKWARD, BACKWARD_ICON);
-        addIcon(STOP, STOP_ICON);
-        addIcon(GRIP, GRIP_ICON);
-        addIcon(HP, HP_ICON);
-        addIcon(AC, AC_ICON);
-        addIcon(HAMBURGER, HAMBURGER_ICON);
+    async saveSettings() {
+        await this.saveData(this.data);
     }
 }

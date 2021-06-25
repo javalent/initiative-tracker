@@ -1,0 +1,34 @@
+.initiative-tracker-add-player-modal .has-error {
+    border-color: var(--background-modifier-error-hover);
+}
+
+.initiative-tracker-additional-container .initiative-tracker-players {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr auto;
+    gap: 0.5rem;
+}
+
+.initiative-tracker-additional-container
+    .initiative-tracker-players
+    .initiative-tracker-player {
+    display: contents;
+}
+.initiative-tracker-additional-container
+    .initiative-tracker-players
+    .initiative-tracker-player
+    > *:not(:first-child) {
+    text-align: center;
+}
+.initiative-tracker-additional-container
+    .initiative-tracker-players
+    .initiative-tracker-player
+    .initiative-tracker-player-icon {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 0.5rem;
+}
+.initiative-tracker-additional-container
+    .initiative-tracker-players
+    .initiative-tracker-player.headers {
+    font-weight: bolder;
+}

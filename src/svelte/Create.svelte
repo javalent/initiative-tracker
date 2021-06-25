@@ -8,6 +8,7 @@
     let name: string;
     let hp: string;
     let initiative: string;
+    let ac: string;
 
     const addButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -30,7 +31,12 @@
 
                 addNew = false;
                 creatures.update((c) => {
-                    c.push({ name: name, hp: hp, initiative: initiative });
+                    c.push({
+                        name,
+                        hp,
+                        initiative,
+                        ac
+                    });
                     return c;
                 });
                 name = undefined;
@@ -67,6 +73,10 @@
             <div>
                 <label for="add-hp">HP</label>
                 <input bind:value={hp} id="add-hp" type="text" name="hp" />
+            </div>
+            <div>
+                <label for="add-ac">AC</label>
+                <input bind:value={ac} id="add-ac" type="text" name="ac" />
             </div>
             <div>
                 <label for="add-init">Initiative</label>
