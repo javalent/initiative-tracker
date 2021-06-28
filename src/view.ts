@@ -22,8 +22,9 @@ export default class TrackerView extends ItemView {
     private _app: App;
     parentEl: HTMLElement;
     private _rendered: boolean = false;
+    players: Creature[];
 
-    constructor(public leaf: WorkspaceLeaf, private plugin: InitiativeTracker) {
+    constructor(public leaf: WorkspaceLeaf, public plugin: InitiativeTracker) {
         super(leaf);
         this.creatures = [...this.plugin.players.map((p) => new Creature(p))];
     }
@@ -58,11 +59,6 @@ export default class TrackerView extends ItemView {
         this.creatures = [...this.plugin.players.map((p) => new Creature(p))];
         this.parentEl = this.containerEl.parentElement;
 
-        console.log(
-            "🚀 ~ file: view.ts ~ line 59 ~ this.contentEl.getBoundingClientRect().width",
-            this.parentEl.getBoundingClientRect().width <
-                MIN_WIDTH_FOR_HAMBURGER
-        );
         this._app = new App({
             target: this.contentEl,
             props: {
@@ -72,6 +68,12 @@ export default class TrackerView extends ItemView {
                     this.contentEl.getBoundingClientRect().width <
                     MIN_WIDTH_FOR_HAMBURGER
             }
+        });
+
+        this._app.$on("new-encounter", () => {
+            this._app.creatures = [
+                ...this.plugin.players.map((p) => new Creature(p))
+            ];
         });
         this._rendered = true;
     }

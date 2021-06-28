@@ -10,6 +10,7 @@ import type { Creature } from "./utils/creature";
 
 export default class InitiativeTracker extends Plugin {
     private view: TrackerView;
+    public active: boolean = false;
     public data: InitiativeTrackerData;
     get players(): Creature[] {
         return this.data.players;
@@ -18,7 +19,6 @@ export default class InitiativeTracker extends Plugin {
         this.data.players = players;
     }
     async onload() {
-        console.log("Loading Initiative Tracker v" + this.manifest.version);
         registerIcons();
 
         await this.loadSettings();
@@ -43,6 +43,53 @@ export default class InitiativeTracker extends Plugin {
                 this.addTrackerView();
             }
         });
+
+        this.addCommand({
+            id: "toggle-encounter",
+            name: "Toggle Encounter",
+            checkCallback: (checking) => {
+                if (checking) {
+                    return (
+                        this.app.workspace.getLeavesOfType(
+                            INTIATIVE_TRACKER_VIEW
+                        ).length != 0
+                    );
+                }
+
+                /* this.view.toggleEncounter(); */
+            }
+        });
+        this.addCommand({
+            id: "next-combatant",
+            name: "Next Combatant",
+            checkCallback: (checking) => {
+                if (checking) {
+                    return (
+                        this.app.workspace.getLeavesOfType(
+                            INTIATIVE_TRACKER_VIEW
+                        ).length != 0 && this.active
+                    );
+                }
+
+                /* this.view.nextCombatant(); */
+            }
+        });
+        this.addCommand({
+            id: "prev-combatant",
+            name: "Previous Combatant",
+            checkCallback: (checking) => {
+                if (checking) {
+                    return (
+                        this.app.workspace.getLeavesOfType(
+                            INTIATIVE_TRACKER_VIEW
+                        ).length != 0 && this.active
+                    );
+                }
+
+                /* this.view.previousCombatant(); */
+            }
+        });
+
         if (this.app.workspace.layoutReady) {
             this.addTrackerView();
         } else {
@@ -78,6 +125,7 @@ export default class InitiativeTracker extends Plugin {
             { players: [], version: this.manifest.version },
             await this.loadData()
         );
+
         this.data = data;
     }
 

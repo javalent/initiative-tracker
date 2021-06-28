@@ -1,11 +1,10 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { createEventDispatcher, afterUpdate } from "svelte";
 
-    import { ExtraButtonComponent } from "obsidian";
+    import { ExtraButtonComponent, Menu } from "obsidian";
     import {
         DEFAULT_UNDEFINED,
         DISABLE,
-        EDIT,
         ENABLE,
         HAMBURGER,
         REMOVE,
@@ -13,25 +12,40 @@
     } from "src/utils";
     import store from "./store";
     import type { Creature } from "src/utils/creature";
+    import type TrackerView from "src/view";
 
     export let creature: Creature;
-    export let remove: (creature: Creature) => void = () => {};
-    export let updateInitiative: (...args: any[]) => void = (
-        node: HTMLElement,
-        creature
-    ) => {
-        creature.initiative = node.textContent;
-    };
+
+    const dispatch = createEventDispatcher();
 
     const updateName = (evt: FocusEvent) => {
         creature.name = (evt.target as HTMLInputElement).value;
         editing = null;
     };
-    export let show: boolean;
-    export let active: boolean;
 
+    let current: Creature;
+    store.current.subscribe((value) => {
+        current = value;
+    });
+
+    let isActive: boolean = false;
+    store.active.subscribe((value) => {
+        isActive = value;
+    });
+
+    let show: boolean;
     store.show.subscribe((value) => {
         show = value;
+    });
+
+    let creatures: Creature[];
+    store.creatures.subscribe((value) => {
+        creatures = value;
+    });
+
+    let view: TrackerView;
+    store.view.subscribe((value) => {
+        view = value;
     });
 
     const deleteButton = (node: HTMLElement) => {
@@ -39,8 +53,7 @@
             .setTooltip("Remove")
             .setIcon(REMOVE)
             .onClick(() => {
-                console.log("Delete", creature);
-                remove(creature);
+                dispatch("remove", creature);
             });
     };
 
@@ -48,51 +61,113 @@
         new ExtraButtonComponent(node)
             .setTooltip("Add Status")
             .setIcon(TAG)
-            .onClick(() => {});
+            .onClick(() => {
+                dispatch("tag", creature);
+            });
     };
-    const editButton = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setTooltip("Edit")
-            .setIcon(EDIT)
-            .onClick(() => {});
-    };
+
     const enableButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Enable")
             .setIcon(ENABLE)
-            .onClick(() => {});
+            .onClick(() => {
+                creature.enabled = true;
+            });
     };
+
     const disableButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Disable")
             .setIcon(DISABLE)
-            .onClick(() => {});
+            .onClick(() => {
+                creature.enabled = false;
+                if (current == creature) {
+                    const enabled = creatures.filter((c) => c.enabled);
+                    const index = enabled.indexOf(current);
+                    const c =
+                        (((index + 1) % enabled.length) + enabled.length) %
+                        enabled.length;
+                    store.current.set(enabled[c]);
+                }
+            });
     };
 
     const hamburgerIcon = (node: HTMLElement) => {
-        new ExtraButtonComponent(node).setIcon(HAMBURGER).onClick(() => {
-            console.log("grip");
-        });
+        const hamburger = new ExtraButtonComponent(node).setIcon(HAMBURGER);
+        hamburger.extraSettingsEl.onclick = (evt) => {
+            const menu = new Menu(view.plugin.app);
+            menu.addItem((item) => {
+                item.setIcon(TAG)
+                    .setTitle("Add Tag")
+                    .onClick(() => {
+                        dispatch("tag", creature);
+                    });
+            });
+            if (creature.enabled) {
+                menu.addItem((item) => {
+                    item.setIcon(DISABLE)
+                        .setTitle("Disable")
+                        .onClick(() => {
+                            creature.enabled = false;
+                            if (current == creature) {
+                                const enabled = creatures.filter(
+                                    (c) => c.enabled
+                                );
+                                const index = enabled.indexOf(current);
+                                const c =
+                                    (((index + 1) % enabled.length) +
+                                        enabled.length) %
+                                    enabled.length;
+                                store.current.set(enabled[c]);
+                            }
+                        });
+                });
+            } else {
+                menu.addItem((item) => {
+                    item.setIcon(ENABLE)
+                        .setTitle("Enable")
+                        .onClick(() => {
+                            creature.enabled = true;
+                        });
+                });
+            }
+            menu.addItem((item) => {
+                item.setIcon(REMOVE)
+                    .setTitle("Remove")
+                    .onClick(() => {
+                        dispatch("remove", creature);
+                    });
+            });
+            menu.showAtPosition(evt);
+        };
+    };
+
+    $: statuses = Array.from(creature.status);
+    const deleteIcon = (node: HTMLElement, status: string) => {
+        const icon = new ExtraButtonComponent(node)
+            .setIcon("cross-in-box")
+            .onClick(() => {
+                creature.status.delete(status);
+                statuses = Array.from(creature.status);
+            });
+        icon.extraSettingsEl.setAttr("style", "margin-left: 3px;");
     };
 
     let editing: string = null;
     let initiativeInput: HTMLInputElement;
-    let nameInput: HTMLInputElement;
 
-    onMount(() => {
-        if (initiativeInput) initiativeInput.focus();
-        if (nameInput) nameInput.focus();
+    afterUpdate(() => {
+        initiativeInput.value = `${creature.initiative}`;
     });
-    $: {
-        if (initiativeInput) initiativeInput.focus();
-        if (nameInput) nameInput.focus();
-    }
 </script>
 
-<div class="initiative-tracker-creature" class:active>
-    <!-- <div class="grip-handle" use:gripHandle /> -->
+<div
+    class="initiative-tracker-creature"
+    class:active={current == creature}
+    class:disabled={!creature.enabled}
+>
     <span class="active-holder">
-        {#if active}
+        {#if current == creature}
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
@@ -109,58 +184,90 @@
             >
         {/if}
     </span>
-    <span
+    <input
         class="editable initiative tree-item-flair"
-        contenteditable="true"
-        on:blur={(evt) => updateInitiative(evt.target, creature)}
-        on:keydown={(evt) => {
-            if (evt.key === "Enter") {
+        bind:this={initiativeInput}
+        on:click={function (evt) {
+            this.select();
+        }}
+        on:blur={function (evt) {
+            dispatch("initiative", { creature, value: this.value });
+        }}
+        on:keydown={function (evt) {
+            if (evt.key === "Enter" || evt.key === "Tab") {
                 evt.preventDefault();
-                updateInitiative(evt.target, creature);
+                this.blur();
                 return;
             }
             if (!/^(\d*\.?\d*|Backspace|Delete|Arrow\w+)$/.test(evt.key)) {
                 evt.preventDefault();
-
                 return;
             }
         }}
-        >{creature.initiative}
-    </span>
-    {#if editing != "name"}
-        <small
-            class="editable"
-            on:click={(evt) => {
-                editing = "name";
-            }}>{creature.name}</small
-        >
+        bind:value={creature.initiative}
+    />
+    {#if creature.player}
+        <small>{creature.name}</small>
     {:else}
         <input
+            class="editable name"
             type="text"
-            bind:this={nameInput}
+            on:focus={function (evt) {
+                this.select();
+            }}
             on:blur={updateName}
+            on:keydown={function (evt) {
+                if (evt.key === "Enter" || evt.key === "Tab") {
+                    evt.preventDefault();
+                    this.blur();
+                    return;
+                }
+            }}
             bind:value={creature.name}
         />
     {/if}
-    <span
-        class="center editable"
-        contenteditable="true"
-        on:keydown={(evt) => {
-            if (!/^(\d*\.?\d*|Backspace|Delete|Arrow\w+)$/.test(evt.key)) {
-                evt.preventDefault();
-                console.log(evt.key);
-                return;
-            }
-        }}>{creature.hp ?? DEFAULT_UNDEFINED}</span
-    >
+
+    <div class="center">
+        <span
+            class="editable"
+            on:click={() => {
+                /* if (creature.hp) */ dispatch("hp", creature);
+            }}>{creature.hpDisplay}</span
+        >
+    </div>
+
     <span class="center">{creature.ac ?? DEFAULT_UNDEFINED}</span>
     <div class="controls">
         <div class="add-button icon" class:show use:hamburgerIcon />
-        <div class="add-button edit" class:show={!show} use:editButton />
         <div class="add-button tags" class:show={!show} use:tagButton />
-        <div class="add-button enable" class:show={!show} use:disableButton />
+        {#if creature.enabled}
+            <div
+                class="add-button enable"
+                class:show={!show}
+                use:disableButton
+            />
+        {:else}
+            <div
+                class="add-button enable"
+                class:show={!show}
+                use:enableButton
+            />
+        {/if}
         <div class="add-button delete" class:show={!show} use:deleteButton />
     </div>
+
+    <!-- {#if creature.status.length} -->
+    <span />
+    <span />
+    <div class="statuses">
+        {#each statuses as status}
+            <div class="status">
+                <span>{status}</span>
+                <div use:deleteIcon={status} />
+            </div>
+        {/each}
+    </div>
+    <!-- {/if} -->
 </div>
 
 <style>
@@ -168,6 +275,10 @@
         width: 100%;
         padding: 0.5rem 0;
         display: contents;
+    }
+
+    .initiative-tracker-creature.disabled * {
+        color: var(--text-faint);
     }
 
     .active-holder {
@@ -182,8 +293,36 @@
         margin-left: -0.5rem;
         user-select: all;
         background-color: inherit;
+        border: 0;
+    }
+    .initiative-tracker-creature .name {
+        display: block;
+        text-align: left;
+        white-space: nowrap;
+        user-select: all;
+        background-color: inherit;
+        border: 0;
+        font-size: smaller;
+        padding: 0;
+        height: unset;
     }
 
+    .statuses {
+        grid-column: span 4;
+        font-size: smaller;
+        margin-bottom: 0.5rem;
+        display: flex;
+        flex-flow: row wrap;
+    }
+    .status {
+        margin-right: 0.1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .status .clickable-icon {
+        margin-left: 0;
+    }
     .center {
         text-align: center;
     }
@@ -191,7 +330,7 @@
     .right {
         margin-left: auto;
     }
-    .editable {
+    .editable:not(.player) {
         cursor: pointer;
     }
     .controls {

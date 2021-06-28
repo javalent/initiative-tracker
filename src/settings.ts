@@ -48,7 +48,10 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                                 if (!modal.saved) return;
 
                                 this.plugin.players.push(
-                                    new Creature({ ...modal.player })
+                                    new Creature({
+                                        ...modal.player,
+                                        player: true
+                                    })
                                 );
                                 await this.plugin.saveSettings();
 

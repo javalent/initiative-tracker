@@ -1,6 +1,8 @@
 <svelte:options accessors={true} />
 
 <script lang="ts">
+    import { beforeUpdate, createEventDispatcher } from "svelte";
+
     import Controls from "./Controls.svelte";
     import Table from "./Table.svelte";
     import Create from "./Create.svelte";
@@ -13,46 +15,43 @@
     export let creatures: Creature[] = [];
     export let view: TrackerView;
 
+    const dispatch = createEventDispatcher();
+
+    store.view.set(view);
     store.creatures.set(creatures);
 
-    export let show =
-        view.parentEl.getBoundingClientRect().width < MIN_WIDTH_FOR_HAMBURGER;
-    console.log("🚀 ~ file: App.svelte ~ line 17 ~ show", show);
+    export let show: boolean;
     store.show.set(show);
-    store.show.subscribe((value) => {
-        console.log("🚀 ~ file: App.svelte ~ line 19 ~ value", value);
-        show = value;
-    });
-    console.log("🚀 ~ file: App.svelte ~ line 24 ~ show", show);
 
-    view.onResize = () => {
-        console.log(
-            " resize ",
+    beforeUpdate(() => {
+        store.creatures.set(creatures);
+        show =
             view.parentEl.getBoundingClientRect().width <
-                MIN_WIDTH_FOR_HAMBURGER
-        );
-
+            MIN_WIDTH_FOR_HAMBURGER;
+    });
+    view.onResize = () => {
+        /* Panel Resized */
         if (
             view.parentEl.getBoundingClientRect().width <
                 MIN_WIDTH_FOR_HAMBURGER &&
             !show
         ) {
-            store.show.set(true);
+            show = true;
+            store.show.set(show);
         } else if (
             view.containerEl.getBoundingClientRect().width >=
                 MIN_WIDTH_FOR_HAMBURGER &&
             show
         ) {
-            store.show.set(false);
+            show = false;
+            store.show.set(show);
         }
-
-        /* Panel Resized */
     };
 </script>
 
 <div class="obsidian-initiative-tracker">
-    <Controls />
-    <Table {show} />
+    <Controls on:new-encounter={() => dispatch("new-encounter")} />
+    <Table />
     <Create />
 </div>
 
