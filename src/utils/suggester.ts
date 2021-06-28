@@ -9,6 +9,9 @@ import {
 } from "obsidian";
 import { createPopper, Instance as PopperInstance } from "@popperjs/core";
 
+import { BESTIARY } from "./srd-bestiary";
+import type { SRDMonster } from "@types";
+
 class Suggester<T> {
     owner: SuggestModal<T>;
     items: T[];
@@ -299,5 +302,57 @@ export class FileSuggestionModal extends SuggestionModal<TFile> {
     }
     getItems() {
         return this.app.vault.getMarkdownFiles();
+    }
+}
+
+export class SRDMonsterSuggestionModal extends SuggestionModal<SRDMonster> {
+    creature: SRDMonster;
+    constructor(app: App, inputEl: HTMLInputElement) {
+        super(app, inputEl);
+    }
+    getItems() {
+        return BESTIARY;
+    }
+    getItemText(item: SRDMonster) {
+        return item.name;
+    }
+    onChooseItem(item: SRDMonster) {
+        this.inputEl.value = item.name;
+        this.creature = item;
+    }
+    selectSuggestion({ item }: FuzzyMatch<SRDMonster>) {
+        this.inputEl.value = item.name;
+        this.creature = item;
+
+        this.onClose();
+        this.close();
+    }
+    renderSuggestion(result: FuzzyMatch<SRDMonster>, el: HTMLElement) {
+        let { item, match: matches } = result || {};
+        let content = el.createDiv({
+            cls: "suggestion-content icon"
+        });
+        if (!item) {
+            content.setText(this.emptyStateText);
+            content.parentElement.addClass("is-selected");
+            return;
+        }
+
+        const matchElements = matches.matches.map((m) => {
+            return createSpan("suggestion-highlight");
+        });
+        for (let i = 0; i < item.name.length; i++) {
+            let match = matches.matches.find((m) => m[0] === i);
+            if (match) {
+                let element = matchElements[matches.matches.indexOf(match)];
+                content.appendChild(element);
+                element.appendText(item.name.substring(match[0], match[1]));
+
+                i += match[1] - match[0] - 1;
+                continue;
+            }
+
+            content.appendText(item.name[i]);
+        }
     }
 }

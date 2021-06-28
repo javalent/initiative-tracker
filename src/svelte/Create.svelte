@@ -1,9 +1,15 @@
 <script lang="ts">
     import { ExtraButtonComponent, Notice } from "obsidian";
+    import { afterUpdate } from "svelte";
     import { SAVE } from "src/utils";
     import { Creature } from "src/utils/creature";
 
-    import { creatures } from "./store";
+    import store, { creatures } from "./store";
+    import { SRDMonsterSuggestionModal } from "src/utils/suggester";
+    import type TrackerView from "src/view";
+
+    let view: TrackerView;
+    store.view.subscribe((v) => (view = v));
 
     let addNew: boolean = false;
     let name: string;
@@ -16,7 +22,6 @@
             .setTooltip("Add Creature")
             .setIcon("plus-with-circle")
             .onClick(() => {
-                
                 addNew = true;
             });
     };
@@ -47,7 +52,6 @@
                 name = undefined;
                 hp = undefined;
                 initiative = undefined;
-                
             });
     };
     const cancelButton = (node: HTMLElement) => {
@@ -61,6 +65,25 @@
                 initiative = undefined;
             });
     };
+
+    let nameInput: HTMLInputElement, modal: SRDMonsterSuggestionModal;
+    afterUpdate(() => {
+        if (nameInput) {
+            modal = new SRDMonsterSuggestionModal(view.plugin.app, nameInput);
+            modal.onClose = () => {
+                console.log(
+                    "🚀 ~ file: Create.svelte ~ line 75 ~ modal.creature",
+                    modal.creature
+                );
+                if (modal.creature) {
+                    name = modal.creature.name;
+                    hp = `${modal.creature.hp}`;
+                    ac = `${modal.creature.ac}`;
+                    initiative = `${Math.floor(Math.random() * 19 + 1)}`; //TODO: Add Modifier;
+                }
+            };
+        }
+    });
 </script>
 
 <div class="add-creature-container">
@@ -70,6 +93,8 @@
                 <label for="add-name">Name</label>
                 <input
                     bind:value={name}
+                    bind:this={nameInput}
+                    on:click={() => modal.open()}
                     id="add-name"
                     type="text"
                     name="name"
