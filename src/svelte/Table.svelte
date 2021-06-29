@@ -90,6 +90,7 @@
             <span>Apply damage or healing:</span>
             <input
                 type="number"
+				autofocus
                 on:blur={function (evt) {
                     updateHP(this.value);
                 }}
@@ -101,6 +102,7 @@
             <span>Apply status:</span>
             <input
                 type="text"
+				autofocus
                 on:blur={function (evt) {
                     addStatus(this.value);
                 }}

@@ -30,7 +30,7 @@
             .setTooltip("Add Creature")
             .setIcon(SAVE)
             .onClick(() => {
-                if (!name.length) {
+                if (!name) {
                     new Notice("Enter a name!");
                     return;
                 }
@@ -51,6 +51,7 @@
                 });
                 name = undefined;
                 hp = undefined;
+				ac = undefined;
                 initiative = undefined;
             });
     };
@@ -62,6 +63,7 @@
                 addNew = false;
                 name = undefined;
                 hp = undefined;
+				ac = undefined;
                 initiative = undefined;
             });
     };
@@ -99,6 +101,7 @@
                     type="text"
                     name="name"
                     tabindex="0"
+					autofocus
                 />
             </div>
             <div>

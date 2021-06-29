@@ -82,7 +82,7 @@
     const restoreButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setIcon(REDO)
-            .setTooltip("Restart Encounter")
+            .setTooltip("Reset HP & status")
             .onClick(() => {
                 for (let creature of creatures) {
                     creature.hp = creature.max;
