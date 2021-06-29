@@ -33,11 +33,12 @@
             .setTooltip("Play") /* 
             .setDisabled(numberOfCreatures == 0) */
             .onClick(() => {
-                const enabled = creatures.filter((c) => c.enabled);
+                dispatch("play");
+                /* const enabled = creatures.filter((c) => c.enabled);
                 store.current.set(enabled[0]);
                 active = true;
                 store.active.set(active);
-                view.plugin.active = active;
+                view.plugin.active = active; */
             });
     };
     const stopButton = (node: HTMLElement) => {
@@ -46,10 +47,11 @@
             .setTooltip("Stop") /* 
             .setDisabled(numberOfCreatures == 0) */
             .onClick(() => {
-                active = false;
+                dispatch("stop");
+                /* active = false;
                 store.active.set(active);
                 store.current.set(null);
-                view.plugin.active = active;
+                view.plugin.active = active; */
             });
     };
     const nextButton = (node: HTMLElement) => {
@@ -57,12 +59,13 @@
             .setIcon(FORWARD)
             .setTooltip("Next")
             .onClick(() => {
-                const enabled = creatures.filter((c) => c.enabled);
+                dispatch("go-to-next");
+                /* const enabled = creatures.filter((c) => c.enabled);
                 const index = enabled.indexOf(current);
                 const c =
                     (((index + 1) % enabled.length) + enabled.length) %
                     enabled.length;
-                store.current.set(enabled[c]);
+                store.current.set(enabled[c]); */
             });
     };
     const prevButton = (node: HTMLElement) => {
@@ -70,25 +73,27 @@
             .setIcon(BACKWARD)
             .setTooltip("Previous")
             .onClick(() => {
-                const enabled = creatures.filter((c) => c.enabled);
+                dispatch("go-to-previous");
+                /* const enabled = creatures.filter((c) => c.enabled);
                 const index = enabled.indexOf(current);
                 const c =
                     (((index - 1) % enabled.length) + enabled.length) %
                     enabled.length;
-                store.current.set(enabled[c]);
+                store.current.set(enabled[c]); */
             });
     };
 
     const restoreButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setIcon(REDO)
-            .setTooltip("Restart Encounter")
+            .setTooltip("Reset HP")
             .onClick(() => {
-                for (let creature of creatures) {
+                dispatch("reset-encounter");
+                /* for (let creature of creatures) {
                     creature.hp = creature.max;
                     creature.status = new Set();
                 }
-                store.creatures.set([...creatures]);
+                store.creatures.set([...creatures]); */
             });
     };
     const newButton = (node: HTMLElement) => {
@@ -105,6 +110,7 @@
             .setIcon(DICE)
             .setTooltip("Re-roll Initiatives")
             .onClick(() => {
+                dispatch("reroll-initiative");
                 for (let creature of creatures) {
                     creature.initiative = Math.floor(Math.random() * 19 + 1);
                 }
