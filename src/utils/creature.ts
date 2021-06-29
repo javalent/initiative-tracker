@@ -29,7 +29,9 @@ export class Creature {
         player?: boolean;
     }) {
         this.name = name;
-        this._initiative = initiative ?? Math.floor(Math.random() * 19 + 1);
+        this._initiative = Number(
+            initiative ?? Math.floor(Math.random() * 19 + 1)
+        );
         this.modifier = modifier ?? 0;
 
         this.max = hp;

@@ -1,43 +1,46 @@
 <script lang="ts">
-    import { Notice, setIcon } from "obsidian";
-    import { AC, HP } from "src/utils";
-    import type { Creature } from "src/utils/creature";
+    import { setIcon } from "obsidian";
+    import { AC, HP, MIN_WIDTH_FOR_HAMBURGER } from "src/utils";
+
     import type TrackerView from "src/view";
 
     import CreatureTemplate from "./Creature.svelte";
 
     import store from "./store";
 
+    import { createEventDispatcher } from "svelte";
+
+    const dispatch = createEventDispatcher();
+
     let numberOfCreatures: number = 0;
     export let creatures: any[] = [];
+    export let show: boolean = false;
+    export let state: boolean;
+    export let current: number;
 
     let view: TrackerView;
+    let el: HTMLElement;
+    function checkOverflow() {
+        const curOverflow = el.style.overflow;
+
+        if (!curOverflow || curOverflow === "visible")
+            el.style.overflow = "hidden";
+
+        const isOverflowing = el.clientWidth < el.scrollWidth;
+        el.style.overflow = curOverflow;
+
+        return isOverflowing;
+    }
     store.view.subscribe((value) => {
         view = value;
+        view.onResize = () => {
+            if (el.clientWidth < MIN_WIDTH_FOR_HAMBURGER && !show) {
+                show = checkOverflow();
+            } else if (el.clientWidth > MIN_WIDTH_FOR_HAMBURGER) {
+                show = checkOverflow();
+            }
+        };
     });
-
-    const remove = (event: CustomEvent<Creature>) => {
-        view.removeCreature(event.detail);
-    };
-
-    const updateInitiative = (creature: Creature, value: number) => {
-        console.log("🚀 ~ file: Table.svelte ~ line 24 ~ creature", creature);
-        if (isNaN(Number(value)) || Number(value) < 1) {
-            new Notice("Enter a valid initiative.");
-
-            store.creatures.set([...creatures]);
-
-            return;
-        }
-        if (creature.initiative == Number(value)) {
-            return;
-        }
-
-        view.updateCreature(creature, { initiative: value });
-
-        /*         creature.initiative = Number(value);
-        store.creatures.set([...creatures]); */
-    };
 
     const hpIcon = (node: HTMLElement) => {
         setIcon(node, HP);
@@ -45,26 +48,13 @@
     const acIcon = (node: HTMLElement) => {
         setIcon(node, AC);
     };
-
-    let updatingHP: Creature;
-    const updateHP = (toAdd: number) => {
-        updatingHP.hp -= Number(toAdd);
-        updatingHP = null;
-        store.creatures.set([...creatures]);
-    };
-
-    let updatingStatus: Creature;
-    const addStatus = (tag: string) => {
-        updatingStatus.status.add(tag);
-        updatingStatus = null;
-        store.creatures.set([...creatures]);
-    };
 </script>
 
 <div>
     <div
         class="initiative-tracker-table"
         class:no-creatures={!creatures || numberOfCreatures == 0}
+        bind:this={el}
     >
         <div class="tracker-table-header">
             <span />
@@ -77,40 +67,14 @@
         {#each creatures as creature}
             <CreatureTemplate
                 {creature}
-                on:remove={remove}
-                on:hp={(evt) => (updatingHP = evt.detail)}
-                on:tag={(evt) => (updatingStatus = evt.detail)}
-                on:initiative={(evt) =>
-                    updateInitiative(evt.detail.creature, evt.detail.value)}
+                on:hp={(evt) => dispatch("update-hp", evt.detail)}
+                on:tag={(evt) => dispatch("update-tags", evt.detail)}
+                {show}
+                {state}
+                {current}
             />
         {/each}
     </div>
-    {#if updatingHP}
-        <div class="updating-hp">
-            <span>Apply damage or healing:</span>
-            <!-- svelte-ignore a11y-autofocus -->
-            <input
-                type="number"
-                autofocus
-                on:blur={function (evt) {
-                    updateHP(this.value);
-                }}
-            />
-        </div>
-    {/if}
-    {#if updatingStatus}
-        <div class="updating-hp">
-            <span>Apply status:</span>
-            <!-- svelte-ignore a11y-autofocus -->
-            <input
-                type="text"
-                autofocus
-                on:blur={function (evt) {
-                    addStatus(this.value);
-                }}
-            />
-        </div>
-    {/if}
 </div>
 
 <style>

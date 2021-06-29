@@ -1,7 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher, afterUpdate } from "svelte";
 
-    import { ExtraButtonComponent, Menu } from "obsidian";
+    import { ExtraButtonComponent, Menu, Notice } from "obsidian";
     import {
         DEFAULT_UNDEFINED,
         DISABLE,
@@ -15,33 +15,15 @@
     import type TrackerView from "src/view";
 
     export let creature: Creature;
+    export let show: boolean;
+    export let state: boolean;
+    export let current: number;
 
     const dispatch = createEventDispatcher();
 
     const updateName = (evt: FocusEvent) => {
         creature.name = (evt.target as HTMLInputElement).value;
-        editing = null;
     };
-
-    let current: Creature;
-    store.current.subscribe((value) => {
-        current = value;
-    });
-
-    let isActive: boolean = false;
-    store.active.subscribe((value) => {
-        isActive = value;
-    });
-
-    let show: boolean;
-    store.show.subscribe((value) => {
-        show = value;
-    });
-
-    let creatures: Creature[];
-    store.creatures.subscribe((value) => {
-        creatures = value;
-    });
 
     let view: TrackerView;
     store.view.subscribe((value) => {
@@ -53,7 +35,7 @@
             .setTooltip("Remove")
             .setIcon(REMOVE)
             .onClick(() => {
-                dispatch("remove", creature);
+                view.removeCreature(creature);
             });
     };
 
@@ -71,7 +53,7 @@
             .setTooltip("Enable")
             .setIcon(ENABLE)
             .onClick(() => {
-                creature.enabled = true;
+                view.setCreatureState(creature, true);
             });
     };
 
@@ -80,15 +62,7 @@
             .setTooltip("Disable")
             .setIcon(DISABLE)
             .onClick(() => {
-                creature.enabled = false;
-                if (current == creature) {
-                    const enabled = creatures.filter((c) => c.enabled);
-                    const index = enabled.indexOf(current);
-                    const c =
-                        (((index + 1) % enabled.length) + enabled.length) %
-                        enabled.length;
-                    store.current.set(enabled[c]);
-                }
+                view.setCreatureState(creature, false);
             });
     };
 
@@ -108,18 +82,7 @@
                     item.setIcon(DISABLE)
                         .setTitle("Disable")
                         .onClick(() => {
-                            creature.enabled = false;
-                            if (current == creature) {
-                                const enabled = creatures.filter(
-                                    (c) => c.enabled
-                                );
-                                const index = enabled.indexOf(current);
-                                const c =
-                                    (((index + 1) % enabled.length) +
-                                        enabled.length) %
-                                    enabled.length;
-                                store.current.set(enabled[c]);
-                            }
+                            view.setCreatureState(creature, false);
                         });
                 });
             } else {
@@ -127,7 +90,7 @@
                     item.setIcon(ENABLE)
                         .setTitle("Enable")
                         .onClick(() => {
-                            creature.enabled = true;
+                            view.setCreatureState(creature, true);
                         });
                 });
             }
@@ -143,6 +106,7 @@
     };
 
     $: statuses = Array.from(creature.status);
+    $: active = view.ordered[current];
     const deleteIcon = (node: HTMLElement, status: string) => {
         const icon = new ExtraButtonComponent(node)
             .setIcon("cross-in-box")
@@ -152,22 +116,16 @@
             });
         icon.extraSettingsEl.setAttr("style", "margin-left: 3px;");
     };
-
-    let editing: string = null;
     let initiativeInput: HTMLInputElement;
-
     afterUpdate(() => {
         initiativeInput.value = `${creature.initiative}`;
     });
 </script>
 
-<div
-    class="initiative-tracker-creature"
-    class:active={current == creature}
-    class:disabled={!creature.enabled}
->
+<div class="initiative-tracker-creature" class:disabled={!creature.enabled}>
+    <!-- class:active={current == creature} -->
     <span class="active-holder">
-        {#if current == creature}
+        {#if state && creature === active}
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
@@ -186,15 +144,23 @@
     </span>
     <input
         class="editable initiative tree-item-flair"
-        bind:this={initiativeInput}
         on:click={function (evt) {
             this.select();
         }}
         on:blur={function (evt) {
-            dispatch("initiative", { creature, value: Number(this.value) });
+            const value = this.value;
+            if (isNaN(Number(value)) || Number(value) < 1) {
+                new Notice("Enter a valid initiative.");
+                this.value = `${creature.initiative}`;
+                return;
+            }
+            if (creature.initiative == Number(value)) {
+                return;
+            }
+
+            view.updateCreature(creature, { initiative: value });
         }}
         on:keydown={function (evt) {
-            console.log("🚀 ~ file: Creature.svelte ~ line 197 ~ evt", evt);
             if (evt.key === "Enter" || evt.key === "Tab") {
                 evt.preventDefault();
                 this.blur();
@@ -202,9 +168,11 @@
             }
             if (!/^(\d*\.?\d*|Backspace|Delete|Arrow\w+)$/.test(evt.key)) {
                 evt.preventDefault();
-                return;
+                return false;
             }
         }}
+        value={creature.initiative}
+        bind:this={initiativeInput}
     />
     <!-- bind:value={creature.initiative} -->
     {#if creature.player}
@@ -262,7 +230,7 @@
     <span />
     <div class="statuses">
         {#each statuses as status}
-            <div class="status">
+            <div class="tag">
                 <span>{status}</span>
                 <div use:deleteIcon={status} />
             </div>
@@ -315,14 +283,16 @@
         display: flex;
         flex-flow: row wrap;
     }
-    .status {
-        margin-right: 0.1rem;
+
+    .tag {
         display: flex;
         align-items: center;
+        padding-right: 0px;
+        margin-right: 0.125rem;
     }
 
     .status .clickable-icon {
-        margin-left: 0;
+        margin: 0;
     }
     .center {
         text-align: center;

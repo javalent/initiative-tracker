@@ -17,9 +17,8 @@ import { Creature } from "./utils/creature";
 
 export default class TrackerView extends ItemView {
     public creatures: Creature[] = [];
-    public current: number;
+    public current: number = 0;
     public players: Creature[] = [];
-    public parentEl: HTMLElement;
     public state: boolean = false;
 
     private _app: App;
@@ -28,7 +27,7 @@ export default class TrackerView extends ItemView {
     constructor(public leaf: WorkspaceLeaf, public plugin: InitiativeTracker) {
         super(leaf);
 
-        this.players = [...this.plugin.players];
+        this.players = [...this.plugin.players.map((p) => new Creature(p))];
         this.creatures = [...this.players];
     }
 
@@ -36,6 +35,12 @@ export default class TrackerView extends ItemView {
         const creatures = [...this.creatures];
         creatures.sort((a, b) => b.initiative - a.initiative);
         return creatures;
+    }
+
+    get enabled() {
+        return this.ordered
+            .map((c, i) => c.enabled && i)
+            .filter((i) => typeof i === "number");
     }
 
     addCreatures(...creatures: Creature[]) {
@@ -49,26 +54,98 @@ export default class TrackerView extends ItemView {
     }
 
     removeCreature(...creatures: Creature[]) {
-        console.log("🚀 ~ file: view.ts ~ line 52 ~ creatures", creatures);
         for (let creature of creatures) {
             this.creatures = this.creatures.filter((c) => c != creature);
         }
-        console.log(
-            "🚀 ~ file: view.ts ~ line 55 ~ this.creatures",
-            this.creatures
-        );
 
         this.setAppState({
             creatures: this.ordered
         });
     }
-    goToNext() {}
-    goToPrevious() {}
+
+    newEncounter() {
+        this.creatures = [...this.players];
+
+        for (let creature of this.creatures) {
+            creature.hp = creature.max;
+            creature.status = new Set();
+            creature.enabled = true;
+            creature.initiative =
+                Math.floor(Math.random() * 19 + 1) + creature.modifier;
+        }
+        this.setAppState({
+            creatures: this.ordered
+        });
+    }
+
+    resetEncounter() {
+        for (let creature of this.creatures) {
+            creature.hp = creature.max;
+            creature.status = new Set();
+            creature.enabled = true;
+        }
+
+        this.current = this.enabled[0];
+
+        this.setAppState({
+            creatures: this.ordered
+        });
+    }
+
+    rollInitiatives() {
+        for (let creature of this.creatures) {
+            creature.initiative =
+                Math.floor(Math.random() * 19 + 1) + creature.modifier;
+        }
+
+        this.setAppState({
+            creatures: this.ordered
+        });
+    }
+
+    goToNext() {
+        const current = this.enabled.indexOf(this.current);
+
+        const next =
+            (((current + 1) % this.enabled.length) + this.enabled.length) %
+            this.enabled.length;
+
+        this.current = this.enabled[next];
+
+        this.setAppState({
+            state: this.state,
+            current: this.current
+        });
+    }
+    goToPrevious() {
+        const current = this.enabled.indexOf(this.current);
+        const next =
+            (((current - 1) % this.enabled.length) + this.enabled.length) %
+            this.enabled.length;
+
+        this.current = this.enabled[next];
+
+        this.setAppState({
+            state: this.state,
+            current: this.current
+        });
+    }
     toggleState() {
         this.state = !this.state;
 
+        if (this.state) {
+            this.current = this.enabled[0];
+        }
+
         this.setAppState({
-            state: this.state
+            state: this.state,
+            current: this.current
+        });
+    }
+    addStatus(creature: Creature, tag: string) {
+        creature.status.add(tag);
+        this.setAppState({
+            creatures: this.ordered
         });
     }
     updateCreature(
@@ -80,13 +157,50 @@ export default class TrackerView extends ItemView {
             name
         }: { hp?: number; ac?: number; initiative?: number; name?: string }
     ) {
-        creature.initiative = initiative;
+        if (initiative) {
+            creature.initiative = Number(initiative);
+        }
+        if (name) {
+            creature.name = name;
+        }
+        if (hp) {
+            creature.hp += Number(hp);
+        }
+        if (ac) {
+            creature.ac = ac;
+        }
 
         this.setAppState({
             creatures: this.ordered
         });
     }
-    setCreatureState(creature: Creature, state: "enabled" | "disabled") {}
+    setCreatureState(creature: Creature, enabled: boolean) {
+        if (enabled) {
+            this._enableCreature(creature);
+        } else {
+            this._disableCreature(creature);
+        }
+        if (!this.enabled.length) {
+            this.current = null;
+        }
+        this.setAppState({
+            creatures: this.ordered,
+            current: this.current
+        });
+    }
+    private _enableCreature(creature: Creature) {
+        creature.enabled = true;
+
+        if (this.enabled.length == 1) {
+            this.current = this.enabled[0];
+        }
+    }
+    private _disableCreature(creature: Creature) {
+        if (this.ordered[this.current] == creature) {
+            this.goToNext();
+        }
+        creature.enabled = false;
+    }
 
     setAppState(state: { [key: string]: any }) {
         if (this._app && this._rendered) {
@@ -95,16 +209,17 @@ export default class TrackerView extends ItemView {
     }
     async onOpen() {
         this.creatures = [...this.plugin.players.map((p) => new Creature(p))];
-        this.parentEl = this.containerEl.parentElement;
-
+        /*  */
         this._app = new App({
             target: this.contentEl,
             props: {
                 view: this,
-                creatures: this.creatures,
+                creatures: this.ordered,
                 show:
                     this.contentEl.getBoundingClientRect().width <
-                    MIN_WIDTH_FOR_HAMBURGER
+                    MIN_WIDTH_FOR_HAMBURGER,
+                state: this.state,
+                current: this.current
             }
         });
 

@@ -1,59 +1,38 @@
 <script lang="ts">
     import { ExtraButtonComponent, Notice } from "obsidian";
-    import { afterUpdate } from "svelte";
-    import { SAVE } from "src/utils";
-    import { Creature } from "src/utils/creature";
 
-    import store, { creatures } from "./store";
-    import { SRDMonsterSuggestionModal } from "src/utils/suggester";
+    import { onMount } from "svelte";
+    import { createEventDispatcher } from "svelte";
+
+    import { DICE, SAVE } from "src/utils";
+
+    import store from "./store";
+
     import type TrackerView from "src/view";
+    import { SRDMonsterSuggestionModal } from "src/utils/suggester";
+
+    const dispatch = createEventDispatcher();
 
     let view: TrackerView;
     store.view.subscribe((v) => (view = v));
 
-    let addNew: boolean = false;
     let name: string;
     let hp: string;
-    let initiative: string;
+    let initiative: number;
     let ac: string;
+    let modifier: number = 0;
 
-    const addButton = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setTooltip("Add Creature")
-            .setIcon("plus-with-circle")
-            .onClick(() => {
-                addNew = true;
-            });
-    };
     const saveButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Add Creature")
             .setIcon(SAVE)
             .onClick(() => {
-                if (!name) {
+                if (!name.length) {
                     new Notice("Enter a name!");
                     return;
                 }
 
-                addNew = false;
-                creatures.update((c) => {
-                    c.push(
-                        new Creature({
-                            name,
-                            hp: hp ? Number(hp) : undefined,
-                            initiative: initiative
-                                ? Number(initiative)
-                                : Math.floor(Math.random() * 19 + 1),
-                            ac: ac ? Number(ac) : undefined
-                        })
-                    );
-                    return c;
-                });
-                name = undefined;
-                hp = undefined;
-				ac = undefined;
-                initiative = undefined;
-                ac = undefined;
+                dispatch("save", { name, hp, initiative, ac, modifier });
             });
     };
     const cancelButton = (node: HTMLElement) => {
@@ -61,102 +40,79 @@
             .setTooltip("Cancel")
             .setIcon("cross")
             .onClick(() => {
-                addNew = false;
-                name = undefined;
-                hp = undefined;
-				ac = undefined;
-                initiative = undefined;
+                dispatch("cancel");
+            });
+    };
+    const diceButton = (node: HTMLElement) => {
+        new ExtraButtonComponent(node)
+            .setIcon(DICE)
+            .setTooltip("Roll Initiative")
+            .onClick(() => {
+                initiative = Math.floor(Math.random() * 19 + 1) + modifier;
             });
     };
 
-    let nameInput: HTMLInputElement, modal: SRDMonsterSuggestionModal;
-    afterUpdate(() => {
-        if (nameInput) {
-            modal = new SRDMonsterSuggestionModal(view.plugin.app, nameInput);
-            modal.onClose = () => {
-                console.log(
-                    "🚀 ~ file: Create.svelte ~ line 75 ~ modal.creature",
-                    modal.creature
-                );
-                if (modal.creature) {
-                    name = modal.creature.name;
-                    hp = `${modal.creature.hp}`;
-                    ac = `${modal.creature.ac}`;
-                    initiative = `${Math.floor(Math.random() * 19 + 1)}`; //TODO: Add Modifier;
-                }
-            };
-        }
+    let nameInput: HTMLInputElement;
+
+    let modal: SRDMonsterSuggestionModal;
+    onMount(() => {
+        modal = new SRDMonsterSuggestionModal(view.plugin.app, nameInput);
     });
+    const openModal = () => {
+        modal.onClose = () => {
+            if (modal.creature) {
+                name = modal.creature.name;
+                hp = `${modal.creature.hp}`;
+                ac = `${modal.creature.ac}`;
+                const dex = (modal.creature.stats ?? [0, 10])[1];
+                modifier = Math.floor((dex - 10) / 2);
+                initiative = Math.floor(Math.random() * 19 + 1) + modifier;
+            }
+        };
+
+        modal.open();
+    };
 </script>
 
-<div class="add-creature-container">
-    {#if addNew}
-        <div class="create-new">
-            <div>
-                <label for="add-name">Name</label>
-                <!-- svelte-ignore a11y-autofocus -->
-                <input
-                    bind:value={name}
-                    bind:this={nameInput}
-                    on:click={() => modal.open()}
-                    id="add-name"
-                    type="text"
-                    name="name"
-                    tabindex="0"
-					autofocus
-                />
-            </div>
-            <div>
-                <label for="add-hp">HP</label>
-                <input
-                    bind:value={hp}
-                    id="add-hp"
-                    type="text"
-                    name="hp"
-                    tabindex="0"
-                />
-            </div>
-            <div>
-                <label for="add-ac">AC</label>
-                <input
-                    bind:value={ac}
-                    id="add-ac"
-                    type="text"
-                    name="ac"
-                    tabindex="0"
-                />
-            </div>
-            <div>
-                <label for="add-init">Initiative</label>
-                <input
-                    bind:value={initiative}
-                    id="add-init"
-                    type="text"
-                    name="initiative"
-                    tabindex="0"
-                />
-            </div>
-        </div>
-        <div class="context-buttons">
-            <div class="add-button" use:saveButton />
-            <div use:cancelButton class="add-button cancel-button" />
-        </div>
-    {:else}
-        <div use:addButton class="add-button" />
-    {/if}
+<div class="create-new">
+    <div>
+        <label for="add-name">Name</label>
+        <input
+            bind:value={name}
+            bind:this={nameInput}
+            on:focus={openModal}
+            id="add-name"
+            type="text"
+            name="name"
+            tabindex="0"
+        />
+    </div>
+    <div>
+        <label for="add-hp">HP</label>
+        <input bind:value={hp} id="add-hp" type="text" name="hp" tabindex="0" />
+    </div>
+    <div>
+        <label for="add-ac">AC</label>
+        <input bind:value={ac} id="add-ac" type="text" name="ac" tabindex="0" />
+    </div>
+    <div class="initiative">
+        <label for="add-init">Initiative</label>
+        <input
+            bind:value={initiative}
+            id="add-init"
+            type="text"
+            name="initiative"
+            tabindex="0"
+        />
+        <div class="dice" use:diceButton />
+    </div>
+</div>
+<div class="context-buttons">
+    <div class="add-button" use:saveButton />
+    <div use:cancelButton class="add-button cancel-button" />
 </div>
 
 <style>
-    .add-creature-container {
-        display: flex;
-        flex-flow: column nowrap;
-        justify-content: flex-start;
-        height: 25px;
-        margin-right: 0.5rem;
-    }
-    .add-button {
-        align-self: flex-end;
-    }
     .create-new > * {
         display: flex;
         justify-content: space-between;
@@ -170,5 +126,15 @@
     }
     .cancel-button {
         color: var(--text-faint);
+    }
+
+    .initiative {
+        position: relative;
+    }
+    .initiative > .dice {
+        position: absolute;
+        right: 0.1rem;
+        top: 50%;
+        transform: translateY(-50%);
     }
 </style>

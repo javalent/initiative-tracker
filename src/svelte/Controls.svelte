@@ -1,31 +1,16 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
     import { ExtraButtonComponent } from "obsidian";
 
     import store from "./store";
     import { BACKWARD, DICE, FORWARD, NEW, PLAY, REDO, STOP } from "src/utils";
-    import type { Creature } from "src/utils/creature";
+
     import type TrackerView from "src/view";
 
-    const dispatch = createEventDispatcher();
-
     let active: boolean = false,
-        creatures: Creature[] = [],
-        current: Creature,
         view: TrackerView;
-
-    store.creatures.subscribe((value) => {
-        creatures = value;
-        creatures.sort((a, b) => b.initiative - a.initiative);
-    });
-    store.current.subscribe((value) => {
-        current = value;
-    });
     store.view.subscribe((value) => {
         view = value;
     });
-
-    store.active.set(active);
 
     const playButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -33,12 +18,8 @@
             .setTooltip("Play") /* 
             .setDisabled(numberOfCreatures == 0) */
             .onClick(() => {
-                dispatch("play");
-                /* const enabled = creatures.filter((c) => c.enabled);
-                store.current.set(enabled[0]);
-                active = true;
-                store.active.set(active);
-                view.plugin.active = active; */
+                view.toggleState();
+                active = view.state;
             });
     };
     const stopButton = (node: HTMLElement) => {
@@ -47,11 +28,8 @@
             .setTooltip("Stop") /* 
             .setDisabled(numberOfCreatures == 0) */
             .onClick(() => {
-                dispatch("stop");
-                /* active = false;
-                store.active.set(active);
-                store.current.set(null);
-                view.plugin.active = active; */
+                view.toggleState();
+                active = view.state;
             });
     };
     const nextButton = (node: HTMLElement) => {
@@ -59,13 +37,7 @@
             .setIcon(FORWARD)
             .setTooltip("Next")
             .onClick(() => {
-                dispatch("go-to-next");
-                /* const enabled = creatures.filter((c) => c.enabled);
-                const index = enabled.indexOf(current);
-                const c =
-                    (((index + 1) % enabled.length) + enabled.length) %
-                    enabled.length;
-                store.current.set(enabled[c]); */
+                view.goToNext();
             });
     };
     const prevButton = (node: HTMLElement) => {
@@ -73,27 +45,16 @@
             .setIcon(BACKWARD)
             .setTooltip("Previous")
             .onClick(() => {
-                dispatch("go-to-previous");
-                /* const enabled = creatures.filter((c) => c.enabled);
-                const index = enabled.indexOf(current);
-                const c =
-                    (((index - 1) % enabled.length) + enabled.length) %
-                    enabled.length;
-                store.current.set(enabled[c]); */
+                view.goToPrevious();
             });
     };
 
     const restoreButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setIcon(REDO)
-            .setTooltip("Reset HP & status")
+            .setTooltip("Reset HP & Status")
             .onClick(() => {
-                dispatch("reset-encounter");
-                /* for (let creature of creatures) {
-                    creature.hp = creature.max;
-                    creature.status = new Set();
-                }
-                store.creatures.set([...creatures]); */
+                view.resetEncounter();
             });
     };
     const newButton = (node: HTMLElement) => {
@@ -101,7 +62,7 @@
             .setIcon(NEW)
             .setTooltip("New Encounter")
             .onClick(() => {
-                dispatch("new-encounter");
+                view.newEncounter();
             });
     };
 
@@ -110,11 +71,7 @@
             .setIcon(DICE)
             .setTooltip("Re-roll Initiatives")
             .onClick(() => {
-                dispatch("reroll-initiative");
-                for (let creature of creatures) {
-                    creature.initiative = Math.floor(Math.random() * 19 + 1);
-                }
-                store.creatures.set([...creatures]);
+                view.rollInitiatives();
             });
     };
 </script>
