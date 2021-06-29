@@ -10,7 +10,7 @@ import type { Creature } from "./utils/creature";
 
 export default class InitiativeTracker extends Plugin {
     private view: TrackerView;
-    public active: boolean = false;
+
     public data: InitiativeTrackerData;
     get players(): Creature[] {
         return this.data.players;
@@ -55,8 +55,7 @@ export default class InitiativeTracker extends Plugin {
                         ).length != 0
                     );
                 }
-
-                /* this.view.toggleEncounter(); */
+                this.view.toggleState();
             }
         });
         this.addCommand({
@@ -67,11 +66,10 @@ export default class InitiativeTracker extends Plugin {
                     return (
                         this.app.workspace.getLeavesOfType(
                             INTIATIVE_TRACKER_VIEW
-                        ).length != 0 && this.active
+                        ).length != 0 && this.view.state
                     );
                 }
-
-                /* this.view.nextCombatant(); */
+                this.view.goToNext();
             }
         });
         this.addCommand({
@@ -82,11 +80,10 @@ export default class InitiativeTracker extends Plugin {
                     return (
                         this.app.workspace.getLeavesOfType(
                             INTIATIVE_TRACKER_VIEW
-                        ).length != 0 && this.active
+                        ).length != 0 && this.view.state
                     );
                 }
-
-                /* this.view.previousCombatant(); */
+                this.view.goToPrevious();
             }
         });
 

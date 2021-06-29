@@ -6,8 +6,9 @@
 
     import type TrackerView from "src/view";
 
-    let active: boolean = false,
-        view: TrackerView;
+    export let state: boolean = false;
+    
+    let view: TrackerView;
     store.view.subscribe((value) => {
         view = value;
     });
@@ -19,7 +20,7 @@
             .setDisabled(numberOfCreatures == 0) */
             .onClick(() => {
                 view.toggleState();
-                active = view.state;
+                state = view.state;
             });
     };
     const stopButton = (node: HTMLElement) => {
@@ -29,7 +30,7 @@
             .setDisabled(numberOfCreatures == 0) */
             .onClick(() => {
                 view.toggleState();
-                active = view.state;
+                state = view.state;
             });
     };
     const nextButton = (node: HTMLElement) => {
@@ -78,7 +79,7 @@
 
 <div class="buttons">
     <div class="state">
-        {#if active}
+        {#if state}
             <div use:stopButton />
             <div use:prevButton />
             <div use:nextButton />

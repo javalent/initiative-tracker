@@ -209,7 +209,7 @@ export default class TrackerView extends ItemView {
     }
     async onOpen() {
         this.creatures = [...this.plugin.players.map((p) => new Creature(p))];
-        /*  */
+
         this._app = new App({
             target: this.contentEl,
             props: {
