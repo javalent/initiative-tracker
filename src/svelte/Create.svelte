@@ -27,12 +27,18 @@
             .setTooltip("Add Creature")
             .setIcon(SAVE)
             .onClick(() => {
-                if (!name.length) {
+                if (!name || !name.length) {
                     new Notice("Enter a name!");
                     return;
                 }
 
-                dispatch("save", { name, hp, initiative, ac, modifier });
+                dispatch("save", {
+                    name,
+                    hp,
+                    initiative: initiative - modifier,
+                    ac,
+                    modifier
+                });
             });
     };
     const cancelButton = (node: HTMLElement) => {
@@ -57,8 +63,6 @@
     let modal: SRDMonsterSuggestionModal;
     onMount(() => {
         modal = new SRDMonsterSuggestionModal(view.plugin.app, nameInput);
-    });
-    const openModal = () => {
         modal.onClose = () => {
             if (modal.creature) {
                 name = modal.creature.name;
@@ -69,7 +73,9 @@
                 initiative = Math.floor(Math.random() * 19 + 1) + modifier;
             }
         };
+    });
 
+    const openModal = () => {
         modal.open();
     };
 </script>
@@ -77,6 +83,7 @@
 <div class="create-new">
     <div>
         <label for="add-name">Name</label>
+        <!-- svelte-ignore a11y-autofocus -->
         <input
             bind:value={name}
             bind:this={nameInput}
@@ -85,6 +92,7 @@
             type="text"
             name="name"
             tabindex="0"
+            autofocus
         />
     </div>
     <div>
@@ -114,8 +122,8 @@
 
 <style>
     .create-new > * {
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 33% 66%;
         margin-bottom: 0.5rem;
     }
     .context-buttons {
@@ -133,7 +141,7 @@
     }
     .initiative > .dice {
         position: absolute;
-        right: 0.1rem;
+        right: 0.25rem;
         top: 50%;
         transform: translateY(-50%);
     }

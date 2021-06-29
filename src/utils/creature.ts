@@ -32,14 +32,14 @@ export class Creature {
         this._initiative = Number(
             initiative ?? Math.floor(Math.random() * 19 + 1)
         );
-        this.modifier = modifier ?? 0;
+        this.modifier = Number(modifier ?? 0);
 
-        this.max = hp;
-        this.hp = this.max;
-        this.ac = ac;
+        this.max = hp ? Number(hp) : undefined;
+        this.ac = ac ? Number(hp) : undefined;
         this.note = note;
-
         this.player = player;
+
+        this.hp = this.max;
     }
     get hpDisplay() {
         if (this.max) {

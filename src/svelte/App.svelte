@@ -69,7 +69,7 @@
                 type="number"
                 autofocus
                 on:blur={function (evt) {
-                    updateHP(this.value);
+                    updateHP(Number(this.value));
                 }}
                 on:keydown={function (evt) {
                     if (evt.key === "Enter" || evt.key === "Tab") {
@@ -101,10 +101,18 @@
                 type="text"
                 autofocus
                 on:blur={function (evt) {
-                    if (!this.value.length) return;
+                    if (!this.value.length) {
+                        updatingStatus = null;
+                        return;
+                    }
                     addStatus(this.value);
                 }}
                 on:keydown={function (evt) {
+                    if (evt.key === "Escape") {
+                        this.value = "";
+                        this.blur();
+                        return;
+                    }
                     if (evt.key === "Enter" || evt.key === "Tab") {
                         evt.preventDefault();
                         this.blur();

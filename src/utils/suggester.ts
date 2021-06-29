@@ -95,6 +95,7 @@ class Suggester<T> {
     }
     useSelectedItem(event: MouseEvent | KeyboardEvent) {
         if (!this.items || !this.items.length) return;
+
         const currentValue = this.items[this.selectedItem];
 
         if (currentValue) {
@@ -146,7 +147,7 @@ abstract class SuggestionModal<T> extends FuzzySuggestModal<T> {
         this.scope.register([], "Escape", this.close.bind(this));
 
         this.inputEl.addEventListener("input", this.onInputChanged.bind(this));
-        this.inputEl.addEventListener("focus", this.onInputChanged.bind(this));
+        /* this.inputEl.addEventListener("focus", this.onInputChanged.bind(this)); */
         this.inputEl.addEventListener("blur", this.close.bind(this));
         this.suggestEl.on(
             "mousedown",
@@ -269,6 +270,7 @@ export class FileSuggestionModal extends SuggestionModal<TFile> {
             cls: "suggestion-content icon"
         });
         if (!item) {
+            this.suggester.selectedItem = null;
             content.setText(this.emptyStateText);
             content.parentElement.addClass("is-selected");
             return;
@@ -330,10 +332,12 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<SRDMonster> {
     }
     renderSuggestion(result: FuzzyMatch<SRDMonster>, el: HTMLElement) {
         let { item, match: matches } = result || {};
+
         let content = el.createDiv({
             cls: "suggestion-content icon"
         });
         if (!item) {
+            this.suggester.selectedItem = null;
             content.setText(this.emptyStateText);
             content.parentElement.addClass("is-selected");
             return;

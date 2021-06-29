@@ -22,7 +22,7 @@
     const dispatch = createEventDispatcher();
 
     const updateName = (evt: FocusEvent) => {
-        creature.name = (evt.target as HTMLInputElement).value;
+        creature.name = (evt.target as HTMLSpanElement).textContent;
     };
 
     let view: TrackerView;
@@ -98,7 +98,7 @@
                 item.setIcon(REMOVE)
                     .setTitle("Remove")
                     .onClick(() => {
-                        dispatch("remove", creature);
+                        view.removeCreature(creature);
                     });
             });
             menu.showAtPosition(evt);
@@ -120,6 +120,9 @@
     afterUpdate(() => {
         initiativeInput.value = `${creature.initiative}`;
     });
+    /*     function select(el: Node) {
+        window.getSelection().selectAllChildren(el);
+    } */
 </script>
 
 <div class="initiative-tracker-creature" class:disabled={!creature.enabled}>
@@ -142,48 +145,49 @@
             >
         {/if}
     </span>
-    <input
-        class="editable initiative tree-item-flair"
-        on:click={function (evt) {
-            this.select();
-        }}
-        on:blur={function (evt) {
-            const value = this.value;
-            if (isNaN(Number(value)) || Number(value) < 1) {
-                new Notice("Enter a valid initiative.");
-                this.value = `${creature.initiative}`;
-                return;
-            }
-            if (creature.initiative == Number(value)) {
-                return;
-            }
-
-            view.updateCreature(creature, { initiative: value });
-        }}
-        on:keydown={function (evt) {
-            if (evt.key === "Enter" || evt.key === "Tab") {
-                evt.preventDefault();
-                this.blur();
-                return;
-            }
-            if (!/^(\d*\.?\d*|Backspace|Delete|Arrow\w+)$/.test(evt.key)) {
-                evt.preventDefault();
-                return false;
-            }
-        }}
-        value={creature.initiative}
-        bind:this={initiativeInput}
-    />
-    <!-- bind:value={creature.initiative} -->
-    {#if creature.player}
-        <small>{creature.name}</small>
-    {:else}
+    <!-- <div class="tree-item-self"> -->
+    <div class="tree-item-flair-outer">
         <input
-            class="editable name"
-            type="text"
-            on:focus={function (evt) {
+            class="editable initiative tree-item-flair"
+            on:click={function (evt) {
                 this.select();
             }}
+            on:blur={function (evt) {
+                const value = this.value;
+                if (isNaN(Number(value)) || Number(value) < 1) {
+                    new Notice("Enter a valid initiative.");
+                    this.value = `${creature.initiative}`;
+                    return;
+                }
+                if (creature.initiative == Number(value)) {
+                    return;
+                }
+
+                view.updateCreature(creature, { initiative: value });
+            }}
+            on:keydown={function (evt) {
+                if (evt.key === "Enter" || evt.key === "Tab") {
+                    evt.preventDefault();
+                    this.blur();
+                    return;
+                }
+                if (!/^(\d*\.?\d*|Backspace|Delete|Arrow\w+)$/.test(evt.key)) {
+                    evt.preventDefault();
+                    return false;
+                }
+            }}
+            value={creature.initiative}
+            bind:this={initiativeInput}
+        />
+    </div>
+    <!-- </div> -->
+    {#if creature.player}
+        <small class="name">{creature.name}</small>
+    {:else}
+        <span
+            contenteditable
+            class="editable name"
+            type="text"
             on:blur={updateName}
             on:keydown={function (evt) {
                 if (evt.key === "Enter" || evt.key === "Tab") {
@@ -191,9 +195,8 @@
                     this.blur();
                     return;
                 }
-            }}
-            bind:value={creature.name}
-        />
+            }}>{creature.name}</span
+        >
     {/if}
 
     <div class="center">
@@ -208,7 +211,7 @@
     <span class="center">{creature.ac ?? DEFAULT_UNDEFINED}</span>
     <div class="controls">
         <div class="add-button icon" class:show use:hamburgerIcon />
-        <div class="add-button tags" class:show={!show} use:tagButton />
+        <!--  <div class="add-button tags" class:show={!show} use:tagButton />
         {#if creature.enabled}
             <div
                 class="add-button enable"
@@ -222,7 +225,7 @@
                 use:enableButton
             />
         {/if}
-        <div class="add-button delete" class:show={!show} use:deleteButton />
+        <div class="add-button delete" class:show={!show} use:deleteButton /> -->
     </div>
 
     <!-- {#if creature.status.length} -->
@@ -253,22 +256,26 @@
     .active-holder {
         margin-left: -0.5rem;
     }
+    .tree-item-flair-outer::after {
+        content: "";
+    }
     .initiative-tracker-creature .initiative {
         display: block;
         padding: 0;
-        width: 12px;
-        text-align: right;
+        width: 20px;
+        text-align: center;
         white-space: nowrap;
         margin-left: -0.5rem;
         user-select: all;
-        background-color: inherit;
         border: 0;
+        color: inherit;
     }
+
     .initiative-tracker-creature .name {
         display: block;
         text-align: left;
-        white-space: nowrap;
-        user-select: all;
+        /* white-space: nowrap; */
+        /* user-select: all; */
         background-color: inherit;
         border: 0;
         font-size: smaller;

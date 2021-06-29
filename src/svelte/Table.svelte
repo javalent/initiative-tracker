@@ -1,18 +1,14 @@
 <script lang="ts">
     import { setIcon } from "obsidian";
-    import { AC, HP, MIN_WIDTH_FOR_HAMBURGER } from "src/utils";
+    import { AC, HP } from "src/utils";
 
     import type TrackerView from "src/view";
 
     import CreatureTemplate from "./Creature.svelte";
-
-    import store from "./store";
-
     import { createEventDispatcher } from "svelte";
 
     const dispatch = createEventDispatcher();
 
-    let numberOfCreatures: number = 0;
     export let creatures: any[] = [];
     export let show: boolean = false;
     export let state: boolean;
@@ -20,27 +16,6 @@
 
     let view: TrackerView;
     let el: HTMLElement;
-    function checkOverflow() {
-        const curOverflow = el.style.overflow;
-
-        if (!curOverflow || curOverflow === "visible")
-            el.style.overflow = "hidden";
-
-        const isOverflowing = el.clientWidth < el.scrollWidth;
-        el.style.overflow = curOverflow;
-
-        return isOverflowing;
-    }
-    store.view.subscribe((value) => {
-        view = value;
-        view.onResize = () => {
-            if (el.clientWidth < MIN_WIDTH_FOR_HAMBURGER && !show) {
-                show = checkOverflow();
-            } else if (el.clientWidth > MIN_WIDTH_FOR_HAMBURGER) {
-                show = checkOverflow();
-            }
-        };
-    });
 
     const hpIcon = (node: HTMLElement) => {
         setIcon(node, HP);
@@ -51,33 +26,40 @@
 </script>
 
 <div>
-    <div
-        class="initiative-tracker-table"
-        class:no-creatures={!creatures || numberOfCreatures == 0}
-        bind:this={el}
-    >
-        <div class="tracker-table-header">
-            <span />
-            <span />
-            <span>Name</span>
-            <span use:hpIcon class="center" />
-            <span use:acIcon class="center" />
-            <span />
+    {#if creatures.length}
+        <div class="initiative-tracker-table" bind:this={el}>
+            <div class="tracker-table-header">
+                <span />
+                <span />
+                <span class="left">Name</span>
+                <span use:hpIcon class="center" />
+                <span use:acIcon class="center" />
+                <span />
+            </div>
+            {#each creatures as creature}
+                <CreatureTemplate
+                    {creature}
+                    on:hp={(evt) => dispatch("update-hp", evt.detail)}
+                    on:tag={(evt) => dispatch("update-tags", evt.detail)}
+                    {show}
+                    {state}
+                    {current}
+                />
+            {/each}
         </div>
-        {#each creatures as creature}
-            <CreatureTemplate
-                {creature}
-                on:hp={(evt) => dispatch("update-hp", evt.detail)}
-                on:tag={(evt) => dispatch("update-tags", evt.detail)}
-                {show}
-                {state}
-                {current}
-            />
-        {/each}
-    </div>
+    {:else}
+        <div class="no-creatures">
+            <p>Add a creature to get started!</p>
+            <small>Players may be created in settings.</small>
+        </div>
+    {/if}
 </div>
 
 <style>
+    .no-creatures {
+        margin: 1rem;
+        text-align: center;
+    }
     .initiative-tracker-table {
         padding: 0.5rem;
         display: grid;
@@ -87,6 +69,9 @@
         width: 100%;
         margin-left: 0rem;
     }
+    .left {
+        text-align: left;
+    }
     .center {
         text-align: center;
     }
@@ -94,9 +79,6 @@
     .tracker-table-header {
         display: contents;
         font-weight: bolder;
-    }
-    .initiative-tracker-table.no-creatures {
-        align-items: center;
     }
     .updating-hp {
         display: grid;

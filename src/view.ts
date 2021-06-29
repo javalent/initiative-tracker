@@ -67,8 +67,6 @@ export default class TrackerView extends ItemView {
         this.creatures = [...this.players];
 
         for (let creature of this.creatures) {
-            creature.hp = creature.max;
-            creature.status = new Set();
             creature.enabled = true;
             creature.initiative =
                 Math.floor(Math.random() * 19 + 1) + creature.modifier;
