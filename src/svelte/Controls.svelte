@@ -86,7 +86,7 @@
     const restoreButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setIcon(REDO)
-            .setTooltip("Reset HP")
+            .setTooltip("Reset HP & status")
             .onClick(() => {
                 dispatch("reset-encounter");
                 /* for (let creature of creatures) {

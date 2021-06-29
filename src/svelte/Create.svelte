@@ -30,7 +30,7 @@
             .setTooltip("Add Creature")
             .setIcon(SAVE)
             .onClick(() => {
-                if (!name.length) {
+                if (!name) {
                     new Notice("Enter a name!");
                     return;
                 }
@@ -51,6 +51,7 @@
                 });
                 name = undefined;
                 hp = undefined;
+				ac = undefined;
                 initiative = undefined;
                 ac = undefined;
             });
@@ -63,6 +64,7 @@
                 addNew = false;
                 name = undefined;
                 hp = undefined;
+				ac = undefined;
                 initiative = undefined;
             });
     };
@@ -92,6 +94,7 @@
         <div class="create-new">
             <div>
                 <label for="add-name">Name</label>
+                <!-- svelte-ignore a11y-autofocus -->
                 <input
                     bind:value={name}
                     bind:this={nameInput}
@@ -100,6 +103,7 @@
                     type="text"
                     name="name"
                     tabindex="0"
+					autofocus
                 />
             </div>
             <div>

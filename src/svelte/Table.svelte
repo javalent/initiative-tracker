@@ -88,8 +88,10 @@
     {#if updatingHP}
         <div class="updating-hp">
             <span>Apply damage or healing:</span>
+            <!-- svelte-ignore a11y-autofocus -->
             <input
                 type="number"
+                autofocus
                 on:blur={function (evt) {
                     updateHP(this.value);
                 }}
@@ -99,8 +101,10 @@
     {#if updatingStatus}
         <div class="updating-hp">
             <span>Apply status:</span>
+            <!-- svelte-ignore a11y-autofocus -->
             <input
                 type="text"
+                autofocus
                 on:blur={function (evt) {
                     addStatus(this.value);
                 }}
