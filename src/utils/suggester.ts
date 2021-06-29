@@ -96,6 +96,10 @@ class Suggester<T> {
     useSelectedItem(event: MouseEvent | KeyboardEvent) {
         if (!this.items || !this.items.length) return;
         const currentValue = this.items[this.selectedItem];
+        console.log(
+            "🚀 ~ file: suggester.ts ~ line 99 ~ currentValue",
+            currentValue
+        );
         if (currentValue) {
             this.owner.selectSuggestion(currentValue, event);
         }
@@ -321,8 +325,13 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<SRDMonster> {
         this.creature = item;
     }
     selectSuggestion({ item }: FuzzyMatch<SRDMonster>) {
+        console.log("🚀 ~ file: suggester.ts ~ line 324 ~ item", item);
         this.inputEl.value = item.name;
         this.creature = item;
+        console.log(
+            "🚀 ~ file: suggester.ts ~ line 327 ~ this.creature",
+            this.creature
+        );
 
         this.onClose();
         this.close();

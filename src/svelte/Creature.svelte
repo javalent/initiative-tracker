@@ -191,9 +191,10 @@
             this.select();
         }}
         on:blur={function (evt) {
-            dispatch("initiative", { creature, value: this.value });
+            dispatch("initiative", { creature, value: Number(this.value) });
         }}
         on:keydown={function (evt) {
+            console.log("🚀 ~ file: Creature.svelte ~ line 197 ~ evt", evt);
             if (evt.key === "Enter" || evt.key === "Tab") {
                 evt.preventDefault();
                 this.blur();
@@ -204,8 +205,8 @@
                 return;
             }
         }}
-        bind:value={creature.initiative}
     />
+    <!-- bind:value={creature.initiative} -->
     {#if creature.player}
         <small>{creature.name}</small>
     {:else}

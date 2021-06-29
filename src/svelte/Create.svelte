@@ -52,6 +52,7 @@
                 name = undefined;
                 hp = undefined;
                 initiative = undefined;
+                ac = undefined;
             });
     };
     const cancelButton = (node: HTMLElement) => {

@@ -24,7 +24,7 @@
     store.show.set(show);
 
     beforeUpdate(() => {
-        store.creatures.set(creatures);
+        console.log(creatures);
         show =
             view.parentEl.getBoundingClientRect().width <
             MIN_WIDTH_FOR_HAMBURGER;
@@ -51,7 +51,7 @@
 
 <div class="obsidian-initiative-tracker">
     <Controls on:new-encounter={() => dispatch("new-encounter")} />
-    <Table />
+    <Table {creatures} />
     <Create />
 </div>
 

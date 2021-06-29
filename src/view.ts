@@ -16,43 +16,81 @@ import App from "./svelte/App.svelte";
 import { Creature } from "./utils/creature";
 
 export default class TrackerView extends ItemView {
-    public state: boolean = false;
     public creatures: Creature[] = [];
+    public current: number;
+    public players: Creature[] = [];
+    public parentEl: HTMLElement;
+    public state: boolean = false;
 
     private _app: App;
-    parentEl: HTMLElement;
     private _rendered: boolean = false;
-    players: Creature[];
 
     constructor(public leaf: WorkspaceLeaf, public plugin: InitiativeTracker) {
         super(leaf);
-        this.creatures = [...this.plugin.players.map((p) => new Creature(p))];
+
+        this.players = [...this.plugin.players];
+        this.creatures = [...this.players];
     }
 
-    get stateIcon() {
-        return this.state ? STOP : PLAY;
-    }
-    get stateMessage() {
-        return this.state ? "End" : "Start";
+    get ordered() {
+        const creatures = [...this.creatures];
+        creatures.sort((a, b) => b.initiative - a.initiative);
+        return creatures;
     }
 
-    getViewType() {
-        return INTIATIVE_TRACKER_VIEW;
-    }
-    getDisplayText() {
-        return "Initiative Tracker";
-    }
-    getIcon() {
-        return BASE;
-    }
     addCreatures(...creatures: Creature[]) {
         for (let creature of creatures) {
-            this.creatures.push(new Creature(creature));
+            this.creatures.push(creature);
         }
+
+        this.setAppState({
+            creatures: this.ordered
+        });
+    }
+
+    removeCreature(...creatures: Creature[]) {
+        console.log("🚀 ~ file: view.ts ~ line 52 ~ creatures", creatures);
+        for (let creature of creatures) {
+            this.creatures = this.creatures.filter((c) => c != creature);
+        }
+        console.log(
+            "🚀 ~ file: view.ts ~ line 55 ~ this.creatures",
+            this.creatures
+        );
+
+        this.setAppState({
+            creatures: this.ordered
+        });
+    }
+    goToNext() {}
+    goToPrevious() {}
+    toggleState() {
+        this.state = !this.state;
+
+        this.setAppState({
+            state: this.state
+        });
+    }
+    updateCreature(
+        creature: Creature,
+        {
+            hp,
+            ac,
+            initiative,
+            name
+        }: { hp?: number; ac?: number; initiative?: number; name?: string }
+    ) {
+        creature.initiative = initiative;
+
+        this.setAppState({
+            creatures: this.ordered
+        });
+    }
+    setCreatureState(creature: Creature, state: "enabled" | "disabled") {}
+
+    setAppState(state: { [key: string]: any }) {
         if (this._app && this._rendered) {
-            this._app.$set({
-                creatures: this.creatures
-            });
+            this._app.$set(state);
         }
     }
     async onOpen() {
@@ -80,5 +118,15 @@ export default class TrackerView extends ItemView {
     async onClose() {
         this._app.$destroy();
         this._rendered = false;
+    }
+
+    getViewType() {
+        return INTIATIVE_TRACKER_VIEW;
+    }
+    getDisplayText() {
+        return "Initiative Tracker";
+    }
+    getIcon() {
+        return BASE;
     }
 }

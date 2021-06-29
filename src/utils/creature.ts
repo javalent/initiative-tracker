@@ -50,7 +50,7 @@ export class Creature {
         return this._initiative + this.modifier;
     }
     set initiative(x: number) {
-        this._initiative = x;
+        this._initiative = Number(x) - this.modifier;
     }
 
     *[Symbol.iterator]() {
