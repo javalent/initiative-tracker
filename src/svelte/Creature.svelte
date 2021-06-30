@@ -30,7 +30,7 @@
         view = value;
     });
 
-    const deleteButton = (node: HTMLElement) => {
+/*     const deleteButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Remove")
             .setIcon(REMOVE)
@@ -64,7 +64,7 @@
             .onClick(() => {
                 view.setCreatureState(creature, false);
             });
-    };
+    }; */
 
     const hamburgerIcon = (node: HTMLElement) => {
         const hamburger = new ExtraButtonComponent(node).setIcon(HAMBURGER).setTooltip("Actions");
@@ -298,16 +298,16 @@
         margin-right: 0.125rem;
     }
 
-    .status .clickable-icon {
+/*     .status .clickable-icon {
         margin: 0;
-    }
+    } */
     .center {
         text-align: center;
     }
 
-    .right {
+/*     .right {
         margin-left: auto;
-    }
+    } */
     .editable:not(.player) {
         cursor: pointer;
     }

@@ -1,12 +1,11 @@
-import type { Creature } from "../src/utils/creature";
-
 export interface InputValidate {
     input: HTMLInputElement;
     validate: (i: HTMLInputElement) => boolean;
 }
 
 export interface InitiativeTrackerData {
-    players: Creature[];
+    players: HomebrewCreature[];
+    homebrew: HomebrewCreature[];
     version: string;
     sync: boolean;
 }
@@ -38,6 +37,18 @@ export interface SRDMonster {
     reactions?: Trait[];
     monster?: string;
     source?: string;
+}
+
+export interface HomebrewCreature {
+    name?: string;
+    hp?: number;
+    ac?: number;
+    stats?: number[];
+    source?: string;
+    cr?: number | string;
+    modifier?: number;
+    note?: string;
+    player?: boolean;
 }
 
 export type ability =

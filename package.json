@@ -1,11 +1,13 @@
 {
     "name": "obsidian-initiative-tracker",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "TTRPG Initiative Tracker for Obsidian.md",
     "main": "main.js",
     "scripts": {
-        "dev": "rollup --config rollup.config-dev.js -w --environment BUILD:dev",
-        "build": "rollup --config rollup.config.js --environment BUILD:production"
+        "dev-rollup": "rollup --config rollup.config-dev.js -w --environment BUILD:dev",
+        "build-rollup": "rollup --config rollup.config.js --environment BUILD:production",
+        "build": "webpack",
+        "dev": "webpack --config webpack.dev.js -w"
     },
     "keywords": [],
     "author": "",
@@ -17,12 +19,21 @@
         "@rollup/plugin-typescript": "^8.2.1",
         "@tsconfig/svelte": "^2.0.1",
         "@types/node": "^14.14.37",
+        "babel-loader": "^8.2.2",
+        "copy-webpack-plugin": "^9.0.1",
+        "css-loader": "^5.2.6",
         "obsidian": "^0.12.5",
         "rollup": "^2.32.1",
         "rollup-plugin-css-only": "^3.1.0",
         "rollup-plugin-svelte": "^7.1.0",
+        "svelte-loader": "^3.1.2",
         "svelte-preprocess": "^4.7.3",
+        "title-case": "^3.0.3",
+        "ts-loader": "^9.2.3",
         "tslib": "^2.3.0",
-        "typescript": "^4.2.4"
+        "typescript": "^4.2.4",
+        "webpack": "^5.41.1",
+        "webpack-cli": "^4.7.2",
+        "webpack-node-externals": "^3.0.0"
     }
 }

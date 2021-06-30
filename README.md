@@ -28,9 +28,44 @@ A new encounter (just player characters) can be started by clicking `New Encount
 
 Players may be added in settings. Players created in this way will be automatically added to encounters.
 
+### Players from Notes
+
+When adding a new player, there is the option to add a player based on a note.
+
+Currently, this functionality will only read the frontmatter of a note to pull in the relevant fields - hp, ac, and initiative modifier.
+
+Frontmatter should be formatted like this:
+
+```
+---
+hp: 23
+ac: 17
+modifier: 2
+---
+```
+
+In the future, this will be used to display more information about the player during combat, and also will update the player's information when the frontmatter is changed.
+
 ## Homebrew Content
 
 If the [5e Statblocks](https://github.com/valentine195/obsidian-5e-statblocks) plugin is installed, the homebrew creatures saved to that plugin can be used in this plugin by enabling the sync in settings.
+
+# Roadmap
+
+This is a list of features that are planned for the plugin. Some of these may or may not be developed.
+
+-   Wikilink Player Characters
+    -   Automatically pull HP/AC from PC Note Wikilinked in settings
+-   Wikilink Creatures
+    -   stat blocks on hover
+-   Wikilink Tags (e.g., condition tag to display condition rules, spell tags for spell effects, etc.)
+-   Creature stat blocks in separate moveable tab of sidebar
+    -   auto-update displayed stat block based on active creature in the encounter
+-   An option to build an encounter in a Note and send it to Initiative Tracker on demand (e.g., in an Obsidian Note, create some code block indicating 3 Goblins and 1 Bugbear in an area; press a button, add the 3 Goblins and Bugbear to the Initiative tracker)
+-   Encounter difficulty/XP tracker for creatures with CR
+-   For the currently active creature, display any actions that would need a dice roll and an integrated dice roller with the specific dice and bonuses for the action already pre-loaded (e.g., for a Bugbear, display "Morningstar" and a to-hit dice with 1d20+4, as well as a damage dice of 2d8+2; Also display for the Javelin action)
+-   Support for multiple parties
+-   Integrated dice roller
 
 # Installation
 

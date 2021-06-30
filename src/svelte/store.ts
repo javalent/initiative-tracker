@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-/* import type TrackerView from "../view"; */
+import type TrackerView from "../view";
 
-export const view = writable/* <TrackerView> */();
+export const view = writable<TrackerView>();
 export default { view };

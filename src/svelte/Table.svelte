@@ -2,8 +2,6 @@
     import { setIcon } from "obsidian";
     import { AC, HP } from "src/utils";
 
-    import type TrackerView from "src/view";
-
     import CreatureTemplate from "./Creature.svelte";
     import { createEventDispatcher } from "svelte";
 
@@ -14,7 +12,6 @@
     export let state: boolean;
     export let current: number;
 
-    let view: TrackerView;
     let el: HTMLElement;
 
     const hpIcon = (node: HTMLElement) => {
@@ -80,9 +77,9 @@
         display: contents;
         font-weight: bolder;
     }
-    .updating-hp {
+/*     .updating-hp {
         display: grid;
         grid-template-rows: auto 1fr;
         width: 100%;
-    }
+    } */
 </style>
