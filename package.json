@@ -1,6 +1,6 @@
 {
     "name": "obsidian-initiative-tracker",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "TTRPG Initiative Tracker for Obsidian.md",
     "main": "main.js",
     "scripts": {
@@ -13,6 +13,7 @@
     "author": "",
     "license": "MIT",
     "devDependencies": {
+        "@babel/core": "^7.14.6",
         "@popperjs/core": "^2.9.2",
         "@rollup/plugin-commonjs": "^18.0.0",
         "@rollup/plugin-node-resolve": "^11.2.1",
@@ -26,6 +27,7 @@
         "rollup": "^2.32.1",
         "rollup-plugin-css-only": "^3.1.0",
         "rollup-plugin-svelte": "^7.1.0",
+        "svelte": "^3.38.3",
         "svelte-loader": "^3.1.2",
         "svelte-preprocess": "^4.7.3",
         "title-case": "^3.0.3",
