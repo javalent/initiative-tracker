@@ -24,6 +24,26 @@ The creatures HP and status effects can be reset by clicking `Reset HP and Statu
 
 A new encounter (just player characters) can be started by clicking `New Encounter`.
 
+### Commands
+
+The plugin registers several commands to Obsidian that can be assigned to hotkeys or used with the Command Palette (<kbd>Ctrl</kbd> / <kbd>Cmd</kbd> + <kbd>P</kbd>).
+
+#### Open Initiative Tracker
+
+If the initiative tracker view has been closed for any reason, use this command to add it back to the right pane.
+
+#### Toggle Encounter
+
+This command can be used to start or stop an encounter.
+
+#### Next Combatant
+
+If the encounter is active, this command can be used to make the next enabled combatant active (similar to clicking the `Next` button).
+
+#### Previous Combatant
+
+If the encounter is active, this command can be used to make the previous enabled combatant active (similar to clicking the `Previous` button).
+
 ## Players
 
 Players may be added in settings. Players created in this way will be automatically added to encounters.
@@ -48,7 +68,17 @@ In the future, this will be used to display more information about the player du
 
 ## Homebrew Content
 
+Homebrew monsters may be created and managed in settings. Homebrew monsters will be available in the monster picker when adding a creature to the combat.
+
+### 5e Statblocks Plugin
+
 If the [5e Statblocks](https://github.com/valentine195/obsidian-5e-statblocks) plugin is installed, the homebrew creatures saved to that plugin can be used in this plugin by enabling the sync in settings.
+
+### Import Homebrew
+
+**Only import content that you own.**
+
+Homebrew monsters can be imported from DnDAppFile XML files or Improved Initiative JSON files in settings.
 
 # Roadmap
 
