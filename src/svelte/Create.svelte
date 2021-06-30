@@ -10,7 +10,7 @@
 
     import type TrackerView from "src/view";
     import { SRDMonsterSuggestionModal } from "src/utils/suggester";
-import type { SRDMonster } from "@types";
+    import type { SRDMonster } from "@types";
 
     const dispatch = createEventDispatcher();
 
@@ -36,7 +36,9 @@ import type { SRDMonster } from "@types";
                 dispatch("save", {
                     name,
                     hp,
-                    initiative: initiative - modifier,
+                    initiative:
+                        (initiative ?? Math.floor(Math.random() * 19 + 1)) -
+                        modifier,
                     ac,
                     modifier
                 });
@@ -71,7 +73,9 @@ import type { SRDMonster } from "@types";
                 ac = `${modal.creature.ac}`;
                 modifier = 0;
                 if ((<SRDMonster>modal.creature).stats) {
-                    const dex = ((<SRDMonster>modal.creature)?.stats ?? [0, 10])[1];
+                    const dex = ((<SRDMonster>modal.creature)?.stats ?? [
+                        0, 10
+                    ])[1];
                     modifier = Math.floor((dex - 10) / 2);
                 }
                 initiative = Math.floor(Math.random() * 19 + 1) + modifier;

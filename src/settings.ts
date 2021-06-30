@@ -83,7 +83,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             "initiative-tracker-additional-container"
         );
 
-        const importSetting = new Setting(importSettingsContainer)
+        new Setting(importSettingsContainer)
             .setName("Import Monsters")
             .setDesc(
                 "Import monsters from monster files. Only import data that you own."
