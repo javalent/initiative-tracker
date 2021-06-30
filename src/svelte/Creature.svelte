@@ -67,12 +67,12 @@
     };
 
     const hamburgerIcon = (node: HTMLElement) => {
-        const hamburger = new ExtraButtonComponent(node).setIcon(HAMBURGER);
+        const hamburger = new ExtraButtonComponent(node).setIcon(HAMBURGER).setTooltip("Actions");
         hamburger.extraSettingsEl.onclick = (evt) => {
             const menu = new Menu(view.plugin.app);
             menu.addItem((item) => {
                 item.setIcon(TAG)
-                    .setTitle("Add Tag")
+                    .setTitle("Add Status")
                     .onClick(() => {
                         dispatch("tag", creature);
                     });

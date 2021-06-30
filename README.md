@@ -1,57 +1,73 @@
-## Obsidian Sample Plugin
+# TTRPG Initiative Tracker for Obsidian.md
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+This plugin can be used as an initiative tracker within Obsidian.md.
 
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+When enabled, the plugin will add an additional view in the right pane, where players and creatures can be added to track their initiatives during combat.
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+## Using the Plugin
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Changes the default font color to red using `styles.css`.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+Monsters may be added to the combat by clicking the `Add Creature` button, which will open a form where the creature's name, HP, AC and initiative can be set.
 
-### First time developing plugins?
+Once all of the creatures in a given combat have been added, initiatives can be modified by clicking on the initiative number and entering the new initiative. Names for non-player creatures can be modified in the same way.
 
-Quick starting guide for new plugin devs:
+### Actions
 
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+Creatures may be disabled or removed from the combat, or statuses (such as "poisoned") may be added in the `Actions` menu on the right of each creature.
 
-### Releasing new releases
+### Controls
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments.
-- Publish the release.
+Combat can be started by clicking the `play` button. This will display the currently active creature. Clicking `next` or `previous` will move to the next enabled combatant.
 
-### Adding your plugin to the community plugin list
+Initiatives can be re-rolled for all monsters in the combat by clicking the `Re-roll Initiatives` button.
 
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+The creatures HP and status effects can be reset by clicking `Reset HP and Status`.
 
-### How to use
+A new encounter (just player characters) can be started by clicking `New Encounter`.
 
-- Clone this repo.
-- `npm i` or `yarn` to install dependencies
-- `npm run dev` to start compilation in watch mode.
+## Players
 
-### Manually installing the plugin
+Players may be added in settings. Players created in this way will be automatically added to encounters.
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+## Homebrew Content
 
-### API Documentation
+If the [5e Statblocks](https://github.com/valentine195/obsidian-5e-statblocks) plugin is installed, the homebrew creatures saved to that plugin can be used in this plugin by enabling the sync in settings.
 
-See https://github.com/obsidianmd/obsidian-api
+# Installation
+
+<!-- ## From within Obsidian
+
+From Obsidian v0.9.8, you can activate this plugin within Obsidian by doing the following:
+
+-   Open Settings > Third-party plugin
+-   Make sure Safe mode is **off**
+-   Click Browse community plugins
+-   Search for this plugin
+-   Click Install
+-   Once installed, close the community plugins window and activate the newly installed plugin -->
+
+## From GitHub
+
+-   Download the Latest Release from the Releases section of the GitHub Repository
+-   Extract the plugin folder from the zip to your vault's plugins folder: `<vault>/.obsidian/plugins/`  
+    Note: On some machines the `.obsidian` folder may be hidden. On MacOS you should be able to press `Command+Shift+Dot` to show the folder in Finder.
+-   Reload Obsidian
+-   If prompted about Safe Mode, you can disable safe mode and enable the plugin.
+    Otherwise head to Settings, third-party plugins, make sure safe mode is off and
+    enable the plugin from there.
+
+### Updates
+
+You can follow the same procedure to update the plugin
+
+# Warning
+
+This plugin comes with no guarantee of stability and bugs may delete data.
+Please ensure you have automated backups.
+
+# TTRPG plugins
+
+If you're using Obsidian to run/plan a TTRPG, you may find my other plugin useful:
+
+-   [Obsidian Leaflet](https://github.com/valentine195/obsidian-leaflet-plugin) - Add interactive maps to Obsidian.md notes
+-   [Dice Roller](https://github.com/valentine195/obsidian-dice-roller) - Inline dice rolling for Obsidian.md
+-   [5e Statblocks](https://github.com/valentine195/obsidian-5e-statblocks)

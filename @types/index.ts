@@ -8,6 +8,7 @@ export interface InputValidate {
 export interface InitiativeTrackerData {
     players: Creature[];
     version: string;
+    sync: boolean;
 }
 
 export interface SRDMonster {

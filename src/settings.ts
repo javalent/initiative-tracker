@@ -14,6 +14,8 @@ import { AC, DEFAULT_UNDEFINED, EDIT, HP, INITIATIVE, REMOVE } from "./utils";
 import type { InputValidate } from "@types";
 import { Creature } from "./utils/creature";
 
+
+
 export default class InitiativeTrackerSettings extends PluginSettingTab {
     constructor(private plugin: InitiativeTracker) {
         super(plugin.app, plugin);
@@ -26,6 +28,23 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             containerEl.addClass("initiative-tracker-settings");
 
             containerEl.createEl("h2", { text: "Initiative Tracker Settings" });
+
+            if (this.plugin.app.plugins.plugins["obsidian-5e-statblocks"]) {
+                const syncEl  =containerEl.createDiv("statblock-sync");
+                if (this.plugin.data.sync) {
+                    new Setting(syncEl).setName("Synced").setDesc(`${this.plugin.homebrew.length} monsters synced.`)
+                }
+                new Setting(syncEl).setName("Sync Monsters from 5e Statblocks").setDesc("Homebrew monsters saved to the 5e Statblocks plugin will be available in the quick-add.").addToggle(t => {
+                    t.setValue(this.plugin.data.sync);
+                    t.onChange(async (v) => {
+                        this.plugin.data.sync = v;
+                        /* this.plugin.loadFromStatblocks(); */
+
+                        await this.plugin.saveSettings();
+                        this.display();
+                    })
+                })
+            } 
 
             const additionalContainer = containerEl.createDiv(
                 "initiative-tracker-additional-container"
@@ -139,7 +158,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             }
         } catch (e) {
             new Notice(
-                "There was an error displaying the settings tab for TTRPG Initiative Tracker."
+                "There was an error displaying the settings tab for Obsidian Initiative Tracker."
             );
         }
     }

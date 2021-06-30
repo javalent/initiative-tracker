@@ -11,6 +11,7 @@ export class Creature {
     player: boolean;
     status: Set<string> = new Set();
     private _initiative: number;
+    source: string;
     constructor({
         name,
         initiative,
@@ -18,7 +19,8 @@ export class Creature {
         hp,
         ac,
         note,
-        player
+        player,
+        source
     }: {
         name?: string;
         initiative?: number;
@@ -27,6 +29,7 @@ export class Creature {
         ac?: number;
         note?: string;
         player?: boolean;
+        source?: string
     }) {
         this.name = name;
         this._initiative = Number(
@@ -35,11 +38,12 @@ export class Creature {
         this.modifier = Number(modifier ?? 0);
 
         this.max = hp ? Number(hp) : undefined;
-        this.ac = ac ? Number(hp) : undefined;
+        this.ac = ac ? Number(ac) : undefined;
         this.note = note;
         this.player = player;
 
         this.hp = this.max;
+        this.source = source;
     }
     get hpDisplay() {
         if (this.max) {
