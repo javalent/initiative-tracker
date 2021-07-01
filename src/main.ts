@@ -51,7 +51,7 @@ export default class InitiativeTracker extends Plugin {
         this.data.players = players;
     }
 
-    private get statblock_creatures() {
+    get statblock_creatures() {
         if (!this.data.sync) return [];
         if (!this.app.plugins.plugins["obsidian-5e-statblocks"]) return [];
 
@@ -67,7 +67,7 @@ export default class InitiativeTracker extends Plugin {
                     modifier: Math.floor((m.stats[1] - 10) / 2)
                 });
             }),
-            ...this._homebrewcreatures
+
         ];
     }
 

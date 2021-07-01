@@ -62,7 +62,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     });
                 if (this.plugin.data.sync) {
                     const synced = new Setting(syncEl).setDesc(
-                        `${this.plugin.homebrew.length} monsters synced.`
+                        `${this.plugin.statblock_creatures.length} monsters synced.`
                     );
                     synced.settingEl.addClass("initiative-synced");
                     setIcon(synced.nameEl, "check-in-circle");
