@@ -12,6 +12,7 @@
 
     import { Creature } from "src/utils/creature";
     import { ExtraButtonComponent } from "obsidian";
+    import { ADD } from "src/utils";
 
     export let creatures: Creature[] = [];
     export let view: TrackerView;
@@ -40,7 +41,7 @@
     const addButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Add Creature")
-            .setIcon("plus-with-circle")
+            .setIcon(ADD)
             .onClick(() => {
                 addNew = true;
             });
