@@ -238,6 +238,7 @@ abstract class SuggestionModal<T> extends FuzzySuggestModal<T> {
 export class FileSuggestionModal extends SuggestionModal<TFile> {
     file: TFile;
     text: TextComponent;
+    files = this.app.vault.getMarkdownFiles();
     constructor(app: App, input: TextComponent) {
         super(app, input.inputEl);
         this.text = input;
@@ -308,7 +309,7 @@ export class FileSuggestionModal extends SuggestionModal<TFile> {
         });
     }
     getItems() {
-        return this.app.vault.getMarkdownFiles();
+        return this.files;
     }
 }
 
@@ -316,11 +317,13 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
     Creature | SRDMonster
 > {
     creature: Creature | SRDMonster;
+    creatures: (Creature | SRDMonster)[];
     constructor(public plugin: InitiativeTracker, inputEl: HTMLInputElement) {
         super(plugin.app, inputEl);
+        this.creatures = [...this.plugin.players, ...this.plugin.bestiary];
     }
     getItems() {
-        return [...this.plugin.players, ...this.plugin.bestiary];
+        return this.creatures;
     }
     getItemText(item: Creature | SRDMonster) {
         return item.name;
@@ -454,16 +457,18 @@ abstract class ElementSuggestionModal<T> extends FuzzySuggestModal<T> {
 
 export class HomebrewMonsterSuggestionModal extends ElementSuggestionModal<HomebrewCreature> {
     creature: HomebrewCreature;
+    homebrew: HomebrewCreature[];
     constructor(
         public plugin: InitiativeTracker,
         inputEl: HTMLInputElement,
         el: HTMLDivElement
     ) {
         super(plugin.app, inputEl, el);
+        this.homebrew = [...this.plugin.data.homebrew];
         this.onInputChanged();
     }
     getItems() {
-        return [...this.plugin.data.homebrew];
+        return this.homebrew;
     }
     getItemText(item: HomebrewCreature) {
         return item.name;
