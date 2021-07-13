@@ -26,15 +26,23 @@ export default class TrackerView extends ItemView {
 
     constructor(public leaf: WorkspaceLeaf, public plugin: InitiativeTracker) {
         super(leaf);
-
-        this.players = [...this.plugin.players.map((p) => new Creature(p))];
-        this.creatures = [...this.players];
+        this.players = [
+            ...this.plugin.players.map((p) => new Creature({ ...p }))
+        ];
+        this.newEncounter();
     }
 
+    /*     async buildCreatures() {
+        
+        this.creatures = [...this.players];
+
+        await this.rollInitiatives();
+    } */
+
     get ordered() {
-        const creatures = [...this.creatures];
-        creatures.sort((a, b) => b.initiative - a.initiative);
-        return creatures;
+        this.creatures.sort((a, b) => b.initiative - a.initiative);
+
+        return this.creatures;
     }
 
     get enabled() {
@@ -63,17 +71,14 @@ export default class TrackerView extends ItemView {
         });
     }
 
-    newEncounter() {
+    async newEncounter() {
         this.creatures = [...this.players];
 
         for (let creature of this.creatures) {
             creature.enabled = true;
-            creature.initiative =
-                Math.floor(Math.random() * 19 + 1) + creature.modifier;
         }
-        this.setAppState({
-            creatures: this.ordered
-        });
+
+        await this.rollInitiatives();
     }
 
     resetEncounter() {
@@ -90,10 +95,27 @@ export default class TrackerView extends ItemView {
         });
     }
 
-    rollInitiatives() {
-        for (let creature of this.creatures) {
+    async rollInitiative(creature: Creature): Promise<void> {
+        if (this.plugin.canUseDiceRoller) {
+            let num = await this.plugin.app.plugins.plugins[
+                "obsidian-dice-roller"
+            ].parseDice(
+                this.plugin.data.initiative.replace(
+                    /%mod%/g,
+                    `${creature.modifier}`
+                )
+            );
+
+            creature.initiative = num.result;
+        } else {
             creature.initiative =
                 Math.floor(Math.random() * 19 + 1) + creature.modifier;
+        }
+    }
+
+    async rollInitiatives() {
+        for (let creature of this.creatures) {
+            await this.rollInitiative(creature);
         }
 
         this.setAppState({
@@ -206,8 +228,6 @@ export default class TrackerView extends ItemView {
         }
     }
     async onOpen() {
-        this.creatures = [...this.plugin.players.map((p) => new Creature(p))];
-
         this._app = new App({
             target: this.contentEl,
             props: {
@@ -219,12 +239,6 @@ export default class TrackerView extends ItemView {
                 state: this.state,
                 current: this.current
             }
-        });
-
-        this._app.$on("new-encounter", () => {
-            this._app.creatures = [
-                ...this.plugin.players.map((p) => new Creature(p))
-            ];
         });
         this._rendered = true;
     }

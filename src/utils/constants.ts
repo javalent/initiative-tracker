@@ -10,5 +10,7 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     players: [],
     homebrew: [],
     version: null,
+    canUseDiceRoll: false,
+    initiative: "1d20 + %mod%",
     sync: false
 };

@@ -21,7 +21,7 @@
     let hp: string;
     let initiative: number;
     let ac: string;
-    let modifier: number = 0;
+    let modifier: number;
 
     const saveButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -31,6 +31,9 @@
                 if (!name || !name.length) {
                     new Notice("Enter a name!");
                     return;
+                }
+                if (!modifier) {
+                    modifier = 0;
                 }
 
                 dispatch("save", {
@@ -57,7 +60,8 @@
             .setIcon(DICE)
             .setTooltip("Roll Initiative")
             .onClick(() => {
-                initiative = Math.floor(Math.random() * 19 + 1) + modifier;
+                initiative =
+                    Math.floor(Math.random() * 19 + 1) + (modifier ?? 0);
             });
     };
 
@@ -72,7 +76,7 @@
                 hp = `${modal.creature.hp}`;
                 ac = `${modal.creature.ac}`;
                 modifier = 0;
-                if ((<SRDMonster>modal.creature).stats) {
+                if ((<SRDMonster>modal.creature).stats && !modifier) {
                     const dex = ((<SRDMonster>modal.creature)?.stats ?? [
                         0, 10
                     ])[1];
@@ -105,18 +109,40 @@
     </div>
     <div>
         <label for="add-hp">HP</label>
-        <input bind:value={hp} id="add-hp" type="text" name="hp" tabindex="0" />
+        <input
+            bind:value={hp}
+            id="add-hp"
+            type="number"
+            name="hp"
+            tabindex="0"
+        />
     </div>
     <div>
         <label for="add-ac">AC</label>
-        <input bind:value={ac} id="add-ac" type="text" name="ac" tabindex="0" />
+        <input
+            bind:value={ac}
+            id="add-ac"
+            type="number"
+            name="ac"
+            tabindex="0"
+        />
+    </div>
+    <div>
+        <label for="add-mod">Modifier</label>
+        <input
+            bind:value={modifier}
+            id="add-mod"
+            type="number"
+            name="ac"
+            tabindex="0"
+        />
     </div>
     <div class="initiative">
         <label for="add-init">Initiative</label>
         <input
             bind:value={initiative}
             id="add-init"
-            type="text"
+            type="number"
             name="initiative"
             tabindex="0"
         />

@@ -13,17 +13,17 @@ import type InitiativeTracker from "./main";
 
 import {
     ImportEntitiesFromXml,
-    ImportEntitiesFromImprovedInitiative
+    ImportEntitiesFromImprovedInitiative,
+    ImportFromCritterDB,
+    ImportFrom5eTools
 } from "src/import";
 
 import {
     FileSuggestionModal,
-    HomebrewMonsterSuggestionModal,
-    SRDMonsterSuggestionModal
+    HomebrewMonsterSuggestionModal
 } from "./utils/suggester";
 import { AC, DEFAULT_UNDEFINED, EDIT, HP, INITIATIVE } from "./utils";
 import type { HomebrewCreature, InputValidate } from "@types";
-import { Creature } from "./utils/creature";
 
 export default class InitiativeTrackerSettings extends PluginSettingTab {
     constructor(private plugin: InitiativeTracker) {
@@ -43,7 +43,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
 
             this._displayPlayers(additionalContainer);
 
-            if (this.plugin.app.plugins.plugins["obsidian-5e-statblocks"]) {
+            if (this.plugin.canUseStatBlocks) {
                 const syncEl = containerEl.createDiv("initiative-sync");
 
                 new Setting(syncEl)
@@ -68,6 +68,54 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     setIcon(synced.nameEl, "check-in-circle");
                     synced.nameEl.appendChild(createSpan({ text: "Synced" }));
                 }
+            }
+
+            const formula = new Setting(containerEl)
+                .setName("Initiative Formula")
+
+                .addText((t) => {
+                    if (!this.plugin.canUseDiceRoller) {
+                        t.setDisabled(true);
+                        this.plugin.data.initiative = "1d20 + %mod%";
+                    }
+                    t.setValue(this.plugin.data.initiative);
+                    t.onChange((v) => {
+                        this.plugin.data.initiative = v;
+                    });
+                    t.inputEl.onblur = async () => {
+                        this.plugin.view.rollInitiatives();
+                        await this.plugin.saveSettings();
+                    };
+                });
+
+            formula.descEl.createSpan({
+                text: "Initiative formula to use when calculating initiative. Use "
+            });
+            formula.descEl.createEl("code", { text: "%mod%" });
+            formula.descEl.createSpan({
+                text: " for the modifier placeholder."
+            });
+
+            if (!this.plugin.canUseDiceRoller) {
+                formula.descEl.createEl("br");
+                formula.descEl.createEl("br");
+                formula.descEl.createSpan({
+                    attr: {
+                        style: `color: var(--text-error);`
+                    },
+                    text: "Requires the "
+                });
+                formula.descEl.createEl("a", {
+                    text: "Dice Roller",
+                    href: "https://github.com/valentine195/obsidian-dice-roller",
+                    cls: "external-link"
+                });
+                formula.descEl.createSpan({
+                    attr: {
+                        style: `color: var(--text-error);`
+                    },
+                    text: " plugin to modify."
+                });
             }
 
             this._displayImports(containerEl);
@@ -178,6 +226,94 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             b.buttonEl.appendChild(inputImprovedInitiative);
             b.onClick(() => inputImprovedInitiative.click());
         });
+
+        const importCritterDB = new Setting(importAdditional)
+            .setName("Import CritterDB Data")
+            .setDesc("Only import content that you own.");
+        const inputCritterDB = createEl("input", {
+            attr: {
+                type: "file",
+                name: "critterdb",
+                accept: ".json"
+            }
+        });
+
+        inputCritterDB.onchange = async () => {
+            const { files } = inputCritterDB;
+            if (!files.length) return;
+            try {
+                const importedMonsters = await ImportFromCritterDB(
+                    ...Array.from(files)
+                );
+
+                try {
+                    await this.plugin.saveMonsters(
+                        Array.from(importedMonsters.values())
+                    );
+                    new Notice(
+                        `Successfully imported ${importedMonsters.size} monsters.`
+                    );
+                } catch (e) {
+                    new Notice(
+                        `There was an issue importing the file${
+                            files.length > 1 ? "s" : ""
+                        }.`
+                    );
+                }
+                this.display();
+            } catch (e) {}
+        };
+
+        importCritterDB.addButton((b) => {
+            b.setButtonText("Choose File").setTooltip("Import CritterDB Data");
+            b.buttonEl.addClass("statblock-file-upload");
+            b.buttonEl.appendChild(inputCritterDB);
+            b.onClick(() => inputCritterDB.click());
+        });
+
+        const import5eTools = new Setting(importAdditional)
+            .setName("Import 5e.tools Data")
+            .setDesc("Only import content that you own.");
+        const input5eTools = createEl("input", {
+            attr: {
+                type: "file",
+                name: "fivetools",
+                accept: ".json"
+            }
+        });
+
+        input5eTools.onchange = async () => {
+            const { files } = input5eTools;
+            if (!files.length) return;
+            try {
+                const importedMonsters = await ImportFrom5eTools(
+                    ...Array.from(files)
+                );
+
+                try {
+                    await this.plugin.saveMonsters(
+                        Array.from(importedMonsters.values())
+                    );
+                    new Notice(
+                        `Successfully imported ${importedMonsters.size} monsters.`
+                    );
+                } catch (e) {
+                    new Notice(
+                        `There was an issue importing the file${
+                            files.length > 1 ? "s" : ""
+                        }.`
+                    );
+                }
+                this.display();
+            } catch (e) {}
+        };
+
+        import5eTools.addButton((b) => {
+            b.setButtonText("Choose File").setTooltip("Import 5e.tools Data");
+            b.buttonEl.addClass("statblock-file-upload");
+            b.buttonEl.appendChild(input5eTools);
+            b.onClick(() => input5eTools.click());
+        });
     }
     private _displayHomebrew(containerEl: HTMLElement) {
         const additionalContainer = containerEl.createDiv(
@@ -247,7 +383,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
 
         suggester.onRemoveItem = async (monster) => {
             try {
-                await this.plugin.deleteMonster(monster.name);
+                await this.plugin.deleteMonster(monster);
             } catch (e) {
                 new Notice(
                     `There was an error deleting the monster:${

@@ -24,15 +24,15 @@ declare module "obsidian" {
                 "obsidian-5e-statblocks": {
                     data: Map<string, SRDMonster>;
                 };
+                "obsidian-dice-roller": {
+                    parseDice(text: string): Promise<{ result: number }>;
+                };
             };
         };
     }
 }
 export default class InitiativeTracker extends Plugin {
-    deleteMonster(name: any) {
-        throw new Error("Method not implemented.");
-    }
-    private view: TrackerView;
+    public view: TrackerView;
     public data: InitiativeTrackerData;
     private _playercreatures: Creature[];
     private _homebrewcreatures: Creature[];
@@ -42,13 +42,21 @@ export default class InitiativeTracker extends Plugin {
             this._playercreatures.length != this.data.players.length
         ) {
             this._playercreatures = this.data.players.map(
-                (p) => new Creature(p)
+                (p) => new Creature({ ...p })
             );
         }
         return this._playercreatures;
     }
     set players(players) {
         this.data.players = players;
+    }
+
+    get canUseDiceRoller() {
+        return "obsidian-dice-roller" in this.app.plugins.plugins;
+    }
+
+    get canUseStatBlocks() {
+        return "obsidian-5e-statblocks" in this.app.plugins.plugins;
     }
 
     get statblock_creatures() {
@@ -66,8 +74,7 @@ export default class InitiativeTracker extends Plugin {
                     source: m.source,
                     modifier: Math.floor((m.stats[1] - 10) / 2)
                 });
-            }),
-
+            })
         ];
     }
 
@@ -77,7 +84,7 @@ export default class InitiativeTracker extends Plugin {
             this._homebrewcreatures.length != this.data.homebrew.length
         ) {
             this._homebrewcreatures = this.data.homebrew.map(
-                (p) => new Creature(p)
+                (p) => new Creature({ ...p })
             );
         }
         return [...this.statblock_creatures, ...this._homebrewcreatures];
@@ -91,10 +98,6 @@ export default class InitiativeTracker extends Plugin {
         registerIcons();
 
         await this.loadSettings();
-
-        /* if (this.data.sync) {
-			this.loadFromStatblocks();
-		} */
 
         this.addSettingTab(new InitiativeTrackerSettings(this));
 
@@ -194,7 +197,10 @@ export default class InitiativeTracker extends Plugin {
 
         await this.saveSettings();
     }
-
+    async deleteMonster(monster: HomebrewCreature) {
+        this.data.homebrew = this.data.homebrew.filter((m) => m != monster);
+        await this.saveSettings();
+    }
     async loadSettings() {
         const data = Object.assign(
             {},

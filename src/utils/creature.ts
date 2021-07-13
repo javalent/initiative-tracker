@@ -29,12 +29,10 @@ export class Creature {
         ac?: number;
         note?: string;
         player?: boolean;
-        source?: string
+        source?: string;
     }) {
         this.name = name;
-        this._initiative = Number(
-            initiative ?? Math.floor(Math.random() * 19 + 1)
-        );
+        this._initiative = Number(initiative ?? 0);
         this.modifier = Number(modifier ?? 0);
 
         this.max = hp ? Number(hp) : undefined;

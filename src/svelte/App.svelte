@@ -49,7 +49,7 @@
 </script>
 
 <div class="obsidian-initiative-tracker">
-    <Controls {state} on:new-encounter={() => dispatch("new-encounter")} />
+    <Controls {state} />
     <Table
         {creatures}
         {show}

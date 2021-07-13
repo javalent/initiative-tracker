@@ -7,6 +7,8 @@ export interface InitiativeTrackerData {
     players: HomebrewCreature[];
     homebrew: HomebrewCreature[];
     version: string;
+    canUseDiceRoll: boolean;
+    initiative: string;
     sync: boolean;
 }
 
