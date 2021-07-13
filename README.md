@@ -80,6 +80,16 @@ If the [5e Statblocks](https://github.com/valentine195/obsidian-5e-statblocks) p
 
 Homebrew monsters can be imported from DnDAppFile XML files or Improved Initiative JSON files in settings.
 
+## Initiative Formula
+
+> This setting can only be modified when the [Dice Roller](https://github.com/valentine195/obsidian-dice-roller) plugin is installed.
+
+This setting can be used to modify how a creature's initiative is calculated by the plugin. Use `%mod` as a placeholder for the creature's initiative modifier.
+
+It defaults to `1d20 + %mod%`.
+
+This will support any dice formula supported by the Dice Roller plugin.
+
 # Roadmap
 
 This is a list of features that are planned for the plugin. Some of these may or may not be developed.
