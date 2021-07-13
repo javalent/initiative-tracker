@@ -44,6 +44,9 @@ If the encounter is active, this command can be used to make the next enabled co
 
 If the encounter is active, this command can be used to make the previous enabled combatant active (similar to clicking the `Previous` button).
 
+# Settings
+
+The setting tab has several options for adding and managing players and homebrew creatures, as well as the ability to change the formula used to calculate the initiative.
 ## Players
 
 Players may be added in settings. Players created in this way will be automatically added to encounters.
