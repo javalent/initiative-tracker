@@ -83,7 +83,8 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         this.plugin.data.initiative = v;
                     });
                     t.inputEl.onblur = async () => {
-                        this.plugin.view.rollInitiatives();
+                        if (this.plugin.view)
+                            this.plugin.view.rollInitiatives();
                         await this.plugin.saveSettings();
                     };
                 });

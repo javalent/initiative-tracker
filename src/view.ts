@@ -1,16 +1,11 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import {
     BASE,
-    PLAY,
-    STOP,
     INTIATIVE_TRACKER_VIEW,
     MIN_WIDTH_FOR_HAMBURGER
 } from "./utils";
 
 import type InitiativeTracker from "./main";
-
-/* import { createApp } from "vue";
-import App from "./ui/App.vue"; */
 
 import App from "./svelte/App.svelte";
 import { Creature } from "./utils/creature";
@@ -31,13 +26,6 @@ export default class TrackerView extends ItemView {
         ];
         this.newEncounter();
     }
-
-    /*     async buildCreatures() {
-        
-        this.creatures = [...this.players];
-
-        await this.rollInitiatives();
-    } */
 
     get ordered() {
         this.creatures.sort((a, b) => b.initiative - a.initiative);
@@ -241,6 +229,7 @@ export default class TrackerView extends ItemView {
             }
         });
         this._rendered = true;
+
     }
     async onClose() {
         this._app.$destroy();

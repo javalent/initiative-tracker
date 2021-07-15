@@ -32,7 +32,6 @@ declare module "obsidian" {
     }
 }
 export default class InitiativeTracker extends Plugin {
-    public view: TrackerView;
     public data: InitiativeTrackerData;
     private _playercreatures: Creature[];
     private _homebrewcreatures: Creature[];
@@ -94,6 +93,14 @@ export default class InitiativeTracker extends Plugin {
         return [...BESTIARY, ...this.homebrew];
     }
 
+    get view() {
+        let leaf = (
+            this.app.workspace.getLeavesOfType(INTIATIVE_TRACKER_VIEW) ?? []
+        ).shift();
+        if (leaf && leaf.view && leaf.view instanceof TrackerView)
+            return leaf.view;
+    }
+
     async onload() {
         registerIcons();
 
@@ -103,7 +110,7 @@ export default class InitiativeTracker extends Plugin {
 
         this.registerView(
             INTIATIVE_TRACKER_VIEW,
-            (leaf: WorkspaceLeaf) => (this.view = new TrackerView(leaf, this))
+            (leaf: WorkspaceLeaf) => new TrackerView(leaf, this)
         );
 
         this.addCommand({
@@ -125,11 +132,7 @@ export default class InitiativeTracker extends Plugin {
             name: "Toggle Encounter",
             checkCallback: (checking) => {
                 if (checking) {
-                    return (
-                        this.app.workspace.getLeavesOfType(
-                            INTIATIVE_TRACKER_VIEW
-                        ).length != 0
-                    );
+                    return this.view != undefined;
                 }
                 this.view.toggleState();
             }
@@ -139,11 +142,7 @@ export default class InitiativeTracker extends Plugin {
             name: "Next Combatant",
             checkCallback: (checking) => {
                 if (checking) {
-                    return (
-                        this.app.workspace.getLeavesOfType(
-                            INTIATIVE_TRACKER_VIEW
-                        ).length != 0 && this.view.state
-                    );
+                    return this.view != undefined && this.view.state;
                 }
                 this.view.goToNext();
             }
@@ -153,11 +152,7 @@ export default class InitiativeTracker extends Plugin {
             name: "Previous Combatant",
             checkCallback: (checking) => {
                 if (checking) {
-                    return (
-                        this.app.workspace.getLeavesOfType(
-                            INTIATIVE_TRACKER_VIEW
-                        ).length != 0 && this.view.state
-                    );
+                    return this.view != undefined && this.view.state;
                 }
                 this.view.goToPrevious();
             }
