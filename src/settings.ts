@@ -379,7 +379,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         searchMonsters.setDesc(
             `Manage homebrew monsters. Currently: ${
                 suggester.getItems().length
-            } monsters.`
+            } monster${suggester.filteredItems.length != 1 ? "s" : ""}.`
         );
 
         suggester.onRemoveItem = async (monster) => {
@@ -392,11 +392,41 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     }`
                 );
             }
-            this.display();
+
+            suggester.homebrew = [...this.plugin.data.homebrew];
+            suggester._onInputChanged();
+            /* this.display(); */
         };
+
+        suggester.onEditItem = (monster) => {
+            const modal = new NewCreatureModal(this.plugin, monster);
+            modal.onClose = async () => {
+                if (!modal.saved) return;
+                try {
+                    const original = this.plugin.data.homebrew.find(
+                        (m) => m == monster
+                    );
+                    if (!original) return;
+                    Object.assign(original, modal.creature);
+                    await this.plugin.saveSettings();
+                } catch (e) {
+                    new Notice(
+                        `There was an error deleting the monster:${
+                            `\n\n` + e.message
+                        }`
+                    );
+                }
+                suggester.homebrew = [...this.plugin.data.homebrew];
+                suggester._onInputChanged();
+            };
+            modal.open();
+        };
+
         suggester.onInputChanged = () =>
             searchMonsters.setDesc(
-                `Manage homebrew monsters. Currently: ${suggester.filteredItems.length} monsters.`
+                `Manage homebrew monsters. Currently: ${
+                    suggester.filteredItems.length
+                } monster${suggester.filteredItems.length != 1 ? "s" : ""}.`
             );
     }
     private _displayPlayers(additionalContainer: HTMLDivElement) {
@@ -691,12 +721,14 @@ class NewPlayerModal extends Modal {
 class NewCreatureModal extends Modal {
     creature: HomebrewCreature;
     saved: boolean;
+    edit: boolean;
     constructor(
         private plugin: InitiativeTracker,
         private original?: HomebrewCreature
     ) {
         super(plugin.app);
         this.creature = { ...(original ?? {}) };
+        this.edit = original ? true : false;
     }
     async display(load?: boolean) {
         let { contentEl } = this;
@@ -707,7 +739,9 @@ class NewCreatureModal extends Modal {
 
         let error = false;
 
-        contentEl.createEl("h2", { text: "New Homebrew Creature" });
+        contentEl.createEl("h2", {
+            text: `${this.edit ? "New" : "Edit"} Homebrew Creature`
+        });
 
         new Setting(contentEl)
             .setName("Link to Note")

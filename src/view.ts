@@ -80,27 +80,29 @@ export default class TrackerView extends ItemView {
         });
     }
 
-    async rollInitiative(creature: Creature): Promise<void> {
+    async getInitiativeValue(modifier: number = 0): Promise<number> {
+        let initiative = Math.floor(Math.random() * 19 + 1) + modifier;
         if (this.plugin.canUseDiceRoller) {
-            let num = await this.plugin.app.plugins.plugins[
+            const num = await this.plugin.app.plugins.plugins[
                 "obsidian-dice-roller"
             ].parseDice(
-                this.plugin.data.initiative.replace(
-                    /%mod%/g,
-                    `${creature.modifier}`
-                )
+                this.plugin.data.initiative.replace(/%mod%/g, `${modifier}`)
             );
 
-            creature.initiative = num.result;
-        } else {
-            creature.initiative =
-                Math.floor(Math.random() * 19 + 1) + creature.modifier;
+            initiative = num.result;
         }
+        return initiative;
+    }
+
+    async rollInitiative(creature: Creature): Promise<void> {
+        creature.initiative = await this.getInitiativeValue(creature.modifier);
     }
 
     async rollInitiatives() {
         for (let creature of this.creatures) {
-            await this.rollInitiative(creature);
+            creature.initiative = await this.getInitiativeValue(
+                creature.modifier
+            );
         }
 
         this.setAppState({

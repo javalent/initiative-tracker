@@ -388,7 +388,7 @@ abstract class ElementSuggestionModal<T> extends FuzzySuggestModal<T> {
     suggestEl: HTMLDivElement;
     promptEl: HTMLDivElement;
     emptyStateText: string = "No match found";
-    limit: number = 100;
+    limit: number = Infinity;
     filteredItems: FuzzyMatch<T>[] = [];
     constructor(
         app: App,
@@ -406,8 +406,8 @@ abstract class ElementSuggestionModal<T> extends FuzzySuggestModal<T> {
 
         this.scope.register([], "Escape", this.close.bind(this));
 
-        this.inputEl.addEventListener("input", this.onInputChanged.bind(this));
-        this.inputEl.addEventListener("focus", this.onInputChanged.bind(this));
+        this.inputEl.addEventListener("input", this._onInputChanged.bind(this));
+        this.inputEl.addEventListener("focus", this._onInputChanged.bind(this));
         this.inputEl.addEventListener("blur", this.close.bind(this));
         this.suggestEl.on(
             "mousedown",
@@ -420,7 +420,7 @@ abstract class ElementSuggestionModal<T> extends FuzzySuggestModal<T> {
     empty() {
         this.suggester.empty();
     }
-    onInputChanged(): void {
+    _onInputChanged(): void {
         const inputStr = this.inputEl.value;
         this.filteredItems = this.getSuggestions(inputStr);
         if (this.filteredItems.length > 0) {
@@ -430,8 +430,10 @@ abstract class ElementSuggestionModal<T> extends FuzzySuggestModal<T> {
         } else {
             this.onNoSuggestion();
         }
+        this.onInputChanged();
         this.open();
     }
+    onInputChanged(): void {}
     onNoSuggestion() {
         this.empty();
         this.renderSuggestion(
@@ -441,9 +443,7 @@ abstract class ElementSuggestionModal<T> extends FuzzySuggestModal<T> {
     }
     open(): void {}
 
-    close(): void {
-        this.suggester.setSuggestions([]);
-    }
+    close(): void {}
     createPrompt(prompts: HTMLSpanElement[]) {
         if (!this.promptEl)
             this.promptEl = this.suggestEl.createDiv("prompt-instructions");
@@ -467,7 +467,7 @@ export class HomebrewMonsterSuggestionModal extends ElementSuggestionModal<Homeb
     ) {
         super(plugin.app, inputEl, el);
         this.homebrew = [...this.plugin.data.homebrew];
-        this.onInputChanged();
+        this._onInputChanged();
     }
     getItems() {
         return this.homebrew;
@@ -481,11 +481,7 @@ export class HomebrewMonsterSuggestionModal extends ElementSuggestionModal<Homeb
         this.creature = item;
     }
     selectSuggestion({ item }: FuzzyMatch<HomebrewCreature>) {
-        this.inputEl.value = item.name;
-        this.creature = item;
-
-        this.onClose();
-        this.close();
+        return;
     }
     renderSuggestion(result: FuzzyMatch<HomebrewCreature>, el: HTMLElement) {
         let { item, match: matches } = result || {};
@@ -517,11 +513,17 @@ export class HomebrewMonsterSuggestionModal extends ElementSuggestionModal<Homeb
 
         content.setDesc(item.source ?? "");
         content.addExtraButton((b) => {
+            b.setIcon("pencil")
+                .setTooltip("Edit")
+                .onClick(() => this.onEditItem(item));
+        });
+        content.addExtraButton((b) => {
             b.setIcon("trash")
                 .setTooltip("Delete")
                 .onClick(() => this.onRemoveItem(item));
         });
     }
+    onEditItem(item: HomebrewCreature) {}
     onRemoveItem(item: HomebrewCreature) {}
 }
 

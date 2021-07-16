@@ -68,7 +68,7 @@
 
     const openModal = (nameInput: HTMLInputElement) => {
         const modal = new SRDMonsterSuggestionModal(view.plugin, nameInput);
-        modal.onClose = () => {
+        modal.onClose = async () => {
             if (modal.creature) {
                 name = modal.creature.name;
                 hp = `${modal.creature.hp}`;
@@ -81,7 +81,8 @@
                     ])[1];
                     modifier = Math.floor((dex - 10) / 2);
                 }
-                initiative = Math.floor(Math.random() * 19 + 1) + modifier;
+
+                initiative = await view.getInitiativeValue(modifier);
             }
         };
         modal.open();

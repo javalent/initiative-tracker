@@ -1,4 +1,4 @@
-import { Plugin, WorkspaceLeaf } from "obsidian";
+import { parseYaml, Plugin, WorkspaceLeaf } from "obsidian";
 
 import {
     DEFAULT_SETTINGS,
@@ -164,10 +164,13 @@ export default class InitiativeTracker extends Plugin {
                 }
             }
         });
-/* 
+        /* 
         this.registerMarkdownCodeBlockProcessor(
             "init-tracker",
-            (src, el, ctx) => {}
+            (src, el, ctx) => {
+                const params = parseYaml(src);
+                console.log("🚀 ~ file: main.ts ~ line 172 ~ params", params);
+            }
         ); */
 
         if (this.app.workspace.layoutReady) {
@@ -202,6 +205,10 @@ export default class InitiativeTracker extends Plugin {
     async saveMonsters(importedMonsters: HomebrewCreature[]) {
         this.data.homebrew.push(...importedMonsters);
 
+        await this.saveSettings();
+    }
+    async saveMonster(monster: HomebrewCreature) {
+        this.data.homebrew.push(monster);
         await this.saveSettings();
     }
     async deleteMonster(monster: HomebrewCreature) {
