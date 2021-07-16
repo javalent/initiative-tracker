@@ -164,14 +164,26 @@ export default class InitiativeTracker extends Plugin {
                 }
             }
         });
-        /* 
+
         this.registerMarkdownCodeBlockProcessor(
             "init-tracker",
             (src, el, ctx) => {
                 const params = parseYaml(src);
                 console.log("🚀 ~ file: main.ts ~ line 172 ~ params", params);
+
+                const rawMonsters = params.monsters ?? [];
+                let monsters: Creature[];
+                if (rawMonsters && rawMonsters instanceof Array) {
+                    monsters = rawMonsters.map(
+                        (m) => new Creature({ name: m[0], hp: m[1] })
+                    );
+                }
+
+                if (this.view) {
+                    this.view.newEncounter({ ...params, creatures: monsters });
+                }
             }
-        ); */
+        );
 
         if (this.app.workspace.layoutReady) {
             this.addTrackerView();

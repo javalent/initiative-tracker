@@ -13,6 +13,8 @@ export default class TrackerView extends ItemView {
     public players: Creature[] = [];
     public state: boolean = false;
 
+    public name: string;
+
     private _app: App;
     private _rendered: boolean = false;
 
@@ -56,8 +58,28 @@ export default class TrackerView extends ItemView {
         });
     }
 
-    async newEncounter() {
-        this.creatures = [...this.players];
+    async newEncounter({
+        name,
+        players = true,
+        creatures = []
+    }: {
+        name?: string;
+        players?: boolean;
+        creatures?: Creature[];
+    } = {}) {
+        if (players) {
+            this.creatures = [...this.players];
+        } else {
+            this.creatures = [];
+        }
+        if (creatures) this.creatures = [...this.creatures, ...creatures];
+
+        if (name) {
+            this.name = name;
+            this.setAppState({
+                name: this.name
+            });
+        }
 
         for (let creature of this.creatures) {
             creature.enabled = true;
@@ -92,10 +114,6 @@ export default class TrackerView extends ItemView {
             initiative = num.result;
         }
         return initiative;
-    }
-
-    async rollInitiative(creature: Creature): Promise<void> {
-        creature.initiative = await this.getInitiativeValue(creature.modifier);
     }
 
     async rollInitiatives() {
