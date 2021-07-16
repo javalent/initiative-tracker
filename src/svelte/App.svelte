@@ -18,7 +18,6 @@
 
     export let creatures: Creature[] = [];
     export let view: TrackerView;
-    export let name: string;
     export let state: boolean;
     export let current: number;
 
@@ -64,9 +63,6 @@
 
 <div class="obsidian-initiative-tracker">
     <Controls {state} />
-    {#if name && name.length}
-        <h2 class="initiative-tracker-name">{name}</h2>
-    {/if}
     <Table
         {creatures}
         {show}
@@ -181,6 +177,7 @@
         margin: 0.5rem;
         min-width: 180px;
     }
+
     .add-creature-container {
         display: flex;
         flex-flow: column nowrap;
@@ -190,9 +187,5 @@
     }
     .add-button {
         align-self: flex-end;
-    }
-    .initiative-tracker-name {
-        margin: 0;
-        padding-left: 0.75rem;
     }
 </style>

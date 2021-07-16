@@ -71,8 +71,8 @@
         modal.onClose = async () => {
             if (modal.creature) {
                 name = modal.creature.name;
-                if (modal.creature.hp) hp = `${modal.creature.hp}`;
-                if (modal.creature.ac) ac = `${modal.creature.ac}`;
+                hp = `${modal.creature.hp}`;
+                ac = `${modal.creature.ac}`;
                 modifier = (<Creature>modal.creature).modifier ?? 0;
 
                 if ((<SRDMonster>modal.creature).stats && !modifier) {
@@ -88,9 +88,9 @@
         modal.open();
     };
 
-    /* function init(el: HTMLInputElement) {
+    function init(el: HTMLInputElement) {
         el.focus();
-    } */
+    }
 </script>
 
 <div class="create-new">
@@ -101,6 +101,7 @@
             on:focus={function () {
                 openModal(this);
             }}
+            use:init
             id="add-name"
             type="text"
             name="name"
