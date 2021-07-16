@@ -10,8 +10,9 @@ import {
 } from "obsidian";
 import { createPopper, Instance as PopperInstance } from "@popperjs/core";
 
-import { BESTIARY } from "./srd-bestiary";
-import type { HomebrewCreature, SRDMonster } from "@types";
+import { Conditions } from "./conditions";
+
+import type { HomebrewCreature, SRDMonster, Condition } from "@types";
 import type InitiativeTracker from "src/main";
 import type { Creature } from "./creature";
 
@@ -321,6 +322,7 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
     constructor(public plugin: InitiativeTracker, inputEl: HTMLInputElement) {
         super(plugin.app, inputEl);
         this.creatures = [...this.plugin.players, ...this.plugin.bestiary];
+        this.onInputChanged();
     }
     getItems() {
         return this.creatures;
@@ -473,6 +475,7 @@ export class HomebrewMonsterSuggestionModal extends ElementSuggestionModal<Homeb
     getItemText(item: HomebrewCreature) {
         return item.name;
     }
+
     onChooseItem(item: HomebrewCreature) {
         this.inputEl.value = item.name;
         this.creature = item;
@@ -520,4 +523,75 @@ export class HomebrewMonsterSuggestionModal extends ElementSuggestionModal<Homeb
         });
     }
     onRemoveItem(item: HomebrewCreature) {}
+}
+
+export class ConditionSuggestionModal extends SuggestionModal<Condition> {
+    items: Condition[] = [];
+    condition: Condition;
+    constructor(public plugin: InitiativeTracker, inputEl: HTMLInputElement) {
+        super(plugin.app, inputEl);
+        this.items = Conditions;
+        this.suggestEl.style.removeProperty("min-width");
+        this.onInputChanged();
+    }
+    getItemText(item: Condition) {
+        return item.name;
+    }
+    getItems() {
+        return this.items;
+    }
+    onChooseItem(item: Condition) {
+        this.inputEl.value = item.name;
+        this.condition = item;
+    }
+    onNoSuggestion() {
+        this.empty();
+        this.renderSuggestion(
+            null,
+            this.contentEl.createDiv("suggestion-item")
+        );
+        this.condition = null;
+    }
+    selectSuggestion({ item }: FuzzyMatch<Condition>) {
+        if (this.condition !== null) {
+            this.inputEl.value = item.name;
+            this.condition = item;
+        } else {
+            this.condition = {
+                name: this.inputEl.value,
+                description: []
+            };
+        }
+
+        this.onClose();
+        this.close();
+    }
+    renderSuggestion(result: FuzzyMatch<Condition>, el: HTMLElement) {
+        let { item, match: matches } = result || {};
+        let content = new Setting(el); /* el.createDiv({
+            cls: "suggestion-content"
+        }); */
+        if (!item) {
+            content.nameEl.setText(this.emptyStateText);
+            this.condition = null;
+            return;
+        }
+
+        const matchElements = matches.matches.map((m) => {
+            return createSpan("suggestion-highlight");
+        });
+        for (let i = 0; i < item.name.length; i++) {
+            let match = matches.matches.find((m) => m[0] === i);
+            if (match) {
+                let element = matchElements[matches.matches.indexOf(match)];
+                content.nameEl.appendChild(element);
+                element.appendText(item.name.substring(match[0], match[1]));
+
+                i += match[1] - match[0] - 1;
+                continue;
+            }
+
+            content.nameEl.appendText(item.name[i]);
+        }
+    }
 }

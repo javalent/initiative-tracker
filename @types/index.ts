@@ -1,3 +1,8 @@
+export interface Condition {
+    name: string;
+    description: string[];
+}
+
 export interface InputValidate {
     input: HTMLInputElement;
     validate: (i: HTMLInputElement) => boolean;

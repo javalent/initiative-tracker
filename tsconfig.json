@@ -13,5 +13,5 @@
         "types": ["svelte", "node"],
         "lib": ["dom", "esnext", "scripthost", "es2015"]
     },
-    "include": ["src/*.ts", "src/**/*.vue"]
+    "include": ["src/*"]
 }

@@ -117,13 +117,12 @@ export default class InitiativeTracker extends Plugin {
             id: "open-tracker",
             name: "Open Initiative Tracker",
             checkCallback: (checking) => {
-                if (checking)
-                    return (
-                        this.app.workspace.getLeavesOfType(
-                            INTIATIVE_TRACKER_VIEW
-                        ).length === 0
-                    );
-                this.addTrackerView();
+                if (!this.view) {
+                    if (!checking) {
+                        this.addTrackerView();
+                    }
+                    return true;
+                }
             }
         });
 
@@ -131,32 +130,45 @@ export default class InitiativeTracker extends Plugin {
             id: "toggle-encounter",
             name: "Toggle Encounter",
             checkCallback: (checking) => {
-                if (checking) {
-                    return this.view != undefined;
+                if (this.view) {
+                    if (!checking) {
+                        this.view.toggleState();
+                    }
+                    return true;
                 }
-                this.view.toggleState();
             }
         });
+
         this.addCommand({
             id: "next-combatant",
             name: "Next Combatant",
             checkCallback: (checking) => {
-                if (checking) {
-                    return this.view != undefined && this.view.state;
+                if (this.view && this.view.state) {
+                    if (!checking) {
+                        this.view.goToNext();
+                    }
+                    return true;
                 }
-                this.view.goToNext();
             }
         });
+
         this.addCommand({
             id: "prev-combatant",
             name: "Previous Combatant",
             checkCallback: (checking) => {
-                if (checking) {
-                    return this.view != undefined && this.view.state;
+                if (this.view && this.view.state) {
+                    if (!checking) {
+                        this.view.goToPrevious();
+                    }
+                    return true;
                 }
-                this.view.goToPrevious();
             }
         });
+/* 
+        this.registerMarkdownCodeBlockProcessor(
+            "init-tracker",
+            (src, el, ctx) => {}
+        ); */
 
         if (this.app.workspace.layoutReady) {
             this.addTrackerView();

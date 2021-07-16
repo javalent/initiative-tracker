@@ -114,3 +114,7 @@
     > *:first-child {
     margin: 0 6px;
 }
+
+.tooltip.initiative-tracker-condition-tooltip {
+    text-align: left;
+}

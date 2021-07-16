@@ -1,3 +1,4 @@
+import type { Condition } from "@types";
 import { DEFAULT_UNDEFINED } from "./constants";
 
 export class Creature {
@@ -9,7 +10,7 @@ export class Creature {
     enabled: boolean = true;
     max: number;
     player: boolean;
-    status: Set<string> = new Set();
+    status: Set<Condition> = new Set();
     private _initiative: number;
     source: string;
     constructor({

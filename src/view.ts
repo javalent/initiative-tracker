@@ -1,14 +1,11 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
-import {
-    BASE,
-    INTIATIVE_TRACKER_VIEW,
-    MIN_WIDTH_FOR_HAMBURGER
-} from "./utils";
+import { BASE, INTIATIVE_TRACKER_VIEW, MIN_WIDTH_FOR_HAMBURGER } from "./utils";
 
 import type InitiativeTracker from "./main";
 
 import App from "./svelte/App.svelte";
 import { Creature } from "./utils/creature";
+import type { Condition } from "@types";
 
 export default class TrackerView extends ItemView {
     public creatures: Creature[] = [];
@@ -150,7 +147,7 @@ export default class TrackerView extends ItemView {
             current: this.current
         });
     }
-    addStatus(creature: Creature, tag: string) {
+    addStatus(creature: Creature, tag: Condition) {
         creature.status.add(tag);
         this.setAppState({
             creatures: this.ordered
@@ -229,7 +226,6 @@ export default class TrackerView extends ItemView {
             }
         });
         this._rendered = true;
-
     }
     async onClose() {
         this._app.$destroy();

@@ -11,6 +11,7 @@
     import type TrackerView from "src/view";
     import { SRDMonsterSuggestionModal } from "src/utils/suggester";
     import type { SRDMonster } from "@types";
+    import type { Creature } from "src/utils/creature";
 
     const dispatch = createEventDispatcher();
 
@@ -65,17 +66,15 @@
             });
     };
 
-    let nameInput: HTMLInputElement;
-
-    let modal: SRDMonsterSuggestionModal;
-    onMount(() => {
-        modal = new SRDMonsterSuggestionModal(view.plugin, nameInput);
+    const openModal = (nameInput: HTMLInputElement) => {
+        const modal = new SRDMonsterSuggestionModal(view.plugin, nameInput);
         modal.onClose = () => {
             if (modal.creature) {
                 name = modal.creature.name;
                 hp = `${modal.creature.hp}`;
                 ac = `${modal.creature.ac}`;
-                modifier = 0;
+                modifier = (<Creature>modal.creature).modifier ?? 0;
+
                 if ((<SRDMonster>modal.creature).stats && !modifier) {
                     const dex = ((<SRDMonster>modal.creature)?.stats ?? [
                         0, 10
@@ -85,26 +84,27 @@
                 initiative = Math.floor(Math.random() * 19 + 1) + modifier;
             }
         };
-    });
-
-    const openModal = () => {
         modal.open();
     };
+
+    function init(el: HTMLInputElement) {
+        el.focus();
+    }
 </script>
 
 <div class="create-new">
     <div>
         <label for="add-name">Name</label>
-        <!-- svelte-ignore a11y-autofocus -->
         <input
             bind:value={name}
-            bind:this={nameInput}
-            on:focus={openModal}
+            on:focus={function () {
+                openModal(this);
+            }}
+            use:init
             id="add-name"
             type="text"
             name="name"
             tabindex="0"
-            autofocus
         />
     </div>
     <div>

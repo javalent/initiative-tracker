@@ -13,6 +13,8 @@
     import { Creature } from "src/utils/creature";
     import { ExtraButtonComponent } from "obsidian";
     import { ADD } from "src/utils";
+    import { ConditionSuggestionModal } from "src/utils/suggester";
+    import type { Condition } from "@types";
 
     export let creatures: Creature[] = [];
     export let view: TrackerView;
@@ -32,7 +34,7 @@
     };
 
     let updatingStatus: Creature;
-    const addStatus = (tag: string) => {
+    const addStatus = (tag: Condition) => {
         view.addStatus(updatingStatus, tag);
         updatingStatus = null;
     };
@@ -46,6 +48,17 @@
                 addNew = true;
             });
     };
+    let modal: ConditionSuggestionModal;
+    const suggestConditions = (node: HTMLInputElement) => {
+        modal = new ConditionSuggestionModal(view.plugin, node);
+        modal.onClose = () => {
+            node.blur();
+        };
+        modal.open();
+    };
+    function init(el: HTMLInputElement) {
+        el.focus();
+    }
 </script>
 
 <div class="obsidian-initiative-tracker">
@@ -64,11 +77,10 @@
     />
     {#if updatingHP}
         <div class="updating-hp">
-            <span>Apply damage or healing:</span>
+            <span>Apply damage(+) or healing(-):</span>
             <!-- svelte-ignore a11y-autofocus -->
             <input
                 type="number"
-                autofocus
                 on:blur={function (evt) {
                     updateHP(Number(this.value));
                 }}
@@ -92,6 +104,7 @@
                         return false;
                     }
                 }}
+                use:init
             />
         </div>
     {:else if updatingStatus}
@@ -100,13 +113,16 @@
             <!-- svelte-ignore a11y-autofocus -->
             <input
                 type="text"
-                autofocus
+                on:focus={function (evt) {
+                    suggestConditions(this);
+                }}
                 on:blur={function (evt) {
                     if (!this.value.length) {
                         updatingStatus = null;
                         return;
                     }
-                    addStatus(this.value);
+
+                    addStatus(modal.condition);
                 }}
                 on:keydown={function (evt) {
                     if (evt.key === "Escape") {
@@ -125,6 +141,7 @@
                         return;
                     }
                 }}
+                use:init
             />
         </div>
     {:else}

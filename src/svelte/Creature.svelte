@@ -13,6 +13,8 @@
     import store from "./store";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/view";
+    import type { Condition } from "@types";
+    import Status from "./Status.svelte";
 
     export let creature: Creature;
     export let show: boolean;
@@ -30,7 +32,7 @@
         view = value;
     });
 
-/*     const deleteButton = (node: HTMLElement) => {
+    /*     const deleteButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Remove")
             .setIcon(REMOVE)
@@ -67,7 +69,9 @@
     }; */
 
     const hamburgerIcon = (node: HTMLElement) => {
-        const hamburger = new ExtraButtonComponent(node).setIcon(HAMBURGER).setTooltip("Actions");
+        const hamburger = new ExtraButtonComponent(node)
+            .setIcon(HAMBURGER)
+            .setTooltip("Actions");
         hamburger.extraSettingsEl.onclick = (evt) => {
             const menu = new Menu(view.plugin.app);
             menu.addItem((item) => {
@@ -107,15 +111,7 @@
 
     $: statuses = Array.from(creature.status);
     $: active = view.ordered[current];
-    const deleteIcon = (node: HTMLElement, status: string) => {
-        const icon = new ExtraButtonComponent(node)
-            .setIcon("cross-in-box")
-            .onClick(() => {
-                creature.status.delete(status);
-                statuses = Array.from(creature.status);
-            });
-        icon.extraSettingsEl.setAttr("style", "margin-left: 3px;");
-    };
+
     let initiativeInput: HTMLInputElement;
     afterUpdate(() => {
         initiativeInput.value = `${creature.initiative}`;
@@ -233,10 +229,13 @@
     <span />
     <div class="statuses">
         {#each statuses as status}
-            <div class="tag">
-                <span>{status}</span>
-                <div use:deleteIcon={status} />
-            </div>
+            <Status
+                {status}
+                on:remove={() => {
+                    creature.status.delete(status);
+                    statuses = Array.from(creature.status);
+                }}
+            />
         {/each}
     </div>
     <!-- {/if} -->
@@ -291,21 +290,14 @@
         flex-flow: row wrap;
     }
 
-    .tag {
-        display: flex;
-        align-items: center;
-        padding-right: 0px;
-        margin-right: 0.125rem;
-    }
-
-/*     .status .clickable-icon {
+    /*     .status .clickable-icon {
         margin: 0;
     } */
     .center {
         text-align: center;
     }
 
-/*     .right {
+    /*     .right {
         margin-left: auto;
     } */
     .editable:not(.player) {
