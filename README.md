@@ -12,14 +12,13 @@ Encounters can be created and launched directly from notes as of `2.0.0` using t
 ```encounter
 name: Example
 creatures:
- - Hobgoblin
  - 3: Goblin
 ```
 ````
 
 This will render like this in Preview:
 
-
+<img src="https://raw.githubusercontent.com/valentine195/obsidian-initiative-tracker/master/assets/encounter.PNG">
 
 Clicking on the button next to the encounter name will then launch the encounter in the Initiative Tracker.
 
