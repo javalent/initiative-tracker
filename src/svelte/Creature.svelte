@@ -13,7 +13,6 @@
     import store from "./store";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/view";
-    import type { Condition } from "@types";
     import Status from "./Status.svelte";
 
     export let creature: Creature;
@@ -32,7 +31,7 @@
         view = value;
     });
 
-    /*     const deleteButton = (node: HTMLElement) => {
+    const deleteButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Remove")
             .setIcon(REMOVE)
@@ -66,7 +65,7 @@
             .onClick(() => {
                 view.setCreatureState(creature, false);
             });
-    }; */
+    };
 
     const hamburgerIcon = (node: HTMLElement) => {
         const hamburger = new ExtraButtonComponent(node)
@@ -116,9 +115,6 @@
     afterUpdate(() => {
         initiativeInput.value = `${creature.initiative}`;
     });
-    /*     function select(el: Node) {
-        window.getSelection().selectAllChildren(el);
-    } */
 </script>
 
 <div class="initiative-tracker-creature" class:disabled={!creature.enabled}>
@@ -145,6 +141,9 @@
     <div class="tree-item-flair-outer">
         <input
             class="editable initiative tree-item-flair"
+            aria-label={`${creature.initiative - creature.modifier} + ${
+                creature.modifier
+            }`}
             on:click={function (evt) {
                 this.select();
             }}
@@ -207,7 +206,7 @@
     <span class="center">{creature.ac ?? DEFAULT_UNDEFINED}</span>
     <div class="controls">
         <div class="add-button icon" class:show use:hamburgerIcon />
-        <!--  <div class="add-button tags" class:show={!show} use:tagButton />
+        <div class="add-button tags" class:show={!show} use:tagButton />
         {#if creature.enabled}
             <div
                 class="add-button enable"
@@ -221,7 +220,7 @@
                 use:enableButton
             />
         {/if}
-        <div class="add-button delete" class:show={!show} use:deleteButton /> -->
+        <div class="add-button delete" class:show={!show} use:deleteButton />
     </div>
 
     <!-- {#if creature.status.length} -->
@@ -273,13 +272,12 @@
     .initiative-tracker-creature .name {
         display: block;
         text-align: left;
-        /* white-space: nowrap; */
-        /* user-select: all; */
         background-color: inherit;
         border: 0;
         font-size: smaller;
         padding: 0;
         height: unset;
+        word-break: break-word;
     }
 
     .statuses {

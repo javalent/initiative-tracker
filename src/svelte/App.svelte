@@ -1,8 +1,6 @@
 <svelte:options accessors={true} />
 
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-
     import Controls from "./Controls.svelte";
     import Table from "./Table.svelte";
     import Create from "./Create.svelte";
@@ -18,11 +16,9 @@
 
     export let creatures: Creature[] = [];
     export let view: TrackerView;
-    export let name: string;
+    export let name: string = null;
     export let state: boolean;
     export let current: number;
-
-    const dispatch = createEventDispatcher();
 
     store.view.set(view);
 
@@ -185,7 +181,6 @@
         display: flex;
         flex-flow: column nowrap;
         justify-content: flex-start;
-        height: 25px;
         margin-right: 0.5rem;
     }
     .add-button {

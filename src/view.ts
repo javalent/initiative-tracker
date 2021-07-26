@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import { ItemView, Platform, WorkspaceLeaf } from "obsidian";
 import { BASE, INTIATIVE_TRACKER_VIEW, MIN_WIDTH_FOR_HAMBURGER } from "./utils";
 
 import type InitiativeTracker from "./main";
@@ -25,7 +25,16 @@ export default class TrackerView extends ItemView {
         ];
         this.newEncounter();
     }
+    onResize() {
+        if (!this.leaf.getRoot() || !this.leaf.getRoot().containerEl) return;
+        if (Platform.isMobile) return;
 
+        this.setAppState({
+            show:
+                this.leaf.getRoot().containerEl.clientWidth <
+                MIN_WIDTH_FOR_HAMBURGER
+        });
+    }
     get ordered() {
         this.creatures.sort((a, b) => b.initiative - a.initiative);
 
@@ -64,10 +73,14 @@ export default class TrackerView extends ItemView {
         creatures = []
     }: {
         name?: string;
-        players?: boolean;
+        players?: boolean | string[];
         creatures?: Creature[];
     } = {}) {
-        if (players) {
+        if (players instanceof Array && players.length) {
+            this.creatures = [
+                ...this.players.filter((p) => players.includes(p.name))
+            ];
+        } else if (players === true) {
             this.creatures = [...this.players];
         } else {
             this.creatures = [];
@@ -233,14 +246,16 @@ export default class TrackerView extends ItemView {
         }
     }
     async onOpen() {
+        let show = Platform.isMobile
+            ? true
+            : this.leaf.getRoot?.().containerEl?.clientWidth <
+                  MIN_WIDTH_FOR_HAMBURGER ?? true;
         this._app = new App({
             target: this.contentEl,
             props: {
                 view: this,
                 creatures: this.ordered,
-                show:
-                    this.contentEl.getBoundingClientRect().width <
-                    MIN_WIDTH_FOR_HAMBURGER,
+                show: show,
                 state: this.state,
                 current: this.current
             }

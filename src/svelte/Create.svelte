@@ -1,7 +1,6 @@
 <script lang="ts">
     import { ExtraButtonComponent, Notice } from "obsidian";
 
-    import { onMount } from "svelte";
     import { createEventDispatcher } from "svelte";
 
     import { DICE, SAVE } from "src/utils";
@@ -10,8 +9,7 @@
 
     import type TrackerView from "src/view";
     import { SRDMonsterSuggestionModal } from "src/utils/suggester";
-    import type { SRDMonster } from "@types";
-    import type { Creature } from "src/utils/creature";
+    import { Creature } from "src/utils/creature";
 
     const dispatch = createEventDispatcher();
 
@@ -70,17 +68,11 @@
         const modal = new SRDMonsterSuggestionModal(view.plugin, nameInput);
         modal.onClose = async () => {
             if (modal.creature) {
-                name = modal.creature.name;
-                if (modal.creature.hp) hp = `${modal.creature.hp}`;
-                if (modal.creature.ac) ac = `${modal.creature.ac}`;
-                modifier = (<Creature>modal.creature).modifier ?? 0;
-
-                if ((<SRDMonster>modal.creature).stats && !modifier) {
-                    const dex = ((<SRDMonster>modal.creature)?.stats ?? [
-                        0, 10
-                    ])[1];
-                    modifier = Math.floor((dex - 10) / 2);
-                }
+                let newCreature = Creature.from(modal.creature);
+                name = newCreature.name;
+                if (newCreature.hp) hp = `${newCreature.hp}`;
+                if (newCreature.ac) ac = `${newCreature.ac}`;
+                modifier = newCreature.modifier ?? 0;
 
                 initiative = await view.getInitiativeValue(modifier);
             }
@@ -88,9 +80,6 @@
         modal.open();
     };
 
-    /* function init(el: HTMLInputElement) {
-        el.focus();
-    } */
 </script>
 
 <div class="create-new">
