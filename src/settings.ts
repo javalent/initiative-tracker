@@ -49,7 +49,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 new Setting(syncEl)
                     .setName("Sync Monsters from 5e Statblocks")
                     .setDesc(
-                        "Homebrew monsters saved to the 5e Statblocks plugin will be available in the quick-add."
+                        "Homebrew creatures saved to the 5e Statblocks plugin will be available in the quick-add."
                     )
                     .addToggle((t) => {
                         t.setValue(this.plugin.data.sync);
@@ -62,7 +62,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     });
                 if (this.plugin.data.sync) {
                     const synced = new Setting(syncEl).setDesc(
-                        `${this.plugin.statblock_creatures.length} monsters synced.`
+                        `${this.plugin.statblock_creatures.length} creatures synced.`
                     );
                     synced.settingEl.addClass("initiative-synced");
                     setIcon(synced.nameEl, "check-in-circle");
@@ -133,9 +133,9 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         );
 
         new Setting(importSettingsContainer)
-            .setName("Import Monsters")
+            .setName("Import Creatures")
             .setDesc(
-                "Import monsters from monster files. Only import data that you own."
+                "Import creatures from creature files. Only import data that you own."
             );
 
         const importAdditional =
@@ -161,7 +161,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 try {
                     await this.plugin.saveMonsters(importedMonsters);
                     new Notice(
-                        `Successfully imported ${importedMonsters.length} monsters.`
+                        `Successfully imported ${importedMonsters.length} creatures.`
                     );
                 } catch (e) {
                     new Notice(
@@ -206,7 +206,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         Array.from(importedMonsters.values())
                     );
                     new Notice(
-                        `Successfully imported ${importedMonsters.size} monsters.`
+                        `Successfully imported ${importedMonsters.size} creatures.`
                     );
                 } catch (e) {
                     new Notice(
@@ -252,7 +252,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         Array.from(importedMonsters.values())
                     );
                     new Notice(
-                        `Successfully imported ${importedMonsters.size} monsters.`
+                        `Successfully imported ${importedMonsters.size} creatures.`
                     );
                 } catch (e) {
                     new Notice(
@@ -296,7 +296,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         Array.from(importedMonsters.values())
                     );
                     new Notice(
-                        `Successfully imported ${importedMonsters.size} monsters.`
+                        `Successfully imported ${importedMonsters.size} creatures.`
                     );
                 } catch (e) {
                     new Notice(
@@ -365,7 +365,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     }
                 })
                 .createSpan({
-                    text: "No saved monsters! Create one to see it here."
+                    text: "No saved creatures! Create one to see it here."
                 });
             return;
         }
@@ -377,9 +377,9 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         );
 
         searchMonsters.setDesc(
-            `Manage homebrew monsters. Currently: ${
+            `Manage homebrew creatures. Currently: ${
                 suggester.getItems().length
-            } monster${suggester.filteredItems.length != 1 ? "s" : ""}.`
+            } creature${suggester.filteredItems.length != 1 ? "s" : ""}.`
         );
 
         suggester.onRemoveItem = async (monster) => {
@@ -387,7 +387,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 await this.plugin.deleteMonster(monster);
             } catch (e) {
                 new Notice(
-                    `There was an error deleting the monster:${
+                    `There was an error deleting the creature:${
                         `\n\n` + e.message
                     }`
                 );
@@ -424,9 +424,9 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
 
         suggester.onInputChanged = () =>
             searchMonsters.setDesc(
-                `Manage homebrew monsters. Currently: ${
+                `Manage homebrew creatures. Currently: ${
                     suggester.filteredItems.length
-                } monster${suggester.filteredItems.length != 1 ? "s" : ""}.`
+                } creature${suggester.filteredItems.length != 1 ? "s" : ""}.`
             );
     }
     private _displayPlayers(additionalContainer: HTMLDivElement) {

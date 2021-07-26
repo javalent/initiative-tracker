@@ -1,8 +1,6 @@
 <svelte:options accessors={true} />
 
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-
     import Controls from "./Controls.svelte";
     import Table from "./Table.svelte";
     import Create from "./Create.svelte";
@@ -18,10 +16,9 @@
 
     export let creatures: Creature[] = [];
     export let view: TrackerView;
+    export let name: string = null;
     export let state: boolean;
     export let current: number;
-
-    const dispatch = createEventDispatcher();
 
     store.view.set(view);
 
@@ -63,6 +60,9 @@
 
 <div class="obsidian-initiative-tracker">
     <Controls {state} />
+    {#if name && name.length}
+        <h2 class="initiative-tracker-name">{name}</h2>
+    {/if}
     <Table
         {creatures}
         {show}
@@ -177,15 +177,17 @@
         margin: 0.5rem;
         min-width: 180px;
     }
-
     .add-creature-container {
         display: flex;
         flex-flow: column nowrap;
         justify-content: flex-start;
-        height: 25px;
         margin-right: 0.5rem;
     }
     .add-button {
         align-self: flex-end;
+    }
+    .initiative-tracker-name {
+        margin: 0;
+        padding-left: 0.75rem;
     }
 </style>

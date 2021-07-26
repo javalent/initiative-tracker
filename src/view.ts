@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import { ItemView, Platform, WorkspaceLeaf } from "obsidian";
 import { BASE, INTIATIVE_TRACKER_VIEW, MIN_WIDTH_FOR_HAMBURGER } from "./utils";
 
 import type InitiativeTracker from "./main";
@@ -13,6 +13,8 @@ export default class TrackerView extends ItemView {
     public players: Creature[] = [];
     public state: boolean = false;
 
+    public name: string;
+
     private _app: App;
     private _rendered: boolean = false;
 
@@ -23,7 +25,16 @@ export default class TrackerView extends ItemView {
         ];
         this.newEncounter();
     }
+    onResize() {
+        if (!this.leaf.getRoot() || !this.leaf.getRoot().containerEl) return;
+        if (Platform.isMobile) return;
 
+        this.setAppState({
+            show:
+                this.leaf.getRoot().containerEl.clientWidth <
+                MIN_WIDTH_FOR_HAMBURGER
+        });
+    }
     get ordered() {
         this.creatures.sort((a, b) => b.initiative - a.initiative);
 
@@ -56,8 +67,32 @@ export default class TrackerView extends ItemView {
         });
     }
 
-    async newEncounter() {
-        this.creatures = [...this.players];
+    async newEncounter({
+        name,
+        players = true,
+        creatures = []
+    }: {
+        name?: string;
+        players?: boolean | string[];
+        creatures?: Creature[];
+    } = {}) {
+        if (players instanceof Array && players.length) {
+            this.creatures = [
+                ...this.players.filter((p) => players.includes(p.name))
+            ];
+        } else if (players === true) {
+            this.creatures = [...this.players];
+        } else {
+            this.creatures = [];
+        }
+        if (creatures) this.creatures = [...this.creatures, ...creatures];
+
+        if (name) {
+            this.name = name;
+            this.setAppState({
+                name: this.name
+            });
+        }
 
         for (let creature of this.creatures) {
             creature.enabled = true;
@@ -92,10 +127,6 @@ export default class TrackerView extends ItemView {
             initiative = num.result;
         }
         return initiative;
-    }
-
-    async rollInitiative(creature: Creature): Promise<void> {
-        creature.initiative = await this.getInitiativeValue(creature.modifier);
     }
 
     async rollInitiatives() {
@@ -215,14 +246,16 @@ export default class TrackerView extends ItemView {
         }
     }
     async onOpen() {
+        let show = Platform.isMobile
+            ? true
+            : this.leaf.getRoot?.().containerEl?.clientWidth <
+                  MIN_WIDTH_FOR_HAMBURGER ?? true;
         this._app = new App({
             target: this.contentEl,
             props: {
                 view: this,
                 creatures: this.ordered,
-                show:
-                    this.contentEl.getBoundingClientRect().width <
-                    MIN_WIDTH_FOR_HAMBURGER,
+                show: show,
                 state: this.state,
                 current: this.current
             }

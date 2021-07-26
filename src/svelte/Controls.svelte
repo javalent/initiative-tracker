@@ -16,8 +16,7 @@
     const playButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setIcon(PLAY)
-            .setTooltip("Play") /* 
-            .setDisabled(numberOfCreatures == 0) */
+            .setTooltip("Play")
             .onClick(() => {
                 view.toggleState();
                 state = view.state;

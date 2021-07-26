@@ -1,4 +1,4 @@
-import type { Condition } from "@types";
+import type { Condition, SRDMonster } from "@types";
 import { DEFAULT_UNDEFINED } from "./constants";
 
 export class Creature {
@@ -65,5 +65,17 @@ export class Creature {
         yield this.max;
         yield this.ac;
         yield this.note;
+    }
+
+    static from(creature: Creature | SRDMonster) {
+        if (creature instanceof Creature) {
+            delete creature.initiative;
+            return new Creature({ ...creature });
+        }
+
+        return new Creature({
+            ...creature,
+            modifier: Math.floor(((creature.stats[1] ?? 10) - 10) / 2)
+        });
     }
 }

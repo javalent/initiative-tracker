@@ -4,7 +4,129 @@ This plugin can be used as an initiative tracker within Obsidian.md.
 
 When enabled, the plugin will add an additional view in the right pane, where players and creatures can be added to track their initiatives during combat.
 
-## Using the Plugin
+## Creating Encounters in Notes
+
+Encounters can be created and launched directly from notes as of `2.0.0` using the "encounter" code block, like so:
+
+````
+```encounter
+name: Example
+creatures:
+ - Hobgoblin
+ - 3: Goblin
+```
+````
+
+This will render like this in Preview:
+
+
+
+Clicking on the button next to the encounter name will then launch the encounter in the Initiative Tracker.
+
+### Parameters
+
+There are 3 parameters for each encounter, with more detail below.
+
+````
+```encounter
+name: string                            # Name of the encounter. Optional.
+players: boolean | string | array       # Which players to include. Optional.
+creatures: array                        # Array of creatures to include in the encounter. Optional.
+```
+````
+
+#### Name
+
+The name of the encounter, which will be displayed both in Preview mode as well as in the Initiative Tracker when the encounter is launched.
+
+#### Players
+
+The `players` parameter can be used to filter the players stored in settings before starting the encounter.
+
+If the `players` parameter is omitted, all players will be added to the encounter.
+
+````
+```encounter
+players: false                          # No players will be added to the encounter.
+players: none                           # Same as players: false
+players: true                           # All players will be added. Same as omitting the parameter.
+players:                                # Players will only be added to the encounter if they match the provided names.
+ - Name
+ - Name 2
+```
+````
+
+#### Creatures
+
+The most complicated parameter, `creatures` may be used to add additional creatures to the encounter.
+
+The basic creature will be defined as an array with the syntax of `[name, hp, ac, initiative modifer]`.
+
+**Please note that in all cases, hp, ac and the modifier are optional.**
+
+````
+```encounter
+creatures:
+  - My Monster                          # 1 monster named My Monster will be added, with no HP, AC or modifier.
+  - Goblin, 7, 15, 2                    # 1 goblin with HP: 7, AC: 15, MOD: 2 will be added.
+```
+````
+
+Multiple of the same creature may be added using `X: [name, hp, ac, initiative modifer]`, which will add `X` creatures:
+
+````
+```encounter
+creatures:
+  - 3: Goblin, 7, 15, 2                 # 3 goblins with HP: 7, AC: 15, MOD: 2 will be added.
+```
+````
+
+You may _also_ add multiple creatures by simply adding additional lines; this will also allow you to change HP, AC and modifier values for different creatures:
+
+````
+```encounter
+creatures:
+  - 2: Goblin, 7, 15, 2                 # 2 goblins with HP: 7, AC: 15, MOD: 2 will be added.
+  - Goblin, 6, 15, 2                    # 1 goblin with HP: 6, AC: 15, MOD: 2 will be added.
+  - Goblin, 9, 15, 2                    # 1 goblin with HP: 9, AC: 15, MOD: 2 will be added.
+```
+````
+
+##### Creatures from the Bestiary
+
+Creatures from your bestiary can be added by their name. This includes the full SRD creature list as well as any homebrew creatures added in Settings.
+
+````
+```encounter
+creatures:
+  - 2: Goblin                           # 2 goblins with HP: 7, AC: 15, MOD: 2 will be added.
+```
+````
+
+### Multiple Encounters
+
+The encounter code block supports an arbitrary number of encounters in one block, separated using `---`:
+
+````
+```encounter
+name: Example 1
+creatures:
+ - Hobgoblin
+ - 3: Goblin
+
+---
+
+name: Example 2
+creatures:
+ - 3: Hobgoblin
+ - Goblin
+
+```
+````
+
+### Parameters
+
+## Using the Initiative Tracker
 
 Monsters may be added to the combat by clicking the `Add Creature` button, which will open a form where the creature's name, HP, AC and initiative can be set.
 
@@ -18,7 +140,7 @@ Creatures may be disabled or removed from the combat, or statuses (such as "pois
 
 Combat can be started by clicking the `play` button. This will display the currently active creature. Clicking `next` or `previous` will move to the next enabled combatant.
 
-Initiatives can be re-rolled for all monsters in the combat by clicking the `Re-roll Initiatives` button.
+Initiatives can be re-rolled for all creatures in the combat by clicking the `Re-roll Initiatives` button.
 
 The creatures HP and status effects can be reset by clicking `Reset HP and Status`.
 
@@ -47,6 +169,7 @@ If the encounter is active, this command can be used to make the previous enable
 # Settings
 
 The setting tab has several options for adding and managing players and homebrew creatures, as well as the ability to change the formula used to calculate the initiative.
+
 ## Players
 
 Players may be added in settings. Players created in this way will be automatically added to encounters.
@@ -71,7 +194,7 @@ In the future, this will be used to display more information about the player du
 
 ## Homebrew Content
 
-Homebrew monsters may be created and managed in settings. Homebrew monsters will be available in the monster picker when adding a creature to the combat.
+Homebrew creatures may be created and managed in settings. Homebrew creatures will be available in the monster picker when adding a creature to the combat.
 
 ### 5e Statblocks Plugin
 
@@ -81,7 +204,7 @@ If the [5e Statblocks](https://github.com/valentine195/obsidian-5e-statblocks) p
 
 **Only import content that you own.**
 
-Homebrew monsters can be imported from DnDAppFile XML files or Improved Initiative JSON files in settings.
+Homebrew creatures can be imported from DnDAppFile XML files or Improved Initiative JSON files in settings.
 
 ## Initiative Formula
 
@@ -104,7 +227,7 @@ This is a list of features that are planned for the plugin. Some of these may or
 -   Wikilink Tags (e.g., condition tag to display condition rules, spell tags for spell effects, etc.)
 -   Creature stat blocks in separate moveable tab of sidebar
     -   auto-update displayed stat block based on active creature in the encounter
--   An option to build an encounter in a Note and send it to Initiative Tracker on demand (e.g., in an Obsidian Note, create some code block indicating 3 Goblins and 1 Bugbear in an area; press a button, add the 3 Goblins and Bugbear to the Initiative tracker)
+-   ~~An option to build an encounter in a Note and send it to Initiative Tracker on demand (e.g., in an Obsidian Note, create some code block indicating 3 Goblins and 1 Bugbear in an area; press a button, add the 3 Goblins and Bugbear to the Initiative tracker)~~
 -   Encounter difficulty/XP tracker for creatures with CR
 -   For the currently active creature, display any actions that would need a dice roll and an integrated dice roller with the specific dice and bonuses for the action already pre-loaded (e.g., for a Bugbear, display "Morningstar" and a to-hit dice with 1d20+4, as well as a damage dice of 2d8+2; Also display for the Javelin action)
 -   Support for multiple parties

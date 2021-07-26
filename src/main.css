@@ -118,3 +118,8 @@
 .tooltip.initiative-tracker-condition-tooltip {
     text-align: left;
 }
+
+.block-language-encounter .encounter-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
