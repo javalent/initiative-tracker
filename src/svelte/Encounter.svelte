@@ -49,37 +49,42 @@
         <div use:open />
         <h3 data-heading={name} class="initiative-tracker-name">{name}</h3>
     </div>
-    <div class="encounter-creatures encounter-players">
+    <div class="creatures-container">
         {#if players instanceof Array && players.length}
-            <h4>Players</h4>
-            <ul>
-                {#each players as player}
-                    <li>
-                        <span>{player}</span>
-                    </li>
-                {/each}
-            </ul>
+            <div class="encounter-creatures encounter-players">
+                <h4>Players</h4>
+                <ul>
+                    {#each players as player}
+                        <li>
+                            <span>{player}</span>
+                        </li>
+                    {/each}
+                </ul>
+            </div>
         {:else if !players}
-            <h4>No Players</h4>
+            <div class="encounter-creatures encounter-players">
+                <h4>No Players</h4>
+            </div>
         {/if}
-    </div>
-    <div class="encounter-creatures">
-        <h4>Creatures</h4>
-        {#if creatures.length}
-            <ul>
-                {#each Array.from(display) as creature}
-                    <li aria-label={label(creature[0])}>
-                        <strong>{creature[1]}</strong><span
-                            >&nbsp;{creature[0]}{creature[1] == 1
-                                ? ""
-                                : "s"}</span
-                        >
-                    </li>
-                {/each}
-            </ul>
-        {:else}
-            <strong>No creatures</strong>
-        {/if}
+
+        <div class="encounter-creatures">
+            <h4>Creatures</h4>
+            {#if creatures.length}
+                <ul>
+                    {#each Array.from(display) as creature}
+                        <li aria-label={label(creature[0])}>
+                            <strong>{creature[1]}</strong><span
+                                >&nbsp;{creature[0]}{creature[1] == 1
+                                    ? ""
+                                    : "s"}</span
+                            >
+                        </li>
+                    {/each}
+                </ul>
+            {:else}
+                <strong>No creatures</strong>
+            {/if}
+        </div>
     </div>
 </div>
 
@@ -89,11 +94,11 @@
         justify-content: flex-start;
         align-items: center;
     }
-    .encounter-creatures.encounter-players h4,
+    .encounter-instance
+        > .creatures-container
+        > .encounter-creatures:first-of-type
+        h4,
     .encounter-creatures > ul {
         margin-top: 0;
-    }
-    .encounter-creatures li {
-        width: max-content;
     }
 </style>
