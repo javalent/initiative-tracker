@@ -121,6 +121,15 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
 
             this._displayImports(containerEl);
             this._displayHomebrew(containerEl);
+
+            const div = containerEl.createDiv("coffee");
+            div.createEl("a", {
+                href: "https://www.buymeacoffee.com/valentine195"
+            }).createEl("img", {
+                attr: {
+                    src: "https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=valentine195&button_colour=e3e7ef&font_colour=262626&font_family=Inter&outline_colour=262626&coffee_colour=ff0000"
+                }
+            });
         } catch (e) {
             new Notice(
                 "There was an error displaying the settings tab for Obsidian Initiative Tracker."

@@ -123,3 +123,13 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
+
+.initiative-tracker-settings .coffee {
+    width: 60%;
+    color: var(--text-faint);
+    margin: 1rem auto;
+    text-align: center;
+}
+.initiative-tracker-settings .coffee img {
+    height: 30px;
+}
