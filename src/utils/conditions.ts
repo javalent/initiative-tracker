@@ -16,6 +16,14 @@ export const Conditions: Condition[] = [
         ]
     },
     {
+        name: "Concentrating",
+        description: [
+            "Some spells require you to maintain concentration in order to keep their magic active. If you lose concentration, such a spell ends.",
+            "A creature loses concentration when: it casts another spell that requires concentration, is incapacitated, or dies.",
+            "When a creature takes damage, it must make a constitution saving throw with a DC of 10 or half the damage it took, whichever is higher. On a failure, concentration is lost."
+        ]
+    },
+    {
         name: "Deafened",
         description: [
             "A deafened creature can’t hear and automatically fails any ability check that requires hearing."
@@ -82,6 +90,15 @@ export const Conditions: Condition[] = [
         ]
     },
     {
+        name: "Reacted",
+        description: [
+            "A creature, unless otherwise specified, gets one reaction per round of combat.",
+            "A reaction is an instant response to a trigger of some kind, which can occur on your turn or on someone else’s.",
+            "A reaction can be spent to make an opportunity attack, do a readied action, or use an ability that requires a reaction.",
+            "A creature that has already reacted cannot use a reaction until the start of its turn."
+        ]
+    },
+    {
         name: "Restrained",
         description: [
             "A restrained creature’s speed becomes 0, and it can’t benefit from any bonus to its speed.",
@@ -106,5 +123,5 @@ export const Conditions: Condition[] = [
             "Attack rolls against the creature have advantage.",
             "Any Attack that hits the creature is a critical hit if the attacker is within 5 feet of the creature."
         ]
-    }
+    },
 ];
