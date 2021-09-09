@@ -1,5 +1,7 @@
 import { Notice, parseYaml, Plugin, WorkspaceLeaf } from "obsidian";
 
+import type ObsidianLeafletPlugin from "../../obsidian-leaflet-plugin/src/main";
+
 import {
     DEFAULT_SETTINGS,
     INTIATIVE_TRACKER_VIEW,
@@ -30,6 +32,7 @@ declare module "obsidian" {
                 "obsidian-dice-roller": {
                     parseDice(text: string): Promise<{ result: number }>;
                 };
+                "obsidian-leaflet-plugin": ObsidianLeafletPlugin;
             };
         };
     }
@@ -62,6 +65,16 @@ export default class InitiativeTracker extends Plugin {
 
     get canUseStatBlocks() {
         return "obsidian-5e-statblocks" in this.app.plugins.plugins;
+    }
+
+    get canUseLeaflet() {
+        return "obsidian-leaflet-plugin" in this.app.plugins.plugins;
+    }
+
+    get leaflet() {
+        if (this.canUseLeaflet) {
+            return this.app.plugins.plugins["obsidian-leaflet-plugin"];
+        }
     }
 
     get statblock_creatures() {
@@ -119,6 +132,7 @@ export default class InitiativeTracker extends Plugin {
             INTIATIVE_TRACKER_VIEW,
             (leaf: WorkspaceLeaf) => new TrackerView(leaf, this)
         );
+
 
         this.addCommand({
             id: "open-tracker",

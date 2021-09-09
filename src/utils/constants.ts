@@ -12,5 +12,8 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     version: null,
     canUseDiceRoll: false,
     initiative: "1d20 + %mod%",
-    sync: false
+    sync: false,
+    leafletIntegration: false,
+    playerMarker: "default",
+    monsterMarker: "default"
 };

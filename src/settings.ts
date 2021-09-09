@@ -118,6 +118,101 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     text: " plugin to modify."
                 });
             }
+            const leaflet = new Setting(containerEl)
+                .setName("Integrate with Obsidian Leaflet")
+
+                .addToggle((t) => {
+                    if (!this.plugin.canUseLeaflet) {
+                        t.setDisabled(true);
+                        this.plugin.data.leafletIntegration = false;
+                    }
+                    t.setValue(this.plugin.data.leafletIntegration);
+                    t.onChange(async (v) => {
+                        this.plugin.data.leafletIntegration = v;
+                        this.plugin.view.setMapState(v);
+                        this.display();
+                        await this.plugin.saveSettings();
+                    });
+                });
+
+            leaflet.descEl.createSpan({
+                text: "Integrate with the Obsidian Leaflet plugin and display combats on a map."
+            });
+
+            if (!this.plugin.canUseLeaflet) {
+                formula.descEl.createEl("br");
+                formula.descEl.createEl("br");
+                formula.descEl.createSpan({
+                    attr: {
+                        style: `color: var(--text-error);`
+                    },
+                    text: "Requires the "
+                });
+                formula.descEl.createEl("a", {
+                    text: "Obsidian Leaflet",
+                    href: "https://github.com/valentine195/obsidian-leaflet-plugin",
+                    cls: "external-link"
+                });
+                formula.descEl.createSpan({
+                    attr: {
+                        style: `color: var(--text-error);`
+                    },
+                    text: " plugin to modify."
+                });
+            }
+
+            if (this.plugin.canUseLeaflet) {
+                const playerMarker = new Setting(containerEl)
+                    .setName("Default Player Marker Type")
+                    .addDropdown((drop) => {
+                        for (let marker of this.plugin.leaflet.markerIcons) {
+                            drop.addOption(marker.type, marker.type);
+                        }
+                        drop.setValue(
+                            this.plugin.data.playerMarker ?? "default"
+                        );
+                        drop.onChange(async (v) => {
+                            this.plugin.data.playerMarker = v;
+                            await this.plugin.saveSettings();
+                            this.display();
+                        });
+                    });
+                if (this.plugin.data.playerMarker) {
+                    const div = createDiv("marker-type-display");
+                    const inner = div.createDiv("marker-icon-display");
+
+                    const marker = this.plugin.leaflet.markerIcons.find(
+                        (icon) => icon.type == this.plugin.data.playerMarker
+                    );
+                    inner.innerHTML = marker.html;
+
+                    playerMarker.descEl.appendChild(div);
+                }
+                const monsterMarker = new Setting(containerEl)
+                    .setName("Default Monster Marker Type")
+                    .addDropdown((drop) => {
+                        for (let marker of this.plugin.leaflet.markerIcons) {
+                            drop.addOption(marker.type, marker.type);
+                        }
+                        drop.setValue(this.plugin.data.monsterMarker);
+                        drop.onChange(async (v) => {
+                            this.plugin.data.monsterMarker = v;
+                            await this.plugin.saveSettings();
+                            this.display();
+                        });
+                    });
+                if (this.plugin.data.monsterMarker) {
+                    const div = createDiv("marker-type-display");
+                    const inner = div.createDiv("marker-icon-display");
+
+                    const marker = this.plugin.leaflet.markerIcons.find(
+                        (icon) => icon.type == this.plugin.data.monsterMarker
+                    );
+                    inner.innerHTML = marker.html;
+
+                    monsterMarker.descEl.appendChild(div);
+                }
+            }
 
             this._displayImports(containerEl);
             this._displayHomebrew(containerEl);
@@ -561,7 +656,9 @@ class NewPlayerModal extends Modal {
 
         let error = false;
 
-        contentEl.createEl("h2", { text: "New Player" });
+        contentEl.createEl("h2", {
+            text: this.original ? "Edit Player" : "New Player"
+        });
 
         new Setting(contentEl)
             .setName("Link to Note")
@@ -678,6 +775,37 @@ class NewPlayerModal extends Modal {
                     this.player.modifier = Number(v);
                 });
             });
+
+        if (this.plugin.canUseLeaflet) {
+            const markerSetting = new Setting(contentEl)
+                .setName("Leaflet Marker")
+                .addDropdown((drop) => {
+                    for (let marker of this.plugin.leaflet.markerIcons) {
+                        drop.addOption(marker.type, marker.type);
+                    }
+                    drop.setValue(
+                        this.player.marker ??
+                            this.plugin.data.playerMarker ??
+                            "default"
+                    );
+                    drop.onChange(async (v) => {
+                        this.player.marker = v;
+                        await this.plugin.saveSettings();
+                        this.display();
+                    });
+                });
+            if (this.player.marker) {
+                const div = createDiv("marker-type-display");
+                const inner = div.createDiv("marker-icon-display");
+
+                const marker = this.plugin.leaflet.markerIcons.find(
+                    (icon) => icon.type == this.player.marker
+                );
+                inner.innerHTML = marker.html;
+
+                markerSetting.descEl.appendChild(div);
+            }
+        }
 
         let footerEl = contentEl.createDiv();
         let footerButtons = new Setting(footerEl);
@@ -867,6 +995,36 @@ class NewCreatureModal extends Modal {
                     this.creature.modifier = Number(v);
                 });
             });
+
+        if (this.plugin.canUseLeaflet) {
+            const markerSetting = new Setting(contentEl)
+                .setName("Leaflet Marker")
+                .addDropdown((drop) => {
+                    for (let marker of this.plugin.leaflet.markerIcons) {
+                        drop.addOption(marker.type, marker.type);
+                    }
+                    drop.setValue(
+                        this.creature.marker ??
+                            this.plugin.data.monsterMarker ??
+                            "default"
+                    );
+                    drop.onChange(async (v) => {
+                        await this.plugin.saveSettings();
+                        this.display();
+                    });
+                });
+            if (this.creature.marker) {
+                const div = createDiv("marker-type-display");
+                const inner = div.createDiv("marker-icon-display");
+
+                const marker = this.plugin.leaflet.markerIcons.find(
+                    (icon) => icon.type == this.creature.marker
+                );
+                inner.innerHTML = marker.html;
+
+                markerSetting.descEl.appendChild(div);
+            }
+        }
 
         let footerEl = contentEl.createDiv();
         let footerButtons = new Setting(footerEl);

@@ -2,12 +2,22 @@
     import { ExtraButtonComponent } from "obsidian";
 
     import store from "./store";
-    import { BACKWARD, DICE, FORWARD, NEW, PLAY, REDO, STOP } from "src/utils";
+    import {
+        BACKWARD,
+        DICE,
+        FORWARD,
+        MAP,
+        NEW,
+        PLAY,
+        REDO,
+        STOP
+    } from "src/utils";
 
     import type TrackerView from "src/view";
 
     export let state: boolean = false;
-    
+    export let map: boolean = false;
+
     let view: TrackerView;
     store.view.subscribe((value) => {
         view = value;
@@ -74,6 +84,15 @@
                 view.rollInitiatives();
             });
     };
+
+    const mapButton = (node: HTMLElement) => {
+        new ExtraButtonComponent(node)
+            .setIcon(MAP)
+            .setTooltip("Open Leaflet Map")
+            .onClick(() => {
+                view.openInitiativeView();
+            });
+    };
 </script>
 
 <div class="buttons">
@@ -90,6 +109,9 @@
         <div use:diceButton />
         <div use:restoreButton />
         <div use:newButton />
+        {#if map}
+            <div use:mapButton />
+        {/if}
     </div>
 </div>
 

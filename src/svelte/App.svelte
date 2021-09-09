@@ -19,6 +19,7 @@
     export let name: string = null;
     export let state: boolean;
     export let current: number;
+    export let map: boolean;
 
     store.view.set(view);
 
@@ -59,7 +60,7 @@
 </script>
 
 <div class="obsidian-initiative-tracker">
-    <Controls {state} />
+    <Controls {state} {map} />
     {#if name && name.length}
         <h2 class="initiative-tracker-name">{name}</h2>
     {/if}

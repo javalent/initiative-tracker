@@ -114,7 +114,11 @@ export default class TrackerView extends ItemView {
             creatures: this.ordered
         });
     }
-
+    setMapState(v: boolean) {
+        this.setAppState({
+            map: v
+        });
+    }
     async getInitiativeValue(modifier: number = 0): Promise<number> {
         let initiative = Math.floor(Math.random() * 19 + 1) + modifier;
         if (this.plugin.canUseDiceRoller) {
@@ -257,7 +261,8 @@ export default class TrackerView extends ItemView {
                 creatures: this.ordered,
                 show: show,
                 state: this.state,
-                current: this.current
+                current: this.current,
+                map: this.plugin.data.leafletIntegration
             }
         });
         this._rendered = true;
@@ -275,5 +280,8 @@ export default class TrackerView extends ItemView {
     }
     getIcon() {
         return BASE;
+    }
+    openInitiativeView() {
+        this.plugin.leaflet.openInitiativeView(this.creatures);
     }
 }

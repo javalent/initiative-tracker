@@ -15,6 +15,9 @@ export interface InitiativeTrackerData {
     canUseDiceRoll: boolean;
     initiative: string;
     sync: boolean;
+    leafletIntegration: boolean;
+    playerMarker: string;
+    monsterMarker: string;
 }
 
 export interface SRDMonster {
@@ -56,6 +59,7 @@ export interface HomebrewCreature {
     modifier?: number;
     note?: string;
     player?: boolean;
+    marker?: string;
 }
 
 export type ability =
