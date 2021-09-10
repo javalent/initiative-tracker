@@ -13,6 +13,9 @@
     import { ADD } from "src/utils";
     import { ConditionSuggestionModal } from "src/utils/suggester";
     import type { Condition } from "@types";
+    import { createEventDispatcher } from "svelte";
+
+    const dispatch = createEventDispatcher();
 
     export let creatures: Creature[] = [];
     export let view: TrackerView;
@@ -38,6 +41,7 @@
     };
 
     let addNew = false;
+    export let addNewAsync = false;
     const addButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Add Creature")
@@ -147,23 +151,32 @@
         </div>
     {:else}
         <div class="add-creature-container">
-            {#if addNew}
+            {#if addNew || addNewAsync}
                 <Create
                     on:cancel={() => {
                         addNew = false;
+                        addNewAsync = false;
+                        dispatch("cancel-add-new-async");
                     }}
                     on:save={(evt) => {
-                        addNew = false;
                         const creature = evt.detail;
-                        view.addCreatures(
-                            new Creature({
+                        const newCreature = new Creature(
+                            {
                                 name: creature.name,
                                 hp: creature.hp,
-                                initiative: creature.initiative,
                                 ac: creature.ac,
-                                modifier: creature.modifier
-                            })
+                                modifier: creature.modifier,
+                                marker: view.plugin.data.monsterMarker
+                            },
+                            creature.initiative
                         );
+                        if (addNewAsync) {
+                            dispatch("add-new-async", newCreature);
+                        } else {
+                            view.addCreatures(newCreature);
+                        }
+                        addNew = false;
+                        addNewAsync = false;
                     }}
                 />
             {:else}

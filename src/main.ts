@@ -57,6 +57,9 @@ export default class InitiativeTracker extends Plugin {
     }
     set players(players) {
         this.data.players = players;
+        if (this.view) {
+            this.view.updatePlayers();
+        }
     }
 
     get canUseDiceRoller() {
@@ -85,13 +88,15 @@ export default class InitiativeTracker extends Plugin {
             ...Array.from(
                 this.app.plugins.plugins["obsidian-5e-statblocks"].data.values()
             ).map((m) => {
-                return new Creature({
-                    name: m.name,
-                    hp: m.hp,
-                    ac: m.ac,
-                    source: m.source,
-                    modifier: Math.floor((m.stats[1] - 10) / 2)
-                });
+                return new Creature(
+                    {
+                        name: m.name,
+                        hp: m.hp,
+                        ac: m.ac,
+                        source: m.source,
+                        modifier: Math.floor((m.stats[1] - 10) / 2)
+                    }
+                );
             })
         ];
     }
@@ -132,7 +137,6 @@ export default class InitiativeTracker extends Plugin {
             INTIATIVE_TRACKER_VIEW,
             (leaf: WorkspaceLeaf) => new TrackerView(leaf, this)
         );
-
 
         this.addCommand({
             id: "open-tracker",
@@ -253,24 +257,26 @@ export default class InitiativeTracker extends Plugin {
                                                 ? Number(monster[3])
                                                 : creature.modifier;
                                     } else {
-                                        creature = new Creature({
-                                            name: monster[0],
-                                            hp:
-                                                monster[1] &&
-                                                !isNaN(Number(monster[1]))
-                                                    ? Number(monster[1])
-                                                    : null,
-                                            ac:
-                                                monster[2] &&
-                                                !isNaN(Number(monster[2]))
-                                                    ? Number(monster[2])
-                                                    : null,
-                                            modifier:
-                                                monster[3] &&
-                                                !isNaN(Number(monster[3]))
-                                                    ? Number(monster[3])
-                                                    : null
-                                        });
+                                        creature = new Creature(
+                                            {
+                                                name: monster[0],
+                                                hp:
+                                                    monster[1] &&
+                                                    !isNaN(Number(monster[1]))
+                                                        ? Number(monster[1])
+                                                        : null,
+                                                ac:
+                                                    monster[2] &&
+                                                    !isNaN(Number(monster[2]))
+                                                        ? Number(monster[2])
+                                                        : null,
+                                                modifier:
+                                                    monster[3] &&
+                                                    !isNaN(Number(monster[3]))
+                                                        ? Number(monster[3])
+                                                        : null
+                                            }
+                                        );
                                     }
                                     return [
                                         ...[...Array(number).keys()].map((k) =>

@@ -1,3 +1,45 @@
+import "obsidian";
+import type Creature__SvelteComponent_ from "src/svelte/Creature.svelte";
+import type { Creature } from "src/utils/creature";
+
+//      CUSTOM EVENTS
+// ------------------------
+// Convert tuple to arguments of Event.on
+type OnArgs<T> = T extends [infer A, ...infer B]
+    ? A extends string
+        ? [name: A, callback: (...args: B) => any]
+        : never
+    : never;
+export type TrackerEvents =
+    | [name: "initiative-tracker:state-change", state: TrackerViewState]
+    | [name: "initiative-tracker:players-updated", pcs: Creature[]]
+    | [name: "initiative-tracker:creatures-added", npcs: Creature[]]
+    | [
+          name: "initiative-tracker:creature-added-at-location",
+          creature: Creature,
+          latlng: L.LatLng
+      ]
+    | [name: "initiative-tracker:add-creature-here", latlng: L.LatLng]
+    | [name: "initiative-tracker:creature-updated", creature: Creature]
+    | [name: "initiative-tracker:creatures-removed", npcs: Creature[]]
+    | [name: "initiative-tracker:new-encounter", state: TrackerViewState]
+    | [name: "initiative-tracker:reset-encounter", state: TrackerViewState]
+    | [name: "initiative-tracker:active-change", creature: Creature];
+
+export type EventsOnArgs = OnArgs<TrackerEvents>;
+declare module "obsidian" {
+    interface Workspace {
+        on(...args: EventsOnArgs): EventRef;
+    }
+}
+
+export interface TrackerViewState {
+    state: boolean;
+    current: number;
+    npcs: Creature[];
+    pcs: Creature[];
+}
+
 export interface Condition {
     name: string;
     description: string[];

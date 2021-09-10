@@ -1,4 +1,4 @@
-import type { Condition, SRDMonster } from "@types";
+import type { Condition, HomebrewCreature, SRDMonster } from "@types";
 import { DEFAULT_UNDEFINED } from "./constants";
 
 export class Creature {
@@ -11,38 +11,23 @@ export class Creature {
     max: number;
     player: boolean;
     status: Set<Condition> = new Set();
+    marker: string;
     private _initiative: number;
     source: string;
-    constructor({
-        name,
-        initiative,
-        modifier,
-        hp,
-        ac,
-        note,
-        player,
-        source
-    }: {
-        name?: string;
-        initiative?: number;
-        modifier?: number;
-        hp?: number;
-        ac?: number;
-        note?: string;
-        player?: boolean;
-        source?: string;
-    }) {
-        this.name = name;
+    constructor(creature: HomebrewCreature, initiative: number = 0) {
+        this.name = creature.name;
         this._initiative = Number(initiative ?? 0);
-        this.modifier = Number(modifier ?? 0);
+        this.modifier = Number(creature.modifier ?? 0);
 
-        this.max = hp ? Number(hp) : undefined;
-        this.ac = ac ? Number(ac) : undefined;
-        this.note = note;
-        this.player = player;
+        this.max = creature.hp ? Number(creature.hp) : undefined;
+        this.ac = creature.ac ? Number(creature.ac) : undefined;
+        this.note = creature.note;
+        this.player = creature.player;
+
+        this.marker = creature.marker ?? "default";
 
         this.hp = this.max;
-        this.source = source;
+        this.source = creature.source;
     }
     get hpDisplay() {
         if (this.max) {
@@ -73,9 +58,12 @@ export class Creature {
             return new Creature({ ...creature });
         }
 
-        return new Creature({
-            ...creature,
-            modifier: Math.floor(((creature.stats[1] ?? 10) - 10) / 2)
-        });
+        return new Creature(
+            {
+                ...creature,
+                modifier: Math.floor(((creature.stats[1] ?? 10) - 10) / 2)
+            },
+            0
+        );
     }
 }

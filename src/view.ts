@@ -4,13 +4,13 @@ import { BASE, INTIATIVE_TRACKER_VIEW, MIN_WIDTH_FOR_HAMBURGER } from "./utils";
 import type InitiativeTracker from "./main";
 
 import App from "./svelte/App.svelte";
-import { Creature } from "./utils/creature";
-import type { Condition } from "@types";
+import type { Creature } from "./utils/creature";
+import type { Condition, TrackerEvents, TrackerViewState } from "@types";
 
 export default class TrackerView extends ItemView {
     public creatures: Creature[] = [];
     public current: number = 0;
-    public players: Creature[] = [];
+
     public state: boolean = false;
 
     public name: string;
@@ -18,12 +18,60 @@ export default class TrackerView extends ItemView {
     private _app: App;
     private _rendered: boolean = false;
 
+    get pcs() {
+        return this.players;
+    }
+    get npcs() {
+        return this.creatures.filter((c) => !c.player);
+    }
+
+    get players() {
+        return [...this.plugin.players];
+    }
+
+    updatePlayers() {
+        this.trigger("initiative-tracker:players-updated", this.pcs);
+        this.setAppState({
+            creatures: this.ordered
+        });
+    }
+
     constructor(public leaf: WorkspaceLeaf, public plugin: InitiativeTracker) {
         super(leaf);
-        this.players = [
-            ...this.plugin.players.map((p) => new Creature({ ...p }))
-        ];
         this.newEncounter();
+
+        this.registerEvent(
+            this.app.workspace.on(
+                "initiative-tracker:add-creature-here",
+                async (latlng: L.LatLng) => {
+                    this.app.workspace.revealLeaf(this.leaf);
+                    let addNewAsync = this._app.$on("add-new-async", (evt) => {
+                        const creature = evt.detail;
+                        this._addCreature(creature);
+
+                        this.trigger(
+                            "initiative-tracker:creature-added-at-location",
+                            creature,
+                            latlng
+                        );
+                        addNewAsync();
+                        cancel();
+                    });
+                    let cancel = this._app.$on("cancel-add-new-async", () => {
+                        addNewAsync();
+                        cancel();
+                    });
+                    this._app.$set({ addNewAsync: true });
+                }
+            )
+        );
+    }
+    private _addCreature(creature: Creature) {
+        this.creatures.push(creature);
+
+        this.setAppState({
+            creatures: this.ordered
+        });
     }
     onResize() {
         if (!this.leaf.getRoot() || !this.leaf.getRoot().containerEl) return;
@@ -52,6 +100,8 @@ export default class TrackerView extends ItemView {
             this.creatures.push(creature);
         }
 
+        this.trigger("initiative-tracker:creatures-added", creatures);
+
         this.setAppState({
             creatures: this.ordered
         });
@@ -62,6 +112,7 @@ export default class TrackerView extends ItemView {
             this.creatures = this.creatures.filter((c) => c != creature);
         }
 
+        this.trigger("initiative-tracker:creatures-removed", creatures);
         this.setAppState({
             creatures: this.ordered
         });
@@ -98,6 +149,8 @@ export default class TrackerView extends ItemView {
             creature.enabled = true;
         }
 
+        this.trigger("initiative-tracker:new-encounter", this.appState);
+
         await this.rollInitiatives();
     }
 
@@ -109,6 +162,8 @@ export default class TrackerView extends ItemView {
         }
 
         this.current = this.enabled[0];
+
+        this.trigger("initiative-tracker:reset-encounter", this.appState);
 
         this.setAppState({
             creatures: this.ordered
@@ -125,7 +180,7 @@ export default class TrackerView extends ItemView {
             const num = await this.plugin.app.plugins.plugins[
                 "obsidian-dice-roller"
             ].parseDice(
-                this.plugin.data.initiative.replace(/%mod%/g, `${modifier}`)
+                this.plugin.data.initiative.replace(/%mod%/g, `(${modifier})`)
             );
 
             initiative = num.result;
@@ -144,7 +199,14 @@ export default class TrackerView extends ItemView {
             creatures: this.ordered
         });
     }
-
+    get appState(): TrackerViewState {
+        return {
+            state: this.state,
+            current: this.current,
+            pcs: this.pcs,
+            npcs: this.npcs
+        };
+    }
     goToNext() {
         const current = this.enabled.indexOf(this.current);
 
@@ -153,6 +215,11 @@ export default class TrackerView extends ItemView {
             this.enabled.length;
 
         this.current = this.enabled[next];
+
+        this.trigger(
+            "initiative-tracker:active-change",
+            this.ordered[this.current]
+        );
 
         this.setAppState({
             state: this.state,
@@ -166,6 +233,11 @@ export default class TrackerView extends ItemView {
             this.enabled.length;
 
         this.current = this.enabled[next];
+
+        this.trigger(
+            "initiative-tracker:active-change",
+            this.ordered[this.current]
+        );
 
         this.setAppState({
             state: this.state,
@@ -186,6 +258,9 @@ export default class TrackerView extends ItemView {
     }
     addStatus(creature: Creature, tag: Condition) {
         creature.status.add(tag);
+
+        this.trigger("initiative-tracker:creature-updated", creature);
+
         this.setAppState({
             creatures: this.ordered
         });
@@ -196,8 +271,15 @@ export default class TrackerView extends ItemView {
             hp,
             ac,
             initiative,
-            name
-        }: { hp?: number; ac?: number; initiative?: number; name?: string }
+            name,
+            marker
+        }: {
+            hp?: number;
+            ac?: number;
+            initiative?: number;
+            name?: string;
+            marker?: string;
+        }
     ) {
         if (initiative) {
             creature.initiative = Number(initiative);
@@ -211,6 +293,11 @@ export default class TrackerView extends ItemView {
         if (ac) {
             creature.ac = ac;
         }
+        if (marker) {
+            creature.marker = marker;
+        }
+
+        this.trigger("initiative-tracker:creature-updated", creature);
 
         this.setAppState({
             creatures: this.ordered
@@ -225,6 +312,9 @@ export default class TrackerView extends ItemView {
         if (!this.enabled.length) {
             this.current = null;
         }
+
+        this.trigger("initiative-tracker:creature-updated", creature);
+
         this.setAppState({
             creatures: this.ordered,
             current: this.current
@@ -246,6 +336,10 @@ export default class TrackerView extends ItemView {
 
     setAppState(state: { [key: string]: any }) {
         if (this._app && this._rendered) {
+            this.plugin.app.workspace.trigger(
+                "initiative-tracker:state-change",
+                this.appState
+            );
             this._app.$set(state);
         }
     }
@@ -282,6 +376,11 @@ export default class TrackerView extends ItemView {
         return BASE;
     }
     openInitiativeView() {
-        this.plugin.leaflet.openInitiativeView(this.creatures);
+        this.plugin.leaflet.openInitiativeView(this.pcs, this.npcs);
+    }
+
+    trigger(...args: TrackerEvents) {
+        const [name, ...data] = args;
+        this.app.workspace.trigger(name, ...data);
     }
 }
