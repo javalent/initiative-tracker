@@ -1,5 +1,14 @@
 import type { Condition, HomebrewCreature, SRDMonster } from "@types";
+import type InitiativeTracker from "src/main";
 import { DEFAULT_UNDEFINED } from "./constants";
+
+function getId() {
+    return "ID_xyxyxyxyxyxy".replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 16) | 0,
+            v = c == "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+}
 
 export class Creature {
     name: string;
@@ -14,6 +23,7 @@ export class Creature {
     marker: string;
     private _initiative: number;
     source: string;
+    id: string;
     constructor(creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;
         this._initiative = Number(initiative ?? 0);
@@ -24,10 +34,12 @@ export class Creature {
         this.note = creature.note;
         this.player = creature.player;
 
-        this.marker = creature.marker ?? "default";
+        this.marker = creature.marker;
 
         this.hp = this.max;
         this.source = creature.source;
+
+        this.id = creature.id ?? getId();
     }
     get hpDisplay() {
         if (this.max) {
@@ -50,20 +62,43 @@ export class Creature {
         yield this.max;
         yield this.ac;
         yield this.note;
+        yield this.id;
+        yield this.marker;
     }
 
-    static from(creature: Creature | SRDMonster) {
-        if (creature instanceof Creature) {
-            delete creature.initiative;
-            return new Creature({ ...creature });
-        }
-
+    static from(creature: HomebrewCreature | SRDMonster) {
         return new Creature(
             {
                 ...creature,
-                modifier: Math.floor(((creature.stats[1] ?? 10) - 10) / 2)
+                modifier: Math.floor(
+                    (("stats" in creature && creature.stats.length > 1
+                        ? creature.stats[1]
+                        : 10) -
+                        10) /
+                        2
+                )
             },
             0
         );
+    }
+
+    update(creature: HomebrewCreature) {
+        this.name = creature.name;
+        this.modifier = Number(creature.modifier ?? 0);
+
+        this.max = creature.hp ? Number(creature.hp) : undefined;
+
+        if (this.hp > this.max) this.hp = this.max;
+
+        this.ac = creature.ac ? Number(creature.ac) : undefined;
+        this.note = creature.note;
+        this.player = creature.player;
+
+        this.marker = creature.marker;
+        this.source = creature.source;
+    }
+
+    toProperties() {
+        return { ...this };
     }
 }

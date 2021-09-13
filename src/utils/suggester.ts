@@ -14,7 +14,6 @@ import { Conditions } from "./conditions";
 
 import type { HomebrewCreature, SRDMonster, Condition } from "@types";
 import type InitiativeTracker from "src/main";
-import type { Creature } from "./creature";
 
 class Suggester<T> {
     owner: SuggestModal<T>;
@@ -315,26 +314,26 @@ export class FileSuggestionModal extends SuggestionModal<TFile> {
 }
 
 export class SRDMonsterSuggestionModal extends SuggestionModal<
-    Creature | SRDMonster
+    HomebrewCreature | SRDMonster
 > {
-    creature: Creature | SRDMonster;
-    creatures: (Creature | SRDMonster)[];
+    creature: HomebrewCreature | SRDMonster;
+    creatures: (HomebrewCreature | SRDMonster)[];
     constructor(public plugin: InitiativeTracker, inputEl: HTMLInputElement) {
         super(plugin.app, inputEl);
-        this.creatures = [...this.plugin.players, ...this.plugin.bestiary];
+        this.creatures = [...this.plugin.data.players, ...this.plugin.bestiary];
         this.onInputChanged();
     }
     getItems() {
         return this.creatures;
     }
-    getItemText(item: Creature | SRDMonster) {
+    getItemText(item: HomebrewCreature | SRDMonster) {
         return item.name;
     }
-    onChooseItem(item: Creature | SRDMonster) {
+    onChooseItem(item: HomebrewCreature | SRDMonster) {
         this.inputEl.value = item.name;
         this.creature = item;
     }
-    selectSuggestion({ item }: FuzzyMatch<Creature | SRDMonster>) {
+    selectSuggestion({ item }: FuzzyMatch<HomebrewCreature | SRDMonster>) {
         this.inputEl.value = item.name;
         this.creature = item;
 
@@ -342,7 +341,7 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
         this.close();
     }
     renderSuggestion(
-        result: FuzzyMatch<Creature | SRDMonster>,
+        result: FuzzyMatch<HomebrewCreature | SRDMonster>,
         el: HTMLElement
     ) {
         let { item, match: matches } = result || {};

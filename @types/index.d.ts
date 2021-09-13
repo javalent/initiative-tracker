@@ -21,23 +21,24 @@ export type TrackerEvents =
       ]
     | [name: "initiative-tracker:add-creature-here", latlng: L.LatLng]
     | [name: "initiative-tracker:creature-updated", creature: Creature]
+    | [
+          name: "initiative-tracker:creature-updated-in-settings",
+          creature: Creature
+      ]
     | [name: "initiative-tracker:creatures-removed", npcs: Creature[]]
     | [name: "initiative-tracker:new-encounter", state: TrackerViewState]
     | [name: "initiative-tracker:reset-encounter", state: TrackerViewState]
-    | [name: "initiative-tracker:active-change", creature: Creature];
+    | [name: "initiative-tracker:active-change", creature: Creature]
+    | [name: "initiative-tracker:unload"];
 
 export type EventsOnArgs = OnArgs<TrackerEvents>;
-declare module "obsidian" {
-    interface Workspace {
-        on(...args: EventsOnArgs): EventRef;
-    }
-}
 
 export interface TrackerViewState {
     state: boolean;
     current: number;
     npcs: Creature[];
     pcs: Creature[];
+    creatures: Creature[];
 }
 
 export interface Condition {
@@ -102,6 +103,7 @@ export interface HomebrewCreature {
     note?: string;
     player?: boolean;
     marker?: string;
+    id?: string;
 }
 
 export type ability =

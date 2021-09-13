@@ -19,11 +19,12 @@
     export let show: boolean;
     export let state: boolean;
     export let current: number;
-
     const dispatch = createEventDispatcher();
 
     const updateName = (evt: FocusEvent) => {
-        creature.name = (evt.target as HTMLSpanElement).textContent;
+        view.updateCreature(creature, {
+            name: (evt.target as HTMLSpanElement).textContent
+        });
     };
 
     let view: TrackerView;
@@ -67,6 +68,27 @@
             });
     };
 
+    const markerButton = (node: HTMLElement) => {
+        const marker = new ExtraButtonComponent(node).setTooltip(
+            "Change Marker"
+        );
+        marker.extraSettingsEl.onclick = (evt) => {
+            const menu = new Menu(view.plugin.app);
+            menu.setNoIcon();
+            for (let marker of view.plugin.leaflet.markerIcons) {
+                menu.addItem((item) => {
+                    item.setTitle(marker.type);
+                    item.onClick(() => {
+                        view.updateCreature(creature, {
+                            marker: marker.type
+                        });
+                    });
+                });
+            }
+            menu.showAtPosition({ x: evt.clientX, y: evt.clientY });
+        };
+    };
+
     const hamburgerIcon = (node: HTMLElement) => {
         const hamburger = new ExtraButtonComponent(node)
             .setIcon(HAMBURGER)
@@ -95,6 +117,25 @@
                         .onClick(() => {
                             view.setCreatureState(creature, true);
                         });
+                });
+            }
+            if (view.plugin.data.leafletIntegration) {
+                menu.addItem((item) => {
+                    item.setTitle("Change Marker").onClick((evt) => {
+                        const markerMenu = new Menu(view.plugin.app);
+                        markerMenu.setNoIcon();
+                        for (let marker of view.plugin.leaflet.markerIcons) {
+                            markerMenu.addItem((item) => {
+                                item.setTitle(marker.type);
+                                item.onClick(() => {
+                                    view.updateCreature(creature, {
+                                        marker: marker.type
+                                    });
+                                });
+                            });
+                        }
+                        markerMenu.showAtMouseEvent(evt);
+                    });
                 });
             }
             menu.addItem((item) => {
@@ -220,6 +261,13 @@
                 use:enableButton
             />
         {/if}
+        {#if view.plugin.data.leafletIntegration}
+            <div
+                class="add-button marker"
+                class:show={!show}
+                use:markerButton
+            />
+        {/if}
         <div class="add-button delete" class:show={!show} use:deleteButton />
     </div>
 
@@ -231,8 +279,8 @@
             <Status
                 {status}
                 on:remove={() => {
-                    creature.status.delete(status);
-                    statuses = Array.from(creature.status);
+                    view.removeStatus(creature, status);
+                    /* statuses = Array.from(creature.status); */
                 }}
             />
         {/each}

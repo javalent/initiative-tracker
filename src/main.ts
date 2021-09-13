@@ -8,6 +8,7 @@ import {
     registerIcons
 } from "./utils";
 import type {
+    EventsOnArgs,
     HomebrewCreature,
     InitiativeTrackerData,
     SRDMonster
@@ -33,34 +34,22 @@ declare module "obsidian" {
                     parseDice(text: string): Promise<{ result: number }>;
                 };
                 "obsidian-leaflet-plugin": ObsidianLeafletPlugin;
+                "initiative-tracker": InitiativeTracker;
             };
         };
     }
     interface WorkspaceItem {
         containerEl: HTMLElement;
     }
+    interface Workspace {
+        on(...args: EventsOnArgs): EventRef;
+    }
 }
+
 export default class InitiativeTracker extends Plugin {
     public data: InitiativeTrackerData;
-    private _playercreatures: Creature[];
-    private _homebrewcreatures: Creature[];
-    get players(): Creature[] {
-        if (
-            !this._playercreatures ||
-            this._playercreatures.length != this.data.players.length
-        ) {
-            this._playercreatures = this.data.players.map(
-                (p) => new Creature({ ...p })
-            );
-        }
-        return this._playercreatures;
-    }
-    set players(players) {
-        this.data.players = players;
-        if (this.view) {
-            this.view.updatePlayers();
-        }
-    }
+    playerCreatures: Map<HomebrewCreature, Creature> = new Map();
+    homebrewCreatures: Map<HomebrewCreature, Creature> = new Map();
 
     get canUseDiceRoller() {
         return "obsidian-dice-roller" in this.app.plugins.plugins;
@@ -87,30 +76,12 @@ export default class InitiativeTracker extends Plugin {
         return [
             ...Array.from(
                 this.app.plugins.plugins["obsidian-5e-statblocks"].data.values()
-            ).map((m) => {
-                return new Creature(
-                    {
-                        name: m.name,
-                        hp: m.hp,
-                        ac: m.ac,
-                        source: m.source,
-                        modifier: Math.floor((m.stats[1] - 10) / 2)
-                    }
-                );
-            })
+            )
         ];
     }
 
     get homebrew() {
-        if (
-            !this._homebrewcreatures ||
-            this._homebrewcreatures.length != this.data.homebrew.length
-        ) {
-            this._homebrewcreatures = this.data.homebrew.map(
-                (p) => new Creature({ ...p })
-            );
-        }
-        return [...this.statblock_creatures, ...this._homebrewcreatures];
+        return [...this.statblock_creatures, ...this.data.homebrew];
     }
 
     get bestiary() {
@@ -257,26 +228,26 @@ export default class InitiativeTracker extends Plugin {
                                                 ? Number(monster[3])
                                                 : creature.modifier;
                                     } else {
-                                        creature = new Creature(
-                                            {
-                                                name: monster[0],
-                                                hp:
-                                                    monster[1] &&
-                                                    !isNaN(Number(monster[1]))
-                                                        ? Number(monster[1])
-                                                        : null,
-                                                ac:
-                                                    monster[2] &&
-                                                    !isNaN(Number(monster[2]))
-                                                        ? Number(monster[2])
-                                                        : null,
-                                                modifier:
-                                                    monster[3] &&
-                                                    !isNaN(Number(monster[3]))
-                                                        ? Number(monster[3])
-                                                        : null
-                                            }
-                                        );
+                                        creature = new Creature({
+                                            name: monster[0],
+                                            hp:
+                                                monster[1] &&
+                                                !isNaN(Number(monster[1]))
+                                                    ? Number(monster[1])
+                                                    : null,
+                                            ac:
+                                                monster[2] &&
+                                                !isNaN(Number(monster[2]))
+                                                    ? Number(monster[2])
+                                                    : null,
+                                            modifier:
+                                                monster[3] &&
+                                                !isNaN(Number(monster[3]))
+                                                    ? Number(monster[3])
+                                                    : null,
+
+                                            marker: this.data.monsterMarker
+                                        });
                                     }
                                     return [
                                         ...[...Array(number).keys()].map((k) =>
@@ -340,20 +311,24 @@ export default class InitiativeTracker extends Plugin {
             }
         });
 
+        this.playerCreatures = new Map(
+            this.data.players.map((p) => [p, Creature.from(p)])
+        );
+        this.homebrewCreatures = new Map(
+            this.bestiary.map((p) => [p, Creature.from(p)])
+        );
+
         if (this.app.workspace.layoutReady) {
             this.addTrackerView();
         } else {
-            this.registerEvent(
-                this.app.workspace.on(
-                    "layout-ready",
-                    this.addTrackerView.bind(this)
-                )
-            );
+            this.app.workspace.onLayoutReady(() => this.addTrackerView());
         }
         console.log("Initiative Tracker v" + this.manifest.version + " loaded");
+
     }
 
     onunload() {
+        this.app.workspace.trigger("initiative-tracker:unload");
         this.app.workspace
             .getLeavesOfType(INTIATIVE_TRACKER_VIEW)
             .forEach((leaf) => leaf.detach());
@@ -372,16 +347,91 @@ export default class InitiativeTracker extends Plugin {
     async saveMonsters(importedMonsters: HomebrewCreature[]) {
         this.data.homebrew.push(...importedMonsters);
 
+        for (let monster of importedMonsters) {
+            this.homebrewCreatures.set(monster, Creature.from(monster));
+        }
+
         await this.saveSettings();
     }
     async saveMonster(monster: HomebrewCreature) {
         this.data.homebrew.push(monster);
+        this.homebrewCreatures.set(monster, Creature.from(monster));
+        await this.saveSettings();
+    }
+    async updatePlayer(existing: HomebrewCreature, player: HomebrewCreature) {
+        if (!this.playerCreatures.has(existing)) {
+            await this.savePlayer(player);
+            return;
+        }
+
+        const creature = this.playerCreatures.get(existing);
+        creature.update(player);
+
+        this.data.players.splice(
+            this.data.players.indexOf(existing),
+            1,
+            player
+        );
+
+        this.playerCreatures.set(player, creature);
+        this.playerCreatures.delete(existing);
+
+        if (this.view) {
+            this.view.updateState();
+        }
+
+        await this.saveSettings();
+    }
+    async updateMonster(existing: HomebrewCreature, monster: HomebrewCreature) {
+        if (!this.homebrewCreatures.has(existing)) {
+            await this.saveMonster(monster);
+            return;
+        }
+
+        const creature = this.homebrewCreatures.get(existing);
+        creature.update(monster);
+
+        this.data.homebrew.splice(
+            this.data.homebrew.indexOf(existing),
+            1,
+            monster
+        );
+
+        this.homebrewCreatures.set(monster, creature);
+        this.homebrewCreatures.delete(existing);
+
+        if (this.view) {
+            this.view.updateState();
+        }
+
         await this.saveSettings();
     }
     async deleteMonster(monster: HomebrewCreature) {
         this.data.homebrew = this.data.homebrew.filter((m) => m != monster);
+        this.homebrewCreatures.delete(monster);
+
         await this.saveSettings();
     }
+
+    async savePlayer(player: HomebrewCreature) {
+        this.data.players.push(player);
+        this.playerCreatures.set(player, Creature.from(player));
+        await this.saveSettings();
+    }
+    async savePlayers(...players: HomebrewCreature[]) {
+        for (let monster of players) {
+            this.data.players.push(monster);
+            this.playerCreatures.set(monster, Creature.from(monster));
+        }
+        await this.saveSettings();
+    }
+
+    async deletePlayer(player: HomebrewCreature) {
+        this.data.players = this.data.players.filter((p) => p != player);
+        this.playerCreatures.delete(player);
+        await this.saveSettings();
+    }
+
     async loadSettings() {
         const data = Object.assign(
             {},
@@ -390,9 +440,28 @@ export default class InitiativeTracker extends Plugin {
         );
 
         this.data = data;
+        if (
+            this.data.leafletIntegration &&
+            !this.data.players.every((p) => p.marker)
+        ) {
+            this.data.players = this.data.players.map((p) => {
+                p.marker = p.marker ?? this.data.playerMarker;
+                return p;
+            });
+        }
     }
 
     async saveSettings() {
+        if (
+            this.data.leafletIntegration &&
+            !this.data.players.every((p) => p.marker)
+        ) {
+            this.data.players = this.data.players.map((p) => {
+                p.marker = p.marker ?? this.data.playerMarker;
+                return p;
+            });
+        }
+
         await this.saveData(this.data);
     }
 }

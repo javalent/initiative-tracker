@@ -130,8 +130,8 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     t.onChange(async (v) => {
                         this.plugin.data.leafletIntegration = v;
                         this.plugin.view.setMapState(v);
-                        this.display();
                         await this.plugin.saveSettings();
+                        this.display();
                     });
                 });
 
@@ -215,7 +215,11 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             }
 
             this._displayImports(containerEl);
-            this._displayHomebrew(containerEl);
+
+            const homebrewContainer = containerEl.createDiv(
+                "initiative-tracker-additional-container initiative-tracker-monsters"
+            );
+            this._displayHomebrew(homebrewContainer);
 
             const div = containerEl.createDiv("coffee");
             div.createEl("a", {
@@ -420,10 +424,9 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             b.onClick(() => input5eTools.click());
         });
     }
-    private _displayHomebrew(containerEl: HTMLElement) {
-        const additionalContainer = containerEl.createDiv(
-            "initiative-tracker-additional-container initiative-tracker-monsters"
-        );
+    private _displayHomebrew(additionalContainer: HTMLElement) {
+        additionalContainer.empty();
+
         new Setting(additionalContainer)
             .setName("Add New Creature")
             .addButton((button: ButtonComponent): ButtonComponent => {
@@ -436,11 +439,10 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         modal.onClose = async () => {
                             if (!modal.saved) return;
 
-                            this.plugin.data.homebrew.push({
+                            this.plugin.saveMonster({
                                 ...modal.creature,
                                 source: "Homebrew"
                             });
-                            await this.plugin.saveSettings();
 
                             this.display();
                         };
@@ -507,15 +509,15 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             modal.onClose = async () => {
                 if (!modal.saved) return;
                 try {
-                    const original = this.plugin.data.homebrew.find(
-                        (m) => m == monster
+                    await this.plugin.updateMonster(monster, modal.creature);
+
+                    this.plugin.app.workspace.trigger(
+                        "initiative-tracker:creature-updated-in-settings",
+                        monster
                     );
-                    if (!original) return;
-                    Object.assign(original, modal.creature);
-                    await this.plugin.saveSettings();
                 } catch (e) {
                     new Notice(
-                        `There was an error deleting the monster:${
+                        `There was an error updating the monster:${
                             `\n\n` + e.message
                         }`
                     );
@@ -534,6 +536,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             );
     }
     private _displayPlayers(additionalContainer: HTMLDivElement) {
+        additionalContainer.empty();
         const additional = additionalContainer.createDiv("additional");
         new Setting(additional)
             .setName("Add New Player")
@@ -548,20 +551,19 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         modal.onClose = async () => {
                             if (!modal.saved) return;
 
-                            this.plugin.data.players.push({
+                            await this.plugin.savePlayer({
                                 ...modal.player,
                                 player: true
                             });
-                            await this.plugin.saveSettings();
 
-                            this.display();
+                            this._displayPlayers(additionalContainer);
                         };
                     });
 
                 return b;
             });
         const playerView = additional.createDiv("initiative-tracker-players");
-        if (!this.plugin.players.length) {
+        if (!this.plugin.data.players.length) {
             additional
                 .createDiv({
                     attr: {
@@ -589,7 +591,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
 
             headers.createDiv();
 
-            for (let player of this.plugin.players) {
+            for (let player of this.plugin.data.players) {
                 const playerDiv = playerView.createDiv(
                     "initiative-tracker-player"
                 );
@@ -615,22 +617,32 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         modal.onClose = async () => {
                             if (!modal.saved) return;
 
-                            Object.assign(player, modal.player);
+                            console.log(
+                                "🚀 ~ file: settings.ts ~ line 628 ~ modal.player",
+                                modal.player,
+                                player
+                            );
+                            await this.plugin.updatePlayer(
+                                player,
+                                modal.player
+                            );
+                            this.plugin.app.workspace.trigger(
+                                "initiative-tracker:creature-updated-in-settings",
+                                player
+                            );
 
-                            await this.plugin.saveSettings();
-
-                            this.display();
+                            this._displayPlayers(additionalContainer);
                         };
                     });
                 new ExtraButtonComponent(icons.createDiv())
                     .setIcon("trash")
                     .setTooltip("Delete")
                     .onClick(async () => {
-                        this.plugin.players = this.plugin.players.filter(
-                            (p) => p != player
-                        );
+                        this.plugin.data.players =
+                            this.plugin.data.players.filter((p) => p != player);
+
                         await this.plugin.saveSettings();
-                        this.display();
+                        this._displayPlayers(additionalContainer);
                     });
             }
         }
@@ -645,6 +657,7 @@ class NewPlayerModal extends Modal {
         private original?: HomebrewCreature
     ) {
         super(plugin.app);
+        console.log("🚀 ~ file: settings.ts ~ line 645 ~ original", original);
         this.player = { ...(original ?? {}) };
     }
     async display(load?: boolean) {
@@ -702,7 +715,7 @@ class NewPlayerModal extends Modal {
                         let error = false;
                         if (
                             (!i.value.length && !load) ||
-                            (this.plugin.players.find(
+                            (this.plugin.data.players.find(
                                 (p) => p.name === i.value
                             ) &&
                                 this.player.name != this.original.name)
@@ -790,10 +803,10 @@ class NewPlayerModal extends Modal {
                     );
                     drop.onChange(async (v) => {
                         this.player.marker = v;
-                        await this.plugin.saveSettings();
                         this.display();
                     });
                 });
+
             if (this.player.marker) {
                 const div = createDiv("marker-type-display");
                 const inner = div.createDiv("marker-icon-display");
@@ -922,7 +935,7 @@ class NewCreatureModal extends Modal {
                         let error = false;
                         if (
                             (!i.value.length && !load) ||
-                            (this.plugin.players.find(
+                            (this.plugin.data.players.find(
                                 (p) => p.name === i.value
                             ) &&
                                 this.creature.name != this.original.name)
@@ -1009,7 +1022,7 @@ class NewCreatureModal extends Modal {
                             "default"
                     );
                     drop.onChange(async (v) => {
-                        await this.plugin.saveSettings();
+                        this.creature.marker = v;
                         this.display();
                     });
                 });

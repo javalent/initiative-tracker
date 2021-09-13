@@ -25,7 +25,6 @@
     export let map: boolean;
 
     store.view.set(view);
-
     export let show: boolean;
 
     let updatingHP: Creature;

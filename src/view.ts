@@ -26,7 +26,7 @@ export default class TrackerView extends ItemView {
     }
 
     get players() {
-        return [...this.plugin.players];
+        return Array.from(this.plugin.playerCreatures.values());
     }
 
     updatePlayers() {
@@ -34,6 +34,11 @@ export default class TrackerView extends ItemView {
         this.setAppState({
             creatures: this.ordered
         });
+    }
+
+    updateState() {
+        console.log(...this.pcs);
+        this.setAppState(this.appState);
     }
 
     constructor(public leaf: WorkspaceLeaf, public plugin: InitiativeTracker) {
@@ -62,6 +67,18 @@ export default class TrackerView extends ItemView {
                         cancel();
                     });
                     this._app.$set({ addNewAsync: true });
+                }
+            )
+        );
+        this.registerEvent(
+            this.app.workspace.on(
+                "initiative-tracker:creature-updated-in-settings",
+                (creature: Creature) => {
+                    const existing = this.creatures.find((c) => c == creature);
+
+                    if (existing) {
+                        this.updateCreature(existing, creature);
+                    }
                 }
             )
         );
@@ -204,7 +221,8 @@ export default class TrackerView extends ItemView {
             state: this.state,
             current: this.current,
             pcs: this.pcs,
-            npcs: this.npcs
+            npcs: this.npcs,
+            creatures: this.ordered
         };
     }
     goToNext() {
@@ -258,6 +276,15 @@ export default class TrackerView extends ItemView {
     }
     addStatus(creature: Creature, tag: Condition) {
         creature.status.add(tag);
+
+        this.trigger("initiative-tracker:creature-updated", creature);
+
+        this.setAppState({
+            creatures: this.ordered
+        });
+    }
+    removeStatus(creature: Creature, tag: Condition) {
+        creature.status.delete(tag);
 
         this.trigger("initiative-tracker:creature-updated", creature);
 
@@ -336,6 +363,10 @@ export default class TrackerView extends ItemView {
 
     setAppState(state: { [key: string]: any }) {
         if (this._app && this._rendered) {
+            console.log(
+                "🚀 ~ file: view.ts ~ line 372 ~ ...this.pcs.map((pc) => pc.ac)",
+                ...this.pcs.map((pc) => pc.ac)
+            );
             this.plugin.app.workspace.trigger(
                 "initiative-tracker:state-change",
                 this.appState
