@@ -37,7 +37,6 @@ export default class TrackerView extends ItemView {
     }
 
     updateState() {
-        console.log(...this.pcs);
         this.setAppState(this.appState);
     }
 
@@ -173,14 +172,17 @@ export default class TrackerView extends ItemView {
 
     resetEncounter() {
         for (let creature of this.creatures) {
-            creature.hp = creature.max;
-            creature.status = new Set();
-            creature.enabled = true;
+            this.updateCreature(creature, {
+                hp: creature.max
+            });
+            this.setCreatureState(creature, true);
+            const statuses = Array.from(creature.status);
+            statuses.forEach((status) => {
+                this.removeStatus(creature, status);
+            });
         }
 
         this.current = this.enabled[0];
-
-        this.trigger("initiative-tracker:reset-encounter", this.appState);
 
         this.setAppState({
             creatures: this.ordered
@@ -267,6 +269,15 @@ export default class TrackerView extends ItemView {
 
         if (this.state) {
             this.current = this.enabled[0];
+            console.log("🚀 ~ file: view.ts ~ line 272 ~ this.current", this.current, this.enabled, this.ordered[this.current]);
+
+            this.trigger(
+                "initiative-tracker:active-change",
+                this.ordered[this.current]
+
+            );
+        } else {
+            this.trigger("initiative-tracker:active-change", null);
         }
 
         this.setAppState({
@@ -363,10 +374,6 @@ export default class TrackerView extends ItemView {
 
     setAppState(state: { [key: string]: any }) {
         if (this._app && this._rendered) {
-            console.log(
-                "🚀 ~ file: view.ts ~ line 372 ~ ...this.pcs.map((pc) => pc.ac)",
-                ...this.pcs.map((pc) => pc.ac)
-            );
             this.plugin.app.workspace.trigger(
                 "initiative-tracker:state-change",
                 this.appState

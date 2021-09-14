@@ -616,12 +616,6 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         modal.open();
                         modal.onClose = async () => {
                             if (!modal.saved) return;
-
-                            console.log(
-                                "🚀 ~ file: settings.ts ~ line 628 ~ modal.player",
-                                modal.player,
-                                player
-                            );
                             await this.plugin.updatePlayer(
                                 player,
                                 modal.player
@@ -657,7 +651,6 @@ class NewPlayerModal extends Modal {
         private original?: HomebrewCreature
     ) {
         super(plugin.app);
-        console.log("🚀 ~ file: settings.ts ~ line 645 ~ original", original);
         this.player = { ...(original ?? {}) };
     }
     async display(load?: boolean) {

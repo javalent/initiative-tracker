@@ -18,7 +18,6 @@
     export let creature: Creature;
     export let show: boolean;
     export let state: boolean;
-    export let current: number;
     const dispatch = createEventDispatcher();
 
     const updateName = (evt: FocusEvent) => {
@@ -150,7 +149,7 @@
     };
 
     $: statuses = Array.from(creature.status);
-    $: active = view.ordered[current];
+    export let active: boolean = false;
 
     let initiativeInput: HTMLInputElement;
     afterUpdate(() => {
@@ -161,7 +160,7 @@
 <div class="initiative-tracker-creature" class:disabled={!creature.enabled}>
     <!-- class:active={current == creature} -->
     <span class="active-holder">
-        {#if state && creature === active}
+        {#if state && active}
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"

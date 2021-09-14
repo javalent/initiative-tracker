@@ -40,7 +40,7 @@
                     on:tag={(evt) => dispatch("update-tags", evt.detail)}
                     {show}
                     {state}
-                    {current}
+                    active={creatures[current] == creature}
                 />
             {/each}
         </div>
