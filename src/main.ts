@@ -60,7 +60,13 @@ export default class InitiativeTracker extends Plugin {
     }
 
     get canUseLeaflet() {
-        return "obsidian-leaflet-plugin" in this.app.plugins.plugins;
+        return (
+            "obsidian-leaflet-plugin" in this.app.plugins.plugins &&
+            Number(
+                this.app.plugins.plugins["obsidian-leaflet-plugin"].data.version
+                    ?.major >= 4
+            )
+        );
     }
 
     get leaflet() {
@@ -324,7 +330,6 @@ export default class InitiativeTracker extends Plugin {
             this.app.workspace.onLayoutReady(() => this.addTrackerView());
         }
         console.log("Initiative Tracker v" + this.manifest.version + " loaded");
-
     }
 
     onunload() {

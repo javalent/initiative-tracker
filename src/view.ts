@@ -269,7 +269,6 @@ export default class TrackerView extends ItemView {
 
         if (this.state) {
             this.current = this.enabled[0];
-            console.log("🚀 ~ file: view.ts ~ line 272 ~ this.current", this.current, this.enabled, this.ordered[this.current]);
 
             this.trigger(
                 "initiative-tracker:active-change",
