@@ -172,9 +172,7 @@ export default class TrackerView extends ItemView {
 
     resetEncounter() {
         for (let creature of this.creatures) {
-            this.updateCreature(creature, {
-                hp: creature.max
-            });
+            creature.hp = creature.max;
             this.setCreatureState(creature, true);
             const statuses = Array.from(creature.status);
             statuses.forEach((status) => {
