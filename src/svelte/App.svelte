@@ -27,13 +27,13 @@
     store.view.set(view);
     export let show: boolean;
 
-    let updatingHP: Creature;
+    export let updatingHP: Creature = null;
     const updateHP = (toAdd: number) => {
         view.updateCreature(updatingHP, { hp: -1 * toAdd });
         updatingHP = null;
     };
 
-    let updatingStatus: Creature;
+    export let updatingStatus: Creature = null;
     const addStatus = (tag: Condition) => {
         view.addStatus(updatingStatus, tag);
         updatingStatus = null;

@@ -81,6 +81,66 @@ export default class TrackerView extends ItemView {
                 }
             )
         );
+        this.registerEvent(
+            this.app.workspace.on(
+                "initiative-tracker:remove",
+                (creature: Creature) => {
+                    const existing = this.creatures.find(
+                        (c) => c.id == creature.id
+                    );
+
+                    if (existing) {
+                        this.removeCreature(existing);
+                    }
+                }
+            )
+        );
+        this.registerEvent(
+            this.app.workspace.on(
+                "initiative-tracker:enable-disable",
+                (creature: Creature, enable: boolean) => {
+                    const existing = this.creatures.find(
+                        (c) => c.id == creature.id
+                    );
+
+                    if (existing) {
+                        this.setCreatureState(existing, enable);
+                    }
+                }
+            )
+        );
+        this.registerEvent(
+            this.app.workspace.on(
+                "initiative-tracker:apply-damage",
+                (creature: Creature) => {
+                    const existing = this.creatures.find(
+                        (c) => c.id == creature.id
+                    );
+
+                    if (existing) {
+                        this.setAppState({
+                            updatingHP: existing
+                        });
+                    }
+                }
+            )
+        );
+        this.registerEvent(
+            this.app.workspace.on(
+                "initiative-tracker:add-status",
+                (creature: Creature) => {
+                    const existing = this.creatures.find(
+                        (c) => c.id == creature.id
+                    );
+
+                    if (existing) {
+                        this.setAppState({
+                            updatingStatus: existing
+                        });
+                    }
+                }
+            )
+        );
     }
     private _addCreature(creature: Creature) {
         this.creatures.push(creature);
@@ -271,7 +331,6 @@ export default class TrackerView extends ItemView {
             this.trigger(
                 "initiative-tracker:active-change",
                 this.ordered[this.current]
-
             );
         } else {
             this.trigger("initiative-tracker:active-change", null);

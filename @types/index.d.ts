@@ -29,7 +29,15 @@ export type TrackerEvents =
     | [name: "initiative-tracker:new-encounter", state: TrackerViewState]
     | [name: "initiative-tracker:reset-encounter", state: TrackerViewState]
     | [name: "initiative-tracker:active-change", creature: Creature]
-    | [name: "initiative-tracker:unload"];
+    | [name: "initiative-tracker:unload"]
+    | [name: "initiative-tracker:apply-damage", creature: Creature]
+    | [name: "initiative-tracker:add-status", creature: Creature]
+    | [
+          name: "initiative-tracker:enable-disable",
+          creature: Creature,
+          enable: boolean
+      ]
+    | [name: "initiative-tracker:remove", creature: Creature];
 
 export type EventsOnArgs = OnArgs<TrackerEvents>;
 
