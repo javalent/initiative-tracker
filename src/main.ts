@@ -63,8 +63,8 @@ export default class InitiativeTracker extends Plugin {
         return (
             "obsidian-leaflet-plugin" in this.app.plugins.plugins &&
             Number(
-                this.app.plugins.plugins["obsidian-leaflet-plugin"].data.version
-                    ?.major >= 4
+                this.app.plugins.plugins["obsidian-leaflet-plugin"].data
+                    ?.version?.major >= 4
             )
         );
     }
