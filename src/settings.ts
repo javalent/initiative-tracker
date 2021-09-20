@@ -140,24 +140,24 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             });
 
             if (!this.plugin.canUseLeaflet) {
-                formula.descEl.createEl("br");
-                formula.descEl.createEl("br");
-                formula.descEl.createSpan({
+                leaflet.descEl.createEl("br");
+                leaflet.descEl.createEl("br");
+                leaflet.descEl.createSpan({
                     attr: {
                         style: `color: var(--text-error);`
                     },
-                    text: "Requires the "
+                    text: "Requires  "
                 });
-                formula.descEl.createEl("a", {
+                leaflet.descEl.createEl("a", {
                     text: "Obsidian Leaflet",
                     href: "https://github.com/valentine195/obsidian-leaflet-plugin",
                     cls: "external-link"
                 });
-                formula.descEl.createSpan({
+                leaflet.descEl.createSpan({
                     attr: {
                         style: `color: var(--text-error);`
                     },
-                    text: " plugin to modify."
+                    text: " version 4.0.0 to modify."
                 });
             }
 
