@@ -10,7 +10,7 @@
 
     import { Creature } from "src/utils/creature";
     import { ExtraButtonComponent } from "obsidian";
-    import { ADD } from "src/utils";
+    import { ADD, COPY } from "src/utils";
     import { ConditionSuggestionModal } from "src/utils/suggester";
     import type { Condition } from "@types";
     import { createEventDispatcher } from "svelte";
@@ -47,6 +47,14 @@
             .setIcon(ADD)
             .onClick(() => {
                 addNew = true;
+            });
+    };
+    const copyButton = (node: HTMLElement) => {
+        new ExtraButtonComponent(node)
+            .setTooltip("Copy Initiative Order")
+            .setIcon(COPY)
+            .onClick(async () => {
+                await view.copyInitiativeOrder();
             });
     };
     let modal: ConditionSuggestionModal;
@@ -179,7 +187,10 @@
                     }}
                 />
             {:else}
-                <div use:addButton class="add-button" />
+                <div class="context-container">
+                    <div use:copyButton class="copy-button" />
+                    <div use:addButton class="add-button" />
+                </div>
             {/if}
         </div>
     {/if}
@@ -196,8 +207,20 @@
         justify-content: flex-start;
         margin-right: 0.5rem;
     }
+    .context-container {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+    }
+    .copy-button {
+        width: min-content;
+        opacity: 0.25;
+    }
+    .copy-button:hover {
+        opacity: 1;
+    }
     .add-button {
-        align-self: flex-end;
+        width: min-content;
     }
     .initiative-tracker-name {
         margin: 0;

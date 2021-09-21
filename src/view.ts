@@ -397,6 +397,12 @@ export default class TrackerView extends ItemView {
             creatures: this.ordered
         });
     }
+    async copyInitiativeOrder() {
+        const contents = this.ordered
+            .map((creature) => `${creature.initiative} ${creature.name}`)
+            .join("\n");
+        await navigator.clipboard.writeText(contents);
+    }
     setCreatureState(creature: Creature, enabled: boolean) {
         if (enabled) {
             this._enableCreature(creature);

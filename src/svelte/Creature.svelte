@@ -324,7 +324,7 @@
         font-size: smaller;
         padding: 0;
         height: unset;
-        word-break: break-word;
+        word-break: keep-all;
     }
 
     .statuses {
