@@ -184,9 +184,11 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     const marker = this.plugin.leaflet.markerIcons.find(
                         (icon) => icon.type == this.plugin.data.playerMarker
                     );
-                    inner.innerHTML = marker.html;
+                    if (marker) {
+                        inner.innerHTML = marker.html;
 
-                    playerMarker.descEl.appendChild(div);
+                        playerMarker.descEl.appendChild(div);
+                    }
                 }
                 const monsterMarker = new Setting(containerEl)
                     .setName("Default Monster Marker Type")
@@ -208,9 +210,11 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     const marker = this.plugin.leaflet.markerIcons.find(
                         (icon) => icon.type == this.plugin.data.monsterMarker
                     );
-                    inner.innerHTML = marker.html;
+                    if (marker) {
+                        inner.innerHTML = marker.html;
 
-                    monsterMarker.descEl.appendChild(div);
+                        monsterMarker.descEl.appendChild(div);
+                    }
                 }
             }
 
@@ -230,6 +234,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 }
             });
         } catch (e) {
+            console.error(e);
             new Notice(
                 "There was an error displaying the settings tab for Obsidian Initiative Tracker."
             );
@@ -807,9 +812,11 @@ class NewPlayerModal extends Modal {
                 const marker = this.plugin.leaflet.markerIcons.find(
                     (icon) => icon.type == this.player.marker
                 );
-                inner.innerHTML = marker.html;
+                if (marker) {
+                    inner.innerHTML = marker.html;
 
-                markerSetting.descEl.appendChild(div);
+                    markerSetting.descEl.appendChild(div);
+                }
             }
         }
 
@@ -1026,9 +1033,11 @@ class NewCreatureModal extends Modal {
                 const marker = this.plugin.leaflet.markerIcons.find(
                     (icon) => icon.type == this.creature.marker
                 );
-                inner.innerHTML = marker.html;
+                if (marker) {
+                    inner.innerHTML = marker.html;
 
-                markerSetting.descEl.appendChild(div);
+                    markerSetting.descEl.appendChild(div);
+                }
             }
         }
 
