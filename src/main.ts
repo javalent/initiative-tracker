@@ -332,7 +332,8 @@ export default class InitiativeTracker extends Plugin {
         console.log("Initiative Tracker v" + this.manifest.version + " loaded");
     }
 
-    onunload() {
+    async onunload() {
+        await this.saveSettings();
         this.app.workspace.trigger("initiative-tracker:unload");
         this.app.workspace
             .getLeavesOfType(INTIATIVE_TRACKER_VIEW)

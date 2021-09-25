@@ -69,6 +69,22 @@ export interface InitiativeTrackerData {
     leafletIntegration: boolean;
     playerMarker: string;
     monsterMarker: string;
+    state: InitiativeViewState;
+}
+
+export interface InitiativeViewState {
+    creatures: CreatureState[];
+    state: boolean;
+    current: number;
+    name: string;
+}
+
+export interface CreatureState extends HomebrewCreature {
+    status: string[];
+    enabled: boolean;
+    currentHP: number;
+    initiative: number;
+    player: boolean;
 }
 
 export interface SRDMonster {
