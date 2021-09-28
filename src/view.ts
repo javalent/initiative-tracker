@@ -461,11 +461,13 @@ export default class TrackerView extends ItemView {
         });
         this._rendered = true;
     }
+
     async onClose() {
+        console.log("onclose");
         this._app.$destroy();
         this._rendered = false;
+        this.trigger("initiative-tracker:closed");
     }
-
     getViewType() {
         return INTIATIVE_TRACKER_VIEW;
     }

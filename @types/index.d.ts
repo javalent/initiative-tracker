@@ -37,7 +37,8 @@ export type TrackerEvents =
           creature: Creature,
           enable: boolean
       ]
-    | [name: "initiative-tracker:remove", creature: Creature];
+    | [name: "initiative-tracker:remove", creature: Creature]
+    | [name: "initiative-tracker:closed"];
 
 export type EventsOnArgs = OnArgs<TrackerEvents>;
 
