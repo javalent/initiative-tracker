@@ -1,4 +1,10 @@
-import { Notice, parseYaml, Plugin, WorkspaceLeaf } from "obsidian";
+import {
+    MarkdownPostProcessorContext,
+    Notice,
+    parseYaml,
+    Plugin,
+    WorkspaceLeaf
+} from "obsidian";
 
 import type ObsidianLeafletPlugin from "../../obsidian-leaflet-plugin/src/main";
 
@@ -115,6 +121,185 @@ export default class InitiativeTracker extends Plugin {
             (leaf: WorkspaceLeaf) => new TrackerView(leaf, this)
         );
 
+        this.addCommands();
+
+        this.registerEvent(
+            this.app.workspace.on(
+                "initiative-tracker:should-save",
+                async () => await this.saveSettings()
+            )
+        );
+
+        this.registerMarkdownCodeBlockProcessor(
+            "encounter",
+            this.encounterProcessor.bind(this)
+        );
+
+        this.playerCreatures = new Map(
+            this.data.players.map((p) => [p, Creature.from(p)])
+        );
+        this.homebrewCreatures = new Map(
+            this.bestiary.map((p) => [p, Creature.from(p)])
+        );
+
+        this.app.workspace.onLayoutReady(() => this.addTrackerView());
+
+        console.log("Initiative Tracker v" + this.manifest.version + " loaded");
+    }
+
+    encounterProcessor(
+        src: string,
+        el: HTMLElement,
+        ctx: MarkdownPostProcessorContext
+    ) {
+        const encounters = src.split("---") ?? [];
+        const containerEl = el.createDiv("encounter-container");
+        const empty = containerEl.createSpan({
+            text: "No encounters created. Please check your syntax and try again."
+        });
+
+        for (let encounter of encounters) {
+            try {
+                const params = parseYaml(encounter);
+                const rawMonsters = params.creatures ?? [];
+
+                let creatures: Creature[];
+                if (rawMonsters && rawMonsters instanceof Array) {
+                    creatures = rawMonsters
+                        .map((m) => {
+                            try {
+                                let monster: string | string[] = m,
+                                    number = 1;
+                                if (
+                                    typeof m === "object" &&
+                                    !(m instanceof Array)
+                                ) {
+                                    number = Number(Object.keys(m).shift());
+                                    monster = Object.values(
+                                        m
+                                    ).shift() as string[];
+                                } else if (typeof m === "string") {
+                                    try {
+                                        let [mon, num] = m
+                                            .split(/:\s?/)
+                                            .reverse();
+                                        if (num && !isNaN(Number(num))) {
+                                            number = Number(num);
+                                        }
+                                        monster = parseYaml(mon);
+                                    } catch (e) {
+                                        console.error(e);
+                                        return;
+                                    }
+                                }
+                                if (!monster.length) return;
+                                if (typeof monster == "string") {
+                                    monster = [monster.split(",")].flat();
+                                }
+                                let creature: Creature;
+                                const bestiary = this.bestiary.find(
+                                    (b) => b.name == monster[0]
+                                );
+                                if (bestiary) {
+                                    creature = Creature.from(bestiary);
+                                    creature.hp =
+                                        monster[1] && !isNaN(Number(monster[1]))
+                                            ? Number(monster[1])
+                                            : creature.hp;
+                                    creature.ac =
+                                        monster[2] && !isNaN(Number(monster[2]))
+                                            ? Number(monster[2])
+                                            : creature.ac;
+                                    creature.modifier =
+                                        monster[3] && !isNaN(Number(monster[3]))
+                                            ? Number(monster[3])
+                                            : creature.modifier;
+                                } else {
+                                    creature = new Creature({
+                                        name: monster[0],
+                                        hp:
+                                            monster[1] &&
+                                            !isNaN(Number(monster[1]))
+                                                ? Number(monster[1])
+                                                : null,
+                                        ac:
+                                            monster[2] &&
+                                            !isNaN(Number(monster[2]))
+                                                ? Number(monster[2])
+                                                : null,
+                                        modifier:
+                                            monster[3] &&
+                                            !isNaN(Number(monster[3]))
+                                                ? Number(monster[3])
+                                                : null,
+
+                                        marker: this.data.monsterMarker
+                                    });
+                                }
+
+                                return [
+                                    ...[...Array(number).keys()].map((k) =>
+                                        Creature.from(creature)
+                                    )
+                                ];
+                            } catch (e) {
+                                new Notice(
+                                    "Initiative Tracker: could not parse line: \n\n" +
+                                        m
+                                );
+                            }
+                        })
+                        .filter((c) => c)
+                        .flat();
+                }
+
+                const encounterEl = containerEl.createDiv("encounter");
+
+                let players: boolean | string[] = true;
+                if (params.players) {
+                    if (params.players === "none") {
+                        players = false;
+                    } else {
+                        players = params.players;
+                    }
+                }
+
+                const instance = new Encounter({
+                    target: encounterEl,
+                    props: {
+                        ...(params.name ? { name: params.name } : {}),
+                        players: players,
+                        creatures: creatures
+                    }
+                });
+
+                instance.$on("begin-encounter", async () => {
+                    if (!this.view) {
+                        await this.addTrackerView();
+                    }
+                    if (this.view) {
+                        this.view?.newEncounter({
+                            ...params,
+                            creatures: creatures
+                        });
+                        this.app.workspace.revealLeaf(this.view.leaf);
+                    } else {
+                        new Notice(
+                            "Could not find the Initiative Tracker. Try reloading the note!"
+                        );
+                    }
+                });
+                empty.detach();
+            } catch (e) {
+                new Notice(
+                    "Initiative Tracker: here was an issue parsing: \n\n" +
+                        encounter
+                );
+            }
+        }
+    }
+
+    addCommands() {
         this.addCommand({
             id: "open-tracker",
             name: "Open Initiative Tracker",
@@ -166,170 +351,6 @@ export default class InitiativeTracker extends Plugin {
                 }
             }
         });
-
-        this.registerMarkdownCodeBlockProcessor("encounter", (src, el, ctx) => {
-            const encounters = src.split("---") ?? [];
-            const containerEl = el.createDiv("encounter-container");
-            const empty = containerEl.createSpan({
-                text: "No encounters created. Please check your syntax and try again."
-            });
-
-            for (let encounter of encounters) {
-                try {
-                    const params = parseYaml(encounter);
-                    const rawMonsters = params.creatures ?? [];
-
-                    let creatures: Creature[];
-                    if (rawMonsters && rawMonsters instanceof Array) {
-                        creatures = rawMonsters
-                            .map((m) => {
-                                try {
-                                    let monster: string | string[] = m,
-                                        number = 1;
-                                    if (
-                                        typeof m === "object" &&
-                                        !(m instanceof Array)
-                                    ) {
-                                        number = Number(Object.keys(m).shift());
-                                        monster = Object.values(
-                                            m
-                                        ).shift() as string[];
-                                    } else if (typeof m === "string") {
-                                        try {
-                                            let [mon, num] = m
-                                                .split(/:\s?/)
-                                                .reverse();
-                                            if (num && !isNaN(Number(num))) {
-                                                number = Number(num);
-                                            }
-                                            monster = parseYaml(mon);
-                                        } catch (e) {
-                                            console.error(e);
-                                            return;
-                                        }
-                                    }
-                                    if (!monster.length) return;
-                                    if (typeof monster == "string") {
-                                        monster = [monster.split(",")].flat();
-                                    }
-                                    let creature: Creature;
-                                    const bestiary = this.bestiary.find(
-                                        (b) => b.name == monster[0]
-                                    );
-                                    if (bestiary) {
-                                        creature = Creature.from(bestiary);
-                                        creature.hp =
-                                            monster[1] &&
-                                            !isNaN(Number(monster[1]))
-                                                ? Number(monster[1])
-                                                : creature.hp;
-                                        creature.ac =
-                                            monster[2] &&
-                                            !isNaN(Number(monster[2]))
-                                                ? Number(monster[2])
-                                                : creature.ac;
-                                        creature.modifier =
-                                            monster[3] &&
-                                            !isNaN(Number(monster[3]))
-                                                ? Number(monster[3])
-                                                : creature.modifier;
-                                    } else {
-                                        creature = new Creature({
-                                            name: monster[0],
-                                            hp:
-                                                monster[1] &&
-                                                !isNaN(Number(monster[1]))
-                                                    ? Number(monster[1])
-                                                    : null,
-                                            ac:
-                                                monster[2] &&
-                                                !isNaN(Number(monster[2]))
-                                                    ? Number(monster[2])
-                                                    : null,
-                                            modifier:
-                                                monster[3] &&
-                                                !isNaN(Number(monster[3]))
-                                                    ? Number(monster[3])
-                                                    : null,
-
-                                            marker: this.data.monsterMarker
-                                        });
-                                    }
-                                    return [
-                                        ...[...Array(number).keys()].map((k) =>
-                                            Creature.from(creature)
-                                        )
-                                    ];
-                                } catch (e) {
-                                    new Notice(
-                                        "Initiative Tracker: could not parse line: \n\n" +
-                                            m
-                                    );
-                                }
-                            })
-                            .filter((c) => c)
-                            .flat();
-                    }
-
-                    const encounterEl = containerEl.createDiv("encounter");
-
-                    let players: boolean | string[] = true;
-                    if (params.players) {
-                        if (params.players === "none") {
-                            players = false;
-                        } else {
-                            players = params.players;
-                        }
-                    }
-
-                    const instance = new Encounter({
-                        target: encounterEl,
-                        props: {
-                            ...(params.name ? { name: params.name } : {}),
-                            players: players,
-                            creatures: creatures
-                        }
-                    });
-
-                    instance.$on("begin-encounter", async () => {
-                        if (!this.view) {
-                            await this.addTrackerView();
-                        }
-                        if (this.view) {
-                            this.view?.newEncounter({
-                                ...params,
-                                creatures: creatures
-                            });
-                            this.app.workspace.revealLeaf(this.view.leaf);
-                        } else {
-                            new Notice(
-                                "Could not find the Initiative Tracker. Try reloading the note!"
-                            );
-                        }
-                    });
-                    empty.detach();
-                } catch (e) {
-                    new Notice(
-                        "Initiative Tracker: here was an issue parsing: \n\n" +
-                            encounter
-                    );
-                }
-            }
-        });
-
-        this.playerCreatures = new Map(
-            this.data.players.map((p) => [p, Creature.from(p)])
-        );
-        this.homebrewCreatures = new Map(
-            this.bestiary.map((p) => [p, Creature.from(p)])
-        );
-
-        if (this.app.workspace.layoutReady) {
-            this.addTrackerView();
-        } else {
-            this.app.workspace.onLayoutReady(() => this.addTrackerView());
-        }
-        console.log("Initiative Tracker v" + this.manifest.version + " loaded");
     }
 
     async onunload() {

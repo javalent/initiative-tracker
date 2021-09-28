@@ -11,7 +11,6 @@ import type {
     TrackerEvents,
     TrackerViewState
 } from "@types";
-import Creature__SvelteComponent_ from "./svelte/Creature.svelte";
 
 export default class TrackerView extends ItemView {
     public creatures: Creature[] = [];
@@ -481,6 +480,9 @@ export default class TrackerView extends ItemView {
             );
             this._app.$set(state);
         }
+
+        this.plugin.data.state = this.toState();
+        this.trigger("initiative-tracker:should-save");
     }
     async onOpen() {
         let show = Platform.isMobile
@@ -524,17 +526,17 @@ export default class TrackerView extends ItemView {
         const [name, ...data] = args;
         this.app.workspace.trigger(name, ...data);
     }
+    toState() {
+        if (!this.state) return null;
+        return {
+            creatures: [...this.ordered.map((c) => c.toJSON())],
+            state: this.state,
+            current: this.current,
+            name: this.name
+        };
+    }
     async onunload() {
-        if (this.state) {
-            this.plugin.data.state = {
-                creatures: [...this.ordered.map((c) => c.toJSON())],
-                state: this.state,
-                current: this.current,
-                name: this.name
-            };
-        } else {
-            this.plugin.data.state = null;
-        }
+        this.plugin.data.state = this.toState();
         await this.plugin.saveSettings();
     }
 }

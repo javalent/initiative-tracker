@@ -72,7 +72,7 @@
             {#if creatures.length}
                 <ul>
                     {#each Array.from(display) as creature}
-                        <li aria-label={label(creature[0])}>
+                        <li aria-label={label(creature[0])} class="creature-li">
                             <strong>{creature[1]}</strong><span
                                 >&nbsp;{creature[0]}{creature[1] == 1
                                     ? ""
@@ -100,5 +100,8 @@
         h4,
     .encounter-creatures > ul {
         margin-top: 0;
+    }
+    .creature-li {
+        width: fit-content;
     }
 </style>

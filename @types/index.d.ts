@@ -38,7 +38,8 @@ export type TrackerEvents =
           enable: boolean
       ]
     | [name: "initiative-tracker:remove", creature: Creature]
-    | [name: "initiative-tracker:closed"];
+    | [name: "initiative-tracker:closed"]
+    | [name: "initiative-tracker:should-save"];
 
 export type EventsOnArgs = OnArgs<TrackerEvents>;
 

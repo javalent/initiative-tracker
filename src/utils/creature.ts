@@ -73,16 +73,20 @@ export class Creature {
     }
 
     static from(creature: HomebrewCreature | SRDMonster) {
+        const modifier =
+            "modifier" in creature
+                ? creature.modifier
+                : Math.floor(
+                      (("stats" in creature && creature.stats.length > 1
+                          ? creature.stats[1]
+                          : 10) -
+                          10) /
+                          2
+                  );
         return new Creature(
             {
                 ...creature,
-                modifier: Math.floor(
-                    (("stats" in creature && creature.stats.length > 1
-                        ? creature.stats[1]
-                        : 10) -
-                        10) /
-                        2
-                )
+                modifier: modifier
             },
             0
         );
