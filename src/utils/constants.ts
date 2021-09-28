@@ -15,5 +15,11 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     sync: false,
     leafletIntegration: false,
     playerMarker: "default",
-    monsterMarker: "default"
+    monsterMarker: "default",
+    state: {
+        creatures: [],
+        state: false,
+        current: null,
+        name: null
+    }
 };

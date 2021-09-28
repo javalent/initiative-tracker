@@ -4,8 +4,14 @@ import { BASE, INTIATIVE_TRACKER_VIEW, MIN_WIDTH_FOR_HAMBURGER } from "./utils";
 import type InitiativeTracker from "./main";
 
 import App from "./svelte/App.svelte";
-import type { Creature } from "./utils/creature";
-import type { Condition, TrackerEvents, TrackerViewState } from "@types";
+import { Creature } from "./utils/creature";
+import type {
+    Condition,
+    InitiativeViewState,
+    TrackerEvents,
+    TrackerViewState
+} from "@types";
+import Creature__SvelteComponent_ from "./svelte/Creature.svelte";
 
 export default class TrackerView extends ItemView {
     public creatures: Creature[] = [];
@@ -42,7 +48,12 @@ export default class TrackerView extends ItemView {
 
     constructor(public leaf: WorkspaceLeaf, public plugin: InitiativeTracker) {
         super(leaf);
-        this.newEncounter();
+
+        if (this.plugin.data.state?.creatures?.length) {
+            this.newEncounterFromState(this.plugin.data.state);
+        } else {
+            this.newEncounter();
+        }
 
         this.registerEvent(
             this.app.workspace.on(
@@ -142,6 +153,27 @@ export default class TrackerView extends ItemView {
             )
         );
     }
+    newEncounterFromState(initiativeState: InitiativeViewState) {
+        if (!initiativeState || !initiativeState?.creatures.length) {
+            this.newEncounter();
+        }
+        const { creatures, state, name, current } = initiativeState;
+        this.creatures = [...creatures.map((c) => Creature.fromJSON(c))];
+
+        if (name) {
+            this.name = name;
+            this.setAppState({
+                name: this.name
+            });
+        }
+        this.state = state;
+        this.current = current;
+        this.trigger("initiative-tracker:new-encounter", this.appState);
+
+        this.setAppState({
+            creatures: this.ordered
+        });
+    }
     private _addCreature(creature: Creature) {
         this.creatures.push(creature);
 
@@ -197,11 +229,13 @@ export default class TrackerView extends ItemView {
     async newEncounter({
         name,
         players = true,
-        creatures = []
+        creatures = [],
+        roll = true
     }: {
         name?: string;
         players?: boolean | string[];
         creatures?: Creature[];
+        roll?: boolean;
     } = {}) {
         if (players instanceof Array && players.length) {
             this.creatures = [
@@ -227,7 +261,12 @@ export default class TrackerView extends ItemView {
 
         this.trigger("initiative-tracker:new-encounter", this.appState);
 
-        await this.rollInitiatives();
+        if (roll) await this.rollInitiatives();
+        else {
+            this.setAppState({
+                creatures: this.ordered
+            });
+        }
     }
 
     resetEncounter() {
@@ -484,5 +523,18 @@ export default class TrackerView extends ItemView {
     trigger(...args: TrackerEvents) {
         const [name, ...data] = args;
         this.app.workspace.trigger(name, ...data);
+    }
+    async onunload() {
+        if (this.state) {
+            this.plugin.data.state = {
+                creatures: [...this.ordered.map((c) => c.toJSON())],
+                state: this.state,
+                current: this.current,
+                name: this.name
+            };
+        } else {
+            this.plugin.data.state = null;
+        }
+        await this.plugin.saveSettings();
     }
 }

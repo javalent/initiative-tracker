@@ -1,5 +1,11 @@
-import type { Condition, HomebrewCreature, SRDMonster } from "@types";
+import type {
+    Condition,
+    CreatureState,
+    HomebrewCreature,
+    SRDMonster
+} from "@types";
 import type InitiativeTracker from "src/main";
+import { Conditions } from ".";
 import { DEFAULT_UNDEFINED } from "./constants";
 
 function getId() {
@@ -100,5 +106,33 @@ export class Creature {
 
     toProperties() {
         return { ...this };
+    }
+
+    toJSON(): CreatureState {
+        return {
+            name: this.name,
+            initiative: this.initiative - this.modifier,
+            modifier: this.modifier,
+            hp: this.max,
+            ac: this.ac,
+            note: this.note,
+            id: this.id,
+            marker: this.marker,
+            currentHP: this.hp,
+            status: Array.from(this.status).map((c) => c.name),
+            enabled: this.enabled,
+            player: this.player
+        };
+    }
+
+    static fromJSON(state: CreatureState) {
+        const creature = new Creature(state, state.initiative);
+        creature.enabled = state.enabled;
+
+        creature.hp = state.currentHP;
+        creature.status = new Set(
+            state.status.map((n) => Conditions.find(({ name }) => n == name))
+        );
+        return creature;
     }
 }
