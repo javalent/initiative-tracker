@@ -39,7 +39,12 @@ export type TrackerEvents =
       ]
     | [name: "initiative-tracker:remove", creature: Creature]
     | [name: "initiative-tracker:closed"]
-    | [name: "initiative-tracker:should-save"];
+    | [name: "initiative-tracker:should-save"]
+    /** This event can be used to start an event by sending an object with a name, HP, AC, and initiative modifier at minimum. */
+    | [
+          name: "initiative-tracker:start-encounter",
+          creatures: HomebrewCreature[]
+      ];
 
 export type EventsOnArgs = OnArgs<TrackerEvents>;
 

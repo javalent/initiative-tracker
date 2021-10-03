@@ -129,6 +129,38 @@ export default class InitiativeTracker extends Plugin {
                 async () => await this.saveSettings()
             )
         );
+        this.registerEvent(
+            this.app.workspace.on(
+                "initiative-tracker:start-encounter",
+                async (homebrews: HomebrewCreature[]) => {
+                    try {
+                        const creatures = homebrews.map((h) =>
+                            Creature.from(h)
+                        );
+                        if (!this.view) {
+                            await this.addTrackerView();
+                        }
+                        if (this.view) {
+                            this.view?.newEncounter({
+                                creatures
+                            });
+                            this.app.workspace.revealLeaf(this.view.leaf);
+                        } else {
+                            new Notice(
+                                "Could not find the Initiative Tracker. Try reloading the note!"
+                            );
+                        }
+                    } catch (e) {
+                        new Notice(
+                            "There was an issue launching the encounter.\n\n" +
+                                e.message
+                        );
+                        console.error(e);
+                        return;
+                    }
+                }
+            )
+        );
 
         this.registerMarkdownCodeBlockProcessor(
             "encounter",
