@@ -305,12 +305,14 @@ export default class InitiativeTracker extends Plugin {
                 }
 
                 const xp = params.xp ?? null;
+                const playerLevels = this.data.players.map((p) => p.level);
 
                 const instance = new Encounter({
                     target: encounterEl,
                     props: {
                         ...(params.name ? { name: params.name } : {}),
                         players,
+                        playerLevels,
                         creatures,
                         xp
                     }

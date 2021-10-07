@@ -190,6 +190,7 @@ Frontmatter should be formatted like this:
 hp: 23
 ac: 17
 modifier: 2
+level: 2
 ---
 ```
 

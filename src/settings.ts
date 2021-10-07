@@ -278,13 +278,12 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     );
                 } catch (e) {
                     new Notice(
-                        `There was an issue importing the file${
-                            files.length > 1 ? "s" : ""
+                        `There was an issue importing the file${files.length > 1 ? "s" : ""
                         }.`
                     );
                 }
                 this.display();
-            } catch (e) {}
+            } catch (e) { }
         };
 
         importAppFile.addButton((b) => {
@@ -323,13 +322,12 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     );
                 } catch (e) {
                     new Notice(
-                        `There was an issue importing the file${
-                            files.length > 1 ? "s" : ""
+                        `There was an issue importing the file${files.length > 1 ? "s" : ""
                         }.`
                     );
                 }
                 this.display();
-            } catch (e) {}
+            } catch (e) { }
         };
 
         importImprovedInitiative.addButton((b) => {
@@ -369,13 +367,12 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     );
                 } catch (e) {
                     new Notice(
-                        `There was an issue importing the file${
-                            files.length > 1 ? "s" : ""
+                        `There was an issue importing the file${files.length > 1 ? "s" : ""
                         }.`
                     );
                 }
                 this.display();
-            } catch (e) {}
+            } catch (e) { }
         };
 
         importCritterDB.addButton((b) => {
@@ -413,13 +410,12 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     );
                 } catch (e) {
                     new Notice(
-                        `There was an issue importing the file${
-                            files.length > 1 ? "s" : ""
+                        `There was an issue importing the file${files.length > 1 ? "s" : ""
                         }.`
                     );
                 }
                 this.display();
-            } catch (e) {}
+            } catch (e) { }
         };
 
         import5eTools.addButton((b) => {
@@ -488,8 +484,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         );
 
         searchMonsters.setDesc(
-            `Manage homebrew creatures. Currently: ${
-                suggester.getItems().length
+            `Manage homebrew creatures. Currently: ${suggester.getItems().length
             } creature${suggester.filteredItems.length != 1 ? "s" : ""}.`
         );
 
@@ -498,8 +493,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 await this.plugin.deleteMonster(monster);
             } catch (e) {
                 new Notice(
-                    `There was an error deleting the creature:${
-                        `\n\n` + e.message
+                    `There was an error deleting the creature:${`\n\n` + e.message
                     }`
                 );
             }
@@ -522,8 +516,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     );
                 } catch (e) {
                     new Notice(
-                        `There was an error updating the monster:${
-                            `\n\n` + e.message
+                        `There was an error updating the monster:${`\n\n` + e.message
                         }`
                     );
                 }
@@ -535,8 +528,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
 
         suggester.onInputChanged = () =>
             searchMonsters.setDesc(
-                `Manage homebrew creatures. Currently: ${
-                    suggester.filteredItems.length
+                `Manage homebrew creatures. Currently: ${suggester.filteredItems.length
                 } creature${suggester.filteredItems.length != 1 ? "s" : ""}.`
             );
     }
@@ -689,16 +681,17 @@ class NewPlayerModal extends Modal {
 
                     if (!metaData || !metaData.frontmatter) return;
 
-                    const { ac, hp, modifier } = metaData.frontmatter;
+                    const { ac, hp, modifier, level } = metaData.frontmatter;
                     this.player = {
                         ...this.player,
-                        ...{ ac, hp, modifier }
+                        ...{ ac, hp, modifier, level }
                     };
                     this.display();
                 };
             });
 
         let nameInput: InputValidate,
+            levelInput: InputValidate,
             hpInput: InputValidate,
             acInput: InputValidate,
             modInput: InputValidate;
@@ -728,6 +721,27 @@ class NewPlayerModal extends Modal {
                 t.onChange((v) => {
                     t.inputEl.removeClass("has-error");
                     this.player.name = v;
+                });
+            });
+        new Setting(contentEl)
+            .setName("Level")
+            .setDesc("Player level.")
+            .addText((t) => {
+                levelInput = {
+                    input: t.inputEl,
+                    validate: (i: HTMLInputElement) => {
+                        let error = false;
+                        if (isNaN(Number(i.value)) || Number(i.value) <= 0) {
+                            i.addClass("has-error");
+                            error = true;
+                        }
+                        return error;
+                    }
+                };
+                t.setValue(`${this.player.level ?? ""}`);
+                t.onChange((v) => {
+                    t.inputEl.removeClass("has-error");
+                    this.player.level = Number(v);
                 });
             });
         new Setting(contentEl).setName("Max Hit Points").addText((t) => {
@@ -796,8 +810,8 @@ class NewPlayerModal extends Modal {
                     }
                     drop.setValue(
                         this.player.marker ??
-                            this.plugin.data.playerMarker ??
-                            "default"
+                        this.plugin.data.playerMarker ??
+                        "default"
                     );
                     drop.onChange(async (v) => {
                         this.player.marker = v;
@@ -1062,8 +1076,8 @@ class NewCreatureModal extends Modal {
                     }
                     drop.setValue(
                         this.creature.marker ??
-                            this.plugin.data.monsterMarker ??
-                            "default"
+                        this.plugin.data.monsterMarker ??
+                        "default"
                     );
                     drop.onChange(async (v) => {
                         this.creature.marker = v;

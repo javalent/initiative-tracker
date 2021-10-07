@@ -133,6 +133,7 @@ export interface HomebrewCreature {
     cr?: number | string;
     modifier?: number;
     note?: string;
+    level?: number;
     player?: boolean;
     marker?: string;
     id?: string;
