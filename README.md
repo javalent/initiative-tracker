@@ -59,24 +59,26 @@ players:                                # Players will only be added to the enco
 
 The most complicated parameter, `creatures` may be used to add additional creatures to the encounter.
 
-The basic creature will be defined as an array with the syntax of `[name, hp, ac, initiative modifer]`.
+The basic creature will be defined as an array with the syntax of `[name, hp, ac, initiative modifer, xp]`.
 
-**Please note that in all cases, hp, ac and the modifier are optional.**
+**Please note that in all cases, hp, ac, the modifier, and xp are optional.**
 
 ````
 ```encounter
 creatures:
   - My Monster                          # 1 monster named My Monster will be added, with no HP, AC or modifier.
   - Goblin, 7, 15, 2                    # 1 goblin with HP: 7, AC: 15, MOD: 2 will be added.
+  - Goblin, 5, 15, 2, 25                # 1 goblin with HP: 7, AC: 15, MOD: 2 worth 25 XP will be added.
 ```
 ````
 
-Multiple of the same creature may be added using `X: [name, hp, ac, initiative modifer]`, which will add `X` creatures:
+Multiple of the same creature may be added using `X: [name, hp, ac, initiative modifer, xp]`, which will add `X` creatures:
 
 ````
 ```encounter
 creatures:
   - 3: Goblin, 7, 15, 2                 # 3 goblins with HP: 7, AC: 15, MOD: 2 will be added.
+  - 2: Goblin, 5, 15, 2, 25             # 3 goblins with HP: 7, AC: 15, MOD: 2 worth 25 XP will be added.
 ```
 ````
 
@@ -101,6 +103,8 @@ creatures:
   - 2: Goblin                           # 2 goblins with HP: 7, AC: 15, MOD: 2 will be added.
 ```
 ````
+
+Creatures from the SRD Bestiary will auto-calculate their XP based on their challenge rating. Otherwise, you can supply a creature either a CR or an XP when creating it in settings.
 
 ### Multiple Encounters
 
