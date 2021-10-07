@@ -246,6 +246,10 @@ export default class InitiativeTracker extends Plugin {
                                         monster[3] && !isNaN(Number(monster[3]))
                                             ? Number(monster[3])
                                             : creature.modifier;
+                                    creature.xp =
+                                        monster[4] && !isNaN(Number(monster[4]))
+                                            ? Number(monster[4])
+                                            : creature.xp;
                                 } else {
                                     creature = new Creature({
                                         name: monster[0],
@@ -264,7 +268,11 @@ export default class InitiativeTracker extends Plugin {
                                             !isNaN(Number(monster[3]))
                                                 ? Number(monster[3])
                                                 : null,
-
+                                        xp:
+                                            monster[4] &&
+                                            !isNaN(Number(monster[4]))
+                                                ? Number(monster[4])
+                                                : null,
                                         marker: this.data.monsterMarker
                                     });
                                 }
@@ -296,12 +304,15 @@ export default class InitiativeTracker extends Plugin {
                     }
                 }
 
+                const xp = params.xp ?? null;
+
                 const instance = new Encounter({
                     target: encounterEl,
                     props: {
                         ...(params.name ? { name: params.name } : {}),
-                        players: players,
-                        creatures: creatures
+                        players,
+                        creatures,
+                        xp
                     }
                 });
 
@@ -312,7 +323,8 @@ export default class InitiativeTracker extends Plugin {
                     if (this.view) {
                         this.view?.newEncounter({
                             ...params,
-                            creatures: creatures
+                            creatures: creatures,
+                            xp
                         });
                         this.app.workspace.revealLeaf(this.view.leaf);
                     } else {

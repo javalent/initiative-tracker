@@ -23,6 +23,16 @@
     export let state: boolean;
     export let current: number;
     export let map: boolean;
+    export let xp: number;
+
+    let totalXP = xp;
+    $: {
+        if (!xp) {
+            totalXP = creatures
+                ?.filter((creature) => creature.xp)
+                ?.reduce((num, cr) => num + cr.xp, 0);
+        }
+    }
 
     store.view.set(view);
     export let show: boolean;
@@ -73,7 +83,14 @@
 <div class="obsidian-initiative-tracker">
     <Controls {state} {map} />
     {#if name && name.length}
-        <h2 class="initiative-tracker-name">{name}</h2>
+        <div class="initiative-tracker-name-container">
+            <h2 class="initiative-tracker-name">{name}</h2>
+            {#if totalXP > 0}
+                <span class="initiative-tracker-xp encounter-xp"
+                    >{totalXP} XP</span
+                >
+            {/if}
+        </div>
     {/if}
     <Table
         {creatures}
@@ -173,7 +190,8 @@
                                 hp: creature.hp,
                                 ac: creature.ac,
                                 modifier: creature.modifier,
-                                marker: view.plugin.data.monsterMarker
+                                marker: view.plugin.data.monsterMarker,
+                                xp: creature.xp
                             },
                             creature.initiative
                         );
@@ -201,6 +219,7 @@
         margin: 0.5rem;
         min-width: 180px;
     }
+
     .add-creature-container {
         display: flex;
         flex-flow: column nowrap;
@@ -222,8 +241,13 @@
     .add-button {
         width: min-content;
     }
+    .initiative-tracker-name-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 0.5rem;
+    }
     .initiative-tracker-name {
         margin: 0;
-        padding-left: 0.75rem;
     }
 </style>

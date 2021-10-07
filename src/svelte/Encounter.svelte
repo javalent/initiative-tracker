@@ -11,12 +11,50 @@
     export let name: string = "Encounter";
     export let creatures: Creature[] = [];
     export let players: boolean | string[] = true;
-    const display: Map<string, number> = new Map();
-    const creatureMap: Map<string, Creature> = new Map(
-        creatures.map((c) => [c.name, c])
-    );
+    export let xp: number;
+
+    let totalXP = xp ?? 0;
+
+    interface CreatureStats {
+        name: string;
+        ac: number;
+        hp: number;
+        modifier: number;
+        xp: number;
+    }
+
+    const displayMap: Array<[CreatureStats, number]> = [];
+
+    const equivalent = (creature: CreatureStats, existing: CreatureStats) => {
+        return (
+            creature.name == existing.name &&
+            creature.ac == existing.ac &&
+            creature.hp == existing.hp &&
+            creature.modifier == existing.modifier &&
+            creature.xp == existing.xp
+        );
+    };
+
     for (let creature of creatures) {
-        display.set(creature.name, (display.get(creature.name) ?? 0) + 1);
+        const stats = {
+            name: creature.name,
+            ac: creature.ac,
+            hp: creature.hp,
+            modifier: creature.modifier,
+            xp: creature.xp
+        };
+        const existing = displayMap.find(([c]) => equivalent(c, stats));
+        if (!existing) {
+            displayMap.push([stats, 1]);
+        } else {
+            displayMap.splice(displayMap.indexOf(existing), 1, [
+                existing[0],
+                existing[1] + 1
+            ]);
+        }
+        if (!xp) {
+            totalXP += creature.xp;
+        }
     }
 
     const open = (node: HTMLElement) => {
@@ -27,10 +65,9 @@
                 dispatch("begin-encounter");
             });
     };
-    const label = (name: string) => {
-        if (!name || !creatureMap.get(name)) return;
-        let label = [],
-            creature = creatureMap.get(name);
+    const label = (creature: CreatureStats) => {
+        if (!creature) return;
+        let label = [];
         if (creature.hp) {
             label.push(`HP: ${creature.hp}`);
         }
@@ -71,18 +108,29 @@
             <h4>Creatures</h4>
             {#if creatures.length}
                 <ul>
-                    {#each Array.from(display) as creature}
-                        <li aria-label={label(creature[0])} class="creature-li">
-                            <strong>{creature[1]}</strong><span
-                                >&nbsp;{creature[0]}{creature[1] == 1
+                    {#each displayMap as [creature, count]}
+                        <li aria-label={label(creature)} class="creature-li">
+                            <strong>{count}</strong><span
+                                >&nbsp;{creature.name}{count == 1
                                     ? ""
                                     : "s"}</span
                             >
+                            {#if creature.xp}
+                                <span>
+                                    ({creature.xp * count} XP)
+                                </span>
+                            {/if}
                         </li>
                     {/each}
                 </ul>
             {:else}
                 <strong>No creatures</strong>
+            {/if}
+        </div>
+
+        <div class="encounter-xp">
+            {#if totalXP > 0}
+                <span>{totalXP} XP</span>
             {/if}
         </div>
     </div>

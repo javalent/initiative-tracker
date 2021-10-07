@@ -21,6 +21,7 @@
     let initiative: number;
     let ac: string;
     let modifier: number;
+    let xp: number;
 
     const saveButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -42,7 +43,8 @@
                         (initiative ?? Math.floor(Math.random() * 19 + 1)) -
                         modifier,
                     ac,
-                    modifier
+                    modifier,
+                    xp
                 });
             });
     };
@@ -73,13 +75,13 @@
                 if (newCreature.hp) hp = `${newCreature.hp}`;
                 if (newCreature.ac) ac = `${newCreature.ac}`;
                 modifier = newCreature.modifier ?? 0;
+                xp = newCreature.xp;
 
                 initiative = await view.getInitiativeValue(modifier);
             }
         };
         modal.open();
     };
-
 </script>
 
 <div class="create-new">

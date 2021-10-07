@@ -229,12 +229,14 @@ export default class TrackerView extends ItemView {
         name,
         players = true,
         creatures = [],
-        roll = true
+        roll = true,
+        xp = null
     }: {
         name?: string;
         players?: boolean | string[];
         creatures?: Creature[];
         roll?: boolean;
+        xp?: number;
     } = {}) {
         if (players instanceof Array && players.length) {
             this.creatures = [
@@ -250,7 +252,8 @@ export default class TrackerView extends ItemView {
         if (name) {
             this.name = name;
             this.setAppState({
-                name: this.name
+                name: this.name,
+                xp
             });
         }
 
@@ -497,14 +500,14 @@ export default class TrackerView extends ItemView {
                 show: show,
                 state: this.state,
                 current: this.current,
-                map: this.plugin.data.leafletIntegration
+                map: this.plugin.data.leafletIntegration,
+                xp: null
             }
         });
         this._rendered = true;
     }
 
     async onClose() {
-        console.log("onclose");
         this._app.$destroy();
         this._rendered = false;
         this.trigger("initiative-tracker:closed");

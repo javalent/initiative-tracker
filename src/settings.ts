@@ -1008,6 +1008,50 @@ class NewCreatureModal extends Modal {
                     this.creature.modifier = Number(v);
                 });
             });
+        new Setting(contentEl)
+            .setName("Experience Points")
+            .setDesc(
+                "If entered, this will be used to calculate encounter experience points."
+            )
+            .addText((t) => {
+                modInput = {
+                    input: t.inputEl,
+                    validate: (i) => {
+                        let error = false;
+                        if (isNaN(Number(i.value))) {
+                            t.inputEl.addClass("has-error");
+                            error = true;
+                        }
+                        return error;
+                    }
+                };
+                t.setValue(`${this.creature.xp ?? ""}`);
+                t.onChange((v) => {
+                    this.creature.xp = Number(v);
+                });
+            });
+        new Setting(contentEl)
+            .setName("Challenge Rating")
+            .setDesc(
+                "If entered, this will be used to calculate creature experience points (if not provided)."
+            )
+            .addText((t) => {
+                modInput = {
+                    input: t.inputEl,
+                    validate: (i) => {
+                        let error = false;
+                        if (i.value && typeof i.value != "string") {
+                            t.inputEl.addClass("has-error");
+                            error = true;
+                        }
+                        return error;
+                    }
+                };
+                t.setValue(`${this.creature.cr ?? ""}`);
+                t.onChange((v) => {
+                    this.creature.cr = v;
+                });
+            });
 
         if (this.plugin.canUseLeaflet) {
             const markerSetting = new Setting(contentEl)

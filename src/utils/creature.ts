@@ -5,7 +5,7 @@ import type {
     SRDMonster
 } from "@types";
 import type InitiativeTracker from "src/main";
-import { Conditions } from ".";
+import { Conditions, XP_PER_CR } from ".";
 import { DEFAULT_UNDEFINED } from "./constants";
 
 function getId() {
@@ -30,6 +30,7 @@ export class Creature {
     private _initiative: number;
     source: string;
     id: string;
+    xp: number;
     constructor(creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;
         this._initiative = Number(initiative ?? 0);
@@ -44,6 +45,12 @@ export class Creature {
 
         this.hp = this.max;
         this.source = creature.source;
+
+        if ("xp" in creature) {
+            this.xp = creature.xp;
+        } else if ("cr" in creature) {
+            this.xp = XP_PER_CR[`${creature.cr}`];
+        }
 
         this.id = creature.id ?? getId();
     }
@@ -70,6 +77,7 @@ export class Creature {
         yield this.note;
         yield this.id;
         yield this.marker;
+        yield this.xp;
     }
 
     static from(creature: HomebrewCreature | SRDMonster) {
@@ -125,7 +133,8 @@ export class Creature {
             currentHP: this.hp,
             status: Array.from(this.status).map((c) => c.name),
             enabled: this.enabled,
-            player: this.player
+            player: this.player,
+            xp: this.xp
         };
     }
 
