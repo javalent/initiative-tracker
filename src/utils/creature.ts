@@ -24,6 +24,7 @@ export class Creature {
     note: string;
     enabled: boolean = true;
     max: number;
+    level: number;
     player: boolean;
     status: Set<Condition> = new Set();
     marker: string;
@@ -39,19 +40,19 @@ export class Creature {
         this.max = creature.hp ? Number(creature.hp) : undefined;
         this.ac = creature.ac ? Number(creature.ac) : undefined;
         this.note = creature.note;
+        this.level = creature.level;
         this.player = creature.player;
-
+        
         this.marker = creature.marker;
-
+        
         this.hp = this.max;
         this.source = creature.source;
-
+        
         if ("xp" in creature) {
             this.xp = creature.xp;
         } else if ("cr" in creature) {
             this.xp = XP_PER_CR[`${creature.cr}`];
         }
-
         this.id = creature.id ?? getId();
     }
     get hpDisplay() {
@@ -85,12 +86,12 @@ export class Creature {
             "modifier" in creature
                 ? creature.modifier
                 : Math.floor(
-                      (("stats" in creature && creature.stats.length > 1
-                          ? creature.stats[1]
-                          : 10) -
-                          10) /
-                          2
-                  );
+                    (("stats" in creature && creature.stats.length > 1
+                        ? creature.stats[1]
+                        : 10) -
+                        10) /
+                    2
+                );
         return new Creature(
             {
                 ...creature,
@@ -110,6 +111,7 @@ export class Creature {
 
         this.ac = creature.ac ? Number(creature.ac) : undefined;
         this.note = creature.note;
+        this.level = creature.level;
         this.player = creature.player;
 
         this.marker = creature.marker;
@@ -133,6 +135,7 @@ export class Creature {
             currentHP: this.hp,
             status: Array.from(this.status).map((c) => c.name),
             enabled: this.enabled,
+            level: this.level,
             player: this.player,
             xp: this.xp
         };
