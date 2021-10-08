@@ -70,6 +70,27 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 }
             }
 
+            new Setting(containerEl)
+                .setName("Display Encounter Difficulty")
+                .setDesc(
+                    "Display encounter difficulty based on creature CR and player level. Creatures without CR or level will not be considered in the calculation."
+                )
+                .addToggle((t) => {
+                    t.setValue(this.plugin.data.displayDifficulty).onChange(
+                        async (v) => {
+                            this.plugin.data.displayDifficulty = v;
+
+                            if (this.plugin.view) {
+                                this.plugin.view.setDisplayDifficulty(
+                                    this.plugin.data.displayDifficulty
+                                );
+                            }
+
+                            await this.plugin.saveSettings();
+                        }
+                    );
+                });
+
             const formula = new Setting(containerEl)
                 .setName("Initiative Formula")
 
@@ -278,12 +299,13 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     );
                 } catch (e) {
                     new Notice(
-                        `There was an issue importing the file${files.length > 1 ? "s" : ""
+                        `There was an issue importing the file${
+                            files.length > 1 ? "s" : ""
                         }.`
                     );
                 }
                 this.display();
-            } catch (e) { }
+            } catch (e) {}
         };
 
         importAppFile.addButton((b) => {
@@ -322,12 +344,13 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     );
                 } catch (e) {
                     new Notice(
-                        `There was an issue importing the file${files.length > 1 ? "s" : ""
+                        `There was an issue importing the file${
+                            files.length > 1 ? "s" : ""
                         }.`
                     );
                 }
                 this.display();
-            } catch (e) { }
+            } catch (e) {}
         };
 
         importImprovedInitiative.addButton((b) => {
@@ -367,12 +390,13 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     );
                 } catch (e) {
                     new Notice(
-                        `There was an issue importing the file${files.length > 1 ? "s" : ""
+                        `There was an issue importing the file${
+                            files.length > 1 ? "s" : ""
                         }.`
                     );
                 }
                 this.display();
-            } catch (e) { }
+            } catch (e) {}
         };
 
         importCritterDB.addButton((b) => {
@@ -410,12 +434,13 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     );
                 } catch (e) {
                     new Notice(
-                        `There was an issue importing the file${files.length > 1 ? "s" : ""
+                        `There was an issue importing the file${
+                            files.length > 1 ? "s" : ""
                         }.`
                     );
                 }
                 this.display();
-            } catch (e) { }
+            } catch (e) {}
         };
 
         import5eTools.addButton((b) => {
@@ -484,7 +509,8 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         );
 
         searchMonsters.setDesc(
-            `Manage homebrew creatures. Currently: ${suggester.getItems().length
+            `Manage homebrew creatures. Currently: ${
+                suggester.getItems().length
             } creature${suggester.filteredItems.length != 1 ? "s" : ""}.`
         );
 
@@ -493,7 +519,8 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 await this.plugin.deleteMonster(monster);
             } catch (e) {
                 new Notice(
-                    `There was an error deleting the creature:${`\n\n` + e.message
+                    `There was an error deleting the creature:${
+                        `\n\n` + e.message
                     }`
                 );
             }
@@ -516,7 +543,8 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     );
                 } catch (e) {
                     new Notice(
-                        `There was an error updating the monster:${`\n\n` + e.message
+                        `There was an error updating the monster:${
+                            `\n\n` + e.message
                         }`
                     );
                 }
@@ -528,7 +556,8 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
 
         suggester.onInputChanged = () =>
             searchMonsters.setDesc(
-                `Manage homebrew creatures. Currently: ${suggester.filteredItems.length
+                `Manage homebrew creatures. Currently: ${
+                    suggester.filteredItems.length
                 } creature${suggester.filteredItems.length != 1 ? "s" : ""}.`
             );
     }
@@ -810,8 +839,8 @@ class NewPlayerModal extends Modal {
                     }
                     drop.setValue(
                         this.player.marker ??
-                        this.plugin.data.playerMarker ??
-                        "default"
+                            this.plugin.data.playerMarker ??
+                            "default"
                     );
                     drop.onChange(async (v) => {
                         this.player.marker = v;
@@ -1076,8 +1105,8 @@ class NewCreatureModal extends Modal {
                     }
                     drop.setValue(
                         this.creature.marker ??
-                        this.plugin.data.monsterMarker ??
-                        "default"
+                            this.plugin.data.monsterMarker ??
+                            "default"
                     );
                     drop.onChange(async (v) => {
                         this.creature.marker = v;

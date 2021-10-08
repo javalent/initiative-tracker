@@ -305,7 +305,9 @@ export default class InitiativeTracker extends Plugin {
                 }
 
                 const xp = params.xp ?? null;
-                const playerLevels = this.data.players.map((p) => p.level);
+                const playerLevels = this.data.players
+                    .map((p) => p.level)
+                    .filter((p) => p);
 
                 const instance = new Encounter({
                     target: encounterEl,
@@ -337,6 +339,7 @@ export default class InitiativeTracker extends Plugin {
                 });
                 empty.detach();
             } catch (e) {
+                console.error(e);
                 new Notice(
                     "Initiative Tracker: here was an issue parsing: \n\n" +
                         encounter

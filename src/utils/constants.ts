@@ -21,7 +21,8 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
         state: false,
         current: null,
         name: null
-    }
+    },
+    displayDifficulty: true
 };
 
 export const XP_PER_CR: Record<string, number> = {

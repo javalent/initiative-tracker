@@ -13,6 +13,9 @@ import type {
 } from "@types";
 
 export default class TrackerView extends ItemView {
+    setDisplayDifficulty(displayDifficulty: boolean) {
+        this._app.$set({ displayDifficulty: displayDifficulty });
+    }
     public creatures: Creature[] = [];
     public current: number = 0;
 
@@ -501,7 +504,8 @@ export default class TrackerView extends ItemView {
                 state: this.state,
                 current: this.current,
                 map: this.plugin.data.leafletIntegration,
-                xp: null
+                xp: null,
+                displayDifficulty: this.plugin.data.displayDifficulty
             }
         });
         this._rendered = true;

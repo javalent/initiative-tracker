@@ -22,6 +22,8 @@
     let ac: string;
     let modifier: number;
     let xp: number;
+    let player: boolean;
+    let level: number;
 
     const saveButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -44,7 +46,9 @@
                         modifier,
                     ac,
                     modifier,
-                    xp
+                    xp,
+                    player,
+                    level
                 });
             });
     };
@@ -71,11 +75,15 @@
         modal.onClose = async () => {
             if (modal.creature) {
                 let newCreature = Creature.from(modal.creature);
+
                 name = newCreature.name;
                 if (newCreature.hp) hp = `${newCreature.hp}`;
                 if (newCreature.ac) ac = `${newCreature.ac}`;
                 modifier = newCreature.modifier ?? 0;
                 xp = newCreature.xp;
+
+                player = newCreature.player;
+                level = newCreature.level;
 
                 initiative = await view.getInitiativeValue(modifier);
             }

@@ -1,5 +1,11 @@
-type XpBudget = { easy: number, medium: number, hard: number, deadly: number };
-export type DifficultyReport = { difficulty: string, totalXp: number, adjustedXp: number, multiplier: number, budget: XpBudget };
+type XpBudget = { easy: number; medium: number; hard: number; deadly: number };
+export type DifficultyReport = {
+    difficulty: string;
+    totalXp: number;
+    adjustedXp: number;
+    multiplier: number;
+    budget: XpBudget;
+};
 
 interface BudgetDict {
     [index: number]: XpBudget;
@@ -26,31 +32,47 @@ const tresholds: BudgetDict = {
     18: { easy: 2100, medium: 4200, hard: 6300, deadly: 9500 },
     19: { easy: 2400, medium: 4900, hard: 7300, deadly: 10900 },
     20: { easy: 2800, medium: 5700, hard: 8500, deadly: 12700 }
-}
+};
 
 function xpBudget(characterLevels: number[]): XpBudget {
-    const easy = characterLevels.reduce((acc, lvl) => acc + tresholds[lvl].easy, 0);
-    const medium = characterLevels.reduce((acc, lvl) => acc + tresholds[lvl].medium, 0);
-    const hard = characterLevels.reduce((acc, lvl) => acc + tresholds[lvl].hard, 0);
-    const deadly = characterLevels.reduce((acc, lvl) => acc + tresholds[lvl].deadly, 0);
-    return { easy: easy, medium: medium, hard: hard, deadly: deadly }
+    const easy = characterLevels.reduce(
+        (acc, lvl) => acc + tresholds[lvl].easy,
+        0
+    );
+    const medium = characterLevels.reduce(
+        (acc, lvl) => acc + tresholds[lvl].medium,
+        0
+    );
+    const hard = characterLevels.reduce(
+        (acc, lvl) => acc + tresholds[lvl].hard,
+        0
+    );
+    const deadly = characterLevels.reduce(
+        (acc, lvl) => acc + tresholds[lvl].deadly,
+        0
+    );
+    return { easy: easy, medium: medium, hard: hard, deadly: deadly };
 }
 
 export function formatDifficultyReport(report: DifficultyReport): string {
     return `${[
         `Encounter is ${report.difficulty}`,
-        `Total XP   : ${report.totalXp}`,
+        `Total XP: ${report.totalXp}`,
         `Adjusted XP: ${report.adjustedXp} (x${report.multiplier})`,
         ` `,
         `Threshold`,
         `Easy: ${report.budget.easy}`,
         `Medium: ${report.budget.medium}`,
         `Hard: ${report.budget.hard}`,
-        `Deadly: ${report.budget.deadly}`,
-    ].join("\n")}`
+        `Deadly: ${report.budget.deadly}`
+    ].join("\n")}`;
 }
 
-export function encounterDifficulty(characterLevels: number[], monsterXp: number[]): DifficultyReport {
+export function encounterDifficulty(
+    characterLevels: number[],
+    monsterXp: number[]
+): DifficultyReport {
+    if (!characterLevels?.length || !monsterXp?.length) return;
     const xp: number = monsterXp.reduce((acc, xp) => acc + xp, 0);
     const numberOfMonsters = monsterXp.length;
     let numberMultiplier: number;
@@ -69,20 +91,20 @@ export function encounterDifficulty(characterLevels: number[], monsterXp: number
     }
     const adjustedXp = numberMultiplier * xp;
     const budget = xpBudget(characterLevels);
-    let difficulty = 'easy';
+    let difficulty = "easy";
     if (adjustedXp >= budget.deadly) {
-        difficulty = 'deadly';
+        difficulty = "deadly";
     } else if (adjustedXp >= budget.hard) {
-        difficulty = 'hard';
+        difficulty = "hard";
     } else if (adjustedXp >= budget.medium) {
-        difficulty = 'medium'
-    };
+        difficulty = "medium";
+    }
     let result = {
         difficulty: difficulty,
         totalXp: xp,
         adjustedXp: adjustedXp,
         multiplier: numberMultiplier,
         budget: budget
-    }
+    };
     return result;
 }
