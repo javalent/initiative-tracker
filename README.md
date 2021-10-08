@@ -196,6 +196,10 @@ level: 2
 
 In the future, this will be used to display more information about the player during combat, and also will update the player's information when the frontmatter is changed.
 
+## Display Encounter Difficulty
+
+This will show encounter difficulty based on creater CR and player level in both Encounters and the Initiative Tracker View.
+
 ## Homebrew Content
 
 Homebrew creatures may be created and managed in settings. Homebrew creatures will be available in the monster picker when adding a creature to the combat.
@@ -232,7 +236,7 @@ This is a list of features that are planned for the plugin. Some of these may or
 -   Creature stat blocks in separate moveable tab of sidebar
     -   auto-update displayed stat block based on active creature in the encounter
 -   ~~An option to build an encounter in a Note and send it to Initiative Tracker on demand (e.g., in an Obsidian Note, create some code block indicating 3 Goblins and 1 Bugbear in an area; press a button, add the 3 Goblins and Bugbear to the Initiative tracker)~~
--   Encounter difficulty/XP tracker for creatures with CR
+-   ~~Encounter difficulty/XP tracker for creatures with CR~~
 -   For the currently active creature, display any actions that would need a dice roll and an integrated dice roller with the specific dice and bonuses for the action already pre-loaded (e.g., for a Bugbear, display "Morningstar" and a to-hit dice with 1d20+4, as well as a damage dice of 2d8+2; Also display for the Javelin action)
 -   Support for multiple parties
 -   Integrated dice roller
