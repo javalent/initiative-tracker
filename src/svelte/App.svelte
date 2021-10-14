@@ -25,7 +25,6 @@
     const dispatch = createEventDispatcher();
 
     export let creatures: Creature[] = [];
-    export let view: TrackerView;
     export let name: string = null;
     export let state: boolean;
     export let current: number;
@@ -81,8 +80,9 @@
             dr = dif;
         }
     }
+    let view: TrackerView;
+    store.view.subscribe((v) => (view = v));
 
-    store.view.set(view);
     export let show: boolean;
 
     export let updatingHP: Creature = null;

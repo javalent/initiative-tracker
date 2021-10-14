@@ -136,7 +136,7 @@
     </div>
 
     <div class="encounter-xp">
-      {#if totalXP > 0}
+      {#if totalXP > 0 && difficulty}
         <span aria-label={formatDifficultyReport(difficulty)}
           >The encounter is <em>{difficulty.difficulty}<em /> ({totalXP} XP)</em
           ></span

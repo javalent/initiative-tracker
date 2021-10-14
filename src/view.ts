@@ -12,6 +12,8 @@ import type {
     TrackerViewState
 } from "@types";
 
+import store from "./svelte/store";
+
 export default class TrackerView extends ItemView {
     setDisplayDifficulty(displayDifficulty: boolean) {
         this._app.$set({ displayDifficulty: displayDifficulty });
@@ -495,10 +497,12 @@ export default class TrackerView extends ItemView {
             ? true
             : this.leaf.getRoot?.().containerEl?.clientWidth <
                   MIN_WIDTH_FOR_HAMBURGER ?? true;
+
+        store.view.set(this);
+
         this._app = new App({
             target: this.contentEl,
             props: {
-                view: this,
                 creatures: this.ordered,
                 show: show,
                 state: this.state,
