@@ -13,12 +13,31 @@ interface EncounterParameters {
     creatures?: RawCreatureArray;
     xp: number;
 }
+interface CreatureStats {
+    name: string;
+    ac: number;
+    hp: number;
+    modifier: number;
+    xp: number;
+}
+
+export const equivalent = (
+    creature: CreatureStats,
+    existing: CreatureStats
+) => {
+    return (
+        creature.name == existing.name &&
+        creature.ac == existing.ac &&
+        creature.hp == existing.hp &&
+        creature.modifier == existing.modifier &&
+        creature.xp == existing.xp
+    );
+};
 
 export class Encounter {
     constructor(public plugin: InitiativeTracker) {}
     async postprocess(
         src: string,
-
         el: HTMLElement,
         ctx: MarkdownPostProcessorContext
     ) {
@@ -37,13 +56,8 @@ export class Encounter {
                 const players: string[] = this.parsePlayers(params);
                 const rawMonsters = params.creatures ?? [];
 
-                let creatures: Creature[] = [];
+                let creatures = await this.parseRawCreatures(rawMonsters);
 
-                if (rawMonsters && Array.isArray(rawMonsters)) {
-                    for (const raw of rawMonsters) {
-                        creatures.push(...(await this.parseRawCreature(raw)));
-                    }
-                }
                 const encounterEl = containerEl.createDiv("encounter");
 
                 const xp = params.xp ?? null;
@@ -54,6 +68,7 @@ export class Encounter {
                 const instance = new EncounterUI({
                     target: encounterEl,
                     props: {
+                        plugin: this.plugin,
                         name,
                         players,
                         playerLevels,
@@ -70,7 +85,7 @@ export class Encounter {
                         this.plugin.view?.newEncounter({
                             ...params,
                             players,
-                            creatures: creatures,
+                            creatures: [],
                             xp
                         });
                         this.plugin.app.workspace.revealLeaf(
@@ -111,6 +126,44 @@ export class Encounter {
                 .filter((p) => p)
         ];
     }
+    async parseRawCreatures(rawMonsters: RawCreatureArray) {
+        const creatureMap: Array<[Creature, number | string]> = [];
+        if (rawMonsters && Array.isArray(rawMonsters)) {
+            for (const raw of rawMonsters) {
+                const { creature, number } =
+                    (await this.parseRawCreature(raw)) ?? {};
+
+                const stats = {
+                    name: creature.name,
+                    ac: creature.ac,
+                    hp: creature.hp,
+                    modifier: creature.modifier,
+                    xp: creature.xp
+                };
+                const existing = creatureMap.find(([c]) =>
+                    equivalent(c, stats)
+                );
+                if (!existing) {
+                    creatureMap.push([creature, number]);
+                } else {
+                    let amount;
+                    if (!isNaN(Number(number)) && !isNaN(Number(existing[1]))) {
+                        amount =
+                            (Number(number) as number) +
+                            (existing[1] as number);
+                    } else {
+                        amount = `${number} + ${existing[1]}`;
+                    }
+
+                    creatureMap.splice(creatureMap.indexOf(existing), 1, [
+                        existing[0],
+                        amount
+                    ]);
+                }
+            }
+        }
+        return creatureMap;
+    }
     async parseRawCreature(raw: RawCreature) {
         let monster: string,
             number = 1;
@@ -126,24 +179,24 @@ export class Encounter {
             monster = entries[1];
         }
 
-        if (!monster) return [];
+        if (!monster) return {};
 
         if (
             typeof number == "string" &&
-            this.plugin.canUseDiceRoller &&
+            !this.plugin.canUseDiceRoller &&
             /\d+d\d+/.test(number)
         ) {
-            number = (await this.plugin.parseDice(number)).result ?? number;
+            number = 1;
         }
-        if (typeof number == "string") number = Number(number);
-        if (!number || typeof number != "number" || number < 1) number = 1;
+        if (!isNaN(Number(number))) number = Number(number);
+        if (!number || (typeof number == "number" && number < 1)) number = 1;
 
         let name = monster.split(/,\s?/)[0];
         let [hp, ac, mod, xp] = monster
             .split(/,\s?/)
             .slice(1)
             .map((v) => (isNaN(Number(v)) ? null : Number(v)));
-        if (!name) return [];
+        if (!name) return {};
 
         let existing = this.plugin.bestiary.find((c) => c.name == name);
         let creature = existing
@@ -154,6 +207,16 @@ export class Encounter {
         creature.ac = ac ?? creature.ac;
         creature.modifier = mod ?? creature.modifier;
         creature.xp = xp ?? creature.xp;
-        return [...Array(number).keys()].map((k) => Creature.from(creature));
+
+        let stats = {
+            name: creature.name,
+            hp: creature.hp,
+            ac: creature.ac,
+            modifier: creature.modifier,
+            xp: creature.xp
+        };
+
+        return { creature, number };
+        /* return [...Array(number).keys()].map((k) => Creature.from(creature)); */
     }
 }

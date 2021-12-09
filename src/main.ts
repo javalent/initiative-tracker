@@ -1,12 +1,7 @@
-import {
-    MarkdownPostProcessorContext,
-    Notice,
-    parseYaml,
-    Plugin,
-    WorkspaceLeaf
-} from "obsidian";
+import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
 
 import type ObsidianLeafletPlugin from "../../obsidian-leaflet-plugin/src/main";
+import type DiceRollerPlugin from "../../obsidian-dice-roller/src/main";
 
 import {
     DEFAULT_SETTINGS,
@@ -28,19 +23,22 @@ import { Creature } from "./utils/creature";
 import { BESTIARY } from "./utils/srd-bestiary";
 
 import TrackerView from "./view";
+
+interface AppPlugins {
+    "obsidian-5e-statblocks": {
+        data: Map<string, SRDMonster>;
+    };
+    "obsidian-dice-roller": DiceRollerPlugin;
+    "obsidian-leaflet-plugin": ObsidianLeafletPlugin;
+    "initiative-tracker": InitiativeTracker;
+}
+
 declare module "obsidian" {
     interface App {
         plugins: {
-            plugins: {
-                "obsidian-5e-statblocks": {
-                    data: Map<string, SRDMonster>;
-                };
-                "obsidian-dice-roller": {
-                    parseDice(text: string): Promise<{ result: number }>;
-                };
-                "obsidian-leaflet-plugin": ObsidianLeafletPlugin;
-                "initiative-tracker": InitiativeTracker;
-            };
+            getPlugin<T extends keyof AppPlugins>(plugin: T): AppPlugins[T];
+            getPlugin(plugin: string): Plugin;
+            plugins: { [key: string]: any };
         };
     }
     interface WorkspaceItem {
@@ -62,6 +60,13 @@ export default class InitiativeTracker extends Plugin {
         return await this.app.plugins.plugins["obsidian-dice-roller"].parseDice(
             text
         );
+    }
+    getRoller(str: string) {
+        if (!this.canUseDiceRoller) return;
+        const roller = this.app.plugins
+            .getPlugin("obsidian-dice-roller")
+            .getRoller(str, "statblock", true);
+        return roller;
     }
     get canUseDiceRoller() {
         return "obsidian-dice-roller" in this.app.plugins.plugins;
