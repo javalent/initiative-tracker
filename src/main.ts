@@ -21,12 +21,11 @@ import type {
 } from "../@types/index";
 
 import InitiativeTrackerSettings from "./settings";
+import { Encounter } from "./encounter";
 
 import { Creature } from "./utils/creature";
 
 import { BESTIARY } from "./utils/srd-bestiary";
-
-import Encounter from "./svelte/Encounter.svelte";
 
 import TrackerView from "./view";
 declare module "obsidian" {
@@ -56,7 +55,14 @@ export default class InitiativeTracker extends Plugin {
     public data: InitiativeTrackerData;
     playerCreatures: Map<HomebrewCreature, Creature> = new Map();
     homebrewCreatures: Map<HomebrewCreature, Creature> = new Map();
+    encounterHandler = new Encounter(this);
+    async parseDice(text: string) {
+        if (!this.canUseDiceRoller) return null;
 
+        return await this.app.plugins.plugins["obsidian-dice-roller"].parseDice(
+            text
+        );
+    }
     get canUseDiceRoller() {
         return "obsidian-dice-roller" in this.app.plugins.plugins;
     }
@@ -162,10 +168,9 @@ export default class InitiativeTracker extends Plugin {
             )
         );
 
-        this.registerMarkdownCodeBlockProcessor(
-            "encounter",
-            this.encounterProcessor.bind(this)
-        );
+        this.registerMarkdownCodeBlockProcessor("encounter", (src, el, ctx) => {
+            this.encounterHandler.postprocess(src, el, ctx);
+        });
 
         this.playerCreatures = new Map(
             this.data.players.map((p) => [p, Creature.from(p)])
@@ -177,175 +182,6 @@ export default class InitiativeTracker extends Plugin {
         this.app.workspace.onLayoutReady(() => this.addTrackerView());
 
         console.log("Initiative Tracker v" + this.manifest.version + " loaded");
-    }
-
-    encounterProcessor(
-        src: string,
-        el: HTMLElement,
-        ctx: MarkdownPostProcessorContext
-    ) {
-        const encounters = src.split("---") ?? [];
-        const containerEl = el.createDiv("encounter-container");
-        const empty = containerEl.createSpan({
-            text: "No encounters created. Please check your syntax and try again."
-        });
-
-        for (let encounter of encounters) {
-            try {
-                const params = parseYaml(encounter);
-                const rawMonsters = params.creatures ?? [];
-
-                let creatures: Creature[];
-                if (rawMonsters && rawMonsters instanceof Array) {
-                    creatures = rawMonsters
-                        .map((m) => {
-                            try {
-                                let monster: string | string[] = m,
-                                    number = 1;
-                                if (
-                                    typeof m === "object" &&
-                                    !(m instanceof Array)
-                                ) {
-                                    number = Number(Object.keys(m).shift());
-                                    monster = Object.values(
-                                        m
-                                    ).shift() as string[];
-                                } else if (typeof m === "string") {
-                                    try {
-                                        let [mon, num] = m
-                                            .split(/:\s?/)
-                                            .reverse();
-                                        if (num && !isNaN(Number(num))) {
-                                            number = Number(num);
-                                        }
-                                        monster = parseYaml(mon);
-                                    } catch (e) {
-                                        console.error(e);
-                                        return;
-                                    }
-                                }
-                                if (!monster.length) return;
-                                if (typeof monster == "string") {
-                                    monster = [monster.split(",")].flat();
-                                }
-                                let creature: Creature;
-                                const bestiary = this.bestiary.find(
-                                    (b) => b.name == monster[0]
-                                );
-                                if (bestiary) {
-                                    creature = Creature.from(bestiary);
-                                    creature.hp =
-                                        monster[1] && !isNaN(Number(monster[1]))
-                                            ? Number(monster[1])
-                                            : creature.hp;
-                                    creature.ac =
-                                        monster[2] && !isNaN(Number(monster[2]))
-                                            ? Number(monster[2])
-                                            : creature.ac;
-                                    creature.modifier =
-                                        monster[3] && !isNaN(Number(monster[3]))
-                                            ? Number(monster[3])
-                                            : creature.modifier;
-                                    creature.xp =
-                                        monster[4] && !isNaN(Number(monster[4]))
-                                            ? Number(monster[4])
-                                            : creature.xp;
-                                } else {
-                                    creature = new Creature({
-                                        name: monster[0],
-                                        hp:
-                                            monster[1] &&
-                                            !isNaN(Number(monster[1]))
-                                                ? Number(monster[1])
-                                                : null,
-                                        ac:
-                                            monster[2] &&
-                                            !isNaN(Number(monster[2]))
-                                                ? Number(monster[2])
-                                                : null,
-                                        modifier:
-                                            monster[3] &&
-                                            !isNaN(Number(monster[3]))
-                                                ? Number(monster[3])
-                                                : null,
-                                        xp:
-                                            monster[4] &&
-                                            !isNaN(Number(monster[4]))
-                                                ? Number(monster[4])
-                                                : null,
-                                        marker: this.data.monsterMarker
-                                    });
-                                }
-
-                                return [
-                                    ...[...Array(number).keys()].map((k) =>
-                                        Creature.from(creature)
-                                    )
-                                ];
-                            } catch (e) {
-                                new Notice(
-                                    "Initiative Tracker: could not parse line: \n\n" +
-                                        m
-                                );
-                            }
-                        })
-                        .filter((c) => c)
-                        .flat();
-                }
-
-                const encounterEl = containerEl.createDiv("encounter");
-
-                let players: boolean | string[] = true;
-                if (params.players) {
-                    if (params.players === "none") {
-                        players = false;
-                    } else {
-                        players = params.players;
-                    }
-                }
-
-                const xp = params.xp ?? null;
-                const playerLevels = this.data.players
-                    .map((p) => p.level)
-                    .filter((p) => p);
-
-                const instance = new Encounter({
-                    target: encounterEl,
-                    props: {
-                        ...(params.name ? { name: params.name } : {}),
-                        players,
-                        playerLevels,
-                        creatures,
-                        xp
-                    }
-                });
-
-                instance.$on("begin-encounter", async () => {
-                    if (!this.view) {
-                        await this.addTrackerView();
-                    }
-                    if (this.view) {
-                        this.view?.newEncounter({
-                            ...params,
-                            creatures: creatures,
-                            xp
-                        });
-                        this.app.workspace.revealLeaf(this.view.leaf);
-                    } else {
-                        new Notice(
-                            "Could not find the Initiative Tracker. Try reloading the note!"
-                        );
-                    }
-                });
-                empty.detach();
-            } catch (e) {
-                console.error(e);
-                new Notice(
-                    "Initiative Tracker: here was an issue parsing: \n\n" +
-                        encounter
-                );
-            }
-        }
     }
 
     addCommands() {
