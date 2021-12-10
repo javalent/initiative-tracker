@@ -78,6 +78,7 @@ export interface InitiativeTrackerData {
     playerMarker: string;
     monsterMarker: string;
     state: InitiativeViewState;
+    condense: boolean;
 }
 
 export interface InitiativeViewState {

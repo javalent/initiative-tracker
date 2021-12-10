@@ -1,11 +1,13 @@
 <script lang="ts">
-    import { ExtraButtonComponent } from "obsidian";
+    import { ExtraButtonComponent, setIcon } from "obsidian";
 
     import store from "./store";
     import {
         BACKWARD,
         DICE,
+        EXPAND,
         FORWARD,
+        GROUP,
         MAP,
         NEW,
         PLAY,
@@ -14,6 +16,9 @@
     } from "src/utils";
 
     import type TrackerView from "src/view";
+    import { Menu } from "obsidian";
+    import { getContext } from "svelte";
+    import type InitiativeTracker from "src/main";
 
     export let state: boolean = false;
     export let map: boolean = false;
@@ -93,6 +98,55 @@
                 view.openInitiativeView();
             });
     };
+
+    const plugin = getContext<InitiativeTracker>("plugin");
+
+    const open = (evt: MouseEvent) => {
+        menu.showAtMouseEvent(evt);
+    };
+    /* const menu = (node: HTMLElement) => { */
+    const menu = new Menu(plugin.app);
+    menu.addItem((item) => {
+        item.setIcon(NEW)
+            .setTitle("New Encounter")
+            .onClick(() => view.newEncounter());
+    });
+    menu.addItem((item) => {
+        item.setIcon(REDO)
+            .setTitle("Reset HP & Status")
+            .onClick(() => view.resetEncounter());
+    });
+    menu.addItem((item) => {
+        item.setIcon(DICE)
+            .setTitle("Re-roll Initiatives")
+            .onClick(() => view.resetEncounter());
+    });
+    menu.addItem((item) => {
+        item.setIcon(GROUP)
+            .setTitle(view.condense ? "Expand Creatures" : "Group Creatures")
+            .onClick(() => {
+                view.condense = !view.condense;
+                item.setIcon(view.condense ? EXPAND : GROUP);
+                item.setTitle(
+                    view.condense ? "Expand Creatures" : "Group Creatures"
+                );
+            });
+    });
+    if (map) {
+        menu.addSeparator();
+        menu.addItem((item) => {
+            item.setIcon(MAP)
+                .setTitle("Open Leaflet Map")
+                .onClick(() => {
+                    view.openInitiativeView();
+                });
+        });
+    }
+
+    const menuIcon = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon("vertical-three-dots");
+    };
+    /* }; */
 </script>
 
 <div class="buttons">
@@ -106,12 +160,13 @@
         {/if}
     </div>
     <div class="clean">
-        <div use:diceButton />
+        <div use:menuIcon on:click={(evt) => open(evt)} />
+        <!-- <div use:diceButton />
         <div use:restoreButton />
         <div use:newButton />
         {#if map}
             <div use:mapButton />
-        {/if}
+        {/if} -->
     </div>
 </div>
 

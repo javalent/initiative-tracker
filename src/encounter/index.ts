@@ -76,27 +76,6 @@ export class Encounter {
                         xp
                     }
                 });
-
-                /* instance.$on("begin-encounter", async () => {
-                    if (!this.plugin.view) {
-                        await this.plugin.addTrackerView();
-                    }
-                    if (this.plugin.view) {
-                        this.plugin.view?.newEncounter({
-                            ...params,
-                            players,
-                            creatures: [],
-                            xp
-                        });
-                        this.plugin.app.workspace.revealLeaf(
-                            this.plugin.view.leaf
-                        );
-                    } else {
-                        new Notice(
-                            "Could not find the Initiative Tracker. Try reloading the note!"
-                        );
-                    }
-                }); */
                 empty.detach();
             } catch (e) {
                 console.error(e);

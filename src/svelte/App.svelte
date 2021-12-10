@@ -21,6 +21,8 @@
     import type { DifficultyReport } from "src/utils/encounter-difficulty";
     import { tweened } from "svelte/motion";
     import { cubicOut } from "svelte/easing";
+    import type InitiativeTracker from "src/main";
+    import { setContext } from "svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -31,6 +33,9 @@
     export let map: boolean;
     export let xp: number;
     export let displayDifficulty: boolean;
+    export let plugin: InitiativeTracker;
+
+    setContext("plugin", plugin);
 
     let canDisplayDifficulty = false;
 

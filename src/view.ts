@@ -25,6 +25,8 @@ export default class TrackerView extends ItemView {
 
     public name: string;
 
+    public condense = this.plugin.data.condense;
+
     private _app: App;
     private _rendered: boolean = false;
 
@@ -513,7 +515,8 @@ export default class TrackerView extends ItemView {
                 current: this.current,
                 map: this.plugin.data.leafletIntegration,
                 xp: null,
-                displayDifficulty: this.plugin.data.displayDifficulty
+                displayDifficulty: this.plugin.data.displayDifficulty,
+                plugin: this.plugin
             }
         });
         this._rendered = true;

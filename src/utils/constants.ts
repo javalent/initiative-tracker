@@ -22,6 +22,7 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
         current: null,
         name: null
     },
+    condense: false,
     displayDifficulty: true
 };
 
