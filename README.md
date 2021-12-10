@@ -93,6 +93,14 @@ creatures:
 ```
 ````
 
+##### Using Dice Rolls
+
+Creatures may also be specified by a dice roll if the [Dice Roller](https://github.com/valentine195/obsidian-dice-roller) plugin is installed. The plugin will still collapse creatures that are the same into one group, but a Dice Roller with the combined formula will be added to the block.
+
+![](https://raw.githubusercontent.com/valentine195/obsidian-initiative-tracker/master/assets/dice-encounter.png)
+
+Clicking the dice roller will re-roll the number of creatures. This number **is not persistent**, but when you launch the encounter, the encounter will use the number of creatures shown.
+
 ##### Creatures from the Bestiary
 
 Creatures from your bestiary can be added by their name. This includes the full SRD creature list as well as any homebrew creatures added in Settings.
