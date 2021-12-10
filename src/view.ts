@@ -300,11 +300,15 @@ export default class TrackerView extends ItemView {
     async getInitiativeValue(modifier: number = 0): Promise<number> {
         let initiative = Math.floor(Math.random() * 19 + 1) + modifier;
         if (this.plugin.canUseDiceRoller) {
-            const num = await this.plugin.app.plugins.plugins[
-                "obsidian-dice-roller"
-            ].parseDice(
-                this.plugin.data.initiative.replace(/%mod%/g, `(${modifier})`)
-            );
+            const num = await this.plugin.app.plugins
+                .getPlugin("obsidian-dice-roller")
+                .parseDice(
+                    this.plugin.data.initiative.replace(
+                        /%mod%/g,
+                        `(${modifier})`
+                    ),
+                    "initiative-tracker"
+                );
 
             initiative = num.result;
         }

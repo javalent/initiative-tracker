@@ -77,7 +77,7 @@ export class Encounter {
                     }
                 });
 
-                instance.$on("begin-encounter", async () => {
+                /* instance.$on("begin-encounter", async () => {
                     if (!this.plugin.view) {
                         await this.plugin.addTrackerView();
                     }
@@ -96,7 +96,7 @@ export class Encounter {
                             "Could not find the Initiative Tracker. Try reloading the note!"
                         );
                     }
-                });
+                }); */
                 empty.detach();
             } catch (e) {
                 console.error(e);
@@ -116,7 +116,11 @@ export class Encounter {
             params.players = [...this.plugin.data.players.map((p) => p.name)];
         }
         return [
-            ...params.players
+            ...(
+                params.players ?? [
+                    ...this.plugin.data.players.map((p) => p.name)
+                ]
+            )
                 .map(
                     (p) =>
                         this.plugin.data.players.find(

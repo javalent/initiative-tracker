@@ -1,17 +1,18 @@
 <script lang="ts">
-    import { ExtraButtonComponent } from "obsidian";
+    import { ExtraButtonComponent, Notice } from "obsidian";
     import { START_ENCOUNTER } from "src/utils";
 
     import { createEventDispatcher } from "svelte";
 
     const dispatch = createEventDispatcher();
 
-    import type { Creature } from "src/utils/creature";
+    import { Creature } from "src/utils/creature";
     import {
         encounterDifficulty,
         formatDifficultyReport
     } from "src/utils/encounter-difficulty";
     import type InitiativeTracker from "src/main";
+    import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
 
     export let plugin: InitiativeTracker;
     export let name: string = "Encounter";
@@ -22,17 +23,23 @@
     let totalXP = xp ?? 0;
     export let playerLevels: number[];
 
-    interface CreatureStats {
-        name: string;
-        ac: number;
-        hp: number;
-        modifier: number;
-        xp: number;
-    }
+    const creatureMap: Map<Creature, number> = new Map();
+    const rollerMap: Map<Creature, StackRoller> = new Map();
 
-    for (let [creature, number] of creatures) {
+    for (let [creature, count] of creatures) {
+        let number: number = Number(count);
+        if (plugin.canUseDiceRoller) {
+            let roller = plugin.getRoller(`${count}`) as StackRoller;
+            roller.on("new-result", () => {
+                creatureMap.set(creature, roller.result);
+            });
+            rollerMap.set(creature, roller);
+            roller.roll();
+        } else {
+            creatureMap.set(creature, number);
+        }
         if (!xp) {
-            totalXP += creature.xp;
+            totalXP += creature.xp * number;
         }
     }
     let difficulty = encounterDifficulty(
@@ -44,11 +51,61 @@
         new ExtraButtonComponent(node)
             .setIcon(START_ENCOUNTER)
             .setTooltip("Begin Encounter")
-            .onClick(() => {
-                dispatch("begin-encounter");
+            .onClick(async () => {
+                if (!plugin.view) {
+                    await plugin.addTrackerView();
+                }
+                if (plugin.view) {
+                    const creatures: Creature[] = [...creatureMap]
+                        .map(([creature, number]) => {
+                            if (isNaN(Number(number)) || number < 1)
+                                return [creature];
+                            return [...Array(number).keys()].map((v) =>
+                                Creature.from(creature)
+                            );
+                        })
+                        .flat();
+
+                    plugin.view?.newEncounter({
+                        name,
+                        players,
+                        creatures,
+                        xp
+                    });
+                    plugin.app.workspace.revealLeaf(plugin.view.leaf);
+                } else {
+                    new Notice(
+                        "Could not find the Initiative Tracker. Try reloading the note!"
+                    );
+                }
             });
     };
-    const label = (creature: CreatureStats) => {
+
+    /* onMount(async () => {
+        if (roller) {
+        }
+    }); */
+    const rollerEl = (node: HTMLElement, creature: Creature) => {
+        console.log(
+            "🚀 ~ file: Encounter.svelte ~ line 68 ~ rollerMap.get(creature)!.static",
+            creature.name,
+            rollerMap.get(creature)!.isStatic
+        );
+        if (
+            plugin.canUseDiceRoller &&
+            rollerMap.has(creature) &&
+            !rollerMap.get(creature)!.isStatic
+        ) {
+            node.appendChild(
+                rollerMap.get(creature)?.containerEl ??
+                    createSpan({ text: `${creatureMap.get(creature)}` })
+            );
+        } else {
+            node.setText(`${creatureMap.get(creature)}`);
+        }
+    };
+
+    const label = (creature: Creature) => {
         if (!creature) return;
         let label = [];
         if (creature.hp) {
@@ -93,14 +150,13 @@
                 <ul>
                     {#each creatures as [creature, count]}
                         <li aria-label={label(creature)} class="creature-li">
-                            <strong>{count}</strong><span
-                                >&nbsp;{creature.name}{count == 1
-                                    ? ""
-                                    : "s"}</span
-                            >
+                            <strong use:rollerEl={creature} />
+                            <span>
+                                &nbsp;{creature.name}{count == 1 ? "" : "s"}
+                            </span>
                             <!-- {#if creature.xp}
                                 <span>
-                                    ({creature.xp * count} XP)
+                                    ({creature.xp * number} XP)
                                 </span>
                             {/if} -->
                         </li>

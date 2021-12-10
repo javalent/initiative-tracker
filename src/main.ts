@@ -1,8 +1,5 @@
 import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
 
-import type ObsidianLeafletPlugin from "../../obsidian-leaflet-plugin/src/main";
-import type DiceRollerPlugin from "../../obsidian-dice-roller/src/main";
-
 import {
     DEFAULT_SETTINGS,
     INTIATIVE_TRACKER_VIEW,
@@ -24,21 +21,11 @@ import { BESTIARY } from "./utils/srd-bestiary";
 
 import TrackerView from "./view";
 
-interface AppPlugins {
-    "obsidian-5e-statblocks": {
-        data: Map<string, SRDMonster>;
-    };
-    "obsidian-dice-roller": DiceRollerPlugin;
-    "obsidian-leaflet-plugin": ObsidianLeafletPlugin;
-    "initiative-tracker": InitiativeTracker;
-}
-
+import type { Plugins } from "../../obsidian-overload/index";
 declare module "obsidian" {
     interface App {
         plugins: {
-            getPlugin<T extends keyof AppPlugins>(plugin: T): AppPlugins[T];
-            getPlugin(plugin: string): Plugin;
-            plugins: { [key: string]: any };
+            getPlugin<T extends keyof Plugins>(plugin: T): Plugins[T];
         };
     }
     interface WorkspaceItem {
@@ -57,9 +44,9 @@ export default class InitiativeTracker extends Plugin {
     async parseDice(text: string) {
         if (!this.canUseDiceRoller) return null;
 
-        return await this.app.plugins.plugins["obsidian-dice-roller"].parseDice(
-            text
-        );
+        return await this.app.plugins
+            .getPlugin("obsidian-dice-roller")
+            .parseDice(text, "initiative-tracker");
     }
     getRoller(str: string) {
         if (!this.canUseDiceRoller) return;
@@ -69,18 +56,18 @@ export default class InitiativeTracker extends Plugin {
         return roller;
     }
     get canUseDiceRoller() {
-        return "obsidian-dice-roller" in this.app.plugins.plugins;
+        return this.app.plugins.getPlugin("obsidian-dice-roller") != null;
     }
 
     get canUseStatBlocks() {
-        return "obsidian-5e-statblocks" in this.app.plugins.plugins;
+        return this.app.plugins.getPlugin("obsidian-5e-statblocks") != null;
     }
 
     get canUseLeaflet() {
         return (
-            "obsidian-leaflet-plugin" in this.app.plugins.plugins &&
+            this.app.plugins.getPlugin("obsidian-leaflet-plugin") != null &&
             Number(
-                this.app.plugins.plugins["obsidian-leaflet-plugin"].data
+                this.app.plugins.getPlugin("obsidian-leaflet-plugin").data
                     ?.version?.major >= 4
             )
         );
@@ -88,17 +75,19 @@ export default class InitiativeTracker extends Plugin {
 
     get leaflet() {
         if (this.canUseLeaflet) {
-            return this.app.plugins.plugins["obsidian-leaflet-plugin"];
+            return this.app.plugins.getPlugin("obsidian-leaflet-plugin");
         }
     }
 
     get statblock_creatures() {
         if (!this.data.sync) return [];
-        if (!this.app.plugins.plugins["obsidian-5e-statblocks"]) return [];
+        if (!this.app.plugins.getPlugin("obsidian-5e-statblocks")) return [];
 
         return [
             ...Array.from(
-                this.app.plugins.plugins["obsidian-5e-statblocks"].data.values()
+                this.app.plugins
+                    .getPlugin("obsidian-5e-statblocks")
+                    .data.values()
             )
         ];
     }
