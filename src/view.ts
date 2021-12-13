@@ -12,11 +12,9 @@ import type {
     TrackerViewState
 } from "@types";
 
-import store from "./svelte/store";
-
 export default class TrackerView extends ItemView {
     setDisplayDifficulty(displayDifficulty: boolean) {
-        this._app.$set({ displayDifficulty: displayDifficulty });
+        /* this._app.$set({ displayDifficulty: displayDifficulty }); */
     }
     public creatures: Creature[] = [];
     public current: number = 0;
@@ -300,21 +298,7 @@ export default class TrackerView extends ItemView {
         });
     }
     async getInitiativeValue(modifier: number = 0): Promise<number> {
-        let initiative = Math.floor(Math.random() * 19 + 1) + modifier;
-        if (this.plugin.canUseDiceRoller) {
-            const num = await this.plugin.app.plugins
-                .getPlugin("obsidian-dice-roller")
-                .parseDice(
-                    this.plugin.data.initiative.replace(
-                        /%mod%/g,
-                        `(${modifier})`
-                    ),
-                    "initiative-tracker"
-                );
-
-            initiative = num.result;
-        }
-        return initiative;
+        return await this.plugin.getInitiativeValue(modifier);
     }
 
     async rollInitiatives() {
@@ -443,6 +427,7 @@ export default class TrackerView extends ItemView {
             creature.marker = marker;
         }
 
+        console.log(this.creatures.find((c) => c == creature).initiative);
         this.trigger("initiative-tracker:creature-updated", creature);
 
         this.setAppState({
@@ -499,23 +484,15 @@ export default class TrackerView extends ItemView {
         this.trigger("initiative-tracker:should-save");
     }
     async onOpen() {
-        let show = Platform.isMobile
-            ? true
-            : this.leaf.getRoot?.().containerEl?.clientWidth <
-                  MIN_WIDTH_FOR_HAMBURGER ?? true;
-
-        store.view.set(this);
-
         this._app = new App({
             target: this.contentEl,
             props: {
                 creatures: this.ordered,
-                show: show,
                 state: this.state,
                 current: this.current,
-                map: this.plugin.data.leafletIntegration,
                 xp: null,
-                displayDifficulty: this.plugin.data.displayDifficulty,
+                view: this,
+                /* displayDifficulty: this.plugin.data.displayDifficulty, */
                 plugin: this.plugin
             }
         });

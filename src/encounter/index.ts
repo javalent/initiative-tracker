@@ -1,4 +1,10 @@
-import { MarkdownPostProcessorContext, Notice, parseYaml } from "obsidian";
+import {
+    Component,
+    MarkdownPostProcessorContext,
+    MarkdownRenderChild,
+    Notice,
+    parseYaml
+} from "obsidian";
 import type InitiativeTracker from "../main";
 import { Creature } from "../utils/creature";
 
@@ -10,6 +16,7 @@ type RawPlayers = boolean | "none" | string[];
 interface EncounterParameters {
     name?: string;
     players?: RawPlayers;
+    hide?: "players" | "creatures" | string[];
     creatures?: RawCreatureArray;
     xp: number;
 }
@@ -22,8 +29,8 @@ interface CreatureStats {
 }
 
 export const equivalent = (
-    creature: CreatureStats,
-    existing: CreatureStats
+    creature: Creature | CreatureStats,
+    existing: Creature | CreatureStats
 ) => {
     return (
         creature.name == existing.name &&
@@ -34,87 +41,83 @@ export const equivalent = (
     );
 };
 
-export class Encounter {
-    constructor(public plugin: InitiativeTracker) {}
-    async postprocess(
-        src: string,
-        el: HTMLElement,
-        ctx: MarkdownPostProcessorContext
+class EncounterComponent {
+    instance: EncounterUI;
+    constructor(
+        public params: EncounterParameters,
+        public encounterEl: HTMLElement,
+        public plugin: InitiativeTracker
     ) {
-        const encounters = src.split("---") ?? [];
-        const containerEl = el.createDiv("encounter-container");
-        const empty = containerEl.createSpan({
-            text: "No encounters created. Please check your syntax and try again."
-        });
-
-        for (let encounter of encounters) {
-            if (!encounter?.trim().length) continue;
-            try {
-                const params: EncounterParameters = parseYaml(encounter);
-
-                const name = params.name;
-                const players: string[] = this.parsePlayers(params);
-                const rawMonsters = params.creatures ?? [];
-
-                let creatures = await this.parseRawCreatures(rawMonsters);
-
-                const encounterEl = containerEl.createDiv("encounter");
-
-                const xp = params.xp ?? null;
-                const playerLevels = this.plugin.data.players
-                    .map((p) => p.level)
-                    .filter((p) => p);
-
-                const instance = new EncounterUI({
-                    target: encounterEl,
-                    props: {
-                        plugin: this.plugin,
-                        name,
-                        players,
-                        playerLevels,
-                        creatures,
-                        xp
-                    }
-                });
-                empty.detach();
-            } catch (e) {
-                console.error(e);
-                new Notice(
-                    "Initiative Tracker: here was an issue parsing: \n\n" +
-                        encounter
-                );
-            }
-        }
+        this.display();
     }
+    async display() {
+        const name = this.params.name;
+        const players: string[] = this.parsePlayers(this.params);
+        const hide = this.parseHide(this.params);
+        const rawMonsters = this.params.creatures ?? [];
 
-    buildEncounter() {}
+        let creatures = await this.parseRawCreatures(rawMonsters);
+
+        const xp = this.params.xp ?? null;
+        const playerLevels = this.plugin.data.players
+            .map((p) => p.level)
+            .filter((p) => p);
+
+        this.instance = new EncounterUI({
+            target: this.encounterEl,
+            props: {
+                plugin: this.plugin,
+                name,
+                players,
+                playerLevels,
+                creatures,
+                xp,
+                hide
+            }
+        });
+    }
+    parseHide(params: EncounterParameters): string[] {
+        if (!("hide" in (params ?? {}))) return [];
+        if (typeof params.hide == "string")
+            return ["creatures", "players"].filter((v) => params.hide == v);
+        if (Array.isArray(params.hide))
+            return ["creatures", "players"].filter((v) =>
+                params.hide.includes(v)
+            );
+
+        return [];
+    }
     parsePlayers(params: EncounterParameters) {
-        if (params.players == "none" || params.players == false) {
-            params.players = [];
-        } else if (!("players" in params) || params.players == true) {
-            params.players = [...this.plugin.data.players.map((p) => p.name)];
+        const players = params.players;
+        if (players == "none" || players == false) {
+            return [];
         }
-        return [
-            ...(
-                params.players ?? [
-                    ...this.plugin.data.players.map((p) => p.name)
-                ]
-            )
-                .map(
-                    (p) =>
-                        this.plugin.data.players.find(
-                            (d) => d.name.toLowerCase() == p
-                        )?.name
+        if (!players || players == true) {
+            return [...this.plugin.data.players.map((p) => p.name)];
+        }
+        if (typeof players == "string") {
+            return [players];
+        }
+        if (Array.isArray(players)) {
+            console.log(
+                "🚀 ~ file: index.ts ~ line 105 ~ players",
+                players,
+                this.plugin.data.players
+            );
+            return (this.plugin.data.players ?? [])
+                .filter((p) =>
+                    players
+                        .map((n) => n.toLowerCase())
+                        .includes(p.name.toLowerCase())
                 )
-                .filter((p) => p)
-        ];
+                .map((p) => p.name);
+        }
     }
     async parseRawCreatures(rawMonsters: RawCreatureArray) {
-        const creatureMap: Array<[Creature, number | string]> = [];
+        const creatureMap: Map<Creature, number | string> = new Map();
         if (rawMonsters && Array.isArray(rawMonsters)) {
             for (const raw of rawMonsters) {
-                const { creature, number } =
-                    (await this.parseRawCreature(raw)) ?? {};
+                const { creature, number } = this.parseRawCreature(raw) ?? {};
 
                 const stats = {
                     name: creature.name,
@@ -123,11 +126,11 @@ export class Encounter {
                     modifier: creature.modifier,
                     xp: creature.xp
                 };
-                const existing = creatureMap.find(([c]) =>
+                const existing = [...creatureMap].find(([c]) =>
                     equivalent(c, stats)
                 );
                 if (!existing) {
-                    creatureMap.push([creature, number]);
+                    creatureMap.set(creature, number);
                 } else {
                     let amount;
                     if (!isNaN(Number(number)) && !isNaN(Number(existing[1]))) {
@@ -138,16 +141,13 @@ export class Encounter {
                         amount = `${number} + ${existing[1]}`;
                     }
 
-                    creatureMap.splice(creatureMap.indexOf(existing), 1, [
-                        existing[0],
-                        amount
-                    ]);
+                    creatureMap.set(existing[0], amount);
                 }
             }
         }
         return creatureMap;
     }
-    async parseRawCreature(raw: RawCreature) {
+    parseRawCreature(raw: RawCreature) {
         let monster: string,
             number = 1;
         if (typeof raw == "string") {
@@ -191,15 +191,57 @@ export class Encounter {
         creature.modifier = mod ?? creature.modifier;
         creature.xp = xp ?? creature.xp;
 
-        let stats = {
-            name: creature.name,
-            hp: creature.hp,
-            ac: creature.ac,
-            modifier: creature.modifier,
-            xp: creature.xp
-        };
-
         return { creature, number };
-        /* return [...Array(number).keys()].map((k) => Creature.from(creature)); */
+    }
+}
+
+export class Encounter extends MarkdownRenderChild {
+    constructor(
+        public plugin: InitiativeTracker,
+        public src: string,
+        public containerEl: HTMLElement
+    ) {
+        super(containerEl);
+    }
+    onload(): void {
+        this.postprocess();
+    }
+    async postprocess() {
+        const encounters = this.src.split("---") ?? [];
+        const containerEl = this.containerEl.createDiv("encounter-container");
+        const empty = containerEl.createSpan({
+            text: "No encounters created. Please check your syntax and try again."
+        });
+
+        for (let encounter of encounters) {
+            if (!encounter?.trim().length) continue;
+            try {
+                const params: EncounterParameters = parseYaml(encounter);
+                const component = new EncounterComponent(
+                    params,
+                    containerEl.createDiv("encounter-instance"),
+                    this.plugin
+                );
+                empty.detach();
+            } catch (e) {
+                console.error(e);
+                new Notice(
+                    "Initiative Tracker: here was an issue parsing: \n\n" +
+                        encounter
+                );
+            }
+
+            this.registerEvent(
+                this.plugin.app.workspace.on(
+                    "initiative-tracker:unload",
+                    () => {
+                        this.containerEl.empty();
+                        this.containerEl.createEl("pre").createEl("code", {
+                            text: `\`\`\`encounter\n${this.src}\`\`\``
+                        });
+                    }
+                )
+            );
+        }
     }
 }

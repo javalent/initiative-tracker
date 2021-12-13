@@ -91,13 +91,13 @@ export function encounterDifficulty(
     }
     const adjustedXp = numberMultiplier * xp;
     const budget = xpBudget(characterLevels);
-    let difficulty = "easy";
+    let difficulty = "Easy";
     if (adjustedXp >= budget.deadly) {
-        difficulty = "deadly";
+        difficulty = "Deadly";
     } else if (adjustedXp >= budget.hard) {
-        difficulty = "hard";
+        difficulty = "Hard";
     } else if (adjustedXp >= budget.medium) {
-        difficulty = "medium";
+        difficulty = "Medium";
     }
     let result = {
         difficulty: difficulty,

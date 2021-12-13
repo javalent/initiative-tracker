@@ -8,12 +8,7 @@
     export let status: Condition;
 
     const deleteIcon = (node: HTMLElement) => {
-        const icon = new ExtraButtonComponent(node)
-            .setIcon("cross-in-box")
-            .onClick(() => {
-                dispatch("remove");
-            });
-        icon.extraSettingsEl.setAttr("style", "margin-left: 3px;");
+        new ExtraButtonComponent(node).setIcon("cross-in-box");
     };
 </script>
 
@@ -26,14 +21,20 @@
     aria-label-classes="initiative-tracker-condition-tooltip"
 >
     <span>{status.name}</span>
-    <div use:deleteIcon />
+    <div use:deleteIcon on:click={() => dispatch("remove")} />
 </div>
 
 <style>
     .tag {
         display: flex;
         align-items: center;
-        padding-right: 0px;
-        margin-right: 0.125rem;
+        gap: 0.125rem;
+        color: var(--text-muted);
+        font-size: small;
+        width: fit-content;
+        border-radius: 0.25rem;
+    }
+    .tag :global(.clickable-icon) {
+        margin: 0;
     }
 </style>

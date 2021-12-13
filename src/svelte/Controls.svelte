@@ -1,7 +1,6 @@
 <script lang="ts">
-    import { ExtraButtonComponent, setIcon } from "obsidian";
+    import { ExtraButtonComponent } from "obsidian";
 
-    import store from "./store";
     import {
         BACKWARD,
         DICE,
@@ -19,32 +18,33 @@
     import { Menu } from "obsidian";
     import { getContext } from "svelte";
     import type InitiativeTracker from "src/main";
+    import { createEventDispatcher } from "svelte";
+
+    const dispatch = createEventDispatcher();
 
     export let state: boolean = false;
     export let map: boolean = false;
 
-    let view: TrackerView;
-    store.view.subscribe((value) => {
-        view = value;
-    });
+    let view = getContext<TrackerView>("view");
 
     const playButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setIcon(PLAY)
             .setTooltip("Play")
             .onClick(() => {
-                view.toggleState();
-                state = view.state;
+                dispatch("toggle");
+                /* view.toggleState();
+                state = view.state; */
             });
     };
     const stopButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setIcon(STOP)
-            .setTooltip("Stop") /* 
-            .setDisabled(numberOfCreatures == 0) */
+            .setTooltip("Stop")
             .onClick(() => {
-                view.toggleState();
-                state = view.state;
+                dispatch("toggle");
+                /* view.toggleState();
+                state = view.state; */
             });
     };
     const nextButton = (node: HTMLElement) => {
@@ -52,7 +52,8 @@
             .setIcon(FORWARD)
             .setTooltip("Next")
             .onClick(() => {
-                view.goToNext();
+                dispatch("next");
+                /* view.goToNext(); */
             });
     };
     const prevButton = (node: HTMLElement) => {
@@ -60,42 +61,8 @@
             .setIcon(BACKWARD)
             .setTooltip("Previous")
             .onClick(() => {
-                view.goToPrevious();
-            });
-    };
-
-    const restoreButton = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setIcon(REDO)
-            .setTooltip("Reset HP & Status")
-            .onClick(() => {
-                view.resetEncounter();
-            });
-    };
-    const newButton = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setIcon(NEW)
-            .setTooltip("New Encounter")
-            .onClick(() => {
-                view.newEncounter();
-            });
-    };
-
-    const diceButton = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setIcon(DICE)
-            .setTooltip("Re-roll Initiatives")
-            .onClick(() => {
-                view.rollInitiatives();
-            });
-    };
-
-    const mapButton = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setIcon(MAP)
-            .setTooltip("Open Leaflet Map")
-            .onClick(() => {
-                view.openInitiativeView();
+                dispatch("previous");
+                /* view.goToPrevious(); */
             });
     };
 
@@ -109,17 +76,17 @@
     menu.addItem((item) => {
         item.setIcon(NEW)
             .setTitle("New Encounter")
-            .onClick(() => view.newEncounter());
+            .onClick(() => dispatch("new") /* view.newEncounter() */);
     });
     menu.addItem((item) => {
         item.setIcon(REDO)
             .setTitle("Reset HP & Status")
-            .onClick(() => view.resetEncounter());
+            .onClick(() => dispatch("reset") /* view.resetEncounter() */);
     });
     menu.addItem((item) => {
         item.setIcon(DICE)
             .setTitle("Re-roll Initiatives")
-            .onClick(() => view.resetEncounter());
+            .onClick(() => dispatch("reroll") /* view.resetEncounter() */);
     });
     menu.addItem((item) => {
         item.setIcon(GROUP)

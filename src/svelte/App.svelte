@@ -1,28 +1,17 @@
-<svelte:options accessors={true} />
-
 <script lang="ts">
     import Controls from "./Controls.svelte";
     import Table from "./Table.svelte";
     import Create from "./Create.svelte";
-
-    import store from "./store";
     import type TrackerView from "src/view";
-
     import { Creature } from "src/utils/creature";
     import { ExtraButtonComponent } from "obsidian";
     import { ADD, COPY } from "src/utils";
     import { ConditionSuggestionModal } from "src/utils/suggester";
     import type { Condition } from "@types";
     import { createEventDispatcher } from "svelte";
-    import {
-        encounterDifficulty,
-        formatDifficultyReport
-    } from "src/utils/encounter-difficulty";
-    import type { DifficultyReport } from "src/utils/encounter-difficulty";
-    import { tweened } from "svelte/motion";
-    import { cubicOut } from "svelte/easing";
     import type InitiativeTracker from "src/main";
     import { setContext } from "svelte";
+    import Difficulty from "./Difficulty.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -30,14 +19,14 @@
     export let name: string = null;
     export let state: boolean;
     export let current: number;
-    export let map: boolean;
     export let xp: number;
-    export let displayDifficulty: boolean;
     export let plugin: InitiativeTracker;
+    export let view: TrackerView;
+
+    let map = plugin.data.leafletIntegration;
 
     setContext("plugin", plugin);
-
-    let canDisplayDifficulty = false;
+    setContext("view", view);
 
     let totalXP = xp;
     $: {
@@ -49,46 +38,7 @@
     }
 
     // update encounter difficulty
-    const difficultyBar = tweened(0, {
-        duration: 400,
-        easing: cubicOut
-    });
-
-    let dr: DifficultyReport;
-    $: {
-        let playerLevels: number[] = [];
-        let monstersXp: number[] = [];
-        creatures
-            ?.filter((creature) => creature.enabled)
-            ?.forEach((creature) => {
-                if (creature.level) {
-                    playerLevels.push(creature.level);
-                } else {
-                    monstersXp.push(creature.xp);
-                }
-            });
-        let dif = encounterDifficulty(
-            playerLevels.filter((p) => p),
-            monstersXp.filter((m) => m)
-        );
-
-        if (!dif) {
-            canDisplayDifficulty = false;
-        } else {
-            canDisplayDifficulty = true;
-
-            let progress =
-                dif.adjustedXp / dif.budget.deadly > 1
-                    ? 1
-                    : dif.adjustedXp / dif.budget.deadly;
-            difficultyBar.set(progress);
-            dr = dif;
-        }
-    }
-    let view: TrackerView;
-    store.view.subscribe((v) => (view = v));
-
-    export let show: boolean;
+    /*  */
 
     export let updatingHP: Creature = null;
     const updateHP = (toAdd: number) => {
@@ -117,7 +67,12 @@
             .setTooltip("Copy Initiative Order")
             .setIcon(COPY)
             .onClick(async () => {
-                await view.copyInitiativeOrder();
+                const contents = creatures
+                    .map(
+                        (creature) => `${creature.initiative} ${creature.name}`
+                    )
+                    .join("\n");
+                await navigator.clipboard.writeText(contents);
             });
     };
     let modal: ConditionSuggestionModal;
@@ -147,7 +102,6 @@
     {/if}
     <Table
         {creatures}
-        {show}
         {state}
         {current}
         on:update-hp={(evt) => {
@@ -157,24 +111,8 @@
             updatingStatus = evt.detail;
         }}
     />
-    {#if displayDifficulty && canDisplayDifficulty}
-        <div
-            class="difficulty-bar-container"
-            aria-label={formatDifficultyReport(dr)}
-        >
-            <span>Easy</span>
-            <span
-                ><meter
-                    class="difficulty-bar"
-                    min="0"
-                    low="0.33"
-                    high="0.66"
-                    optimum="0"
-                    value={$difficultyBar}
-                /></span
-            >
-            <span>Deadly</span>
-        </div>
+    {#if plugin.data.displayDifficulty}
+        <Difficulty {creatures} />
     {/if}
     {#if updatingHP}
         <div class="updating-hp">
@@ -323,19 +261,5 @@
     }
     .initiative-tracker-name {
         margin: 0;
-    }
-    .difficulty-bar-container {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-        gap: 0.5rem;
-        align-items: center;
-        padding: 0 0.5rem;
-        margin-bottom: 0.5rem;
-        width: 100%;
-    }
-    .difficulty-bar {
-        width: 100%;
-        border: 1px solid #ccc;
-        border-radius: 3px;
     }
 </style>

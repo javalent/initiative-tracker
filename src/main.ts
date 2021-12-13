@@ -8,8 +8,7 @@ import {
 import type {
     EventsOnArgs,
     HomebrewCreature,
-    InitiativeTrackerData,
-    SRDMonster
+    InitiativeTrackerData
 } from "../@types/index";
 
 import InitiativeTrackerSettings from "./settings";
@@ -40,7 +39,6 @@ export default class InitiativeTracker extends Plugin {
     public data: InitiativeTrackerData;
     playerCreatures: Map<HomebrewCreature, Creature> = new Map();
     homebrewCreatures: Map<HomebrewCreature, Creature> = new Map();
-    encounterHandler = new Encounter(this);
     async parseDice(text: string) {
         if (!this.canUseDiceRoller) return null;
 
@@ -57,6 +55,21 @@ export default class InitiativeTracker extends Plugin {
     }
     get canUseDiceRoller() {
         return this.app.plugins.getPlugin("obsidian-dice-roller") != null;
+    }
+
+    async getInitiativeValue(modifier: number = 0): Promise<number> {
+        let initiative = Math.floor(Math.random() * 19 + 1) + modifier;
+        if (this.canUseDiceRoller) {
+            const num = await this.app.plugins
+                .getPlugin("obsidian-dice-roller")
+                .parseDice(
+                    this.data.initiative.replace(/%mod%/g, `(${modifier})`),
+                    "initiative-tracker"
+                );
+
+            initiative = num.result;
+        }
+        return initiative;
     }
 
     get canUseStatBlocks() {
@@ -123,47 +136,9 @@ export default class InitiativeTracker extends Plugin {
 
         this.addCommands();
 
-        this.registerEvent(
-            this.app.workspace.on(
-                "initiative-tracker:should-save",
-                async () => await this.saveSettings()
-            )
-        );
-        this.registerEvent(
-            this.app.workspace.on(
-                "initiative-tracker:start-encounter",
-                async (homebrews: HomebrewCreature[]) => {
-                    try {
-                        const creatures = homebrews.map((h) =>
-                            Creature.from(h)
-                        );
-                        if (!this.view) {
-                            await this.addTrackerView();
-                        }
-                        if (this.view) {
-                            this.view?.newEncounter({
-                                creatures
-                            });
-                            this.app.workspace.revealLeaf(this.view.leaf);
-                        } else {
-                            new Notice(
-                                "Could not find the Initiative Tracker. Try reloading the note!"
-                            );
-                        }
-                    } catch (e) {
-                        new Notice(
-                            "There was an issue launching the encounter.\n\n" +
-                                e.message
-                        );
-                        console.error(e);
-                        return;
-                    }
-                }
-            )
-        );
-
         this.registerMarkdownCodeBlockProcessor("encounter", (src, el, ctx) => {
-            this.encounterHandler.postprocess(src, el, ctx);
+            const handler = new Encounter(this, src, el);
+            ctx.addChild(handler);
         });
 
         this.playerCreatures = new Map(
@@ -196,9 +171,10 @@ export default class InitiativeTracker extends Plugin {
             id: "toggle-encounter",
             name: "Toggle Encounter",
             checkCallback: (checking) => {
-                if (this.view) {
+                const view = this.view;
+                if (view) {
                     if (!checking) {
-                        this.view.toggleState();
+                        view.toggleState();
                     }
                     return true;
                 }
@@ -209,9 +185,10 @@ export default class InitiativeTracker extends Plugin {
             id: "next-combatant",
             name: "Next Combatant",
             checkCallback: (checking) => {
-                if (this.view && this.view.state) {
+                const view = this.view;
+                if (view && view.state) {
                     if (!checking) {
-                        this.view.goToNext();
+                        view.goToNext();
                     }
                     return true;
                 }
@@ -222,14 +199,58 @@ export default class InitiativeTracker extends Plugin {
             id: "prev-combatant",
             name: "Previous Combatant",
             checkCallback: (checking) => {
-                if (this.view && this.view.state) {
+                const view = this.view;
+                if (view && view.state) {
                     if (!checking) {
-                        this.view.goToPrevious();
+                        view.goToPrevious();
                     }
                     return true;
                 }
             }
         });
+    }
+
+    addEvents() {
+        this.registerEvent(
+            this.app.workspace.on(
+                "initiative-tracker:should-save",
+                async () => await this.saveSettings()
+            )
+        );
+        this.registerEvent(
+            this.app.workspace.on(
+                "initiative-tracker:start-encounter",
+                async (homebrews: HomebrewCreature[]) => {
+                    try {
+                        const creatures = homebrews.map((h) =>
+                            Creature.from(h)
+                        );
+
+                        const view = this.view;
+                        if (!view) {
+                            await this.addTrackerView();
+                        }
+                        if (view) {
+                            view?.newEncounter({
+                                creatures
+                            });
+                            this.app.workspace.revealLeaf(view.leaf);
+                        } else {
+                            new Notice(
+                                "Could not find the Initiative Tracker. Try reloading the note!"
+                            );
+                        }
+                    } catch (e) {
+                        new Notice(
+                            "There was an issue launching the encounter.\n\n" +
+                                e.message
+                        );
+                        console.error(e);
+                        return;
+                    }
+                }
+            )
+        );
     }
 
     async onunload() {
@@ -282,8 +303,9 @@ export default class InitiativeTracker extends Plugin {
         this.playerCreatures.set(player, creature);
         this.playerCreatures.delete(existing);
 
-        if (this.view) {
-            this.view.updateState();
+        const view = this.view;
+        if (view) {
+            view.updateState();
         }
 
         await this.saveSettings();
@@ -306,8 +328,9 @@ export default class InitiativeTracker extends Plugin {
         this.homebrewCreatures.set(monster, creature);
         this.homebrewCreatures.delete(existing);
 
-        if (this.view) {
-            this.view.updateState();
+        const view = this.view;
+        if (view) {
+            view.updateState();
         }
 
         await this.saveSettings();

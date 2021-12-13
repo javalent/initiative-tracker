@@ -2,17 +2,22 @@
     import { setIcon } from "obsidian";
     import { AC, HP } from "src/utils";
 
+    import { flip } from "svelte/animate";
+    import { dndzone } from "svelte-dnd-action";
+
     import CreatureTemplate from "./Creature.svelte";
     import { createEventDispatcher } from "svelte";
+    import { Creature, getId } from "src/utils/creature";
 
     const dispatch = createEventDispatcher();
 
-    export let creatures: any[] = [];
-    export let show: boolean = false;
+    export let creatures: Creature[] = [];
     export let state: boolean;
     export let current: number;
 
-    let el: HTMLElement;
+    $: items = [...creatures].map((c) => {
+        return { creature: c, id: getId() };
+    });
 
     const hpIcon = (node: HTMLElement) => {
         setIcon(node, HP);
@@ -20,30 +25,52 @@
     const acIcon = (node: HTMLElement) => {
         setIcon(node, AC);
     };
+    const flipDurationMs = 300;
+    function handleDndConsider(
+        e: CustomEvent<GenericDndEvent<{ creature: Creature; id: string }>>
+    ) {
+        items = e.detail.items;
+    }
+    function handleDndFinalize(
+        e: CustomEvent<GenericDndEvent<{ creature: Creature; id: string }>>
+    ) {
+        items = e.detail.items;
+    }
 </script>
 
 <div>
     {#if creatures.length}
-        <div class="initiative-tracker-table" bind:this={el}>
-            <div class="tracker-table-header">
-                <span />
-                <span />
-                <span class="left">Name</span>
-                <span use:hpIcon class="center" />
-                <span use:acIcon class="center" />
-                <span />
-            </div>
-            {#each creatures as creature}
-                <CreatureTemplate
-                    {creature}
-                    on:hp={(evt) => dispatch("update-hp", evt.detail)}
-                    on:tag={(evt) => dispatch("update-tags", evt.detail)}
-                    {show}
-                    {state}
-                    active={creatures[current] == creature}
-                />
-            {/each}
-        </div>
+        <table class="initiative-tracker-table">
+            <thead class="tracker-table-header">
+                <th />
+                <th />
+                <th class="left">Name</th>
+                <th use:hpIcon class="center" />
+                <th use:acIcon class="center" />
+                <th />
+            </thead>
+            <tbody
+                use:dndzone={{ items, flipDurationMs }}
+                on:consider={handleDndConsider}
+                on:finalize={handleDndFinalize}
+            >
+                {#each items as { creature, id } (id)}
+                    <tr
+                        class="draggable initiative-tracker-creature"
+                        animate:flip={{ duration: flipDurationMs }}
+                    >
+                        <CreatureTemplate
+                            {creature}
+                            on:hp={(evt) => dispatch("update-hp", evt.detail)}
+                            on:tag={(evt) =>
+                                dispatch("update-tags", evt.detail)}
+                            {state}
+                            active={creatures[current] == creature}
+                        />
+                    </tr>
+                {/each}
+            </tbody>
+        </table>
     {:else}
         <div class="no-creatures">
             <p>Add a creature to get started!</p>
@@ -59,13 +86,12 @@
     }
     .initiative-tracker-table {
         padding: 0.5rem;
-        display: grid;
-        grid-template-columns: 0rem auto /* 12px */ 1fr auto auto auto;
         align-items: center;
         gap: 0 0.5rem;
         width: 100%;
         margin-left: 0rem;
     }
+
     .left {
         text-align: left;
     }
@@ -74,12 +100,11 @@
     }
 
     .tracker-table-header {
-        display: contents;
         font-weight: bolder;
+        display: contents;
     }
-    /*     .updating-hp {
-        display: grid;
-        grid-template-rows: auto 1fr;
-        width: 100%;
+
+    /* .initiative-tracker-creature.disabled :global(*) {
+        color: var(--text-faint);
     } */
 </style>

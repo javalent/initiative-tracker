@@ -1,13 +1,10 @@
 <script lang="ts">
-    import { ExtraButtonComponent, Notice } from "obsidian";
+    import { ExtraButtonComponent } from "obsidian";
     import { START_ENCOUNTER } from "src/utils";
-
-    import { createEventDispatcher } from "svelte";
-
-    const dispatch = createEventDispatcher();
 
     import { Creature } from "src/utils/creature";
     import {
+        DifficultyReport,
         encounterDifficulty,
         formatDifficultyReport
     } from "src/utils/encounter-difficulty";
@@ -15,16 +12,18 @@
     import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
 
     export let plugin: InitiativeTracker;
+
     export let name: string = "Encounter";
-    export let creatures: [Creature, string | number][] = [];
+    export let creatures: Map<Creature, number | string>;
     export let players: boolean | string[] = true;
+    export let hide: string[] = [];
     export let xp: number;
 
-    let totalXP = xp ?? 0;
     export let playerLevels: number[];
 
     const creatureMap: Map<Creature, number> = new Map();
     const rollerMap: Map<Creature, StackRoller> = new Map();
+    let totalXP = [...creatureMap].reduce((a, c) => a + c[0].xp * c[1], 0);
 
     for (let [creature, count] of creatures) {
         let number: number = Number(count);
@@ -32,20 +31,26 @@
             let roller = plugin.getRoller(`${count}`) as StackRoller;
             roller.on("new-result", () => {
                 creatureMap.set(creature, roller.result);
+                totalXP = [...creatureMap].reduce(
+                    (a, c) => a + c[0].xp * c[1],
+                    0
+                );
             });
             rollerMap.set(creature, roller);
             roller.roll();
         } else {
             creatureMap.set(creature, number);
         }
-        if (!xp) {
-            totalXP += creature.xp * number;
+    }
+    let difficulty: DifficultyReport;
+    $: {
+        if (!isNaN(totalXP)) {
+            difficulty = encounterDifficulty(
+                playerLevels,
+                [...creatures].map((creature) => creature[0].xp)
+            );
         }
     }
-    let difficulty = encounterDifficulty(
-        playerLevels,
-        creatures.map((creature) => creature[0].xp)
-    );
 
     const open = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -55,29 +60,25 @@
                 if (!plugin.view) {
                     await plugin.addTrackerView();
                 }
-                if (plugin.view) {
-                    const creatures: Creature[] = [...creatureMap]
-                        .map(([creature, number]) => {
-                            if (isNaN(Number(number)) || number < 1)
-                                return [creature];
-                            return [...Array(number).keys()].map((v) =>
-                                Creature.from(creature)
-                            );
-                        })
-                        .flat();
 
-                    plugin.view?.newEncounter({
-                        name,
-                        players,
-                        creatures,
-                        xp
-                    });
-                    plugin.app.workspace.revealLeaf(plugin.view.leaf);
-                } else {
-                    new Notice(
-                        "Could not find the Initiative Tracker. Try reloading the note!"
-                    );
-                }
+                const view = plugin.view;
+                const creatures: Creature[] = [...creatureMap]
+                    .map(([creature, number]) => {
+                        if (isNaN(Number(number)) || number < 1)
+                            return [creature];
+                        return [...Array(number).keys()].map((v) =>
+                            Creature.from(creature)
+                        );
+                    })
+                    .flat();
+
+                view?.newEncounter({
+                    name,
+                    players,
+                    creatures,
+                    xp
+                });
+                plugin.app.workspace.revealLeaf(view.leaf);
             });
     };
 
@@ -86,11 +87,6 @@
         }
     }); */
     const rollerEl = (node: HTMLElement, creature: Creature) => {
-        console.log(
-            "🚀 ~ file: Encounter.svelte ~ line 68 ~ rollerMap.get(creature)!.static",
-            creature.name,
-            rollerMap.get(creature)!.isStatic
-        );
         if (
             plugin.canUseDiceRoller &&
             rollerMap.has(creature) &&
@@ -127,55 +123,83 @@
         <h3 data-heading={name} class="initiative-tracker-name">{name}</h3>
     </div>
     <div class="creatures-container">
-        {#if players instanceof Array && players.length}
-            <div class="encounter-creatures encounter-players">
-                <h4>Players</h4>
-                <ul>
-                    {#each players as player}
-                        <li>
-                            <span>{player}</span>
-                        </li>
-                    {/each}
-                </ul>
-            </div>
-        {:else if !players}
-            <div class="encounter-creatures encounter-players">
-                <h4>No Players</h4>
+        {#if !hide.includes("players")}
+            {#if players instanceof Array && players.length}
+                <div class="encounter-creatures encounter-players">
+                    <h4>Players</h4>
+                    <ul>
+                        {#each players as player}
+                            <li>
+                                <span>{player}</span>
+                            </li>
+                        {/each}
+                    </ul>
+                </div>
+            {:else if !players}
+                <div class="encounter-creatures encounter-players">
+                    <h4>No Players</h4>
+                </div>
+            {/if}
+        {/if}
+        <div class="encounter-creatures">
+            {#if !hide.includes("creatures")}
+                <h4>Creatures</h4>
+                {#if creatures.size}
+                    <ul>
+                        {#each [...creatures] as [creature, count]}
+                            <li
+                                aria-label={label(creature)}
+                                class="creature-li"
+                            >
+                                <strong use:rollerEl={creature} />
+                                <span>
+                                    &nbsp;{creature.name}{count == 1 ? "" : "s"}
+                                </span>
+                                {#if creature.xp && creatureMap.has(creature)}
+                                    <span class="xp-parent">
+                                        <span class="paren left">(</span>
+                                        <span class="xp-container">
+                                            <span class="xp number">
+                                                {creature.xp *
+                                                    creatureMap.get(creature)}
+                                            </span>
+                                            <span class="xp text">XP</span>
+                                        </span>
+                                        <span class="paren right">)</span>
+                                    </span>
+                                {/if}
+                            </li>
+                        {/each}
+                    </ul>
+                {:else}
+                    <strong>No creatures</strong>
+                {/if}
+            {/if}
+        </div>
+        {#if plugin.data.displayDifficulty}
+            <div class="encounter-xp difficulty">
+                {#if totalXP > 0 && difficulty}
+                    <span
+                        aria-label={formatDifficultyReport(difficulty)}
+                        class={difficulty.difficulty.toLowerCase()}
+                    >
+                        <strong class="difficulty-label"
+                            >{difficulty.difficulty}</strong
+                        >
+                        <span class="xp-parent difficulty">
+                            <span class="paren left">(</span>
+                            <span class="xp-container">
+                                <span class="xp number">
+                                    {totalXP}
+                                </span>
+                                <span class="xp text">XP</span>
+                            </span>
+                            <span class="paren right">)</span>
+                        </span>
+                    </span>
+                {/if}
             </div>
         {/if}
-
-        <div class="encounter-creatures">
-            <h4>Creatures</h4>
-            {#if creatures.length}
-                <ul>
-                    {#each creatures as [creature, count]}
-                        <li aria-label={label(creature)} class="creature-li">
-                            <strong use:rollerEl={creature} />
-                            <span>
-                                &nbsp;{creature.name}{count == 1 ? "" : "s"}
-                            </span>
-                            <!-- {#if creature.xp}
-                                <span>
-                                    ({creature.xp * number} XP)
-                                </span>
-                            {/if} -->
-                        </li>
-                    {/each}
-                </ul>
-            {:else}
-                <strong>No creatures</strong>
-            {/if}
-        </div>
-
-        <div class="encounter-xp">
-            {#if totalXP > 0 && difficulty}
-                <span aria-label={formatDifficultyReport(difficulty)}
-                    >The encounter is <em
-                        >{difficulty.difficulty}<em /> ({totalXP} XP)</em
-                    ></span
-                >
-            {/if}
-        </div>
     </div>
 </div>
 
@@ -194,5 +218,23 @@
     }
     .creature-li {
         width: fit-content;
+    }
+    .xp-parent {
+        display: inline-flex;
+    }
+    .difficulty {
+        width: fit-content;
+    }
+    .deadly .difficulty-label {
+        color: red;
+    }
+    .hard .difficulty-label {
+        color: orange;
+    }
+    .medium .difficulty-label {
+        color: yellow;
+    }
+    .easy .difficulty-label {
+        color: green;
     }
 </style>

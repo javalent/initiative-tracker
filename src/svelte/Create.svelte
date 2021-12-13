@@ -1,20 +1,16 @@
 <script lang="ts">
     import { ExtraButtonComponent, Notice } from "obsidian";
 
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
 
     import { DICE, SAVE } from "src/utils";
-
-    import store from "./store";
-
     import type TrackerView from "src/view";
     import { SRDMonsterSuggestionModal } from "src/utils/suggester";
     import { Creature } from "src/utils/creature";
 
     const dispatch = createEventDispatcher();
 
-    let view: TrackerView;
-    store.view.subscribe((v) => (view = v));
+    let view = getContext<TrackerView>("view");
 
     let name: string;
     let hp: string;
@@ -74,7 +70,7 @@
         const modal = new SRDMonsterSuggestionModal(view.plugin, nameInput);
         modal.onClose = async () => {
             if (modal.creature) {
-                let newCreature = Creature.from(modal.creature);
+                let newCreature = Creature.from(modal.creature, this);
 
                 name = newCreature.name;
                 if (newCreature.hp) hp = `${newCreature.hp}`;

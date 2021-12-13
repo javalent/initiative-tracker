@@ -117,6 +117,7 @@
 
 .tooltip.initiative-tracker-condition-tooltip {
     text-align: left;
+    word-break: keep-all;
 }
 
 .block-language-encounter .encounter-container {

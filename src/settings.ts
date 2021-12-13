@@ -80,8 +80,9 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         async (v) => {
                             this.plugin.data.displayDifficulty = v;
 
-                            if (this.plugin.view) {
-                                this.plugin.view.setDisplayDifficulty(
+                            const view = this.plugin.view;
+                            if (view) {
+                                view.setDisplayDifficulty(
                                     this.plugin.data.displayDifficulty
                                 );
                             }
@@ -104,8 +105,8 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         this.plugin.data.initiative = v;
                     });
                     t.inputEl.onblur = async () => {
-                        if (this.plugin.view)
-                            this.plugin.view.rollInitiatives();
+                        const view = this.plugin.view;
+                        if (view) view.rollInitiatives();
                         await this.plugin.saveSettings();
                     };
                 });

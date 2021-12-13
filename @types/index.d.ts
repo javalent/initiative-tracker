@@ -51,9 +51,9 @@ export type EventsOnArgs = OnArgs<TrackerEvents>;
 export interface TrackerViewState {
     state: boolean;
     current: number;
-    npcs: Creature[];
-    pcs: Creature[];
-    creatures: Creature[];
+    npcs: HomebrewCreature[];
+    pcs: HomebrewCreature[];
+    creatures: HomebrewCreature[];
 }
 
 export interface Condition {

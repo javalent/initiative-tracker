@@ -8,7 +8,7 @@ import type InitiativeTracker from "src/main";
 import { Conditions, XP_PER_CR } from ".";
 import { DEFAULT_UNDEFINED } from "./constants";
 
-function getId() {
+export function getId() {
     return "ID_xyxyxyxyxyxy".replace(/[xy]/g, function (c) {
         var r = (Math.random() * 16) | 0,
             v = c == "x" ? r : (r & 0x3) | 0x8;
@@ -32,9 +32,12 @@ export class Creature {
     source: string;
     id: string;
     xp: number;
-    constructor(creature: HomebrewCreature, initiative: number = 0) {
+    constructor(public creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;
-        this._initiative = Number(initiative ?? 0);
+        this._initiative =
+            "initiative" in creature
+                ? (creature as Creature).initiative
+                : Number(initiative ?? 0);
         this.modifier = Number(creature.modifier ?? 0);
 
         this.max = creature.hp ? Number(creature.hp) : undefined;
@@ -42,12 +45,12 @@ export class Creature {
         this.note = creature.note;
         this.level = creature.level;
         this.player = creature.player;
-        
+
         this.marker = creature.marker;
-        
+
         this.hp = this.max;
         this.source = creature.source;
-        
+
         if ("xp" in creature) {
             this.xp = creature.xp;
         } else if ("cr" in creature) {
@@ -81,24 +84,25 @@ export class Creature {
         yield this.xp;
     }
 
-    static from(creature: HomebrewCreature | SRDMonster) {
+    static new(creature: Creature) {}
+
+    static from(
+        creature: HomebrewCreature | SRDMonster
+    ) {
         const modifier =
             "modifier" in creature
                 ? creature.modifier
                 : Math.floor(
-                    (("stats" in creature && creature.stats.length > 1
-                        ? creature.stats[1]
-                        : 10) -
-                        10) /
-                    2
-                );
-        return new Creature(
-            {
-                ...creature,
-                modifier: modifier
-            },
-            0
-        );
+                      (("stats" in creature && creature.stats.length > 1
+                          ? creature.stats[1]
+                          : 10) -
+                          10) /
+                          2
+                  );
+        return new Creature({
+            ...creature,
+            modifier: modifier
+        });
     }
 
     update(creature: HomebrewCreature) {
