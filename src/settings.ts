@@ -49,7 +49,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 new Setting(syncEl)
                     .setName("Sync Monsters from 5e Statblocks")
                     .setDesc(
-                        "Homebrew creatures saved to the 5e Statblocks plugin will be available in the quick-add."
+                        "Homebrew creatures saved to the TTRPG Statblocks plugin will be available in the quick-add."
                     )
                     .addToggle((t) => {
                         t.setValue(this.plugin.data.sync);
