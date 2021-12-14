@@ -20,6 +20,7 @@
     let xp: number;
     let player: boolean;
     let level: number;
+    let number: number = 1;
 
     const saveButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -44,7 +45,8 @@
                     modifier,
                     xp,
                     player,
-                    level
+                    level,
+                    number: Number(number)
                 });
             });
     };
@@ -70,7 +72,7 @@
         const modal = new SRDMonsterSuggestionModal(view.plugin, nameInput);
         modal.onClose = async () => {
             if (modal.creature) {
-                let newCreature = Creature.from(modal.creature, this);
+                let newCreature = Creature.from(modal.creature);
 
                 name = newCreature.name;
                 if (newCreature.hp) hp = `${newCreature.hp}`;
@@ -142,6 +144,16 @@
             tabindex="0"
         />
         <div class="dice" use:diceButton />
+    </div>
+    <div class="amount">
+        <label for="add-init">Amount</label>
+        <input
+            bind:value={number}
+            id="add-init"
+            type="number"
+            name="initiative"
+            tabindex="0"
+        />
     </div>
 </div>
 <div class="context-buttons">
