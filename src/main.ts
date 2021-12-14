@@ -1,6 +1,7 @@
 import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
 
 import {
+    CREATURE_TRACKER_VIEW,
     DEFAULT_SETTINGS,
     INTIATIVE_TRACKER_VIEW,
     registerIcons
@@ -19,7 +20,7 @@ import { Creature } from "./utils/creature";
 
 import { BESTIARY } from "./utils/srd-bestiary";
 
-import TrackerView from "./view";
+import TrackerView, { CreatureView } from "./view";
 
 import type { Plugins } from "../../obsidian-overload/index";
 declare module "obsidian" {
@@ -76,7 +77,12 @@ export default class InitiativeTracker extends Plugin {
     get canUseStatBlocks() {
         return this.app.plugins.getPlugin("obsidian-5e-statblocks") != null;
     }
-
+    get statblocks() {
+        return this.app.plugins.getPlugin("obsidian-5e-statblocks");
+    }
+    get statblockVersion() {
+        return this.statblocks?.settings?.version ?? { major: 0 };
+    }
     get canUseLeaflet() {
         return (
             this.app.plugins.getPlugin("obsidian-leaflet-plugin") != null &&
@@ -122,6 +128,14 @@ export default class InitiativeTracker extends Plugin {
         if (leaf && leaf.view && leaf.view instanceof TrackerView)
             return leaf.view;
     }
+    get combatant() {
+        const leaves = this.app.workspace.getLeavesOfType(
+            CREATURE_TRACKER_VIEW
+        );
+        const leaf = leaves.length ? leaves[0] : null;
+        if (leaf && leaf.view && leaf.view instanceof CreatureView)
+            return leaf.view;
+    }
 
     async onload() {
         registerIcons();
@@ -133,6 +147,10 @@ export default class InitiativeTracker extends Plugin {
         this.registerView(
             INTIATIVE_TRACKER_VIEW,
             (leaf: WorkspaceLeaf) => new TrackerView(leaf, this)
+        );
+        this.registerView(
+            CREATURE_TRACKER_VIEW,
+            (leaf: WorkspaceLeaf) => new CreatureView(leaf, this)
         );
 
         this.addCommands();
@@ -259,6 +277,9 @@ export default class InitiativeTracker extends Plugin {
         this.app.workspace.trigger("initiative-tracker:unload");
         this.app.workspace
             .getLeavesOfType(INTIATIVE_TRACKER_VIEW)
+            .forEach((leaf) => leaf.detach());
+        this.app.workspace
+            .getLeavesOfType(CREATURE_TRACKER_VIEW)
             .forEach((leaf) => leaf.detach());
         console.log("Initiative Tracker unloaded");
     }

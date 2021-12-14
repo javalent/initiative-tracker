@@ -55,6 +55,10 @@
         items = e.detail.items;
         view.creatures = items.map(({ creature }) => creature);
     }
+
+    const openView = (creature: Creature) => {
+        view.openCombatant(creature);
+    };
 </script>
 
 <div>
@@ -82,7 +86,9 @@
                         class="draggable initiative-tracker-creature"
                         class:disabled={!creature.enabled}
                         class:active={state && creature.active}
+                        class:viewing={creature.viewing}
                         animate:flip={{ duration: flipDurationMs }}
+                        on:click={() => openView(creature)}
                     >
                         <CreatureTemplate {creature} on:hp on:tag />
                     </tr>
@@ -144,14 +150,17 @@
     .initiative-tracker-creature :global(td:last-child) {
         border-right: 1px solid transparent;
     }
-    .initiative-tracker-creature:hover :global(td) {
+    .initiative-tracker-creature:hover :global(td),
+    .initiative-tracker-creature.viewing :global(td) {
         border-top: 1px solid var(--background-modifier-border);
         border-bottom: 1px solid var(--background-modifier-border);
     }
-    .initiative-tracker-creature:hover :global(td:first-child) {
+    .initiative-tracker-creature:hover :global(td:first-child),
+    .initiative-tracker-creature.viewing :global(td:first-child) {
         border-left: 1px solid var(--background-modifier-border);
     }
-    .initiative-tracker-creature:hover :global(td:last-child) {
+    .initiative-tracker-creature:hover :global(td:last-child),
+    .initiative-tracker-creature.viewing :global(td:last-child) {
         border-right: 1px solid var(--background-modifier-border);
     }
 </style>

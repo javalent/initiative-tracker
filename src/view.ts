@@ -1,5 +1,15 @@
-import { ItemView, Platform, WorkspaceLeaf } from "obsidian";
-import { BASE, INTIATIVE_TRACKER_VIEW, MIN_WIDTH_FOR_HAMBURGER } from "./utils";
+import {
+    ExtraButtonComponent,
+    ItemView,
+    Platform,
+    WorkspaceLeaf
+} from "obsidian";
+import {
+    BASE,
+    CREATURE,
+    CREATURE_TRACKER_VIEW,
+    INTIATIVE_TRACKER_VIEW
+} from "./utils";
 
 import type InitiativeTracker from "./main";
 
@@ -7,6 +17,7 @@ import App from "./svelte/App.svelte";
 import { Creature } from "./utils/creature";
 import type {
     Condition,
+    HomebrewCreature,
     InitiativeViewState,
     TrackerEvents,
     TrackerViewState
@@ -18,8 +29,20 @@ export default class TrackerView extends ItemView {
         this.condense = !this.condense;
         this.setAppState({ creatures: this.ordered });
     }
-    setDisplayDifficulty(displayDifficulty: boolean) {
-        /* this._app.$set({ displayDifficulty: displayDifficulty }); */
+    async openCombatant(creature: Creature) {
+        const view = this.plugin.combatant;
+        if (!view) {
+            await this.app.workspace.getRightLeaf(true).setViewState({
+                type: CREATURE_TRACKER_VIEW
+            });
+        }
+        this.ordered.forEach((c) => (c.viewing = false));
+        creature.viewing = true;
+        this.setAppState({ creatures: this.ordered });
+        this.plugin.combatant.render(creature);
+        view.onunload = () => {
+            creature.viewing = false;
+        };
     }
     public creatures: Creature[] = [];
 
@@ -526,5 +549,54 @@ export default class TrackerView extends ItemView {
                 }
             )
         );
+    }
+}
+
+export class CreatureView extends ItemView {
+    buttonEl = this.contentEl.createDiv("creature-view-button");
+    statblockEl = this.contentEl.createDiv("creature-statblock-container");
+    constructor(leaf: WorkspaceLeaf, public plugin: InitiativeTracker) {
+        super(leaf);
+        this.load();
+        this.containerEl.addClass("creature-view-container");
+    }
+    onload() {
+        new ExtraButtonComponent(this.buttonEl).setIcon("cross").onClick(() => {
+            this.render();
+        });
+    }
+    render(creature?: HomebrewCreature) {
+        this.statblockEl.empty();
+        if (!creature) {
+            this.statblockEl.createEl("em", {
+                text: "Select a creature to view it here."
+            });
+            return;
+        }
+        if (
+            this.plugin.canUseStatBlocks &&
+            this.plugin.statblockVersion?.major >= 2
+        ) {
+            const statblock = this.plugin.statblocks.render(
+                creature,
+                this.statblockEl
+            );
+            if (statblock) {
+                this.addChild(statblock);
+            }
+        } else {
+            this.statblockEl.createEl("em", {
+                text: "Install the TTRPG Statblocks plugin to use this feature!"
+            });
+        }
+    }
+    getDisplayText(): string {
+        return "Combatant";
+    }
+    getIcon(): string {
+        return CREATURE;
+    }
+    getViewType(): string {
+        return CREATURE_TRACKER_VIEW;
     }
 }

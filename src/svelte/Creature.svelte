@@ -9,8 +9,6 @@
     import CreatureControls from "./CreatureControls.svelte";
     import Status from "./Status.svelte";
 
-    import type { Condition } from "@types";
-
     export let creature: Creature;
     $: statuses = creature.status;
 
@@ -25,11 +23,6 @@
     let view = getContext<TrackerView>("view");
 </script>
 
-<!-- <td class="active-holder">
-    {#if state && active}
-        <div use:activeIcon />
-    {/if}
-</td> -->
 <td class="initiative-container">
     <Initiative
         initiative={creature.initiative}

@@ -1,6 +1,7 @@
 import type { InitiativeTrackerData } from "@types";
 
 export const INTIATIVE_TRACKER_VIEW = "initiative-tracker-view";
+export const CREATURE_TRACKER_VIEW = "initiative-tracker-creature-view";
 
 export const MIN_WIDTH_FOR_HAMBURGER = 300;
 
@@ -19,7 +20,6 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     state: {
         creatures: [],
         state: false,
-        current: null,
         name: null
     },
     condense: false,

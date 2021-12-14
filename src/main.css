@@ -134,3 +134,20 @@
 .initiative-tracker-settings .coffee img {
     height: 30px;
 }
+
+.creature-view-container {
+    padding: 0.5rem;
+}
+
+.creature-view-container .creature-statblock-container {
+    display: flex;
+    justify-content: center;
+}
+.creature-view-container .statblock .column {
+    max-width: 400px;
+    width: 100%;
+}
+.creature-view-container .creature-view-button {
+    display: flex;
+    justify-content: flex-end;
+}
