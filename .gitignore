@@ -16,3 +16,5 @@ data.json
 .DS_Store
 rollup.config-dev.js
 webpack.dev.js
+
+.env
