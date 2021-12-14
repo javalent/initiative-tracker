@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.0.2](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.0.1...5.0.2) (2021-12-14)
+
+
+### Bug Fixes
+
+* added global condense setting in Settings ([56df12a](https://github.com/valentine195/obsidian-initiative-tracker/commit/56df12af7de3ba45ee16567d68c74a63d2497ef7))
+
 ### [5.0.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.0.0...5.0.1) (2021-12-14)
 
 
