@@ -12,7 +12,7 @@
     import type { Condition } from "@types";
 
     export let creature: Creature;
-    export let state: boolean;
+    $: statuses = creature.status;
 
     const dispatch = createEventDispatcher();
 
@@ -23,11 +23,6 @@
     };
 
     let view = getContext<TrackerView>("view");
-    let statuses: Condition[] = [];
-    export let active: boolean = false;
-
-    const activeIcon = (node: HTMLElement) =>
-        setIcon(node, "initiative-tracker-active");
 </script>
 
 <!-- <td class="active-holder">
@@ -45,32 +40,37 @@
     />
 </td>
 <td class="name-container">
-    {#if creature.player}
-        <small class="name">{creature.name}</small>
-    {:else}
-        <span
-            contenteditable
-            class="editable name"
-            type="text"
-            on:blur={updateName}
-            on:keydown={function (evt) {
-                if (evt.key === "Enter" || evt.key === "Tab") {
-                    evt.preventDefault();
-                    this.blur();
-                    return;
-                }
-            }}>{creature.name}</span
-        >
-    {/if}
+    <div class="name-holder">
+        {#if creature.player}
+            <span class="name">{creature.name}</span>
+        {:else}
+            <span
+                contenteditable
+                class="editable name"
+                type="text"
+                on:blur={updateName}
+                on:keydown={function (evt) {
+                    if (evt.key === "Enter" || evt.key === "Tab") {
+                        evt.preventDefault();
+                        this.blur();
+                        return;
+                    }
+                }}>{creature.name}</span
+            >
+        {/if}
+    </div>
     <div class="statuses">
-        {#each statuses as status}
-            <Status
-                {status}
-                on:remove={() => {
-                    /* view.removeStatus(creature, status); */
-                }}
-            />
-        {/each}
+        {#if statuses.size}
+            {#each [...statuses] as status}
+                <Status
+                    {status}
+                    on:remove={() => {
+                        creature.status.delete(status);
+                        statuses = creature.status;
+                    }}
+                />
+            {/each}
+        {/if}
     </div>
 </td>
 
@@ -86,24 +86,20 @@
 <td class="center ac-container">{creature.ac ?? DEFAULT_UNDEFINED}</td>
 
 <td class="controls-container">
-    <CreatureControls {view} {creature} />
+    <CreatureControls on:tag {view} {creature} />
 </td>
 
-<!-- </div> -->
 <style>
-    .active-holder {
-        position: absolute;
-        /* top: 50%;
-        transform: translateY(-50%);
-        left: -1rem; */
+    .name-holder {
+        display: flex;
+        gap: 0.25rem;
+        font-size: small;
     }
-
     .name {
         display: block;
         text-align: left;
         background-color: inherit;
         border: 0;
-        font-size: smaller;
         padding: 0;
         height: unset;
         word-break: keep-all;
@@ -114,17 +110,11 @@
     .editable:not(.player) {
         cursor: pointer;
     }
-    /* .controls {
-        display: flex;
-        justify-content: flex-end;
-    } */
-    /* .add-button {
-        display: none;
-    } */
 
     .statuses {
         display: flex;
-        gap: 0.25rem;
+        flex-flow: row wrap;
+        column-gap: 0.25rem;
     }
 
     .initiative-container {

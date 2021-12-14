@@ -17,6 +17,7 @@ export function getId() {
 }
 
 export class Creature {
+    active: boolean;
     name: string;
     modifier: number;
     hp: number;
@@ -84,11 +85,16 @@ export class Creature {
         yield this.xp;
     }
 
-    static new(creature: Creature) {}
+    static new(creature: Creature) {
+        return new Creature(
+            {
+                ...creature
+            },
+            creature._initiative
+        );
+    }
 
-    static from(
-        creature: HomebrewCreature | SRDMonster
-    ) {
+    static from(creature: HomebrewCreature | SRDMonster) {
         const modifier =
             "modifier" in creature
                 ? creature.modifier
@@ -141,7 +147,8 @@ export class Creature {
             enabled: this.enabled,
             level: this.level,
             player: this.player,
-            xp: this.xp
+            xp: this.xp,
+            active: this.active
         };
     }
 
@@ -153,6 +160,7 @@ export class Creature {
         creature.status = new Set(
             state.status.map((n) => Conditions.find(({ name }) => n == name))
         );
+        creature.active = state.active;
         return creature;
     }
 }

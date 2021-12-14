@@ -50,7 +50,6 @@ export type EventsOnArgs = OnArgs<TrackerEvents>;
 
 export interface TrackerViewState {
     state: boolean;
-    current: number;
     npcs: HomebrewCreature[];
     pcs: HomebrewCreature[];
     creatures: HomebrewCreature[];
@@ -84,7 +83,6 @@ export interface InitiativeTrackerData {
 export interface InitiativeViewState {
     creatures: CreatureState[];
     state: boolean;
-    current: number;
     name: string;
 }
 
@@ -95,6 +93,7 @@ export interface CreatureState extends HomebrewCreature {
     initiative: number;
     player: boolean;
     xp: number;
+    active: boolean;
 }
 
 export interface SRDMonster {

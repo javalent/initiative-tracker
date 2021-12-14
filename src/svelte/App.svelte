@@ -18,7 +18,6 @@
     export let creatures: Creature[] = [];
     export let name: string = null;
     export let state: boolean;
-    export let current: number;
     export let xp: number;
     export let plugin: InitiativeTracker;
     export let view: TrackerView;
@@ -36,9 +35,6 @@
                 ?.reduce((num, cr) => num + cr.xp, 0);
         }
     }
-
-    // update encounter difficulty
-    /*  */
 
     export let updatingHP: Creature = null;
     const updateHP = (toAdd: number) => {
@@ -103,11 +99,10 @@
     <Table
         {creatures}
         {state}
-        {current}
-        on:update-hp={(evt) => {
+        on:hp={(evt) => {
             updatingHP = evt.detail;
         }}
-        on:update-tags={(evt) => {
+        on:tag={(evt) => {
             updatingStatus = evt.detail;
         }}
     />
@@ -210,7 +205,15 @@
                         if (addNewAsync) {
                             dispatch("add-new-async", newCreature);
                         } else {
-                            view.addCreatures(newCreature);
+                            const number = Math.max(
+                                isNaN(creature.number) ? 1 : creature.number,
+                                1
+                            );
+                            view.addCreatures(
+                                ...[...Array(number).keys()].map((k) =>
+                                    Creature.new(newCreature)
+                                )
+                            );
                         }
                         addNew = false;
                         addNewAsync = false;

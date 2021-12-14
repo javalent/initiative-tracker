@@ -88,7 +88,7 @@
         item.setIcon(GROUP)
             .setTitle(view.condense ? "Expand Creatures" : "Group Creatures")
             .onClick(() => {
-                view.condense = !view.condense;
+                view.toggleCondensed();
                 item.setIcon(view.condense ? EXPAND : GROUP);
                 item.setTitle(
                     view.condense ? "Expand Creatures" : "Group Creatures"

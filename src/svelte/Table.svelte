@@ -8,12 +8,15 @@
     import CreatureTemplate from "./Creature.svelte";
     import { createEventDispatcher } from "svelte";
     import { Creature, getId } from "src/utils/creature";
+    import { getContext } from "svelte";
+    import type TrackerView from "src/view";
 
     const dispatch = createEventDispatcher();
 
     export let creatures: Creature[] = [];
     export let state: boolean;
-    export let current: number;
+
+    const view = getContext<TrackerView>("view");
 
     $: items = [...creatures].map((c) => {
         return { creature: c, id: getId() };
@@ -50,6 +53,7 @@
             }
         }
         items = e.detail.items;
+        view.creatures = items.map(({ creature }) => creature);
     }
 </script>
 
@@ -57,11 +61,11 @@
     {#if creatures.length}
         <table class="initiative-tracker-table">
             <thead class="tracker-table-header">
-                <th />
-                <th class="left">Name</th>
-                <th use:hpIcon class="center" />
-                <th use:acIcon class="center" />
-                <th />
+                <th style="width:10%" />
+                <th class="left" style="width:55%">Name</th>
+                <th style="width:15%" use:hpIcon class="center" />
+                <th style="width:15%" use:acIcon class="center" />
+                <th style="width:5%" />
             </thead>
             <tbody
                 use:dndzone={{
@@ -77,17 +81,10 @@
                     <tr
                         class="draggable initiative-tracker-creature"
                         class:disabled={!creature.enabled}
-                        class:active={items[current].creature == creature}
+                        class:active={state && creature.active}
                         animate:flip={{ duration: flipDurationMs }}
                     >
-                        <CreatureTemplate
-                            {creature}
-                            on:hp={(evt) => dispatch("update-hp", evt.detail)}
-                            on:tag={(evt) =>
-                                dispatch("update-tags", evt.detail)}
-                            {state}
-                            active={creatures[current] == creature}
-                        />
+                        <CreatureTemplate {creature} on:hp on:tag />
                     </tr>
                 {/each}
             </tbody>
@@ -108,10 +105,12 @@
     .initiative-tracker-table {
         padding: 0.5rem;
         align-items: center;
-        gap: 0 0.5rem;
+        gap: 0.25rem 0.5rem;
         width: 100%;
         margin-left: 0rem;
-        border-collapse: collapse;
+        table-layout: fixed;
+        border-collapse: separate;
+        border-spacing: 0 2px;
     }
 
     .left {
@@ -128,12 +127,31 @@
 
     .initiative-tracker-creature {
         position: relative;
-        border-radius: 0.25rem;
     }
     .initiative-tracker-creature.active {
         background-color: rgba(0, 0, 0, 0.1);
     }
     .initiative-tracker-creature.disabled :global(*) {
         color: var(--text-faint);
+    }
+    .initiative-tracker-creature :global(td) {
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+    }
+    .initiative-tracker-creature :global(td:first-child) {
+        border-left: 1px solid transparent;
+    }
+    .initiative-tracker-creature :global(td:last-child) {
+        border-right: 1px solid transparent;
+    }
+    .initiative-tracker-creature:hover :global(td) {
+        border-top: 1px solid var(--background-modifier-border);
+        border-bottom: 1px solid var(--background-modifier-border);
+    }
+    .initiative-tracker-creature:hover :global(td:first-child) {
+        border-left: 1px solid var(--background-modifier-border);
+    }
+    .initiative-tracker-creature:hover :global(td:last-child) {
+        border-right: 1px solid var(--background-modifier-border);
     }
 </style>
