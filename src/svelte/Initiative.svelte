@@ -6,10 +6,7 @@
     const dispatch = createEventDispatcher();
 
     export let initiative: number;
-    console.log(
-        "🚀 ~ file: Initiative.svelte ~ line 9 ~ initiative",
-        initiative
-    );
+
     export let modifier: number;
 </script>
 
@@ -23,10 +20,6 @@
             }}
             on:blur={function (evt) {
                 const value = this.value;
-                console.log(
-                    "🚀 ~ file: Initiative.svelte ~ line 26 ~ value",
-                    value
-                );
                 if (isNaN(Number(value)) || Number(value) < 1) {
                     new Notice("Enter a valid initiative.");
                     this.value = `${initiative}`;
@@ -63,7 +56,6 @@
         width: 20px;
         text-align: center;
         white-space: nowrap;
-        margin-left: -0.5rem;
         user-select: all;
         border: 0;
         color: inherit;

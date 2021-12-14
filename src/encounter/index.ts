@@ -99,11 +99,6 @@ class EncounterComponent {
             return [players];
         }
         if (Array.isArray(players)) {
-            console.log(
-                "🚀 ~ file: index.ts ~ line 105 ~ players",
-                players,
-                this.plugin.data.players
-            );
             return (this.plugin.data.players ?? [])
                 .filter((p) =>
                     players

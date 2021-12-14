@@ -1,6 +1,12 @@
 <script lang="ts">
     import { ExtraButtonComponent, Menu } from "obsidian";
-    import { DISABLE, ENABLE, HAMBURGER, REMOVE, TAG } from "src/utils";
+    import {
+        DISABLE,
+        ENABLE,
+        MAPMARKER,
+        REMOVE,
+        TAG
+    } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/view";
     import { createEventDispatcher } from "svelte";
@@ -9,63 +15,6 @@
 
     export let view: TrackerView;
     export let creature: Creature;
-
-    const deleteButton = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setTooltip("Remove")
-            .setIcon(REMOVE)
-            .onClick(() => {
-                view.removeCreature(creature);
-            });
-    };
-
-    const tagButton = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setTooltip("Add Status")
-            .setIcon(TAG)
-            .onClick(() => {
-                dispatch("tag", creature);
-            });
-    };
-
-    const enableButton = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setTooltip("Enable")
-            .setIcon(ENABLE)
-            .onClick(() => {
-                view.setCreatureState(creature, true);
-            });
-    };
-
-    const disableButton = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setTooltip("Disable")
-            .setIcon(DISABLE)
-            .onClick(() => {
-                view.setCreatureState(creature, false);
-            });
-    };
-
-    const markerButton = (node: HTMLElement) => {
-        const marker = new ExtraButtonComponent(node).setTooltip(
-            "Change Marker"
-        );
-        marker.extraSettingsEl.onclick = (evt) => {
-            const menu = new Menu(view.plugin.app);
-            menu.setNoIcon();
-            for (let marker of view.plugin.leaflet.markerIcons) {
-                menu.addItem((item) => {
-                    item.setTitle(marker.type);
-                    item.onClick(() => {
-                        view.updateCreature(creature, {
-                            marker: marker.type
-                        });
-                    });
-                });
-            }
-            menu.showAtPosition({ x: evt.clientX, y: evt.clientY });
-        };
-    };
 
     const hamburgerIcon = (node: HTMLElement) => {
         const hamburger = new ExtraButtonComponent(node)
@@ -99,21 +48,24 @@
             }
             if (view.plugin.data.leafletIntegration) {
                 menu.addItem((item) => {
-                    item.setTitle("Change Marker").onClick((evt) => {
-                        const markerMenu = new Menu(view.plugin.app);
-                        markerMenu.setNoIcon();
-                        for (let marker of view.plugin.leaflet.markerIcons) {
-                            markerMenu.addItem((item) => {
-                                item.setTitle(marker.type);
-                                item.onClick(() => {
-                                    view.updateCreature(creature, {
-                                        marker: marker.type
+                    item.setIcon(MAPMARKER)
+                        .setTitle("Change Marker")
+                        .onClick((evt) => {
+                            const markerMenu = new Menu(view.plugin.app);
+                            markerMenu.setNoIcon();
+                            for (let marker of view.plugin.leaflet
+                                .markerIcons) {
+                                markerMenu.addItem((item) => {
+                                    item.setTitle(marker.type);
+                                    item.onClick(() => {
+                                        view.updateCreature(creature, {
+                                            marker: marker.type
+                                        });
                                     });
                                 });
-                            });
-                        }
-                        markerMenu.showAtMouseEvent(evt);
-                    });
+                            }
+                            markerMenu.showAtMouseEvent(evt);
+                        });
                 });
             }
             menu.addItem((item) => {
@@ -159,5 +111,8 @@
     .controls {
         display: flex;
         justify-content: flex-end;
+    }
+    .icon :global(.clickable-icon) {
+        margin-right: 0;
     }
 </style>

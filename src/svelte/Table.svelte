@@ -34,6 +34,21 @@
     function handleDndFinalize(
         e: CustomEvent<GenericDndEvent<{ creature: Creature; id: string }>>
     ) {
+        if (e.detail.items.length > 1) {
+            let dropped = e.detail.items.find(
+                ({ id }) => id == e.detail.info.id
+            );
+            const index = e.detail.items.findIndex(
+                (c) => c.id == e.detail.info.id
+            );
+            if (index == e.detail.items.length - 1) {
+                dropped.creature.initiative =
+                    e.detail.items[index - 1].creature.initiative;
+            } else {
+                dropped.creature.initiative =
+                    e.detail.items[index + 1].creature.initiative;
+            }
+        }
         items = e.detail.items;
     }
 </script>
@@ -43,20 +58,26 @@
         <table class="initiative-tracker-table">
             <thead class="tracker-table-header">
                 <th />
-                <th />
                 <th class="left">Name</th>
                 <th use:hpIcon class="center" />
                 <th use:acIcon class="center" />
                 <th />
             </thead>
             <tbody
-                use:dndzone={{ items, flipDurationMs }}
+                use:dndzone={{
+                    items,
+                    flipDurationMs,
+                    dropTargetStyle: {},
+                    morphDisabled: true
+                }}
                 on:consider={handleDndConsider}
                 on:finalize={handleDndFinalize}
             >
                 {#each items as { creature, id } (id)}
                     <tr
                         class="draggable initiative-tracker-creature"
+                        class:disabled={!creature.enabled}
+                        class:active={items[current].creature == creature}
                         animate:flip={{ duration: flipDurationMs }}
                     >
                         <CreatureTemplate
@@ -90,6 +111,7 @@
         gap: 0 0.5rem;
         width: 100%;
         margin-left: 0rem;
+        border-collapse: collapse;
     }
 
     .left {
@@ -104,7 +126,14 @@
         display: contents;
     }
 
-    /* .initiative-tracker-creature.disabled :global(*) {
+    .initiative-tracker-creature {
+        position: relative;
+        border-radius: 0.25rem;
+    }
+    .initiative-tracker-creature.active {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+    .initiative-tracker-creature.disabled :global(*) {
         color: var(--text-faint);
-    } */
+    }
 </style>

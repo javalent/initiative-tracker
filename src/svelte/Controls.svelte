@@ -32,9 +32,8 @@
             .setIcon(PLAY)
             .setTooltip("Play")
             .onClick(() => {
-                dispatch("toggle");
-                /* view.toggleState();
-                state = view.state; */
+                view.toggleState();
+                state = view.state;
             });
     };
     const stopButton = (node: HTMLElement) => {
@@ -42,9 +41,8 @@
             .setIcon(STOP)
             .setTooltip("Stop")
             .onClick(() => {
-                dispatch("toggle");
-                /* view.toggleState();
-                state = view.state; */
+                view.toggleState();
+                state = view.state;
             });
     };
     const nextButton = (node: HTMLElement) => {
@@ -52,8 +50,7 @@
             .setIcon(FORWARD)
             .setTooltip("Next")
             .onClick(() => {
-                dispatch("next");
-                /* view.goToNext(); */
+                view.goToNext();
             });
     };
     const prevButton = (node: HTMLElement) => {
@@ -61,8 +58,7 @@
             .setIcon(BACKWARD)
             .setTooltip("Previous")
             .onClick(() => {
-                dispatch("previous");
-                /* view.goToPrevious(); */
+                view.goToPrevious();
             });
     };
 
@@ -76,17 +72,17 @@
     menu.addItem((item) => {
         item.setIcon(NEW)
             .setTitle("New Encounter")
-            .onClick(() => dispatch("new") /* view.newEncounter() */);
+            .onClick(() => view.newEncounter());
     });
     menu.addItem((item) => {
         item.setIcon(REDO)
             .setTitle("Reset HP & Status")
-            .onClick(() => dispatch("reset") /* view.resetEncounter() */);
+            .onClick(() => view.resetEncounter());
     });
     menu.addItem((item) => {
         item.setIcon(DICE)
             .setTitle("Re-roll Initiatives")
-            .onClick(() => dispatch("reroll") /* view.resetEncounter() */);
+            .onClick(() => view.rollInitiatives());
     });
     menu.addItem((item) => {
         item.setIcon(GROUP)

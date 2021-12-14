@@ -8,7 +8,8 @@ import {
 import type {
     EventsOnArgs,
     HomebrewCreature,
-    InitiativeTrackerData
+    InitiativeTrackerData,
+    SRDMonster
 } from "../@types/index";
 
 import InitiativeTrackerSettings from "./settings";
@@ -102,7 +103,7 @@ export default class InitiativeTracker extends Plugin {
                     .getPlugin("obsidian-5e-statblocks")
                     .data.values()
             )
-        ];
+        ] as SRDMonster[];
     }
 
     get homebrew() {

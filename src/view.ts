@@ -426,8 +426,6 @@ export default class TrackerView extends ItemView {
         if (marker) {
             creature.marker = marker;
         }
-
-        console.log(this.creatures.find((c) => c == creature).initiative);
         this.trigger("initiative-tracker:creature-updated", creature);
 
         this.setAppState({
@@ -441,6 +439,7 @@ export default class TrackerView extends ItemView {
         await navigator.clipboard.writeText(contents);
     }
     setCreatureState(creature: Creature, enabled: boolean) {
+        console.log("🚀 ~ file: view.ts ~ line 442 ~ enabled", enabled);
         if (enabled) {
             this._enableCreature(creature);
         } else {

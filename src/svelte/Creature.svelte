@@ -30,17 +30,16 @@
         setIcon(node, "initiative-tracker-active");
 </script>
 
-<td class="active-holder">
+<!-- <td class="active-holder">
     {#if state && active}
         <div use:activeIcon />
     {/if}
-</td>
+</td> -->
 <td class="initiative-container">
     <Initiative
         initiative={creature.initiative}
         modifier={creature.modifier}
         on:initiative={(e) => {
-            console.log(e.detail);
             view.updateCreature(creature, { initiative: Number(e.detail) });
         }}
     />
@@ -90,12 +89,13 @@
     <CreatureControls {view} {creature} />
 </td>
 
-<td />
-
 <!-- </div> -->
 <style>
     .active-holder {
-        margin-left: -0.5rem;
+        position: absolute;
+        /* top: 50%;
+        transform: translateY(-50%);
+        left: -1rem; */
     }
 
     .name {
@@ -125,5 +125,14 @@
     .statuses {
         display: flex;
         gap: 0.25rem;
+    }
+
+    .initiative-container {
+        border-top-left-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+    }
+    .controls-container {
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
     }
 </style>
