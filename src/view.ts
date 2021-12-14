@@ -39,10 +39,15 @@ export default class TrackerView extends ItemView {
         this.ordered.forEach((c) => (c.viewing = false));
         creature.viewing = true;
         this.setAppState({ creatures: this.ordered });
-        this.plugin.combatant.render(creature);
         view.onunload = () => {
             creature.viewing = false;
+            this.setAppState({ creatures: this.ordered });
         };
+        this.app.workspace.on("initiative-tracker:stop-viewing", () => {
+            creature.viewing = false;
+            this.setAppState({ creatures: this.ordered });
+        });
+        this.plugin.combatant.render(creature);
     }
     public creatures: Creature[] = [];
 
@@ -566,6 +571,7 @@ export class CreatureView extends ItemView {
             .setTooltip("Close Statblock")
             .onClick(() => {
                 this.render();
+                this.app.workspace.trigger("initiative-tracker:stop-viewing");
             });
     }
     render(creature?: HomebrewCreature) {

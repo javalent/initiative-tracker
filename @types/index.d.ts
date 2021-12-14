@@ -44,7 +44,8 @@ export type TrackerEvents =
     | [
           name: "initiative-tracker:start-encounter",
           creatures: HomebrewCreature[]
-      ];
+      ]
+    | [name: "initiative-tracker:stop-viewing", creatures: HomebrewCreature[]];
 
 export type EventsOnArgs = OnArgs<TrackerEvents>;
 
