@@ -23,10 +23,11 @@
     let view = getContext<TrackerView>("view");
 </script>
 
-<td class="initiative-container">
+<td class="initiative-container" on:click={(e) => e.stopPropagation()}>
     <Initiative
         initiative={creature.initiative}
         modifier={creature.modifier}
+        on:click={(e) => e.stopPropagation()}
         on:initiative={(e) => {
             view.updateCreature(creature, { initiative: Number(e.detail) });
         }}
@@ -41,6 +42,7 @@
                 contenteditable
                 class="editable name"
                 type="text"
+                on:click={(e) => e.stopPropagation()}
                 on:blur={updateName}
                 on:keydown={function (evt) {
                     if (evt.key === "Enter" || evt.key === "Tab") {
@@ -52,7 +54,7 @@
             >
         {/if}
     </div>
-    <div class="statuses">
+    <div class="statuses" on:click={(e) => e.stopPropagation()}>
         {#if statuses.size}
             {#each [...statuses] as status}
                 <Status
@@ -70,8 +72,9 @@
 <td class="center hp-container">
     <span
         class="editable"
-        on:click={() => {
+        on:click={(e) => {
             dispatch("hp", creature);
+            e.stopPropagation();
         }}>{creature.hpDisplay}</span
     >
 </td>
@@ -79,7 +82,12 @@
 <td class="center ac-container">{creature.ac ?? DEFAULT_UNDEFINED}</td>
 
 <td class="controls-container">
-    <CreatureControls on:tag {view} {creature} />
+    <CreatureControls
+        on:click={(e) => e.stopPropagation()}
+        on:tag
+        {view}
+        {creature}
+    />
 </td>
 
 <style>

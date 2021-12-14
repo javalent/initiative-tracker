@@ -32,21 +32,24 @@ export default class TrackerView extends ItemView {
     async openCombatant(creature: Creature) {
         const view = this.plugin.combatant;
         if (!view) {
-            await this.app.workspace.getRightLeaf(true).setViewState({
+            const leaf = this.app.workspace.getRightLeaf(true);
+            await leaf.setViewState({
                 type: CREATURE_TRACKER_VIEW
             });
         }
         this.ordered.forEach((c) => (c.viewing = false));
         creature.viewing = true;
         this.setAppState({ creatures: this.ordered });
-        view.onunload = () => {
-            creature.viewing = false;
-            this.setAppState({ creatures: this.ordered });
-        };
-        this.app.workspace.on("initiative-tracker:stop-viewing", () => {
-            creature.viewing = false;
-            this.setAppState({ creatures: this.ordered });
-        });
+        const ref = this.app.workspace.on(
+            "initiative-tracker:stop-viewing",
+            () => {
+                creature.viewing = false;
+                this.setAppState({ creatures: this.ordered });
+                this.app.workspace.offref(ref);
+            }
+        );
+        this.registerEvent(ref);
+
         this.plugin.combatant.render(creature);
     }
     public creatures: Creature[] = [];
@@ -574,6 +577,9 @@ export class CreatureView extends ItemView {
                 this.app.workspace.trigger("initiative-tracker:stop-viewing");
             });
     }
+    onunload(): void {
+        this.app.workspace.trigger("initiative-tracker:stop-viewing");
+    }
     render(creature?: HomebrewCreature) {
         this.statblockEl.empty();
         if (!creature) {
@@ -590,6 +596,7 @@ export class CreatureView extends ItemView {
                 creature,
                 this.statblockEl
             );
+            console.log("🚀 ~ file: view.ts ~ line 593 ~ statblock", statblock);
             if (statblock) {
                 this.addChild(statblock);
             }
