@@ -79,14 +79,23 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     t.setValue(this.plugin.data.displayDifficulty).onChange(
                         async (v) => {
                             this.plugin.data.displayDifficulty = v;
-
+                            await this.plugin.saveSettings();
+                        }
+                    );
+                });
+            new Setting(containerEl)
+                .setName("Roll Equivalent Creatures Together")
+                .setDesc(
+                    "Equivalent creatures (same HP, AC and Name) will roll the same initiative by default."
+                )
+                .addToggle((t) => {
+                    t.setValue(this.plugin.data.condense).onChange(
+                        async (v) => {
+                            this.plugin.data.condense = v;
                             const view = this.plugin.view;
                             if (view) {
-                                view.setDisplayDifficulty(
-                                    this.plugin.data.displayDifficulty
-                                );
+                                view.setCondensed(this.plugin.data.condense);
                             }
-
                             await this.plugin.saveSettings();
                         }
                     );

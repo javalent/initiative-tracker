@@ -29,6 +29,10 @@ export default class TrackerView extends ItemView {
         this.condense = !this.condense;
         this.setAppState({ creatures: this.ordered });
     }
+    setCondensed(bool: boolean) {
+        this.condense = bool;
+        this.setAppState({ creatures: this.ordered });
+    }
     async openCombatant(creature: Creature) {
         const view = this.plugin.combatant;
         if (!view) {
