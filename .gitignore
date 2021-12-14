@@ -10,6 +10,7 @@ main.js
 *.js.map
 dist
 styles.css
+!src/styles.css
 
 # obsidian
 data.json
