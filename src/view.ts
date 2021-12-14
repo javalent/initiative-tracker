@@ -561,9 +561,12 @@ export class CreatureView extends ItemView {
         this.containerEl.addClass("creature-view-container");
     }
     onload() {
-        new ExtraButtonComponent(this.buttonEl).setIcon("cross").onClick(() => {
-            this.render();
-        });
+        new ExtraButtonComponent(this.buttonEl)
+            .setIcon("cross")
+            .setTooltip("Close Statblock")
+            .onClick(() => {
+                this.render();
+            });
     }
     render(creature?: HomebrewCreature) {
         this.statblockEl.empty();
