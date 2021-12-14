@@ -4,6 +4,14 @@ This plugin can be used as an initiative tracker within Obsidian.md.
 
 When enabled, the plugin will add an additional view in the right pane, where players and creatures can be added to track their initiatives during combat.
 
+## Updating Initiatives
+
+Initiatives can be updated by clicking on the initiative number and entering the new value, or by drag-and-dropping the monsters.
+
+## Creature View
+
+If the TTRPG Statblocks (version 2.0+) is installed, creatures may be viewed by clicking on them in the initiative tracker. A new view will open up with a rendered statblock.
+
 ## Creating Encounters in Notes
 
 Encounters can be created and launched directly from notes as of `2.0.0` using the "encounter" code block, like so:
@@ -241,13 +249,13 @@ This is a list of features that are planned for the plugin. Some of these may or
 -   Wikilink Creatures
     -   stat blocks on hover
 -   Wikilink Tags (e.g., condition tag to display condition rules, spell tags for spell effects, etc.)
--   Creature stat blocks in separate moveable tab of sidebar
-    -   auto-update displayed stat block based on active creature in the encounter
+    ~~- Creature stat blocks in separate moveable tab of sidebar~~
+    ~~- auto-update displayed stat block based on active creature in the encounter~~
 -   ~~An option to build an encounter in a Note and send it to Initiative Tracker on demand (e.g., in an Obsidian Note, create some code block indicating 3 Goblins and 1 Bugbear in an area; press a button, add the 3 Goblins and Bugbear to the Initiative tracker)~~
 -   ~~Encounter difficulty/XP tracker for creatures with CR~~
--   For the currently active creature, display any actions that would need a dice roll and an integrated dice roller with the specific dice and bonuses for the action already pre-loaded (e.g., for a Bugbear, display "Morningstar" and a to-hit dice with 1d20+4, as well as a damage dice of 2d8+2; Also display for the Javelin action)
+    ~~- For the currently active creature, display any actions that would need a dice roll and an integrated dice roller with the specific dice and bonuses for the action already pre-loaded (e.g., for a Bugbear, display "Morningstar" and a to-hit dice with 1d20+4, as well as a damage dice of 2d8+2; Also display for the Javelin action)~~
 -   Support for multiple parties
--   Integrated dice roller
+    ~~- Integrated dice roller~~
 
 # Installation
 
