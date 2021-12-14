@@ -190,6 +190,7 @@ export default class TrackerView extends ItemView {
             statuses.forEach((status) => {
                 this.removeStatus(creature, status);
             });
+            creature.active = false;
         }
 
         if (this.ordered.length) this.ordered[0].active = true;
@@ -212,7 +213,10 @@ export default class TrackerView extends ItemView {
             creature.initiative = await this.getInitiativeValue(
                 creature.modifier
             );
+            creature.active = false;
         }
+
+        if (this.ordered.length) this.ordered[0].active = true;
 
         this.setAppState({
             creatures: this.ordered
@@ -235,15 +239,12 @@ export default class TrackerView extends ItemView {
         ];
         const next = sliced.find((c) => c.enabled);
         if (this.ordered[active]) this.ordered[active].active = false;
-        if (next) next.active = true;
+        if (!next) return;
+        next.active = true;
 
-        this.trigger(
-            "initiative-tracker:active-change",
-            this.ordered.find((c) => c.active)
-        );
+        this.trigger("initiative-tracker:active-change", next);
 
         this.setAppState({
-            state: this.state,
             creatures: this.ordered
         });
     }
@@ -255,12 +256,9 @@ export default class TrackerView extends ItemView {
         const after = [...this.ordered].slice(active + 1).reverse();
         const creature = [...previous, ...after].find((c) => c.enabled);
         if (this.ordered[active]) this.ordered[active].active = false;
-        if (creature) creature.active = true;
-        this.trigger(
-            "initiative-tracker:active-change",
-            this.ordered.find((c) => c.active)
-        );
-
+        if (!creature) return;
+        creature.active = true;
+        this.trigger("initiative-tracker:active-change", creature);
         this.setAppState({
             creatures: this.ordered
         });
