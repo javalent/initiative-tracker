@@ -52,7 +52,6 @@
                 contenteditable
                 class="editable name"
                 type="text"
-                on:click={(e) => e.stopPropagation()}
                 on:blur={updateName}
                 on:keydown={function (evt) {
                     if (evt.key === "Enter" || evt.key === "Tab") {
