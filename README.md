@@ -197,6 +197,8 @@ You can also save and load encounters by opening the initiative tracker menu and
 
 Saving an encounter saves a **snapshot** of the encounter at that moment. Any further changes to the encounter will not be saved -- it must be saved again.
 
+![](https://raw.githubusercontent.com/valentine195/obsidian-initiative-tracker/master/assets/save-encounter.png)
+
 # Settings
 
 The setting tab has several options for adding and managing players and homebrew creatures, as well as the ability to change the formula used to calculate the initiative.
