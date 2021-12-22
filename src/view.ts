@@ -93,7 +93,7 @@ export default class TrackerView extends ItemView {
 
         this.plugin.combatant.render(creature);
     }
-    public creatures: Creature[] = [];
+    protected creatures: Creature[] = [];
 
     public state: boolean = false;
 
@@ -140,8 +140,7 @@ export default class TrackerView extends ItemView {
             this.newEncounter();
         }
         const { creatures, state, name } = initiativeState;
-        this.creatures = [...creatures.map((c) => Creature.fromJSON(c))];
-
+        this.setCreatures([...creatures.map((c) => Creature.fromJSON(c))]);
         this.name = name;
         if (name) {
             this.setAppState({
@@ -156,11 +155,12 @@ export default class TrackerView extends ItemView {
         });
     }
     private _addCreature(creature: Creature) {
-        this.creatures.push(creature);
+        this.addCreatures([creature], false);
+        /* this.creatures.push(creature);
 
         this.setAppState({
             creatures: this.ordered
-        });
+        }); */
     }
     get condensed() {
         if (this.condense) {
@@ -185,12 +185,15 @@ export default class TrackerView extends ItemView {
         return this.ordered.filter((c) => c.enabled);
     }
 
-    addCreatures(...creatures: Creature[]) {
-        for (let creature of creatures) {
+    addCreatures(creatures: Creature[], trigger = true) {
+        /* for (let creature of creatures) {
             this.creatures.push(creature);
-        }
+        } */
 
-        this.trigger("initiative-tracker:creatures-added", creatures);
+        this.setCreatures([...(this.creatures ?? []), ...(creatures ?? [])]);
+
+        if (trigger)
+            this.trigger("initiative-tracker:creatures-added", creatures);
 
         this.setAppState({
             creatures: this.ordered
@@ -198,14 +201,33 @@ export default class TrackerView extends ItemView {
     }
 
     removeCreature(...creatures: Creature[]) {
-        for (let creature of creatures) {
-            this.creatures = this.creatures.filter((c) => c != creature);
-        }
+        this.setCreatures(this.creatures.filter((c) => !creatures.includes(c)));
 
         this.trigger("initiative-tracker:creatures-removed", creatures);
         this.setAppState({
             creatures: this.ordered
         });
+    }
+
+    setCreatures(creatures: Creature[]) {
+        this.creatures = creatures;
+
+        for (let i = 0; i < this.creatures.length; i++) {
+            const creature = this.creatures[i];
+            if (
+                creature.player ||
+                this.creatures.filter((c) => c.name == creature.name).length ==
+                    1
+            ) {
+                continue;
+            }
+            if (creature.number > 0) continue;
+            const prior = this.creatures
+                .slice(0, i)
+                .filter((c) => c.name == creature.name)
+                .map((c) => c.number);
+            creature.number = prior.length ? Math.max(...prior) + 1 : 1;
+        }
     }
 
     async newEncounter({
@@ -230,7 +252,7 @@ export default class TrackerView extends ItemView {
         } else {
             this.creatures = [];
         }
-        if (creatures) this.creatures = [...this.creatures, ...creatures];
+        if (creatures) this.setCreatures([...this.creatures, ...creatures]);
 
         this.name = name;
         if (name) {
@@ -391,6 +413,7 @@ export default class TrackerView extends ItemView {
         }
         if (name) {
             creature.name = name;
+            creature.number = 0;
         }
         if (hp) {
             creature.hp += Number(hp);

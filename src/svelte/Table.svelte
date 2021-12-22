@@ -6,12 +6,9 @@
     import { dndzone } from "svelte-dnd-action";
 
     import CreatureTemplate from "./Creature.svelte";
-    import { createEventDispatcher } from "svelte";
     import { Creature, getId } from "src/utils/creature";
     import { getContext } from "svelte";
     import type TrackerView from "src/view";
-
-    const dispatch = createEventDispatcher();
 
     export let creatures: Creature[] = [];
     export let state: boolean;
@@ -53,7 +50,7 @@
             }
         }
         items = e.detail.items;
-        view.creatures = items.map(({ creature }) => creature);
+        view.setCreatures(items.map(({ creature }) => creature));
     }
 
     const openView = (creature: Creature) => {

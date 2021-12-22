@@ -34,6 +34,7 @@ export class Creature {
     id: string;
     xp: number;
     viewing: boolean = false;
+    number = 0;
     constructor(public creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;
         this._initiative =

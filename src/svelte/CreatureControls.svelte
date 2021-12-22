@@ -1,12 +1,6 @@
 <script lang="ts">
     import { ExtraButtonComponent, Menu } from "obsidian";
-    import {
-        DISABLE,
-        ENABLE,
-        MAPMARKER,
-        REMOVE,
-        TAG
-    } from "src/utils";
+    import { DISABLE, ENABLE, MAPMARKER, REMOVE, TAG } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/view";
     import { createEventDispatcher } from "svelte";
@@ -21,6 +15,7 @@
             .setIcon("vertical-three-dots")
             .setTooltip("Actions");
         hamburger.extraSettingsEl.onclick = (evt) => {
+            evt.stopPropagation();
             const menu = new Menu(view.plugin.app);
             menu.addItem((item) => {
                 item.setIcon(TAG)

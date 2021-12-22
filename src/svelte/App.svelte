@@ -225,7 +225,7 @@
                                 1
                             );
                             view.addCreatures(
-                                ...[...Array(number).keys()].map((k) =>
+                                [...Array(number).keys()].map((k) =>
                                     Creature.new(newCreature)
                                 )
                             );

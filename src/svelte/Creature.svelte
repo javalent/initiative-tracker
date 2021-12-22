@@ -1,7 +1,6 @@
 <script lang="ts">
     import { createEventDispatcher, getContext } from "svelte";
 
-    import { setIcon } from "obsidian";
     import { DEFAULT_UNDEFINED } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/view";
@@ -10,6 +9,10 @@
     import Status from "./Status.svelte";
 
     export let creature: Creature;
+    console.log(
+        "🚀 ~ file: Creature.svelte ~ line 12 ~ creature",
+        creature.number
+    );
     $: statuses = creature.status;
 
     const dispatch = createEventDispatcher();
@@ -21,6 +24,13 @@
     };
 
     let view = getContext<TrackerView>("view");
+
+    const name = () => {
+        if (creature.number > 0) {
+            return `${creature.name} ${creature.number}`;
+        }
+        return creature.name;
+    };
 </script>
 
 <td class="initiative-container" on:click={(e) => e.stopPropagation()}>
@@ -50,7 +60,7 @@
                         this.blur();
                         return;
                     }
-                }}>{creature.name}</span
+                }}>{name()}</span
             >
         {/if}
     </div>
