@@ -11,16 +11,14 @@
         NEW,
         PLAY,
         REDO,
+        SAVE,
         STOP
     } from "src/utils";
 
     import type TrackerView from "src/view";
     import { Menu } from "obsidian";
-    import { getContext } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
     import type InitiativeTracker from "src/main";
-    import { createEventDispatcher } from "svelte";
-
-    const dispatch = createEventDispatcher();
 
     export let state: boolean = false;
     export let map: boolean = false;
@@ -93,6 +91,23 @@
                 item.setTitle(
                     view.condense ? "Expand Creatures" : "Group Creatures"
                 );
+            });
+    });
+
+    const dispatch = createEventDispatcher();
+    menu.addSeparator();
+    menu.addItem((item) => {
+        item.setIcon(SAVE)
+            .setTitle("Save Encounter")
+            .onClick(() => {
+                dispatch("save");
+            });
+    });
+    menu.addItem((item) => {
+        item.setIcon("open-elsewhere-glyph")
+            .setTitle("Load Encounter")
+            .onClick(() => {
+                dispatch("load");
             });
     });
     if (map) {

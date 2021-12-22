@@ -1,7 +1,10 @@
 import {
     ExtraButtonComponent,
     ItemView,
+    Modal,
+    Notice,
     Platform,
+    Setting,
     WorkspaceLeaf
 } from "obsidian";
 import {
@@ -24,7 +27,41 @@ import type {
 } from "@types";
 import { equivalent } from "./encounter";
 
+class LoadEncounterModal extends Modal {
+    constructor(public plugin: InitiativeTracker) {
+        super(plugin.app);
+    }
+    onOpen() {
+        this.titleEl.setText("Load Encounter");
+
+        for (const encounter of Object.values(this.plugin.data.encounters)) {
+            new Setting(this.contentEl).setName(encounter.name);
+        }
+    }
+}
+
 export default class TrackerView extends ItemView {
+    async saveEncounter(name: string) {
+        console.log("save");
+        if (!name) {
+            new Notice("An encounter must have a name to be saved.");
+            return;
+        }
+        this.plugin.data.encounters[name] = {
+            creatures: [...this.ordered.map((c) => c.toJSON())],
+            state: this.state,
+            name
+        };
+        await this.plugin.saveSettings();
+    }
+    async loadEncounter(name: string) {
+        const state = this.plugin.data.encounters[name];
+        if (!state) {
+            new Notice("There was an issue loading the encounter.");
+            return;
+        }
+        this.newEncounterFromState(state);
+    }
     toggleCondensed() {
         this.condense = !this.condense;
         this.setAppState({ creatures: this.ordered });
@@ -105,8 +142,8 @@ export default class TrackerView extends ItemView {
         const { creatures, state, name } = initiativeState;
         this.creatures = [...creatures.map((c) => Creature.fromJSON(c))];
 
+        this.name = name;
         if (name) {
-            this.name = name;
             this.setAppState({
                 name: this.name
             });
@@ -195,8 +232,8 @@ export default class TrackerView extends ItemView {
         }
         if (creatures) this.creatures = [...this.creatures, ...creatures];
 
+        this.name = name;
         if (name) {
-            this.name = name;
             this.setAppState({
                 name: this.name,
                 xp

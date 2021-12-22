@@ -12,6 +12,8 @@
     import type InitiativeTracker from "src/main";
     import { setContext } from "svelte";
     import Difficulty from "./Difficulty.svelte";
+    import SaveEncounter from "./SaveEncounter.svelte";
+    import LoadEncounter from "./LoadEncounter.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -82,10 +84,18 @@
     function init(el: HTMLInputElement) {
         el.focus();
     }
+
+    let saving = false;
+    let loading = false;
 </script>
 
 <div class="obsidian-initiative-tracker">
-    <Controls {state} {map} />
+    <Controls
+        {state}
+        {map}
+        on:save={() => (saving = true)}
+        on:load={() => (loading = true)}
+    />
     {#if name && name.length}
         <div class="initiative-tracker-name-container">
             <h2 class="initiative-tracker-name">{name}</h2>
@@ -109,6 +119,7 @@
     {#if plugin.data.displayDifficulty}
         <Difficulty {creatures} />
     {/if}
+    <!-- This is disgusting. TODO: Fix it! -->
     {#if updatingHP}
         <div class="updating-hp">
             <span>Apply damage(+) or healing(-):</span>
@@ -178,6 +189,10 @@
                 use:init
             />
         </div>
+    {:else if saving}
+        <SaveEncounter {name} on:cancel={() => (saving = false)} />
+    {:else if loading}
+        <LoadEncounter on:cancel={() => (loading = false)} />
     {:else}
         <div class="add-creature-container">
             {#if addNew || addNewAsync}
@@ -255,6 +270,9 @@
     }
     .add-button {
         width: min-content;
+    }
+    .add-button :global(.clickable-icon) {
+        margin: 0;
     }
     .initiative-tracker-name-container {
         display: flex;

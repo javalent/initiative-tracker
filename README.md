@@ -4,10 +4,6 @@ This plugin can be used as an initiative tracker within Obsidian.md.
 
 When enabled, the plugin will add an additional view in the right pane, where players and creatures can be added to track their initiatives during combat.
 
-## Updating Initiatives
-
-Initiatives can be updated by clicking on the initiative number and entering the new value, or by drag-and-dropping the monsters.
-
 ## Creature View
 
 If the TTRPG Statblocks (version 2.0+) is installed, creatures may be viewed by clicking on them in the initiative tracker. A new view will open up with a rendered statblock.
@@ -149,7 +145,15 @@ creatures:
 
 Monsters may be added to the combat by clicking the `Add Creature` button, which will open a form where the creature's name, HP, AC and initiative can be set.
 
-Once all of the creatures in a given combat have been added, initiatives can be modified by clicking on the initiative number and entering the new initiative. Names for non-player creatures can be modified in the same way.
+### Names and Initiatives
+
+Once all of the creatures in a given combat have been added, initiatives can be modified by clicking on the initiative number and entering the new initiative.
+
+Creature names may _also_ be modified by clicking on them.
+
+### HP
+
+Creatures can take damage or healing by clicking on their HP.
 
 ### Actions
 
@@ -184,6 +188,14 @@ If the encounter is active, this command can be used to make the next enabled co
 #### Previous Combatant
 
 If the encounter is active, this command can be used to make the previous enabled combatant active (similar to clicking the `Previous` button).
+
+## Saving Encounters
+
+If an encounter is in-progress (combat has been started), the plugin will automatically track it and reload the encounter state when Obsidian is re-opened.
+
+You can also save and load encounters by opening the initiative tracker menu and choosing "Save Encounter" or "Load Encounter".
+
+Saving an encounter saves a **snapshot** of the encounter at that moment. Any further changes to the encounter will not be saved -- it must be saved again.
 
 # Settings
 

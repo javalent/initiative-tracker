@@ -23,7 +23,8 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
         name: null
     },
     condense: false,
-    displayDifficulty: true
+    displayDifficulty: true,
+    encounters: {}
 };
 
 export const XP_PER_CR: Record<string, number> = {

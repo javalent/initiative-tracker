@@ -102,12 +102,11 @@ export default class InitiativeTracker extends Plugin {
     get statblock_creatures() {
         if (!this.data.sync) return [];
         if (!this.app.plugins.getPlugin("obsidian-5e-statblocks")) return [];
-
         return [
             ...Array.from(
                 this.app.plugins
                     .getPlugin("obsidian-5e-statblocks")
-                    .data.values()
+                    .data?.values() ?? []
             )
         ] as SRDMonster[];
     }
@@ -389,6 +388,10 @@ export default class InitiativeTracker extends Plugin {
             { ...DEFAULT_SETTINGS },
             await this.loadData()
         );
+        console.log(
+            "🚀 ~ file: main.ts ~ line 391 ~ data",
+            await this.loadData()
+        );
 
         this.data = data;
         if (
@@ -414,5 +417,6 @@ export default class InitiativeTracker extends Plugin {
         }
 
         await this.saveData(this.data);
+        console.log("🚀 ~ file: main.ts ~ line 417 ~ this.data", this.data);
     }
 }
