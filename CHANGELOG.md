@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.1.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.1.0...5.1.1) (2021-12-22)
+
+
+### Bug Fixes
+
+* encounter name now clears on new encounter ([39889c4](https://github.com/valentine195/obsidian-initiative-tracker/commit/39889c46c10343fe6dbe332d6d851df273aa5a8f))
+
 ## [5.1.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.0.3...5.1.0) (2021-12-22)
 
 
