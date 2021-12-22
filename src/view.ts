@@ -141,12 +141,12 @@ export default class TrackerView extends ItemView {
         }
         const { creatures, state, name } = initiativeState;
         this.setCreatures([...creatures.map((c) => Creature.fromJSON(c))]);
+
         this.name = name;
-        if (name) {
-            this.setAppState({
-                name: this.name
-            });
-        }
+        this.setAppState({
+            name: this.name
+        });
+
         this.state = state;
         this.trigger("initiative-tracker:new-encounter", this.appState);
 
@@ -255,12 +255,10 @@ export default class TrackerView extends ItemView {
         if (creatures) this.setCreatures([...this.creatures, ...creatures]);
 
         this.name = name;
-        if (name) {
-            this.setAppState({
-                name: this.name,
-                xp
-            });
-        }
+        this.setAppState({
+            name: this.name,
+            xp
+        });
 
         for (let creature of this.creatures) {
             creature.enabled = true;
