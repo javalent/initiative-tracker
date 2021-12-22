@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.1.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.0.3...5.1.0) (2021-12-22)
+
+
+### Features
+
+* can now save and load encounter states ([7085303](https://github.com/valentine195/obsidian-initiative-tracker/commit/708530342040ae1bf4be44276c483d4d5005e023))
+* initiative tracker now displays creature count ([e73e9cd](https://github.com/valentine195/obsidian-initiative-tracker/commit/e73e9cd9edff5a8c5fcbfa2cb6be5134dafd1dfb))
+
+
+### Bug Fixes
+
+* clicking a creature name now opens the creature statblock ([31917c1](https://github.com/valentine195/obsidian-initiative-tracker/commit/31917c193e960d33c74a21125062bf642a170aeb))
+
 ### [5.0.3](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.0.2...5.0.3) (2021-12-14)
 
 
