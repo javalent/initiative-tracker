@@ -637,7 +637,6 @@ export class CreatureView extends ItemView {
                 creature,
                 this.statblockEl
             );
-            console.log("🚀 ~ file: view.ts ~ line 593 ~ statblock", statblock);
             if (statblock) {
                 this.addChild(statblock);
             }
