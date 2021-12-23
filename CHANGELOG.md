@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.1.2](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.1.1...5.1.2) (2021-12-23)
+
+
+### Bug Fixes
+
+* fixed issue with custom statuses breaking view loading ([0b5b95d](https://github.com/valentine195/obsidian-initiative-tracker/commit/0b5b95d62466497df5ee1a01d5bbabb2e02364df))
+
 ### [5.1.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.1.0...5.1.1) (2021-12-22)
 
 
