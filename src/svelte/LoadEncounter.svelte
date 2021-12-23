@@ -40,7 +40,7 @@
         <div use:cancel on:click={() => dispatch("cancel")} />
     </div>
     <div class="encounter-container">
-        {#if !encounters || !Object.keys(encounters).length}
+        {#if !encounters || !Object.keys(encounters)?.length}
             <span class="no-encounters">
                 <em>There are no saved encounters.</em>
             </span>

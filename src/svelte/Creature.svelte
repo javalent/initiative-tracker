@@ -9,15 +9,12 @@
     import Status from "./Status.svelte";
 
     export let creature: Creature;
-    console.log(
-        "🚀 ~ file: Creature.svelte ~ line 12 ~ creature",
-        creature.number
-    );
     $: statuses = creature.status;
 
     const dispatch = createEventDispatcher();
 
     const updateName = (evt: FocusEvent) => {
+        
         view.updateCreature(creature, {
             name: (evt.target as HTMLSpanElement).textContent
         });

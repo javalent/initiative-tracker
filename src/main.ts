@@ -123,7 +123,7 @@ export default class InitiativeTracker extends Plugin {
         const leaves = this.app.workspace.getLeavesOfType(
             INTIATIVE_TRACKER_VIEW
         );
-        const leaf = leaves.length ? leaves[0] : null;
+        const leaf = leaves?.length ? leaves[0] : null;
         if (leaf && leaf.view && leaf.view instanceof TrackerView)
             return leaf.view;
     }
@@ -131,7 +131,7 @@ export default class InitiativeTracker extends Plugin {
         const leaves = this.app.workspace.getLeavesOfType(
             CREATURE_TRACKER_VIEW
         );
-        const leaf = leaves.length ? leaves[0] : null;
+        const leaf = leaves?.length ? leaves[0] : null;
         if (leaf && leaf.view && leaf.view instanceof CreatureView)
             return leaf.view;
     }
@@ -284,7 +284,9 @@ export default class InitiativeTracker extends Plugin {
     }
 
     async addTrackerView() {
-        if (this.app.workspace.getLeavesOfType(INTIATIVE_TRACKER_VIEW).length) {
+        if (
+            this.app.workspace.getLeavesOfType(INTIATIVE_TRACKER_VIEW)?.length
+        ) {
             return;
         }
         await this.app.workspace.getRightLeaf(false).setViewState({
@@ -388,10 +390,6 @@ export default class InitiativeTracker extends Plugin {
             { ...DEFAULT_SETTINGS },
             await this.loadData()
         );
-        console.log(
-            "🚀 ~ file: main.ts ~ line 391 ~ data",
-            await this.loadData()
-        );
 
         this.data = data;
         if (
@@ -417,6 +415,5 @@ export default class InitiativeTracker extends Plugin {
         }
 
         await this.saveData(this.data);
-        console.log("🚀 ~ file: main.ts ~ line 417 ~ this.data", this.data);
     }
 }

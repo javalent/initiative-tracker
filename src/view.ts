@@ -42,7 +42,6 @@ class LoadEncounterModal extends Modal {
 
 export default class TrackerView extends ItemView {
     async saveEncounter(name: string) {
-        console.log("save");
         if (!name) {
             new Notice("An encounter must have a name to be saved.");
             return;
@@ -136,7 +135,7 @@ export default class TrackerView extends ItemView {
         }
     }
     newEncounterFromState(initiativeState: InitiativeViewState) {
-        if (!initiativeState || !initiativeState?.creatures.length) {
+        if (!initiativeState || !initiativeState?.creatures?.length) {
             this.newEncounter();
         }
         const { creatures, state, name } = initiativeState;
@@ -226,7 +225,7 @@ export default class TrackerView extends ItemView {
                 .slice(0, i)
                 .filter((c) => c.name == creature.name)
                 .map((c) => c.number);
-            creature.number = prior.length ? Math.max(...prior) + 1 : 1;
+            creature.number = prior?.length ? Math.max(...prior) + 1 : 1;
         }
     }
 

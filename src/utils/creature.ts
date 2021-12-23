@@ -159,9 +159,19 @@ export class Creature {
         creature.enabled = state.enabled;
 
         creature.hp = state.currentHP;
-        creature.status = new Set(
-            state.status.map((n) => Conditions.find(({ name }) => n == name))
-        );
+        let statuses: Condition[] = [];
+        for (const status of state.status) {
+            const existing = Conditions.find(({ name }) => status == name);
+            if (existing) {
+                statuses.push(existing);
+            } else {
+                statuses.push({
+                    name: status,
+                    description: null
+                });
+            }
+        }
+        creature.status = new Set(statuses);
         creature.active = state.active;
         return creature;
     }

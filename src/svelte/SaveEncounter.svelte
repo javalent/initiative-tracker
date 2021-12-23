@@ -37,12 +37,6 @@
                     dispatch("cancel");
                 }
             });
-        console.log(
-            encounterName,
-            encounterName?.length,
-            encounterName != undefined && encounterName?.length > 0,
-            saveButton.disabled
-        );
     };
     const dispatch = createEventDispatcher();
     const cancel = (node: HTMLElement) => {

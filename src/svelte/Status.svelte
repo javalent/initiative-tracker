@@ -15,7 +15,7 @@
 <!-- svelte-ignore a11y-unknown-aria-attribute -->
 <div
     class="tag"
-    aria-label={status.description.length
+    aria-label={status.description?.length
         ? status.description.join("\n\n")
         : null}
     aria-label-classes="initiative-tracker-condition-tooltip"

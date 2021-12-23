@@ -27,7 +27,7 @@
             .setTooltip("Add Creature")
             .setIcon(SAVE)
             .onClick(() => {
-                if (!name || !name.length) {
+                if (!name || !name?.length) {
                     new Notice("Enter a name!");
                     return;
                 }
