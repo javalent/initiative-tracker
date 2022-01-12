@@ -9,6 +9,7 @@ import type InitiativeTracker from "../main";
 import { Creature } from "../utils/creature";
 
 import EncounterUI from "./ui/Encounter.svelte";
+import EncounterTable from "./ui/EncounterTable.svelte";
 
 type RawCreatureArray = string | Array<string | { [key: number]: string }>;
 type RawCreature = string | { [key: number]: string };
@@ -41,40 +42,38 @@ export const equivalent = (
     );
 };
 
-class EncounterComponent {
-    instance: EncounterUI;
-    constructor(
-        public params: EncounterParameters,
-        public encounterEl: HTMLElement,
-        public plugin: InitiativeTracker
-    ) {
-        this.display();
-    }
-    async display() {
-        const name = this.params.name;
-        const players: string[] = this.parsePlayers(this.params);
-        const hide = this.parseHide(this.params);
-        const rawMonsters = this.params.creatures ?? [];
+export interface ParsedParams {
+    name: string;
+    players: string[];
+    hide: string[];
+    creatures: Map<Creature, string | number>;
+    xp: number;
+    playerLevels: number[];
+}
+
+class EncounterParser {
+    constructor(public plugin: InitiativeTracker) {}
+    async parse(params: EncounterParameters): Promise<ParsedParams> {
+        const name = params.name;
+        const players: string[] = this.parsePlayers(params);
+        const hide = this.parseHide(params);
+        const rawMonsters = params.creatures ?? [];
 
         let creatures = await this.parseRawCreatures(rawMonsters);
 
-        const xp = this.params.xp ?? null;
+        const xp = params.xp ?? null;
         const playerLevels = this.plugin.data.players
             .map((p) => p.level)
             .filter((p) => p);
 
-        this.instance = new EncounterUI({
-            target: this.encounterEl,
-            props: {
-                plugin: this.plugin,
-                name,
-                players,
-                playerLevels,
-                creatures,
-                xp,
-                hide
-            }
-        });
+        return {
+            name,
+            players,
+            hide,
+            creatures,
+            xp,
+            playerLevels
+        };
     }
     parseHide(params: EncounterParameters): string[] {
         if (!("hide" in (params ?? {}))) return [];
@@ -190,16 +189,47 @@ class EncounterComponent {
     }
 }
 
-export class Encounter extends MarkdownRenderChild {
+class EncounterComponent {
+    instance: EncounterUI;
+    constructor(
+        public params: ParsedParams,
+        public encounterEl: HTMLElement,
+        public plugin: InitiativeTracker
+    ) {
+        this.display();
+    }
+    async display() {
+        this.instance = new EncounterUI({
+            target: this.encounterEl,
+            props: {
+                plugin: this.plugin,
+                name: this.params.name,
+                players: this.params.players,
+                playerLevels: this.params.playerLevels,
+                creatures: this.params.creatures,
+                xp: this.params.xp,
+                hide: this.params.hide
+            }
+        });
+    }
+}
+
+export class EncounterBlock extends MarkdownRenderChild {
+    parser = new EncounterParser(this.plugin);
     constructor(
         public plugin: InitiativeTracker,
         public src: string,
-        public containerEl: HTMLElement
+        public containerEl: HTMLElement,
+        public table = false
     ) {
         super(containerEl);
     }
     onload(): void {
-        this.postprocess();
+        if (this.table) {
+            this.postprocessTable();
+        } else {
+            this.postprocess();
+        }
     }
     async postprocess() {
         const encounters = this.src.split("---") ?? [];
@@ -212,8 +242,8 @@ export class Encounter extends MarkdownRenderChild {
             if (!encounter?.trim().length) continue;
             try {
                 const params: EncounterParameters = parseYaml(encounter);
-                const component = new EncounterComponent(
-                    params,
+                new EncounterComponent(
+                    await this.parser.parse(params),
                     containerEl.createDiv("encounter-instance"),
                     this.plugin
                 );
@@ -225,18 +255,55 @@ export class Encounter extends MarkdownRenderChild {
                         encounter
                 );
             }
-
-            this.registerEvent(
-                this.plugin.app.workspace.on(
-                    "initiative-tracker:unload",
-                    () => {
-                        this.containerEl.empty();
-                        this.containerEl.createEl("pre").createEl("code", {
-                            text: `\`\`\`encounter\n${this.src}\`\`\``
-                        });
-                    }
-                )
-            );
         }
+        this.registerEvent(
+            this.plugin.app.workspace.on("initiative-tracker:unload", () => {
+                this.containerEl.empty();
+                this.containerEl.createEl("pre").createEl("code", {
+                    text: `\`\`\`encounter\n${this.src}\`\`\``
+                });
+            })
+        );
+    }
+    async postprocessTable() {
+        const encounterSource = this.src.split("---") ?? [];
+        const containerEl = this.containerEl.createDiv("encounter-container");
+        const empty = containerEl.createSpan({
+            text: "No encounters created. Please check your syntax and try again."
+        });
+
+        const encounters: ParsedParams[] = [];
+
+        for (let encounter of encounterSource) {
+            if (!encounter?.trim().length) continue;
+            try {
+                const params: EncounterParameters = parseYaml(encounter);
+                encounters.push(await this.parser.parse(params));
+            } catch (e) {
+                console.error(e);
+                new Notice(
+                    "Initiative Tracker: here was an issue parsing: \n\n" +
+                        encounter
+                );
+            }
+        }
+        if (encounters.length) {
+            empty.detach();
+            new EncounterTable({
+                target: this.containerEl,
+                props: {
+                    encounters,
+                    plugin: this.plugin
+                }
+            });
+        }
+        this.registerEvent(
+            this.plugin.app.workspace.on("initiative-tracker:unload", () => {
+                this.containerEl.empty();
+                this.containerEl.createEl("pre").createEl("code", {
+                    text: `\`\`\`encounter-table\n${this.src}\`\`\``
+                });
+            })
+        );
     }
 }

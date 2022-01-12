@@ -14,7 +14,7 @@ import type {
 } from "../@types/index";
 
 import InitiativeTrackerSettings from "./settings";
-import { Encounter } from "./encounter";
+import { EncounterBlock } from "./encounter";
 
 import { Creature } from "./utils/creature";
 
@@ -155,9 +155,16 @@ export default class InitiativeTracker extends Plugin {
         this.addCommands();
 
         this.registerMarkdownCodeBlockProcessor("encounter", (src, el, ctx) => {
-            const handler = new Encounter(this, src, el);
+            const handler = new EncounterBlock(this, src, el);
             ctx.addChild(handler);
         });
+        this.registerMarkdownCodeBlockProcessor(
+            "encounter-table",
+            (src, el, ctx) => {
+                const handler = new EncounterBlock(this, src, el, true);
+                ctx.addChild(handler);
+            }
+        );
 
         this.playerCreatures = new Map(
             this.data.players.map((p) => [p, Creature.from(p)])

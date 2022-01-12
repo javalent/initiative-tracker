@@ -1,25 +1,26 @@
 <script lang="ts">
-    import { ExtraButtonComponent, Platform } from "obsidian";
-    import { START_ENCOUNTER } from "src/utils";
+    import { ExtraButtonComponent } from "obsidian";
 
+    import type InitiativeTracker from "src/main";
+    import { START_ENCOUNTER } from "src/utils";
     import { Creature } from "src/utils/creature";
     import {
         DifficultyReport,
         encounterDifficulty,
         formatDifficultyReport
     } from "src/utils/encounter-difficulty";
-    import type InitiativeTracker from "src/main";
-    import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
 
-    export let plugin: InitiativeTracker;
+    import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
 
     export let name: string = "Encounter";
     export let creatures: Map<Creature, number | string>;
     export let players: boolean | string[] = true;
+
     export let hide: string[] = [];
     export let xp: number;
-
     export let playerLevels: number[];
+    export let plugin: InitiativeTracker;
+    export let headers: string[];
 
     const creatureMap: Map<Creature, number> = new Map();
     const rollerMap: Map<Creature, StackRoller> = new Map();
@@ -117,6 +118,12 @@
         }
     };
 
+    const joiner = (index: number, length: number) => {
+        if (length == 1 || index == 0) return "";
+        const delim = length > 2 ? "," : "";
+        if (index == length - 1) return `${delim} and `;
+        return `${delim} `;
+    };
     const label = (creature: Creature) => {
         if (!creature) return;
         let label = [];
@@ -133,117 +140,62 @@
     };
 </script>
 
-<div class="encounter-instance">
-    <div class="encounter-name">
-        <h3 data-heading={name} class="initiative-tracker-name">{name}</h3>
-        <div class="icons">
-            <div use:open />
-            <div use:addButton on:click={add} aria-label="Add to Encounter" />
-        </div>
-    </div>
-    <div class="creatures-container">
-        {#if !hide.includes("players")}
-            {#if players instanceof Array && players.length}
-                <div class="encounter-creatures encounter-players">
-                    <h4>Players</h4>
-                    <ul>
-                        {#each players as player}
-                            <li>
-                                <span>{player}</span>
-                            </li>
-                        {/each}
-                    </ul>
-                </div>
-            {:else if !players}
-                <div class="encounter-creatures encounter-players">
-                    <h4>No Players</h4>
-                </div>
+<tr class="encounter-row">
+    <td>{name}</td>
+    {#if headers.includes("creatures")}
+        <td>
+            {#if !hide.includes("creatures") && creatures.size}
+                {#each [...creatures] as [creature, count], index}
+                    <span aria-label={label(creature)}>
+                        {joiner(index, creatures.size)}
+                        <strong
+                            use:rollerEl={creature}
+                        />&nbsp;{creature.name}{count == 1 ? "" : "s"}
+                    </span>
+                {/each}
+            {:else}
+                -
             {/if}
-        {/if}
-        <div class="encounter-creatures">
-            {#if !hide.includes("creatures")}
-                <h4>Creatures</h4>
-                {#if creatures.size}
-                    <ul>
-                        {#each [...creatures] as [creature, count]}
-                            <li
-                                aria-label={label(creature)}
-                                class="creature-li"
-                            >
-                                <strong use:rollerEl={creature} />
-                                <span>
-                                    &nbsp;{creature.name}{count == 1 ? "" : "s"}
-                                </span>
-                                {#if creature.xp && creatureMap.has(creature)}
-                                    <span class="xp-parent">
-                                        <span class="paren left">(</span>
-                                        <span class="xp-container">
-                                            <span class="xp number">
-                                                {creature.xp *
-                                                    creatureMap.get(creature)}
-                                            </span>
-                                            <span class="xp text">XP</span>
-                                        </span>
-                                        <span class="paren right">)</span>
-                                    </span>
-                                {/if}
-                            </li>
-                        {/each}
-                    </ul>
-                {:else}
-                    <strong>No creatures</strong>
-                {/if}
+        </td>
+    {/if}
+    {#if headers.includes("players")}
+        <td>
+            {#if !hide.includes("players") && players instanceof Array && players.length}
+                {#each players as player, index}
+                    {joiner(index, players.length)}{player}
+                {/each}
+            {:else}
+                -
             {/if}
-        </div>
-        {#if plugin.data.displayDifficulty}
+        </td>
+    {/if}
+    {#if plugin.data.displayDifficulty}
+        <td>
             <div class="encounter-xp difficulty">
                 {#if totalXP > 0 && difficulty}
                     <span
                         aria-label={formatDifficultyReport(difficulty)}
                         class={difficulty.difficulty.toLowerCase()}
                     >
-                        <strong class="difficulty-label"
-                            >{difficulty.difficulty}</strong
-                        >
-                        <span class="xp-parent difficulty">
-                            <span class="paren left">(</span>
-                            <span class="xp-container">
-                                <span class="xp number">
-                                    {totalXP}
-                                </span>
-                                <span class="xp text">XP</span>
-                            </span>
-                            <span class="paren right">)</span>
-                        </span>
+                        <strong class="difficulty-label">
+                            {difficulty.difficulty}
+                        </strong>
                     </span>
+                {:else}
+                    -
                 {/if}
             </div>
-        {/if}
-    </div>
-</div>
+        </td>
+    {/if}
+    <td>
+        <div class="icons">
+            <div use:open />
+            <div use:addButton on:click={add} aria-label="Add to Encounter" />
+        </div>
+    </td>
+</tr>
 
 <style>
-    .encounter-name {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-    }
-    .encounter-instance
-        > .creatures-container
-        > .encounter-creatures:first-of-type
-        h4,
-    .encounter-creatures > ul {
-        margin-top: 0;
-    }
-    .creature-li {
-        width: fit-content;
-    }
-    .xp-parent {
-        display: inline-flex;
-    }
-    .difficulty {
-        width: fit-content;
-    }
     .deadly .difficulty-label {
         color: red;
     }
