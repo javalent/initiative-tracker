@@ -26,6 +26,39 @@ This will render like this in Preview:
 
 Clicking on the button next to the encounter name will then launch the encounter in the Initiative Tracker.
 
+### Launching Encounters
+
+An encounter can be launched by clicking the "Begin Encounter" button. This will launch a **new encounter** as defined.
+
+Alternatively, the "Add to Encounter" button can be used to add the specified creatures to an existing encounter.
+
+### Encounter Tables
+
+Alternatively to the encounter blocks shown above, you can create encounter tables using the `encounter-table` code block.
+
+Each encounter defined using the [Multiple Encounters](#multiple-encounters) syntax will be added to the table as a row. Encounter tables supports the full list of parameters shown in [Parameters](#parameters) below.
+
+For example:
+
+````
+```encounter-table
+name: Example 1
+creatures:
+ - Hobgoblin
+ - 3: Goblin
+
+---
+
+name: Example 2
+creatures:
+ - 3: Hobgoblin
+ - Goblin
+
+```
+````
+
+<img src="https://raw.githubusercontent.com/valentine195/obsidian-initiative-tracker/master/assets/encounter-table.PNG">
+
 ### Parameters
 
 There are 3 parameters for each encounter, with more detail below.
@@ -138,8 +171,6 @@ creatures:
 
 ```
 ````
-
-### Parameters
 
 ## Using the Initiative Tracker
 
