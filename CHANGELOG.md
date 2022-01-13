@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.3.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.2.0...5.3.0) (2022-01-13)
+
+
+### Features
+
+* add encounter line post processor ([eb98ea9](https://github.com/valentine195/obsidian-initiative-tracker/commit/eb98ea90ad01838ba633a3c2e041320d2bcbda7a))
+* add round number display to tracker (close [#23](https://github.com/valentine195/obsidian-initiative-tracker/issues/23)) ([59e13e5](https://github.com/valentine195/obsidian-initiative-tracker/commit/59e13e512ce32990327c7633157667a786e8b62c))
+
+
+### Bug Fixes
+
+* Update release notes message ([66c7ed3](https://github.com/valentine195/obsidian-initiative-tracker/commit/66c7ed361c6b0c12fd1ebd501b645d2c1a45cc2d))
+
 ## [5.2.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.1.2...5.2.0) (2022-01-12)
 
 
