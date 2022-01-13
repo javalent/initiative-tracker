@@ -186,7 +186,7 @@ export default class InitiativeTracker extends Plugin {
                     .map((s) => parseYaml(s.trim()));
                 const parser = new EncounterParser(this);
                 const parsed = await parser.parse({ creatures });
-                console.log("🚀 ~ file: main.ts ~ line 189 ~ parsed", parsed);
+
                 if (!parsed || !parsed.creatures || !parsed.creatures.size)
                     continue;
 
