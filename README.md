@@ -59,6 +59,31 @@ creatures:
 
 <img src="https://raw.githubusercontent.com/valentine195/obsidian-initiative-tracker/master/assets/encounter-table.PNG">
 
+### Inline Encounters
+
+Inline encounters can be created using the `` `encounter: <creatures>` `` syntax.
+
+Creatures should be formatted as normal, but separated by commas.
+
+For example:
+
+`` `encounter: 3: Hobgoblin, 1d5: Goblin, Custom Monster` ``
+
+**Please note:** It is not possible to customize monster stats or control players using the inline syntax.
+
+This syntax enables Encounters to be used in [Dice Roller](https://github.com/valentine195/obsidian-dice-roller) lookup tables!
+
+```md
+| 1d2 | Encounter                                      |
+| --- | ---------------------------------------------- |
+| 1   | `encounter: 3: Hobgoblin, 1d5: Goblin, Custom` |
+| 2   | `encounter: 2 Hobgoblin`                       |
+^test-encounter
+
+
+`dice: [[Encounter#^test-encounter]]`
+```
+
 ### Parameters
 
 There are 3 parameters for each encounter, with more detail below.
