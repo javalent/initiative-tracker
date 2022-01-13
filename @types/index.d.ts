@@ -86,6 +86,7 @@ export interface InitiativeViewState {
     creatures: CreatureState[];
     state: boolean;
     name: string;
+    round: number;
 }
 
 export interface CreatureState extends HomebrewCreature {

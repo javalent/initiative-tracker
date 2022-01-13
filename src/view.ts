@@ -49,7 +49,8 @@ export default class TrackerView extends ItemView {
         this.plugin.data.encounters[name] = {
             creatures: [...this.ordered.map((c) => c.toJSON())],
             state: this.state,
-            name
+            name,
+            round: this.round
         };
         await this.plugin.saveSettings();
     }
@@ -100,6 +101,8 @@ export default class TrackerView extends ItemView {
 
     public condense = this.plugin.data.condense;
 
+    public round: number = 1;
+
     private _app: App;
     private _rendered: boolean = false;
 
@@ -127,7 +130,6 @@ export default class TrackerView extends ItemView {
 
     constructor(public leaf: WorkspaceLeaf, public plugin: InitiativeTracker) {
         super(leaf);
-
         if (this.plugin.data.state?.creatures?.length) {
             this.newEncounterFromState(this.plugin.data.state);
         } else {
@@ -138,19 +140,19 @@ export default class TrackerView extends ItemView {
         if (!initiativeState || !initiativeState?.creatures?.length) {
             this.newEncounter();
         }
-        const { creatures, state, name } = initiativeState;
+        const { creatures, state, name, round = 1 } = initiativeState;
         this.setCreatures([...creatures.map((c) => Creature.fromJSON(c))]);
 
         this.name = name;
-        this.setAppState({
-            name: this.name
-        });
-
+        this.round = round;
         this.state = state;
         this.trigger("initiative-tracker:new-encounter", this.appState);
 
         this.setAppState({
-            creatures: this.ordered
+            creatures: this.ordered,
+            state: this.state,
+            round: this.round,
+            name: this.name
         });
     }
     private _addCreature(creature: Creature) {
@@ -254,8 +256,10 @@ export default class TrackerView extends ItemView {
         if (creatures) this.setCreatures([...this.creatures, ...creatures]);
 
         this.name = name;
+        this.round = 1;
         this.setAppState({
             name: this.name,
+            round: this.round,
             xp
         });
 
@@ -331,12 +335,14 @@ export default class TrackerView extends ItemView {
         const next = sliced.find((c) => c.enabled);
         if (this.ordered[active]) this.ordered[active].active = false;
         if (!next) return;
+        if (active > this.ordered.indexOf(next)) this.round++;
         next.active = true;
 
         this.trigger("initiative-tracker:active-change", next);
 
         this.setAppState({
-            creatures: this.ordered
+            creatures: this.ordered,
+            round: this.round
         });
     }
     goToPrevious() {
@@ -348,10 +354,13 @@ export default class TrackerView extends ItemView {
         const creature = [...previous, ...after].find((c) => c.enabled);
         if (this.ordered[active]) this.ordered[active].active = false;
         if (!creature) return;
+        if (active < this.ordered.indexOf(creature))
+            this.round = Math.max(1, this.round - 1);
         creature.active = true;
         this.trigger("initiative-tracker:active-change", creature);
         this.setAppState({
-            creatures: this.ordered
+            creatures: this.ordered,
+            round: this.round
         });
     }
     toggleState() {
@@ -480,7 +489,8 @@ export default class TrackerView extends ItemView {
                 xp: null,
                 view: this,
                 /* displayDifficulty: this.plugin.data.displayDifficulty, */
-                plugin: this.plugin
+                plugin: this.plugin,
+                round: this.round
             }
         });
         this._rendered = true;
@@ -513,7 +523,8 @@ export default class TrackerView extends ItemView {
         return {
             creatures: [...this.ordered.map((c) => c.toJSON())],
             state: this.state,
-            name: this.name
+            name: this.name,
+            round: this.round
         };
     }
     async onunload() {

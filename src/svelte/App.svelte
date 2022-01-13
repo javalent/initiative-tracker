@@ -23,6 +23,7 @@
     export let xp: number;
     export let plugin: InitiativeTracker;
     export let view: TrackerView;
+    export let round: number;
 
     let map = plugin.data.leafletIntegration;
 
@@ -96,6 +97,15 @@
         on:save={() => (saving = true)}
         on:load={() => (loading = true)}
     />
+    {#if state}
+        <div class="initiative-tracker-round-container">
+            <small>
+                <em>
+                    Round {round}
+                </em>
+            </small>
+        </div>
+    {/if}
     {#if name && name.length}
         <div class="initiative-tracker-name-container">
             <h2 class="initiative-tracker-name">{name}</h2>
@@ -249,7 +259,9 @@
         margin: 0.5rem;
         min-width: 180px;
     }
-
+    .initiative-tracker-round-container {
+        padding: 0 0.5rem;
+    }
     .add-creature-container {
         display: flex;
         flex-flow: column nowrap;
