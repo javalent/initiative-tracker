@@ -1,4 +1,4 @@
-import { Notice, Plugin, WorkspaceLeaf } from "obsidian";
+import { Notice, parseYaml, Plugin, WorkspaceLeaf } from "obsidian";
 
 import {
     CREATURE_TRACKER_VIEW,
@@ -14,7 +14,8 @@ import type {
 } from "../@types/index";
 
 import InitiativeTrackerSettings from "./settings";
-import { EncounterBlock } from "./encounter";
+import { EncounterBlock, EncounterParser } from "./encounter";
+import EncounterLine from "./encounter/ui/EncounterLine.svelte";
 
 import { Creature } from "./utils/creature";
 
@@ -165,6 +166,42 @@ export default class InitiativeTracker extends Plugin {
                 ctx.addChild(handler);
             }
         );
+
+        this.registerMarkdownPostProcessor(async (el, ctx) => {
+            if (!el || !el.firstElementChild) return;
+
+            const codeEls = el.querySelectorAll<HTMLElement>("code");
+            if (!codeEls || !codeEls.length) return;
+
+            const codes = Array.from(codeEls).filter((code) =>
+                /^encounter:\s/.test(code.innerText)
+            );
+            if (!codes.length) return;
+
+            for (const code of codes) {
+                const creatures = code.innerText
+                    .replace(`encounter:`, "")
+                    .trim()
+                    .split(",")
+                    .map((s) => parseYaml(s.trim()));
+                const parser = new EncounterParser(this);
+                const parsed = await parser.parse({ creatures });
+                console.log("🚀 ~ file: main.ts ~ line 189 ~ parsed", parsed);
+                if (!parsed || !parsed.creatures || !parsed.creatures.size)
+                    continue;
+
+                const target = createSpan("initiative-tracker-encounter-line");
+                new EncounterLine({
+                    target,
+                    props: {
+                        ...parsed,
+                        plugin: this
+                    }
+                });
+
+                code.replaceWith(target);
+            }
+        });
 
         this.playerCreatures = new Map(
             this.data.players.map((p) => [p, Creature.from(p)])

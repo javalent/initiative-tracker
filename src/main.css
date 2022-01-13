@@ -152,3 +152,7 @@
     display: flex;
     justify-content: flex-end;
 }
+
+.initiative-tracker-encounter-line {
+    display: inline-block;
+}

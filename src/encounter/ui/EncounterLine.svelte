@@ -7,11 +7,9 @@
 
     import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
 
-    export let name: string = "Encounter";
     export let creatures: Map<Creature, number | string>;
 
     export let plugin: InitiativeTracker;
-    export let headers: string[];
 
     const creatureMap: Map<Creature, number> = new Map();
     const rollerMap: Map<Creature, StackRoller> = new Map();
@@ -30,32 +28,28 @@
         }
     }
 
-    const open = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setIcon(START_ENCOUNTER)
-            .setTooltip("Begin Encounter")
-            .onClick(async () => {
-                if (!plugin.view) {
-                    await plugin.addTrackerView();
-                }
+    const openButton = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon(START_ENCOUNTER);
+    };
+    const open = async () => {
+        if (!plugin.view) {
+            await plugin.addTrackerView();
+        }
 
-                const view = plugin.view;
-                const creatures: Creature[] = [...creatureMap]
-                    .map(([creature, number]) => {
-                        if (isNaN(Number(number)) || number < 1)
-                            return [creature];
-                        return [...Array(number).keys()].map((v) =>
-                            Creature.from(creature)
-                        );
-                    })
-                    .flat();
+        const view = plugin.view;
+        const creatures: Creature[] = [...creatureMap]
+            .map(([creature, number]) => {
+                if (isNaN(Number(number)) || number < 1) return [creature];
+                return [...Array(number).keys()].map((v) =>
+                    Creature.from(creature)
+                );
+            })
+            .flat();
 
-                view?.newEncounter({
-                    name,
-                    creatures
-                });
-                plugin.app.workspace.revealLeaf(view.leaf);
-            });
+        view?.newEncounter({
+            creatures
+        });
+        plugin.app.workspace.revealLeaf(view.leaf);
     };
 
     const addButton = (node: HTMLElement) => {
@@ -115,47 +109,44 @@
     };
 </script>
 
-<span class="encounter-row">
-    <span>{name}</span>
-    {#if headers.includes("creatures")}
-        <span>
-            {#if creatures.size}
-                {#each [...creatures] as [creature, count], index}
-                    <span aria-label={label(creature)}>
-                        {joiner(index, creatures.size)}
-                        <strong
-                            use:rollerEl={creature}
-                        />&nbsp;{creature.name}{count == 1 ? "" : "s"}
-                    </span>
-                {/each}
-            {:else}
-                -
-            {/if}
-        </span>
-    {/if}
+<span class="encounter-line encounter-row">
+    <span>
+        {#if creatures.size}
+            {#each [...creatures] as [creature, count], index}
+                <span aria-label={label(creature)}>
+                    {joiner(index, creatures.size)}
+                    <strong
+                        use:rollerEl={creature}
+                    />&nbsp;{creature.name}{count == 1 ? "" : "s"}
+                </span>
+            {/each}
+        {:else}
+            -
+        {/if}
+    </span>
     <span class="icons">
-        <span use:open />
-        <span use:addButton on:click={add} aria-label="Add to Encounter" />
+        <span
+            use:openButton
+            on:click|stopPropagation={open}
+            aria-label="Begin Encounter"
+        />
+        <span
+            use:addButton
+            on:click|stopPropagation={add}
+            aria-label="Add to Encounter"
+        />
     </span>
 </span>
 
 <style>
-    .deadly .difficulty-label {
-        color: red;
-    }
-    .hard .difficulty-label {
-        color: orange;
-    }
-    .medium .difficulty-label {
-        color: yellow;
-    }
-    .easy .difficulty-label {
-        color: green;
+    .encounter-line {
+        display: flex;
+        gap: 1rem;
     }
     .icons {
         display: flex;
     }
-    .icons > span:first-child :global(.clickable-icon) {
+    .icons > span :global(.clickable-icon) {
         margin-right: 0;
     }
 </style>

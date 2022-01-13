@@ -19,7 +19,7 @@ interface EncounterParameters {
     players?: RawPlayers;
     hide?: "players" | "creatures" | string[];
     creatures?: RawCreatureArray;
-    xp: number;
+    xp?: number;
 }
 interface CreatureStats {
     name: string;
@@ -51,7 +51,7 @@ export interface ParsedParams {
     playerLevels: number[];
 }
 
-class EncounterParser {
+export class EncounterParser {
     constructor(public plugin: InitiativeTracker) {}
     async parse(params: EncounterParameters): Promise<ParsedParams> {
         const name = params.name;
@@ -111,7 +111,9 @@ class EncounterParser {
         const creatureMap: Map<Creature, number | string> = new Map();
         if (rawMonsters && Array.isArray(rawMonsters)) {
             for (const raw of rawMonsters) {
-                const { creature, number } = this.parseRawCreature(raw) ?? {};
+                const { creature, number = 1 } =
+                    this.parseRawCreature(raw) ?? {};
+                if (!creature) continue;
 
                 const stats = {
                     name: creature.name,
@@ -142,6 +144,7 @@ class EncounterParser {
         return creatureMap;
     }
     parseRawCreature(raw: RawCreature) {
+        if (!raw) return {};
         let monster: string,
             number = 1;
         if (typeof raw == "string") {
