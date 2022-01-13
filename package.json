@@ -10,7 +10,8 @@
         "build-rollup": "rollup --config rollup.config.js --environment BUILD:production",
         "webpack:build": "webpack",
         "webpack:dev": "webpack --config webpack.dev.js -w",
-        "release": "standard-version"
+        "release": "standard-version",
+        "push": "git push --follow-tags origin"
     },
     "standard-version": {
         "t": "",
