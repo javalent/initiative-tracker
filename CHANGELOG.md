@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [6.0.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/6.0.0...6.0.1) (2022-01-20)
+
+
+### Bug Fixes
+
+* removed console logs ([2b07d78](https://github.com/valentine195/obsidian-initiative-tracker/commit/2b07d78429ad637c2a4e3dce8f2df435e87a241a))
+
 ## [6.0.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.3.1...6.0.0) (2022-01-20)
 
 
