@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.3.1...6.0.0) (2022-01-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* Removed homebrew creatures. Homebrew creatures are now manages solely through 5e Statblocks.
+
+### Features
+
+* Removed homebrew creatures. Homebrew creatures are now manages solely through 5e Statblocks. ([12c374b](https://github.com/valentine195/obsidian-initiative-tracker/commit/12c374bf9d1a04e4fa939a44e70044b5a51b0033))
+
 ### [5.3.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/5.3.0...5.3.1) (2022-01-13)
 
 
