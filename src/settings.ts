@@ -82,7 +82,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 });
             });
 
-        new Setting(containerEl)
+/*         new Setting(containerEl)
             .setName("Monster Property used for Modifier")
             .setDesc(
                 "The tracker will try to use this property on a monster to calculate initiative."
@@ -96,7 +96,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     if (view) view.rollInitiatives();
                     await this.plugin.saveSettings();
                 };
-            });
+            }); */
     }
     private async _displayIntegrations(containerEl: HTMLDivElement) {
         containerEl.empty();
