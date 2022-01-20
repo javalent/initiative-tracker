@@ -73,6 +73,7 @@ export interface InitiativeTrackerData {
     version: string;
     canUseDiceRoll: boolean;
     initiative: string;
+    modifier: string;
     sync: boolean;
     leafletIntegration: boolean;
     playerMarker: string;
@@ -80,6 +81,7 @@ export interface InitiativeTrackerData {
     state: InitiativeViewState;
     encounters: { [key: string]: InitiativeViewState };
     condense: boolean;
+    warnedAboutImports: boolean;
 }
 
 export interface InitiativeViewState {

@@ -3,9 +3,8 @@
 }
 
 .initiative-tracker-settings .initiative-tracker-additional-container {
-    border-top: 1px solid var(--background-modifier-border);
     border-bottom: 0px solid var(--background-modifier-border);
-    padding: 18px 0 0 0;
+    padding: 18px 0;
     background-color: inherit;
 }
 

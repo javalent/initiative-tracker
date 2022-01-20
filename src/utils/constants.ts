@@ -13,6 +13,7 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     version: null,
     canUseDiceRoll: false,
     initiative: "1d20 + %mod%",
+    modifier: null,
     sync: false,
     leafletIntegration: false,
     playerMarker: "default",
@@ -20,11 +21,13 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     state: {
         creatures: [],
         state: false,
-        name: null
+        name: null,
+        round: null
     },
     condense: false,
     displayDifficulty: true,
-    encounters: {}
+    encounters: {},
+    warnedAboutImports: false
 };
 
 export const XP_PER_CR: Record<string, number> = {
