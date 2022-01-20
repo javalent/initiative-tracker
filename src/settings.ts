@@ -102,10 +102,6 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         containerEl.empty();
         new Setting(containerEl).setHeading().setName("Plugin Integrations");
         const syncEl = containerEl.createDiv("initiative-sync");
-        console.log(
-            "🚀 ~ file: settings.ts ~ line 106 ~ this.plugin.canUseStatBlocks",
-            this.plugin.canUseStatBlocks
-        );
         if (!this.plugin.canUseStatBlocks) {
             this.plugin.data.sync = false;
             await this.plugin.saveSettings();
