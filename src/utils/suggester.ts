@@ -465,7 +465,7 @@ export class HomebrewMonsterSuggestionModal extends ElementSuggestionModal<Homeb
         el: HTMLDivElement
     ) {
         super(plugin.app, inputEl, el);
-        this.homebrew = [...this.plugin.data.homebrew];
+        this.homebrew = this.plugin.homebrew;
         this._onInputChanged();
     }
     getItems() {

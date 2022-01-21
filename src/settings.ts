@@ -82,7 +82,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 });
             });
 
-/*         new Setting(containerEl)
+        /*         new Setting(containerEl)
             .setName("Monster Property used for Modifier")
             .setDesc(
                 "The tracker will try to use this property on a monster to calculate initiative."
@@ -335,17 +335,18 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         b.setIcon("install")
                             .setTooltip("Migrate")
                             .onClick(async () => {
-                                const existing = this.app.plugins.getPlugin(
+                                const statblocks = this.app.plugins.getPlugin(
                                     "obsidian-5e-statblocks"
-                                ).settings.monsters.length;
-                                await this.app.plugins
-                                    .getPlugin("obsidian-5e-statblocks")
-                                    .saveMonsters(this.plugin.data.homebrew);
+                                );
+                                const existing =
+                                    statblocks.settings.monsters.length;
+                                await statblocks.saveMonsters(
+                                    this.plugin.data.homebrew
+                                );
                                 new Notice(
                                     `${
-                                        this.app.plugins.getPlugin(
-                                            "obsidian-5e-statblocks"
-                                        ).settings.monsters.length - existing
+                                        statblocks.settings.monsters.length -
+                                        existing
                                     } of ${
                                         this.plugin.data.homebrew.length
                                     } Homebrew Monsters saved.`
