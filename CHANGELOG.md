@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.0.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/6.0.1...7.0.0) (2022-01-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* removes homebrew monster support (homebrew is now managed solely by TTRPG statblocks)
+
+### Features
+
+* removes homebrew monster support (homebrew is now managed solely by TTRPG statblocks) ([6aded50](https://github.com/valentine195/obsidian-initiative-tracker/commit/6aded5072a1f712a97fbffb0957d2656d8bb2c77))
+
+
+### Bug Fixes
+
+* fixes issue where clicking a creature name will reset its name (close [#24](https://github.com/valentine195/obsidian-initiative-tracker/issues/24)) ([6c07566](https://github.com/valentine195/obsidian-initiative-tracker/commit/6c0756608d875926676e5f89605d48d637290d90))
+
 ### [6.0.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/6.0.0...6.0.1) (2022-01-20)
 
 
