@@ -414,6 +414,7 @@ export default class TrackerView extends ItemView {
             marker?: string;
         }
     ) {
+        
         if (initiative) {
             creature.initiative = Number(initiative);
         }

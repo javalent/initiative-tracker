@@ -12,11 +12,12 @@
 
     let view = getContext<TrackerView>("view");
 
-    let name: string;
-    let hp: string;
-    let initiative: number;
-    let ac: string;
-    let modifier: number;
+    export let editing = false;
+    export let name: string = null;
+    export let hp: string = null;
+    export let initiative: number = null;
+    export let ac: string = null;
+    export let modifier: number = null;
     let xp: number;
     let player: boolean;
     let level: number;
@@ -67,7 +68,6 @@
                     Math.floor(Math.random() * 19 + 1) + (modifier ?? 0);
             });
     };
-
     const openModal = (nameInput: HTMLInputElement) => {
         const modal = new SRDMonsterSuggestionModal(view.plugin, nameInput);
         modal.onClose = async () => {
@@ -145,16 +145,18 @@
         />
         <div class="dice" use:diceButton />
     </div>
-    <div class="amount">
-        <label for="add-init">Amount</label>
-        <input
-            bind:value={number}
-            id="add-init"
-            type="number"
-            name="initiative"
-            tabindex="0"
-        />
-    </div>
+    {#if !editing}
+        <div class="amount">
+            <label for="add-init">Amount</label>
+            <input
+                bind:value={number}
+                id="add-init"
+                type="number"
+                name="initiative"
+                tabindex="0"
+            />
+        </div>
+    {/if}
 </div>
 <div class="context-buttons">
     <div class="add-button" use:saveButton />

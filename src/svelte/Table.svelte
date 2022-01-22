@@ -87,7 +87,7 @@
                         animate:flip={{ duration: flipDurationMs }}
                         on:click={() => openView(creature)}
                     >
-                        <CreatureTemplate {creature} on:hp on:tag />
+                        <CreatureTemplate {creature} on:hp on:tag on:edit />
                     </tr>
                 {/each}
             </tbody>

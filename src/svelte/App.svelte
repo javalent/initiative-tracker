@@ -53,6 +53,7 @@
 
     let addNew = false;
     export let addNewAsync = false;
+    let editCreature: Creature = null;
     const addButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Add Creature")
@@ -124,6 +125,9 @@
         }}
         on:tag={(evt) => {
             updatingStatus = evt.detail;
+        }}
+        on:edit={(evt) => {
+            editCreature = evt.detail;
         }}
     />
     {#if plugin.data.displayDifficulty}
@@ -205,11 +209,18 @@
         <LoadEncounter on:cancel={() => (loading = false)} />
     {:else}
         <div class="add-creature-container">
-            {#if addNew || addNewAsync}
+            {#if editCreature || addNew || addNewAsync}
                 <Create
+                    editing={editCreature != null}
+                    name={editCreature?.name}
+                    hp={`${editCreature?.hp}`}
+                    initiative={editCreature?.initiative}
+                    modifier={editCreature?.modifier}
+                    ac={`${editCreature?.ac}`}
                     on:cancel={() => {
                         addNew = false;
                         addNewAsync = false;
+                        editCreature = null;
                         dispatch("cancel-add-new-async");
                     }}
                     on:save={(evt) => {
@@ -229,6 +240,12 @@
                         );
                         if (addNewAsync) {
                             dispatch("add-new-async", newCreature);
+                        } else if (editCreature) {
+                            editCreature.name = creature.name;
+                            editCreature.ac = creature.ac;
+                            editCreature.initiative = creature.initiative;
+                            editCreature.modifier = creature.modifier;
+                            view.updateCreature(editCreature, {name: creature.name});
                         } else {
                             const number = Math.max(
                                 isNaN(creature.number) ? 1 : creature.number,
@@ -242,6 +259,7 @@
                         }
                         addNew = false;
                         addNewAsync = false;
+                        editCreature = null;
                     }}
                 />
             {:else}

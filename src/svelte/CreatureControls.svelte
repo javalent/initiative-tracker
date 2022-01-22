@@ -18,6 +18,13 @@
             evt.stopPropagation();
             const menu = new Menu(view.plugin.app);
             menu.addItem((item) => {
+                item.setIcon("pencil")
+                    .setTitle("Edit")
+                    .onClick(() => {
+                        dispatch("edit", creature);
+                    });
+            });
+            menu.addItem((item) => {
                 item.setIcon(TAG)
                     .setTitle("Add Status")
                     .onClick(() => {

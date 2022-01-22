@@ -14,7 +14,6 @@
     const dispatch = createEventDispatcher();
 
     const updateName = (evt: FocusEvent) => {
-        
         view.updateCreature(creature, {
             name: (evt.target as HTMLSpanElement).textContent
         });
@@ -45,19 +44,7 @@
         {#if creature.player}
             <span class="name">{creature.name}</span>
         {:else}
-            <span
-                contenteditable
-                class="editable name"
-                type="text"
-                on:blur={updateName}
-                on:keydown={function (evt) {
-                    if (evt.key === "Enter" || evt.key === "Tab") {
-                        evt.preventDefault();
-                        this.blur();
-                        return;
-                    }
-                }}>{name()}</span
-            >
+            <span class="name">{name()}</span>
         {/if}
     </div>
     <div class="statuses" on:click={(e) => e.stopPropagation()}>
@@ -91,6 +78,7 @@
     <CreatureControls
         on:click={(e) => e.stopPropagation()}
         on:tag
+        on:edit
         {view}
         {creature}
     />
