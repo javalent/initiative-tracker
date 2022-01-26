@@ -1,5 +1,6 @@
 <script lang="ts">
     import { ExtraButtonComponent, Menu } from "obsidian";
+    import type InitiativeTracker from "src/main";
     import { DISABLE, ENABLE, MAPMARKER, REMOVE, TAG } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/view";
@@ -9,6 +10,7 @@
 
     export let view: TrackerView;
     export let creature: Creature;
+
 
     const hamburgerIcon = (node: HTMLElement) => {
         const hamburger = new ExtraButtonComponent(node)

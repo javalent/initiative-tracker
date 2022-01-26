@@ -1,17 +1,19 @@
 <script lang="ts">
-    import { setIcon } from "obsidian";
-    import { AC, HP } from "src/utils";
+    import { Menu, setIcon } from "obsidian";
+    import { AC, DISABLE, ENABLE, HP, MAPMARKER, REMOVE, TAG } from "src/utils";
 
     import { flip } from "svelte/animate";
     import { dndzone } from "svelte-dnd-action";
 
     import CreatureTemplate from "./Creature.svelte";
     import { Creature, getId } from "src/utils/creature";
-    import { getContext } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
     import type TrackerView from "src/view";
 
     export let creatures: Creature[] = [];
     export let state: boolean;
+
+    const dispatch = createEventDispatcher();
 
     const view = getContext<TrackerView>("view");
 
@@ -56,6 +58,71 @@
     const openView = (creature: Creature) => {
         view.openCombatant(creature);
     };
+
+    const hamburgerIcon = (evt: MouseEvent, creature: Creature) => {
+        evt.stopPropagation();
+        const menu = new Menu(view.plugin.app);
+        menu.addItem((item) => {
+            item.setIcon("pencil")
+                .setTitle("Edit")
+                .onClick(() => {
+                    dispatch("edit", creature);
+                });
+        });
+        menu.addItem((item) => {
+            item.setIcon(TAG)
+                .setTitle("Add Status")
+                .onClick(() => {
+                    dispatch("tag", creature);
+                });
+        });
+        if (creature.enabled) {
+            menu.addItem((item) => {
+                item.setIcon(DISABLE)
+                    .setTitle("Disable")
+                    .onClick(() => {
+                        view.setCreatureState(creature, false);
+                    });
+            });
+        } else {
+            menu.addItem((item) => {
+                item.setIcon(ENABLE)
+                    .setTitle("Enable")
+                    .onClick(() => {
+                        view.setCreatureState(creature, true);
+                    });
+            });
+        }
+        if (view.plugin.data.leafletIntegration) {
+            menu.addItem((item) => {
+                item.setIcon(MAPMARKER)
+                    .setTitle("Change Marker")
+                    .onClick((evt) => {
+                        const markerMenu = new Menu(view.plugin.app);
+                        markerMenu.setNoIcon();
+                        for (let marker of view.plugin.leaflet.markerIcons) {
+                            markerMenu.addItem((item) => {
+                                item.setTitle(marker.type);
+                                item.onClick(() => {
+                                    view.updateCreature(creature, {
+                                        marker: marker.type
+                                    });
+                                });
+                            });
+                        }
+                        markerMenu.showAtMouseEvent(evt);
+                    });
+            });
+        }
+        menu.addItem((item) => {
+            item.setIcon(REMOVE)
+                .setTitle("Remove")
+                .onClick(() => {
+                    view.removeCreature(creature);
+                });
+        });
+        menu.showAtPosition(evt);
+    };
 </script>
 
 <div>
@@ -86,6 +153,7 @@
                         class:viewing={creature.viewing}
                         animate:flip={{ duration: flipDurationMs }}
                         on:click={() => openView(creature)}
+                        on:contextmenu={(evt) => hamburgerIcon(evt, creature)}
                     >
                         <CreatureTemplate {creature} on:hp on:tag on:edit />
                     </tr>
