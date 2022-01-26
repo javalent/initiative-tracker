@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.1.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.0.0...7.1.0) (2022-01-26)
+
+
+### Features
+
+* can now right click monsters for context menu ([1fef354](https://github.com/valentine195/obsidian-initiative-tracker/commit/1fef354ea08d1b35fae31d258690525ab31d793a))
+
+
+### Bug Fixes
+
+* fixes issue with deleting active monster not going to next ([8ee9d09](https://github.com/valentine195/obsidian-initiative-tracker/commit/8ee9d09fd0640dcc0ff9e5279e4d08a0e81e9b31))
+
 ## [7.0.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/6.0.1...7.0.0) (2022-01-22)
 
 
