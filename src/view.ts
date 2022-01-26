@@ -202,8 +202,14 @@ export default class TrackerView extends ItemView {
     }
 
     removeCreature(...creatures: Creature[]) {
+        if (creatures.some((c) => c.active)) {
+            const active = this.creatures.find((c) => c.active);
+            this.goToNext();
+            this.setCreatures(this.creatures.filter((c) => c != active));
+            this.removeCreature(...creatures.filter((c) => c != active));
+            return;
+        }
         this.setCreatures(this.creatures.filter((c) => !creatures.includes(c)));
-
         this.trigger("initiative-tracker:creatures-removed", creatures);
         this.setAppState({
             creatures: this.ordered
@@ -325,8 +331,8 @@ export default class TrackerView extends ItemView {
             creatures: this.ordered
         };
     }
-    goToNext() {
-        const active = this.ordered.findIndex((c) => c.active);
+    goToNext(active = this.ordered.findIndex((c) => c.active)) {
+        /* const active = this.ordered.findIndex((c) => c.active); */
         if (active == -1) return;
         const sliced = [
             ...this.ordered.slice(active + 1),
@@ -345,8 +351,8 @@ export default class TrackerView extends ItemView {
             round: this.round
         });
     }
-    goToPrevious() {
-        const active = this.ordered.findIndex((c) => c.active);
+    goToPrevious(active = this.ordered.findIndex((c) => c.active)) {
+        /* const active = this.ordered.findIndex((c) => c.active); */
         if (active == -1) return;
 
         const previous = [...this.ordered].slice(0, active).reverse();
@@ -414,7 +420,6 @@ export default class TrackerView extends ItemView {
             marker?: string;
         }
     ) {
-        
         if (initiative) {
             creature.initiative = Number(initiative);
         }
