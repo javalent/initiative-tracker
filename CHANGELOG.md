@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.2.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.2.0...7.2.1) (2022-02-22)
+
+
+### Bug Fixes
+
+* update some settings descriptions ([ee33a40](https://github.com/valentine195/obsidian-initiative-tracker/commit/ee33a405277b3f9d09422f6dd5a62b1dc7b75698))
+
 ## [7.2.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.1.0...7.2.0) (2022-02-22)
 
 
