@@ -1,4 +1,5 @@
 import type { InitiativeTrackerData } from "@types";
+import { Conditions } from "./conditions";
 
 export const INTIATIVE_TRACKER_VIEW = "initiative-tracker-view";
 export const CREATURE_TRACKER_VIEW = "initiative-tracker-creature-view";
@@ -10,6 +11,7 @@ export const DEFAULT_UNDEFINED = "–";
 export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     players: [],
     homebrew: [],
+    statuses: [...Conditions],
     version: null,
     canUseDiceRoll: false,
     initiative: "1d20 + %mod%",
@@ -27,7 +29,12 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     condense: false,
     displayDifficulty: true,
     encounters: {},
-    warnedAboutImports: false
+    warnedAboutImports: false,
+    openState: {
+        party: true,
+        status: true,
+        plugin: true
+    }
 };
 
 export const XP_PER_CR: Record<string, number> = {

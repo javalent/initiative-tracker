@@ -1,4 +1,5 @@
 import {
+    addIcon,
     ExtraButtonComponent,
     Notice,
     PluginSettingTab,
@@ -9,8 +10,15 @@ import {
 import type InitiativeTracker from "./main";
 
 import { FileSuggestionModal } from "./utils/suggester";
-import { AC, DEFAULT_UNDEFINED, EDIT, HP, INITIATIVE } from "./utils";
-import type { HomebrewCreature, InputValidate } from "@types";
+import {
+    AC,
+    Conditions,
+    DEFAULT_UNDEFINED,
+    EDIT,
+    HP,
+    INITIATIVE
+} from "./utils";
+import type { Condition, HomebrewCreature, InputValidate } from "@types";
 
 export default class InitiativeTrackerSettings extends PluginSettingTab {
     constructor(private plugin: InitiativeTracker) {
@@ -27,10 +35,35 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
 
             this._displayBase(containerEl.createDiv());
             this._displayPlayers(
-                containerEl.createDiv("initiative-tracker-additional-container")
+                containerEl.createEl("details", {
+                    cls: "initiative-tracker-additional-container",
+                    attr: {
+                        ...(this.plugin.data.openState.party
+                            ? { open: true }
+                            : {})
+                    }
+                })
             );
-
-            this._displayIntegrations(containerEl.createDiv());
+            this._displayStatuses(
+                containerEl.createEl("details", {
+                    cls: "initiative-tracker-additional-container",
+                    attr: {
+                        ...(this.plugin.data.openState.status
+                            ? { open: true }
+                            : {})
+                    }
+                })
+            );
+            this._displayIntegrations(
+                containerEl.createEl("details", {
+                    cls: "initiative-tracker-additional-container",
+                    attr: {
+                        ...(this.plugin.data.openState.plugin
+                            ? { open: true }
+                            : {})
+                    }
+                })
+            );
             this._displayHomebrew(
                 containerEl.createDiv("initiative-tracker-additional-container")
             );
@@ -50,6 +83,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             );
         }
     }
+
     private _displayBase(containerEl: HTMLDivElement) {
         containerEl.empty();
         new Setting(containerEl).setHeading().setName("Basic Settings");
@@ -98,9 +132,256 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 };
             }); */
     }
-    private async _displayIntegrations(containerEl: HTMLDivElement) {
+    private _displayPlayers(additionalContainer: HTMLDetailsElement) {
+        additionalContainer.empty();
+        additionalContainer.ontoggle = () => {
+            this.plugin.data.openState.party = additionalContainer.open;
+        };
+        const summary = additionalContainer.createEl("summary");
+        new Setting(summary).setHeading().setName("Players");
+        summary.createDiv("collapser").createDiv("handle");
+        new Setting(additionalContainer)
+            .setName("Add New Player")
+            .setDesc("These players will always be added to new encounters.")
+            .addButton((button: ButtonComponent): ButtonComponent => {
+                let b = button
+                    .setTooltip("Add Player")
+                    .setButtonText("+")
+                    .onClick(async () => {
+                        const modal = new NewPlayerModal(this.plugin);
+                        modal.open();
+                        modal.onClose = async () => {
+                            if (!modal.saved) return;
+
+                            await this.plugin.savePlayer({
+                                ...modal.player,
+                                player: true
+                            });
+
+                            this._displayPlayers(additionalContainer);
+                        };
+                    });
+
+                return b;
+            });
+        const additional = additionalContainer.createDiv("additional");
+        const playerView = additional.createDiv("initiative-tracker-players");
+        if (!this.plugin.data.players.length) {
+            additional
+                .createDiv({
+                    attr: {
+                        style: "display: flex; justify-content: center; padding-bottom: 18px;"
+                    }
+                })
+                .createSpan({
+                    text: "No saved players! Create one to see it here."
+                });
+        } else {
+            const headers = playerView.createDiv(
+                "initiative-tracker-player headers"
+            );
+
+            headers.createDiv({ text: "Name" });
+            new ExtraButtonComponent(headers.createDiv())
+                .setIcon(HP)
+                .setTooltip("Max HP");
+            new ExtraButtonComponent(headers.createDiv())
+                .setIcon(AC)
+                .setTooltip("Armor Class");
+            new ExtraButtonComponent(headers.createDiv())
+                .setIcon(INITIATIVE)
+                .setTooltip("Initiative Modifier");
+
+            headers.createDiv();
+
+            for (let player of this.plugin.data.players) {
+                const playerDiv = playerView.createDiv(
+                    "initiative-tracker-player"
+                );
+                playerDiv.createDiv({ text: player.name });
+                playerDiv.createDiv({
+                    text: `${player.hp ?? DEFAULT_UNDEFINED}`
+                });
+                playerDiv.createDiv({
+                    text: `${player.ac ?? DEFAULT_UNDEFINED}`
+                });
+                playerDiv.createDiv({
+                    text: `${player.modifier ?? DEFAULT_UNDEFINED}`
+                });
+                const icons = playerDiv.createDiv(
+                    "initiative-tracker-player-icon"
+                );
+                new ExtraButtonComponent(icons.createDiv())
+                    .setIcon("pencil")
+                    .setTooltip("Edit")
+                    .onClick(() => {
+                        const modal = new NewPlayerModal(this.plugin, player);
+                        modal.open();
+                        modal.onClose = async () => {
+                            if (!modal.saved) return;
+                            await this.plugin.updatePlayer(
+                                player,
+                                modal.player
+                            );
+                            this.plugin.app.workspace.trigger(
+                                "initiative-tracker:creature-updated-in-settings",
+                                player
+                            );
+
+                            this._displayPlayers(additionalContainer);
+                        };
+                    });
+                new ExtraButtonComponent(icons.createDiv())
+                    .setIcon("trash")
+                    .setTooltip("Delete")
+                    .onClick(async () => {
+                        this.plugin.data.players =
+                            this.plugin.data.players.filter((p) => p != player);
+
+                        await this.plugin.saveSettings();
+                        this._displayPlayers(additionalContainer);
+                    });
+            }
+        }
+    }
+    private _displayStatuses(additionalContainer: HTMLDetailsElement) {
+        additionalContainer.empty();
+        additionalContainer.ontoggle = () => {
+            this.plugin.data.openState.status = additionalContainer.open;
+        };
+        const summary = additionalContainer.createEl("summary");
+        new Setting(summary).setHeading().setName("Statuses");
+        summary.createDiv("collapser").createDiv("handle");
+        const add = new Setting(additionalContainer)
+            .setName("Add New Status")
+            .setDesc("These statuses will be available to apply to creatures.")
+            .addButton((button: ButtonComponent): ButtonComponent => {
+                let b = button
+                    .setTooltip("Add Status")
+                    .setButtonText("+")
+                    .onClick(async () => {
+                        const modal = new StatusModal(this.plugin);
+                        modal.onClose = async () => {
+                            if (modal.canceled) return;
+                            if (!modal.status.name) return;
+                            if (
+                                this.plugin.data.statuses.filter(
+                                    (status) => status.name == modal.status.name
+                                )
+                            ) {
+                                const map = new Map(
+                                    [...this.plugin.data.statuses].map((c) => [
+                                        c.name,
+                                        c
+                                    ])
+                                );
+                                map.set(modal.status.name, modal.status);
+                                this.plugin.data.statuses = Array.from(
+                                    map.values()
+                                );
+                            } else {
+                                this.plugin.data.statuses.push(modal.status);
+                            }
+                            await this.plugin.saveSettings();
+                            this._displayStatuses(additionalContainer);
+                        };
+                        modal.open();
+                    });
+
+                return b;
+            });
+        console.log(
+            !Conditions.every((c) => this.plugin.data.statuses.includes(c))
+        );
+        if (!Conditions.every((c) => this.plugin.data.statuses.includes(c))) {
+            add.addExtraButton((b) =>
+                b
+                    .setIcon("reset")
+                    .setTooltip("Re-add Default Conditions")
+                    .onClick(async () => {
+                        this.plugin.data.statuses = Array.from(
+                            new Map(
+                                [
+                                    ...this.plugin.data.statuses,
+                                    ...Conditions
+                                ].map((c) => [c.name, c])
+                            ).values()
+                        );
+                        await this.plugin.saveSettings();
+                        this._displayStatuses(additionalContainer);
+                    })
+            );
+        }
+        const additional = additionalContainer.createDiv("additional");
+        for (const status of this.plugin.data.statuses) {
+            new Setting(additional)
+                .setName(status.name)
+                .setDesc(status.description)
+                .addExtraButton((b) =>
+                    b.setIcon("pencil").onClick(() => {
+                        const modal = new StatusModal(this.plugin, status);
+                        modal.onClose = async () => {
+                            if (modal.canceled) return;
+                            if (!modal.status.name) return;
+                            this.plugin.data.statuses.splice(
+                                this.plugin.data.statuses.indexOf(status),
+                                1,
+                                modal.status
+                            );
+                            if (
+                                this.plugin.data.statuses.filter(
+                                    (s) => s.name == modal.status.name
+                                ).length > 1
+                            ) {
+                                if (
+                                    this.plugin.data.statuses.filter(
+                                        (status) =>
+                                            status.name == modal.status.name
+                                    )
+                                ) {
+                                    const map = new Map(
+                                        this.plugin.data.statuses.map((c) => [
+                                            c.name,
+                                            c
+                                        ])
+                                    );
+                                    console.log(
+                                        "🚀 ~ file: settings.ts ~ line 348 ~ map",
+                                        map
+                                    );
+                                    map.set(modal.status.name, modal.status);
+                                    this.plugin.data.statuses = Array.from(
+                                        map.values()
+                                    );
+                                }
+                            }
+                            await this.plugin.saveSettings();
+                            this._displayStatuses(additionalContainer);
+                        };
+                        modal.open();
+                    })
+                )
+                .addExtraButton((b) =>
+                    b.setIcon("trash").onClick(async () => {
+                        this.plugin.data.statuses =
+                            this.plugin.data.statuses.filter(
+                                (s) => s.name != status.name
+                            );
+                        await this.plugin.saveSettings();
+                        this._displayStatuses(additionalContainer);
+                    })
+                )
+                .setClass("initiative-status-item");
+        }
+    }
+    private async _displayIntegrations(containerEl: HTMLDetailsElement) {
         containerEl.empty();
-        new Setting(containerEl).setHeading().setName("Plugin Integrations");
+        containerEl.ontoggle = () => {
+            this.plugin.data.openState.plugin = containerEl.open;
+        };
+        const summary = containerEl.createEl("summary");
+        new Setting(summary).setHeading().setName("Plugin Integrations");
+        summary.createDiv("collapser").createDiv("handle");
         if (!this.plugin.canUseStatBlocks) {
             this.plugin.data.sync = false;
             await this.plugin.saveSettings();
@@ -386,113 +667,6 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 warning.createSpan({
                     text: " plugin to migrate."
                 });
-            }
-        }
-    }
-    private _displayPlayers(additionalContainer: HTMLDivElement) {
-        additionalContainer.empty();
-        new Setting(additionalContainer).setHeading().setName("Players");
-        new Setting(additionalContainer)
-            .setName("Add New Player")
-            .setDesc("These players will always be added to new encounters.")
-            .addButton((button: ButtonComponent): ButtonComponent => {
-                let b = button
-                    .setTooltip("Add Player")
-                    .setButtonText("+")
-                    .onClick(async () => {
-                        const modal = new NewPlayerModal(this.plugin);
-                        modal.open();
-                        modal.onClose = async () => {
-                            if (!modal.saved) return;
-
-                            await this.plugin.savePlayer({
-                                ...modal.player,
-                                player: true
-                            });
-
-                            this._displayPlayers(additionalContainer);
-                        };
-                    });
-
-                return b;
-            });
-        const additional = additionalContainer.createDiv("additional");
-        const playerView = additional.createDiv("initiative-tracker-players");
-        if (!this.plugin.data.players.length) {
-            additional
-                .createDiv({
-                    attr: {
-                        style: "display: flex; justify-content: center; padding-bottom: 18px;"
-                    }
-                })
-                .createSpan({
-                    text: "No saved players! Create one to see it here."
-                });
-        } else {
-            const headers = playerView.createDiv(
-                "initiative-tracker-player headers"
-            );
-
-            headers.createDiv({ text: "Name" });
-            new ExtraButtonComponent(headers.createDiv())
-                .setIcon(HP)
-                .setTooltip("Max HP");
-            new ExtraButtonComponent(headers.createDiv())
-                .setIcon(AC)
-                .setTooltip("Armor Class");
-            new ExtraButtonComponent(headers.createDiv())
-                .setIcon(INITIATIVE)
-                .setTooltip("Initiative Modifier");
-
-            headers.createDiv();
-
-            for (let player of this.plugin.data.players) {
-                const playerDiv = playerView.createDiv(
-                    "initiative-tracker-player"
-                );
-                playerDiv.createDiv({ text: player.name });
-                playerDiv.createDiv({
-                    text: `${player.hp ?? DEFAULT_UNDEFINED}`
-                });
-                playerDiv.createDiv({
-                    text: `${player.ac ?? DEFAULT_UNDEFINED}`
-                });
-                playerDiv.createDiv({
-                    text: `${player.modifier ?? DEFAULT_UNDEFINED}`
-                });
-                const icons = playerDiv.createDiv(
-                    "initiative-tracker-player-icon"
-                );
-                new ExtraButtonComponent(icons.createDiv())
-                    .setIcon(EDIT)
-                    .setTooltip("Edit")
-                    .onClick(() => {
-                        const modal = new NewPlayerModal(this.plugin, player);
-                        modal.open();
-                        modal.onClose = async () => {
-                            if (!modal.saved) return;
-                            await this.plugin.updatePlayer(
-                                player,
-                                modal.player
-                            );
-                            this.plugin.app.workspace.trigger(
-                                "initiative-tracker:creature-updated-in-settings",
-                                player
-                            );
-
-                            this._displayPlayers(additionalContainer);
-                        };
-                    });
-                new ExtraButtonComponent(icons.createDiv())
-                    .setIcon("trash")
-                    .setTooltip("Delete")
-                    .onClick(async () => {
-                        this.plugin.data.players =
-                            this.plugin.data.players.filter((p) => p != player);
-
-                        await this.plugin.saveSettings();
-                        this._displayPlayers(additionalContainer);
-                    });
             }
         }
     }
@@ -795,5 +969,79 @@ export class ConfirmModal extends Modal {
     }
     onOpen() {
         this.display();
+    }
+}
+addIcon(
+    "initiative-tracker-warning",
+    `<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="exclamation-triangle" class="svg-inline--fa fa-exclamation-triangle fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"></path></svg>`
+);
+
+class StatusModal extends Modal {
+    status: Condition = { name: null, description: null };
+    canceled = false;
+    editing: boolean = false;
+    original: string;
+    constructor(public plugin: InitiativeTracker, status?: Condition) {
+        super(plugin.app);
+        if (status) {
+            this.editing = true;
+            this.original = status.name;
+            this.status = {
+                name: status.name,
+                description: status.description
+            };
+        }
+    }
+    warned = false;
+    onOpen() {
+        this.titleEl.setText(this.editing ? "Edit Status" : "New Status");
+
+        const name = new Setting(this.contentEl)
+            .setName("Name")
+            .addText((t) => {
+                t.setValue(this.status.name).onChange((v) => {
+                    this.status.name = v;
+                    if (
+                        this.plugin.data.statuses.find(
+                            (s) => s.name == this.status.name
+                        ) &&
+                        !this.warned &&
+                        this.original != this.status.name
+                    ) {
+                        this.warned = true;
+                        name.setDesc(
+                            createFragment((e) => {
+                                const container = e.createDiv(
+                                    "initiative-tracker-warning"
+                                );
+                                setIcon(
+                                    container,
+                                    "initiative-tracker-warning"
+                                );
+                                container.createSpan({
+                                    text: "A status by this name already exists and will be overwritten."
+                                });
+                            })
+                        );
+                    } else if (this.warned) {
+                        this.warned = false;
+                        name.setDesc("");
+                    }
+                });
+            });
+        new Setting(this.contentEl).setName("Description").addTextArea((t) => {
+            t.setValue(this.status.description).onChange(
+                (v) => (this.status.description = v)
+            );
+        });
+
+        new ButtonComponent(
+            this.contentEl.createDiv("initiative-tracker-cancel")
+        )
+            .setButtonText("Cancel")
+            .onClick(() => {
+                this.canceled = true;
+                this.close();
+            });
     }
 }

@@ -58,7 +58,7 @@ export interface TrackerViewState {
 
 export interface Condition {
     name: string;
-    description: string[];
+    description: string;
 }
 
 export interface InputValidate {
@@ -68,6 +68,12 @@ export interface InputValidate {
 
 export interface InitiativeTrackerData {
     displayDifficulty: boolean;
+    statuses: Condition[];
+    openState: {
+        party: boolean;
+        status: boolean;
+        plugin: boolean;
+    };
     players: HomebrewCreature[];
     homebrew: HomebrewCreature[];
     version: string;

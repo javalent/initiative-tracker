@@ -62,9 +62,7 @@
     margin: 0 2rem;
     padding-top: 0;
 }
-.initiative-tracker-settings
-    .initiative-synced
-    .setting-item-name {
+.initiative-tracker-settings .initiative-synced .setting-item-name {
     color: var(--interactive-success);
     display: grid;
     grid-template-columns: auto 1fr;
@@ -105,6 +103,13 @@
     > .setting-item-control
     > *:first-child {
     margin: 0 6px;
+}
+.initiative-tracker-settings .initiative-status-item .setting-item-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    word-break: keep-all;
+    overflow: hidden;
 }
 
 .tooltip.initiative-tracker-condition-tooltip {
@@ -147,4 +152,57 @@
 
 .initiative-tracker-encounter-line {
     display: inline-block;
+}
+
+.initiative-tracker-settings details > summary {
+    outline: none;
+    display: block !important;
+    list-style: none !important;
+    list-style-type: none !important;
+    min-height: 1rem;
+    border-top-left-radius: 0.1rem;
+    border-top-right-radius: 0.1rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.initiative-tracker-settings details > summary::-webkit-details-marker,
+.initiative-tracker-settings details > summary::marker {
+    display: none !important;
+}
+
+.initiative-tracker-settings details > summary > .collapser {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    content: "";
+}
+
+.initiative-tracker-settings details > summary > .collapser > .handle {
+    transform: rotate(0deg);
+    transition: transform 0.25s;
+    background-color: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-image: var(--admonition-details-icon);
+    mask-image: var(--admonition-details-icon);
+    width: 20px;
+    height: 20px;
+}
+
+.initiative-tracker-settings details[open] > summary > .collapser > .handle {
+    transform: rotate(90deg);
+}
+.initiative-tracker-settings details:not([open]) > summary {
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.initiative-tracker-warning {
+    color: var(--text-error);
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
 }

@@ -16,7 +16,7 @@
 <div
     class="tag"
     aria-label={status.description?.length
-        ? status.description.join("\n\n")
+        ? status.description
         : null}
     aria-label-classes="initiative-tracker-condition-tooltip"
 >

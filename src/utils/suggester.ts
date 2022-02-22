@@ -531,7 +531,7 @@ export class ConditionSuggestionModal extends SuggestionModal<Condition> {
     condition: Condition;
     constructor(public plugin: InitiativeTracker, inputEl: HTMLInputElement) {
         super(plugin.app, inputEl);
-        this.items = Conditions;
+        this.items = this.plugin.data.statuses;
         this.suggestEl.style.removeProperty("min-width");
         this.onInputChanged();
     }
@@ -560,7 +560,7 @@ export class ConditionSuggestionModal extends SuggestionModal<Condition> {
         } else {
             this.condition = {
                 name: this.inputEl.value,
-                description: []
+                description: ''
             };
         }
 
