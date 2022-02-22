@@ -1,4 +1,11 @@
-import { Notice, parseYaml, Plugin, WorkspaceLeaf } from "obsidian";
+import {
+    FrontMatterCache,
+    Notice,
+    parseYaml,
+    Plugin,
+    TFile,
+    WorkspaceLeaf
+} from "obsidian";
 
 import {
     CREATURE_TRACKER_VIEW,
@@ -40,8 +47,9 @@ declare module "obsidian" {
 
 export default class InitiativeTracker extends Plugin {
     public data: InitiativeTrackerData;
-    playerCreatures: Map<HomebrewCreature, Creature> = new Map();
-    homebrewCreatures: Map<HomebrewCreature, Creature> = new Map();
+    playerCreatures: Map<string, Creature> = new Map();
+    homebrewCreatures: Map<string, Creature> = new Map();
+    watchers: Map<TFile, HomebrewCreature> = new Map();
     async parseDice(text: string) {
         if (!this.canUseDiceRoller) return null;
 
@@ -204,13 +212,94 @@ export default class InitiativeTracker extends Plugin {
         });
 
         this.playerCreatures = new Map(
-            this.data.players.map((p) => [p, Creature.from(p)])
+            this.data.players.map((p) => [p.name, Creature.from(p)])
         );
         this.homebrewCreatures = new Map(
-            this.bestiary.map((p) => [p, Creature.from(p)])
+            this.bestiary.map((p) => [p.name, Creature.from(p)])
         );
 
-        this.app.workspace.onLayoutReady(() => this.addTrackerView());
+        this.app.workspace.onLayoutReady(async () => {
+            this.addTrackerView();
+            //Update players from < 7.2
+            for (const player of this.data.players) {
+                if (player.path) continue;
+                if (!player.note) continue;
+                const file = await this.app.metadataCache.getFirstLinkpathDest(
+                    player.note,
+                    ""
+                );
+                if (
+                    !file ||
+                    !this.app.metadataCache.getFileCache(file)?.frontmatter
+                ) {
+                    new Notice(
+                        `Initiative Tracker: There was an issue with the linked note for ${player.name}.\n\nPlease re-link it in settings.`
+                    );
+                    continue;
+                }
+            }
+            this.registerEvent(
+                this.app.metadataCache.on("changed", (file) => {
+                    if (!(file instanceof TFile)) return;
+                    const players = this.data.players.filter(
+                        (p) => p.path == file.path
+                    );
+                    if (!players.length) return;
+                    const frontmatter: FrontMatterCache =
+                        this.app.metadataCache.getFileCache(file)?.frontmatter;
+                    if (!frontmatter) return;
+                    for (let player of players) {
+                        const { ac, hp, modifier, level } = frontmatter;
+                        player.ac = ac;
+                        player.hp = hp;
+                        player.modifier = modifier;
+                        player.level = level;
+
+                        this.playerCreatures.set(
+                            player.name,
+                            Creature.from(player)
+                        );
+                        if (this.view) {
+                            const creature = this.view.ordered.find(
+                                (c) => c.name == player.name
+                            );
+                            if (creature) {
+                                this.view.updateCreature(creature, {
+                                    max: player.hp,
+                                    ac: player.ac
+                                });
+                            }
+                        }
+                    }
+                })
+            );
+            this.registerEvent(
+                this.app.vault.on("rename", (file, old) => {
+                    if (!(file instanceof TFile)) return;
+                    const players = this.data.players.filter(
+                        (p) => p.path == old
+                    );
+                    if (!players.length) return;
+                    for (const player of players) {
+                        player.path = file.path;
+                        player.note = file.basename;
+                    }
+                })
+            );
+            this.registerEvent(
+                this.app.vault.on("delete", (file) => {
+                    if (!(file instanceof TFile)) return;
+                    const players = this.data.players.filter(
+                        (p) => p.path == file.path
+                    );
+                    if (!players.length) return;
+                    for (const player of players) {
+                        player.path = null;
+                        player.note = null;
+                    }
+                })
+            );
+        });
 
         console.log("Initiative Tracker v" + this.manifest.version + " loaded");
     }
@@ -342,23 +431,23 @@ export default class InitiativeTracker extends Plugin {
         this.data.homebrew.push(...importedMonsters);
 
         for (let monster of importedMonsters) {
-            this.homebrewCreatures.set(monster, Creature.from(monster));
+            this.homebrewCreatures.set(monster.name, Creature.from(monster));
         }
 
         await this.saveSettings();
     }
     async saveMonster(monster: HomebrewCreature) {
         this.data.homebrew.push(monster);
-        this.homebrewCreatures.set(monster, Creature.from(monster));
+        this.homebrewCreatures.set(monster.name, Creature.from(monster));
         await this.saveSettings();
     }
     async updatePlayer(existing: HomebrewCreature, player: HomebrewCreature) {
-        if (!this.playerCreatures.has(existing)) {
+        if (!this.playerCreatures.has(existing.name)) {
             await this.savePlayer(player);
             return;
         }
 
-        const creature = this.playerCreatures.get(existing);
+        const creature = this.playerCreatures.get(existing.name);
         creature.update(player);
 
         this.data.players.splice(
@@ -367,8 +456,8 @@ export default class InitiativeTracker extends Plugin {
             player
         );
 
-        this.playerCreatures.set(player, creature);
-        this.playerCreatures.delete(existing);
+        this.playerCreatures.set(player.name, creature);
+        this.playerCreatures.delete(existing.name);
 
         const view = this.view;
         if (view) {
@@ -378,12 +467,12 @@ export default class InitiativeTracker extends Plugin {
         await this.saveSettings();
     }
     async updateMonster(existing: HomebrewCreature, monster: HomebrewCreature) {
-        if (!this.homebrewCreatures.has(existing)) {
+        if (!this.homebrewCreatures.has(existing.name)) {
             await this.saveMonster(monster);
             return;
         }
 
-        const creature = this.homebrewCreatures.get(existing);
+        const creature = this.homebrewCreatures.get(existing.name);
         creature.update(monster);
 
         this.data.homebrew.splice(
@@ -392,8 +481,8 @@ export default class InitiativeTracker extends Plugin {
             monster
         );
 
-        this.homebrewCreatures.set(monster, creature);
-        this.homebrewCreatures.delete(existing);
+        this.homebrewCreatures.set(monster.name, creature);
+        this.homebrewCreatures.delete(existing.name);
 
         const view = this.view;
         if (view) {
@@ -404,27 +493,27 @@ export default class InitiativeTracker extends Plugin {
     }
     async deleteMonster(monster: HomebrewCreature) {
         this.data.homebrew = this.data.homebrew.filter((m) => m != monster);
-        this.homebrewCreatures.delete(monster);
+        this.homebrewCreatures.delete(monster.name);
 
         await this.saveSettings();
     }
 
     async savePlayer(player: HomebrewCreature) {
         this.data.players.push(player);
-        this.playerCreatures.set(player, Creature.from(player));
+        this.playerCreatures.set(player.name, Creature.from(player));
         await this.saveSettings();
     }
     async savePlayers(...players: HomebrewCreature[]) {
         for (let monster of players) {
             this.data.players.push(monster);
-            this.playerCreatures.set(monster, Creature.from(monster));
+            this.playerCreatures.set(monster.name, Creature.from(monster));
         }
         await this.saveSettings();
     }
 
     async deletePlayer(player: HomebrewCreature) {
         this.data.players = this.data.players.filter((p) => p != player);
-        this.playerCreatures.delete(player);
+        this.playerCreatures.delete(player.name);
         await this.saveSettings();
     }
 

@@ -515,10 +515,6 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                                             c
                                         ])
                                     );
-                                    console.log(
-                                        "🚀 ~ file: settings.ts ~ line 348 ~ map",
-                                        map
-                                    );
                                     map.set(modal.status.name, modal.status);
                                     this.plugin.data.statuses = Array.from(
                                         map.values()
@@ -879,6 +875,7 @@ class NewPlayerModal extends Modal {
                     );
 
                     this.player.note = modal.file.basename;
+                    this.player.path = modal.file.path;
                     this.player.name = modal.file.basename;
 
                     if (!metaData || !metaData.frontmatter) return;

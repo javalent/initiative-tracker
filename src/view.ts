@@ -428,6 +428,7 @@ export default class TrackerView extends ItemView {
         creature: Creature,
         {
             hp,
+            max,
             ac,
             initiative,
             name,
@@ -438,6 +439,7 @@ export default class TrackerView extends ItemView {
             initiative?: number;
             name?: string;
             marker?: string;
+            max?: number;
         }
     ) {
         if (initiative) {
@@ -449,6 +451,12 @@ export default class TrackerView extends ItemView {
         }
         if (hp) {
             creature.hp += Number(hp);
+        }
+        if (max) {
+            if (creature.hp == creature.max) {
+                creature.hp = Number(max);
+            }
+            creature.max = Number(max);
         }
         if (ac) {
             creature.ac = ac;
@@ -515,14 +523,12 @@ export default class TrackerView extends ItemView {
                 state: this.state,
                 xp: null,
                 view: this,
-                /* displayDifficulty: this.plugin.data.displayDifficulty, */
                 plugin: this.plugin,
                 round: this.round
             }
         });
         this._rendered = true;
     }
-
     async onClose() {
         this._app.$destroy();
         this._rendered = false;
