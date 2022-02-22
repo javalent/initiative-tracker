@@ -161,7 +161,9 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         summary.createDiv("collapser").createDiv("handle");
         new Setting(additionalContainer)
             .setName("Add New Player")
-            .setDesc("These players will always be added to new encounters.")
+            .setDesc(
+                "Players added here will be available to add to a party. If you do not have a party created, all players will be added to a new encounter."
+            )
             .addButton((button: ButtonComponent): ButtonComponent => {
                 let b = button
                     .setTooltip("Add Player")
@@ -467,7 +469,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             add.addExtraButton((b) =>
                 b
                     .setIcon("reset")
-                    .setTooltip("Re-add Default Conditions")
+                    .setTooltip("Re-add Default Statuses")
                     .onClick(async () => {
                         this.plugin.data.statuses = Array.from(
                             new Map(
@@ -553,7 +555,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             await this.plugin.saveSettings();
         }
         new Setting(containerEl)
-            .setName("Sync Monsters from 5e Statblocks")
+            .setName("Sync Monsters from TTRPG Statblocks")
             .setDesc(
                 createFragment((e) => {
                     e.createSpan({
@@ -566,7 +568,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                             text: "Install and enable the "
                         });
                         e.createEl("a", {
-                            text: "5e Statblocks",
+                            text: "TTRPG Statblocks",
                             href: "obsidian://show-plugin?id=obsidian-5e-statblocks"
                         });
                         e.createSpan({

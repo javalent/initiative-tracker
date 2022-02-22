@@ -26,6 +26,12 @@ This will render like this in Preview:
 
 Clicking on the button next to the encounter name will then launch the encounter in the Initiative Tracker.
 
+> :warning: **Please Note**
+>
+> If a default [Party](#party) is defined, it will be used to control what players are added to an encounter.
+>
+> You can override this by specifying a different party, or specifying `party: none`
+
 ### Launching Encounters
 
 An encounter can be launched by clicking the "Begin Encounter" button. This will launch a **new encounter** as defined.
@@ -69,7 +75,9 @@ For example:
 
 `` `encounter: 3: Hobgoblin, 1d5: Goblin, Custom Monster` ``
 
-**Please note:** It is not possible to customize monster stats or control players using the inline syntax.
+> :warning: **Please note:**
+>
+> It is not possible to customize monster stats or control players using the inline syntax.
 
 This syntax enables Encounters to be used in [Dice Roller](https://github.com/valentine195/obsidian-dice-roller) lookup tables!
 
@@ -78,8 +86,8 @@ This syntax enables Encounters to be used in [Dice Roller](https://github.com/va
 | --- | ---------------------------------------------- |
 | 1   | `encounter: 3: Hobgoblin, 1d5: Goblin, Custom` |
 | 2   | `encounter: 2 Hobgoblin`                       |
-^test-encounter
 
+^test-encounter
 
 `dice: [[Encounter#^test-encounter]]`
 ```
@@ -91,6 +99,7 @@ There are 3 parameters for each encounter, with more detail below.
 ````
 ```encounter
 name: string                            # Name of the encounter. Optional.
+party: string                           # Name of Party to use. Overrides any defined players. Optional.
 players: boolean | string | array       # Which players to include. Optional.
 creatures: array                        # Array of creatures to include in the encounter. Optional.
 ```
@@ -99,6 +108,12 @@ creatures: array                        # Array of creatures to include in the e
 #### Name
 
 The name of the encounter, which will be displayed both in Preview mode as well as in the Initiative Tracker when the encounter is launched.
+
+#### Party
+
+The `party` parameter specifies what party to use for this encounter. **If a default party is set in settings, it will be used if this parameter is not provided.**
+
+This parameter _always_ takes precendence over the `players` parameter.
 
 #### Players
 
@@ -201,11 +216,9 @@ creatures:
 
 Monsters may be added to the combat by clicking the `Add Creature` button, which will open a form where the creature's name, HP, AC and initiative can be set.
 
-### Names and Initiatives
+### Initiatives
 
 Once all of the creatures in a given combat have been added, initiatives can be modified by clicking on the initiative number and entering the new initiative.
-
-Creature names may _also_ be modified by clicking on them.
 
 ### HP
 
@@ -213,7 +226,7 @@ Creatures can take damage or healing by clicking on their HP.
 
 ### Actions
 
-Creatures may be disabled or removed from the combat, or statuses (such as "poisoned") may be added in the `Actions` menu on the right of each creature.
+Creatures may be edited, disabled / removed from the combat, or statuses (such as "poisoned") may be added to them in the `Actions` menu located to the right of each creature.
 
 ### Controls
 
@@ -245,7 +258,33 @@ If the encounter is active, this command can be used to make the next enabled co
 
 If the encounter is active, this command can be used to make the previous enabled combatant active (similar to clicking the `Previous` button).
 
-## Saving Encounters
+### Tracker Menu
+
+The Initiative Tracker has a tracker menu located in the top right of the view. This can be used to do several things, such as creating a new encounter, resetting HP, or changing parties.
+
+#### New Encounter
+
+This will clear any creatures from the encounter, reset HP and status effects, enable all party members, and roll new initiatives.
+
+#### Reset HP & Status
+
+This will reset all creature's (including party members) HP and status effects, but will _not_ roll new initiatives or re-enable disabled creatures.
+
+#### Re-roll Initiatives
+
+This will re-roll initiatives for _all_ creatures, including players.
+
+#### Switch Party
+
+All players will be removed from the encounter and replaced with the new party members.
+
+Please note that if the same player is in both parties, they will receive a new initiative.
+
+#### Group / Ungroup Creatures
+
+Any equivalent creatures (HP, AC and Name are the same) will be "grouped" and roll a single initiative value.
+
+#### Saving Encounters
 
 If an encounter is in-progress (combat has been started), the plugin will automatically track it and reload the encounter state when Obsidian is re-opened.
 
@@ -255,21 +294,39 @@ Saving an encounter saves a **snapshot** of the encounter at that moment. Any fu
 
 ![](https://raw.githubusercontent.com/valentine195/obsidian-initiative-tracker/master/assets/save-encounter.png)
 
+#### Open Leaflet Map
+
+This will open a battlemap using the [Obsidian Leaflet](https://github.com/valentine195/obsidian-leaflet-plugin) plugin, if it is [enabled in settings](#integrate-with-obsidian-leaflet).
+
 # Settings
 
 The setting tab has several options for adding and managing players and homebrew creatures, as well as the ability to change the formula used to calculate the initiative.
 
+## Basic Settings
+
+### Display Encounter Difficulty
+
+The plugin will calculate and display encounter difficulty based on the challenge rating of the creatures and levels of your party members.
+
+Creatures and players without this information will be ignored for the calculation.
+
+### Roll Equivalent Creatures Together
+
+Equivalent creatures (same HP, AC, and Name) will roll initiatives as a group.
+
 ## Players
 
-Players may be added in settings. Players created in this way will be automatically added to encounters.
+Players added here will be available to add to [Parties](#parties).
+
+If you do not have any parties, all the players added here will be considered as a default party and will all be added to new encounters.
 
 ### Players from Notes
 
 When adding a new player, there is the option to add a player based on a note.
 
-Currently, this functionality will only read the frontmatter of a note to pull in the relevant fields - hp, ac, and initiative modifier.
+The plugin will keep the player's data in sync with the frontmatter if it is changed.
 
-Frontmatter should be formatted like this:
+Frontmatter should be formatted like this (all fields are optional):
 
 ```
 ---
@@ -280,27 +337,25 @@ level: 2
 ---
 ```
 
-In the future, this will be used to display more information about the player during combat, and also will update the player's information when the frontmatter is changed.
+## Parties
 
-## Display Encounter Difficulty
+Parties allow you to create different groups of your players. Each player can be a member of multiple parties.
 
-This will show encounter difficulty based on creater CR and player level in both Encounters and the Initiative Tracker View.
+You can set a default party for encounters to use, or specify the party for the encounter in the encounter block. While running an encounter in the tracker, you can change the active party, allowing you to quickly switch which players are in combat.
 
-## Homebrew Content
+## Statuses
 
-Homebrew creatures may be created and managed in settings. Homebrew creatures will be available in the monster picker when adding a creature to the combat.
+Add and manage statuses available to apply to creatures here.
 
-### 5e Statblocks Plugin
+If any default statuses are deleted, you can re-add them by clicking the "Re-add Default Statuses" button. This button is only available if default statuses have been deleted.
+
+## Plugin Integrations
+
+### Sync Monsters from TTRPG Statblocks Plugin
 
 If the [5e Statblocks](https://github.com/valentine195/obsidian-5e-statblocks) plugin is installed, the homebrew creatures saved to that plugin can be used in this plugin by enabling the sync in settings.
 
-### Import Homebrew
-
-**Only import content that you own.**
-
-Homebrew creatures can be imported from DnDAppFile XML files or Improved Initiative JSON files in settings.
-
-## Initiative Formula
+### Initiative Formula
 
 > This setting can only be modified when the [Dice Roller](https://github.com/valentine195/obsidian-dice-roller) plugin is installed.
 
@@ -309,6 +364,10 @@ This setting can be used to modify how a creature's initiative is calculated by 
 It defaults to `1d20 + %mod%`.
 
 This will support any dice formula supported by the Dice Roller plugin.
+
+### Integrate with Obsidian Leaflet
+
+If the [Obsidian Leaflet](https://github.com/valentine195/obsidian-leaflet-plugin) plugin is installed, it can be used as a battle map for encounters by turning this setting on.
 
 # Roadmap
 
