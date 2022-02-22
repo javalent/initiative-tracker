@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.2.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.1.0...7.2.0) (2022-02-22)
+
+
+### Features
+
+* Adds monster display names (close [#28](https://github.com/valentine195/obsidian-initiative-tracker/issues/28)) ([3b8c0de](https://github.com/valentine195/obsidian-initiative-tracker/commit/3b8c0de80a02fbcc8392ee21a656d274af1f87bf))
+* Adds Parties to settings ([353a27d](https://github.com/valentine195/obsidian-initiative-tracker/commit/353a27df5813a8641112523f95756adc2afbfb8b))
+* Implements custom status effects ([8d204a5](https://github.com/valentine195/obsidian-initiative-tracker/commit/8d204a5caa9fa75b94ba20ce7c95c344096645e3))
+* Players linked to notes will now update their hp, ac, modifier, and level ([648145c](https://github.com/valentine195/obsidian-initiative-tracker/commit/648145c45170dd81145a828fc2e0d27cbf55fd89))
+
+
+### Bug Fixes
+
+* fixes styling issues with settings tab ([44a7407](https://github.com/valentine195/obsidian-initiative-tracker/commit/44a7407d55afa669965fd62aaaab8a6538a8e59a))
+
 ## [7.1.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.0.0...7.1.0) (2022-01-26)
 
 
