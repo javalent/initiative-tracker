@@ -13,15 +13,12 @@
 
     const dispatch = createEventDispatcher();
 
-    const updateName = (evt: FocusEvent) => {
-        view.updateCreature(creature, {
-            name: (evt.target as HTMLSpanElement).textContent
-        });
-    };
-
     let view = getContext<TrackerView>("view");
 
     const name = () => {
+        if (creature.display) {
+            return creature.display;
+        }
         if (creature.number > 0) {
             return `${creature.name} ${creature.number}`;
         }

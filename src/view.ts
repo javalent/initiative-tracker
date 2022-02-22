@@ -699,7 +699,8 @@ export class CreatureView extends ItemView {
         ) {
             const statblock = this.plugin.statblocks.render(
                 creature,
-                this.statblockEl
+                this.statblockEl,
+                creature.display
             );
             if (statblock) {
                 this.addChild(statblock);

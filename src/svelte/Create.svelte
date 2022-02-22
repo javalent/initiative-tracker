@@ -14,6 +14,7 @@
 
     export let editing = false;
     export let name: string = null;
+    export let display: string = null;
     export let hp: string = null;
     export let initiative: number = null;
     export let ac: string = null;
@@ -39,6 +40,7 @@
                 dispatch("save", {
                     name,
                     hp,
+                    display,
                     initiative:
                         (initiative ?? Math.floor(Math.random() * 19 + 1)) -
                         modifier,
@@ -92,7 +94,7 @@
 
 <div class="create-new">
     <div>
-        <label for="add-name">Name</label>
+        <label for="add-name">Creature</label>
         <input
             bind:value={name}
             on:focus={function () {
@@ -101,6 +103,16 @@
             id="add-name"
             type="text"
             name="name"
+            tabindex="0"
+        />
+    </div>
+    <div>
+        <label for="add-display">Display Name</label>
+        <input
+            bind:value={display}
+            id="add-display"
+            type="text"
+            name="display"
             tabindex="0"
         />
     </div>

@@ -14,6 +14,7 @@
     import Difficulty from "./Difficulty.svelte";
     import SaveEncounter from "./SaveEncounter.svelte";
     import LoadEncounter from "./LoadEncounter.svelte";
+    import { log } from "console";
 
     const dispatch = createEventDispatcher();
 
@@ -217,6 +218,7 @@
                 <Create
                     editing={editCreature != null}
                     name={editCreature?.name}
+                    display={editCreature?.display}
                     hp={`${editCreature?.hp}`}
                     initiative={editCreature?.initiative}
                     modifier={editCreature?.modifier}
@@ -229,9 +231,11 @@
                     }}
                     on:save={(evt) => {
                         const creature = evt.detail;
+                        console.log(creature.display);
                         const newCreature = new Creature(
                             {
                                 name: creature.name,
+                                display: creature.display,
                                 hp: creature.hp,
                                 ac: creature.ac,
                                 modifier: creature.modifier,
@@ -247,6 +251,7 @@
                         } else if (editCreature) {
                             editCreature.name = creature.name;
                             editCreature.ac = creature.ac;
+                            editCreature.display = creature.display;
                             editCreature.initiative = creature.initiative;
                             editCreature.modifier = creature.modifier;
                             view.updateCreature(editCreature, {

@@ -146,6 +146,7 @@ export interface SRDMonster {
 
 export interface HomebrewCreature {
     name?: string;
+    display?: string;
     hp?: number;
     ac?: number;
     stats?: number[];
