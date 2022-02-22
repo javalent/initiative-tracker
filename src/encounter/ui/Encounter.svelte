@@ -16,6 +16,7 @@
     export let name: string = "Encounter";
     export let creatures: Map<Creature, number | string>;
     export let players: boolean | string[] = true;
+    export let party: string = null;
     export let hide: string[] = [];
     export let xp: number;
 
@@ -52,34 +53,32 @@
         }
     }
 
-    const open = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setIcon(START_ENCOUNTER)
-            .setTooltip("Begin Encounter")
-            .onClick(async () => {
-                if (!plugin.view) {
-                    await plugin.addTrackerView();
-                }
+    const openButton = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon(START_ENCOUNTER);
+    };
 
-                const view = plugin.view;
-                const creatures: Creature[] = [...creatureMap]
-                    .map(([creature, number]) => {
-                        if (isNaN(Number(number)) || number < 1)
-                            return [creature];
-                        return [...Array(number).keys()].map((v) =>
-                            Creature.from(creature)
-                        );
-                    })
-                    .flat();
+    const open = async () => {
+        if (!plugin.view) {
+            await plugin.addTrackerView();
+        }
 
-                view?.newEncounter({
-                    name,
-                    players,
-                    creatures,
-                    xp
-                });
-                plugin.app.workspace.revealLeaf(view.leaf);
-            });
+        const view = plugin.view;
+        const creatures: Creature[] = [...creatureMap]
+            .map(([creature, number]) => {
+                if (isNaN(Number(number)) || number < 1) return [creature];
+                return [...Array(number).keys()].map((v) =>
+                    Creature.from(creature)
+                );
+            })
+            .flat();
+
+        view?.newEncounter({
+            name,
+            players,
+            creatures,
+            xp
+        });
+        plugin.app.workspace.revealLeaf(view.leaf);
     };
 
     const addButton = (node: HTMLElement) => {
@@ -137,7 +136,7 @@
     <div class="encounter-name">
         <h3 data-heading={name} class="initiative-tracker-name">{name}</h3>
         <div class="icons">
-            <div use:open />
+            <div use:openButton on:click={open} aria-label="Start Encounter" />
             <div use:addButton on:click={add} aria-label="Add to Encounter" />
         </div>
     </div>
@@ -145,7 +144,7 @@
         {#if !hide.includes("players")}
             {#if players instanceof Array && players.length}
                 <div class="encounter-creatures encounter-players">
-                    <h4>Players</h4>
+                    <h4>{party ? party : "Players"}</h4>
                     <ul>
                         {#each players as player}
                             <li>
@@ -227,6 +226,9 @@
         display: flex;
         justify-content: flex-start;
         align-items: center;
+    }
+    .encounter-name .initiative-tracker-name {
+        margin: 0;
     }
     .encounter-instance
         > .creatures-container

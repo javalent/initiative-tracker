@@ -82,6 +82,26 @@
             .setTitle("Re-roll Initiatives")
             .onClick(() => view.rollInitiatives());
     });
+    if (plugin.data.parties && plugin.data.parties.length) {
+        menu.addItem((item) => {
+            item.setIcon("switch")
+                .setTitle("Switch Party")
+                .onClick((evt) => {
+                    menu.hide();
+                    const partyMenu = new Menu(plugin.app).setNoIcon();
+                    for (const party of plugin.data.parties) {
+                        partyMenu.addItem((item) => {
+                            item.setTitle(party.name)
+                                .onClick(() => {
+                                    view.switchParty(party.name);
+                                })
+                                .setDisabled(view.party == party.name);
+                        });
+                    }
+                    partyMenu.showAtMouseEvent(evt);
+                });
+        });
+    }
     menu.addItem((item) => {
         item.setIcon(GROUP)
             .setTitle(view.condense ? "Expand Creatures" : "Group Creatures")

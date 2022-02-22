@@ -66,6 +66,11 @@ export interface InputValidate {
     validate: (i: HTMLInputElement) => boolean;
 }
 
+interface Party {
+    players: string[];
+    name: string;
+}
+
 export interface InitiativeTrackerData {
     displayDifficulty: boolean;
     statuses: Condition[];
@@ -73,8 +78,11 @@ export interface InitiativeTrackerData {
         party: boolean;
         status: boolean;
         plugin: boolean;
+        player: boolean;
     };
     players: HomebrewCreature[];
+    parties: Party[];
+    defaultParty: string;
     homebrew: HomebrewCreature[];
     version: string;
     canUseDiceRoll: boolean;

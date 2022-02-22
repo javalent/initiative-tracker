@@ -2,7 +2,7 @@
     border-color: var(--background-modifier-error-hover);
 }
 
-.initiative-tracker-settings .initiative-tracker-additional-container {
+.initiative-tracker-additional-container {
     border-bottom: 0px solid var(--background-modifier-border);
     padding: 18px 0;
     background-color: inherit;
@@ -84,20 +84,14 @@
     display: none;
 }
 
-.initiative-tracker-settings
-    .initiative-tracker-additional-container
-    > .additional {
+.initiative-tracker-additional-container > .additional {
     margin: 6px 12px;
 }
-.initiative-tracker-settings
-    .initiative-tracker-additional-container
-    > .additional
-    > .setting-item {
+.initiative-tracker-additional-container > .additional > .setting-item {
     border-top: 0;
     padding-top: 9px;
 }
-.initiative-tracker-settings
-    .initiative-tracker-additional-container
+.initiative-tracker-additional-container
     > .additional
     > .setting-item
     > .setting-item-control
@@ -196,7 +190,10 @@
 .initiative-tracker-settings details[open] > summary > .collapser > .handle {
     transform: rotate(90deg);
 }
-.initiative-tracker-settings details:not([open]) > summary {
+.initiative-tracker-settings details > summary {
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+.initiative-tracker-settings details > summary {
     border-bottom: 1px solid var(--background-modifier-border);
 }
 
@@ -205,4 +202,18 @@
     display: flex;
     gap: 0.25rem;
     align-items: center;
+}
+
+.initiative-tracker-settings details > summary + .setting-item,
+.initiative-tracker-explanation + .setting-item {
+    border-top: 0;
+}
+
+.initiative-tracker-explanation {
+    padding-top: 16px;
+}
+
+.initiative-tracker-cancel {
+    display: flex;
+    justify-content: flex-end;
 }

@@ -12,7 +12,7 @@ import { createPopper, Instance as PopperInstance } from "@popperjs/core";
 
 import { Conditions } from "./conditions";
 
-import type { HomebrewCreature, SRDMonster, Condition } from "@types";
+import type { HomebrewCreature, SRDMonster, Condition, Party } from "@types";
 import type InitiativeTracker from "src/main";
 
 class Suggester<T> {
@@ -560,7 +560,7 @@ export class ConditionSuggestionModal extends SuggestionModal<Condition> {
         } else {
             this.condition = {
                 name: this.inputEl.value,
-                description: ''
+                description: ""
             };
         }
 
@@ -594,5 +594,78 @@ export class ConditionSuggestionModal extends SuggestionModal<Condition> {
 
             content.nameEl.appendText(item.name[i]);
         }
+    }
+}
+
+export class PlayerSuggestionModal extends SuggestionModal<HomebrewCreature> {
+    player: HomebrewCreature;
+    text: TextComponent;
+    items = this.plugin.data.players;
+    constructor(
+        public plugin: InitiativeTracker,
+        input: TextComponent,
+        public party: Party
+    ) {
+        super(plugin.app, input.inputEl);
+        this.text = input;
+
+        this.createPrompts();
+
+        this.inputEl.addEventListener("input", this.getItem.bind(this));
+        this.inputEl.addEventListener("focus", this.onInputChanged.bind(this));
+    }
+    createPrompts() {}
+    getItem() {
+        const v = this.inputEl.value,
+            file = this.items.find((file) => file.name === v.trim());
+        if (file == this.player) return;
+        this.player = file;
+        if (this.items) this.onInputChanged();
+    }
+    getItemText(item: HomebrewCreature) {
+        return item.name;
+    }
+    onChooseItem(item: HomebrewCreature) {
+        this.text.setValue(item.name);
+        this.player = item;
+    }
+    selectSuggestion({ item }: FuzzyMatch<HomebrewCreature>) {
+        this.text.setValue(item.name);
+        this.player = item;
+
+        this.onClose();
+        this.close();
+    }
+    renderSuggestion(result: FuzzyMatch<HomebrewCreature>, el: HTMLElement) {
+        let { item, match: matches } = result || {};
+        let content = el.createDiv({
+            cls: "suggestion-content icon"
+        });
+        if (!item) {
+            this.suggester.selectedItem = null;
+            content.setText(this.emptyStateText);
+            content.parentElement.addClass("is-selected");
+            return;
+        }
+
+        const matchElements = matches.matches.map((m) => {
+            return createSpan("suggestion-highlight");
+        });
+        for (let i = 0; i < item.name.length; i++) {
+            let match = matches.matches.find((m) => m[0] === i);
+            if (match) {
+                let element = matchElements[matches.matches.indexOf(match)];
+                content.appendChild(element);
+                element.appendText(item.name.substring(match[0], match[1]));
+
+                i += match[1] - match[0] - 1;
+                continue;
+            }
+
+            content.appendText(item.name[i]);
+        }
+    }
+    getItems() {
+        return this.items.filter((p) => !this.party.players.includes(p.name));
     }
 }

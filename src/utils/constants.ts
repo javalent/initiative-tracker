@@ -10,6 +10,8 @@ export const DEFAULT_UNDEFINED = "–";
 
 export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     players: [],
+    parties: [],
+    defaultParty: null,
     homebrew: [],
     statuses: [...Conditions],
     version: null,
@@ -33,7 +35,8 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     openState: {
         party: true,
         status: true,
-        plugin: true
+        plugin: true,
+        player: true
     }
 };
 

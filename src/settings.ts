@@ -4,12 +4,13 @@ import {
     Notice,
     PluginSettingTab,
     setIcon,
-    Setting
+    Setting,
+    TextComponent
 } from "obsidian";
 
 import type InitiativeTracker from "./main";
 
-import { FileSuggestionModal } from "./utils/suggester";
+import { FileSuggestionModal, PlayerSuggestionModal } from "./utils/suggester";
 import {
     AC,
     Conditions,
@@ -18,7 +19,7 @@ import {
     HP,
     INITIATIVE
 } from "./utils";
-import type { Condition, HomebrewCreature, InputValidate } from "@types";
+import type { Condition, HomebrewCreature, InputValidate, Party } from "@types";
 
 export default class InitiativeTrackerSettings extends PluginSettingTab {
     constructor(private plugin: InitiativeTracker) {
@@ -34,7 +35,25 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             containerEl.createEl("h2", { text: "Initiative Tracker Settings" });
 
             this._displayBase(containerEl.createDiv());
+            if (!this.plugin.data.openState) {
+                this.plugin.data.openState = {
+                    player: true,
+                    party: true,
+                    plugin: true,
+                    status: true
+                };
+            }
             this._displayPlayers(
+                containerEl.createEl("details", {
+                    cls: "initiative-tracker-additional-container",
+                    attr: {
+                        ...(this.plugin.data.openState.player
+                            ? { open: true }
+                            : {})
+                    }
+                })
+            );
+            this._displayParties(
                 containerEl.createEl("details", {
                     cls: "initiative-tracker-additional-container",
                     attr: {
@@ -135,7 +154,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
     private _displayPlayers(additionalContainer: HTMLDetailsElement) {
         additionalContainer.empty();
         additionalContainer.ontoggle = () => {
-            this.plugin.data.openState.party = additionalContainer.open;
+            this.plugin.data.openState.player = additionalContainer.open;
         };
         const summary = additionalContainer.createEl("summary");
         new Setting(summary).setHeading().setName("Players");
@@ -244,6 +263,160 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             }
         }
     }
+    private _displayParties(additionalContainer: HTMLDetailsElement) {
+        additionalContainer.empty();
+        additionalContainer.ontoggle = () => {
+            this.plugin.data.openState.party = additionalContainer.open;
+        };
+        const summary = additionalContainer.createEl("summary");
+        new Setting(summary).setHeading().setName("Parties");
+        summary.createDiv("collapser").createDiv("handle");
+        const explanation = additionalContainer.createDiv(
+            "initiative-tracker-explanation"
+        );
+        explanation.createEl("span", {
+            text: "Parties allow you to create different groups of your players. Each player can be a member of multiple parties."
+        });
+        explanation.createEl("br");
+        explanation.createEl("br");
+        explanation.createEl("span", {
+            text: "You can set a default party for encounters to use, or specify the party for the encounter in the encounter block. While running an encounter in the tracker, you can change the active party, allowing you to quickly switch which players are in combat."
+        });
+        new Setting(additionalContainer)
+            .setName("Default Party")
+            .setDesc(
+                "The tracker will load this party to encounters by default."
+            )
+            .addDropdown((d) => {
+                d.addOption("none", "None");
+                for (const party of this.plugin.data.parties) {
+                    d.addOption(party.name, party.name);
+                }
+                d.setValue(this.plugin.data.defaultParty ?? "none");
+                d.onChange(async (v) => {
+                    this.plugin.data.defaultParty = v == "none" ? null : v;
+                    this.plugin.saveSettings();
+                });
+            });
+        new Setting(additionalContainer)
+            .setName("Add New Party")
+            .addButton((button: ButtonComponent): ButtonComponent => {
+                let b = button
+                    .setTooltip("Add Party")
+                    .setButtonText("+")
+                    .onClick(async () => {
+                        const modal = new PartyModal(this.plugin);
+                        modal.open();
+                        modal.onClose = async () => {
+                            if (modal.canceled) return;
+                            if (!modal.party.name || !modal.party.name.length)
+                                return;
+                            if (
+                                this.plugin.data.parties.filter(
+                                    (party) => party.name == modal.party.name
+                                )
+                            ) {
+                                const map = new Map(
+                                    [...this.plugin.data.parties].map((c) => [
+                                        c.name,
+                                        c
+                                    ])
+                                );
+                                map.set(modal.party.name, modal.party);
+                                this.plugin.data.parties = Array.from(
+                                    map.values()
+                                );
+                            } else {
+                                this.plugin.data.parties.push(modal.party);
+                            }
+
+                            await this.plugin.saveSettings();
+
+                            this._displayParties(additionalContainer);
+                        };
+                    });
+
+                return b;
+            });
+        const additional = additionalContainer.createDiv("additional");
+        if (!this.plugin.data.parties.length) {
+            additional
+                .createDiv({
+                    attr: {
+                        style: "display: flex; justify-content: center; padding-bottom: 18px;"
+                    }
+                })
+                .createSpan({
+                    text: "No saved parties! Create one to see it here."
+                });
+        } else {
+            for (const party of this.plugin.data.parties) {
+                new Setting(additional)
+                    .setName(party.name)
+                    .setDesc(party.players.join(", "))
+                    .addExtraButton((b) => {
+                        b.setIcon("pencil").onClick(() => {
+                            const modal = new PartyModal(this.plugin, party);
+                            modal.open();
+                            modal.onClose = async () => {
+                                if (modal.canceled) return;
+                                if (
+                                    !modal.party.name ||
+                                    !modal.party.name.length
+                                )
+                                    return;
+
+                                this.plugin.data.parties.splice(
+                                    this.plugin.data.parties.indexOf(party),
+                                    1,
+                                    modal.party
+                                );
+                                if (
+                                    this.plugin.data.parties.filter(
+                                        (s) => s.name == modal.party.name
+                                    ).length > 1
+                                ) {
+                                    if (
+                                        this.plugin.data.parties.filter(
+                                            (status) =>
+                                                status.name == modal.party.name
+                                        )
+                                    ) {
+                                        const map = new Map(
+                                            this.plugin.data.parties.map(
+                                                (c) => [c.name, c]
+                                            )
+                                        );
+                                        map.set(modal.party.name, modal.party);
+                                        this.plugin.data.parties = Array.from(
+                                            map.values()
+                                        );
+                                    }
+                                }
+
+                                await this.plugin.saveSettings();
+
+                                this._displayParties(additionalContainer);
+                            };
+                        });
+                    })
+                    .addExtraButton((b) => {
+                        b.setIcon("trash").onClick(async () => {
+                            this.plugin.data.parties =
+                                this.plugin.data.parties.filter(
+                                    (p) => p.name != party.name
+                                );
+                            if (this.plugin.data.defaultParty == party.name) {
+                                this.plugin.data.defaultParty =
+                                    this.plugin.data.parties[0]?.name ?? null;
+                            }
+                            await this.plugin.saveSettings();
+                            this._displayParties(additionalContainer);
+                        });
+                    });
+            }
+        }
+    }
     private _displayStatuses(additionalContainer: HTMLDetailsElement) {
         additionalContainer.empty();
         additionalContainer.ontoggle = () => {
@@ -290,9 +463,6 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
 
                 return b;
             });
-        console.log(
-            !Conditions.every((c) => this.plugin.data.statuses.includes(c))
-        );
         if (!Conditions.every((c) => this.plugin.data.statuses.includes(c))) {
             add.addExtraButton((b) =>
                 b
@@ -1043,5 +1213,134 @@ class StatusModal extends Modal {
                 this.canceled = true;
                 this.close();
             });
+    }
+}
+
+class PartyModal extends Modal {
+    party: Party = { name: null, players: [] };
+    canceled = false;
+    editing = false;
+    warned = false;
+    original: string;
+    constructor(public plugin: InitiativeTracker, party?: Party) {
+        super(plugin.app);
+        if (party) {
+            this.editing = true;
+            this.original = party.name;
+            this.party = {
+                name: party.name,
+                players: [...(party.players ?? [])]
+            };
+        }
+    }
+    onOpen(): void {
+        this.titleEl.setText(
+            this.editing ? `Edit ${this.party.name ?? "Party"}` : "New Party"
+        );
+
+        const name = new Setting(this.contentEl)
+            .setName("Name")
+            .addText((t) => {
+                t.setValue(this.party.name).onChange((v) => {
+                    this.party.name = v;
+                    if (
+                        this.plugin.data.parties.find(
+                            (s) => s.name == this.party.name
+                        ) &&
+                        !this.warned &&
+                        this.original != this.party.name
+                    ) {
+                        this.warned = true;
+                        name.setDesc(
+                            createFragment((e) => {
+                                const container = e.createDiv(
+                                    "initiative-tracker-warning"
+                                );
+                                setIcon(
+                                    container,
+                                    "initiative-tracker-warning"
+                                );
+                                container.createSpan({
+                                    text: "A party by this name already exists and will be overwritten."
+                                });
+                            })
+                        );
+                    } else if (this.warned) {
+                        this.warned = false;
+                        name.setDesc("");
+                    }
+                });
+            });
+
+        const playersEl = this.contentEl.createDiv(
+            "initiative-tracker-additional-container"
+        );
+        let playerText: TextComponent;
+        new Setting(playersEl)
+            .setName("Add Player to Party")
+            .addText((t) => {
+                playerText = t;
+                new PlayerSuggestionModal(this.plugin, t, this.party);
+            })
+            .addExtraButton((b) =>
+                b.setIcon("plus-with-circle").onClick(() => {
+                    if (!playerText.getValue() || !playerText.getValue().length)
+                        return;
+                    if (this.party.players.includes(playerText.getValue())) {
+                        new Notice("That player is already in this party!");
+                        return;
+                    }
+                    if (
+                        !this.plugin.data.players.find(
+                            (p) => p.name == playerText.getValue()
+                        )
+                    ) {
+                        new Notice(
+                            "That player doesn't exist! You should make them first."
+                        );
+                        return;
+                    }
+                    this.party.players.push(playerText.getValue());
+                    this.displayPlayers(playersDisplayEl);
+                    playerText.setValue("");
+                })
+            );
+        const playersDisplayEl = playersEl.createDiv("additional");
+        this.displayPlayers(playersDisplayEl);
+
+        new ButtonComponent(
+            this.contentEl.createDiv("initiative-tracker-cancel")
+        )
+            .setButtonText("Cancel")
+            .onClick(() => {
+                this.canceled = true;
+                this.close();
+            });
+    }
+    displayPlayers(containerEl: HTMLDivElement) {
+        containerEl.empty();
+        if (this.party.players.length) {
+            for (const player of this.party.players) {
+                new Setting(containerEl).setName(player).addExtraButton((b) => {
+                    b.setIcon("trash").onClick(() => {
+                        this.party.players.splice(
+                            this.party.players.indexOf(player),
+                            1
+                        );
+                        this.displayPlayers(containerEl);
+                    });
+                });
+            }
+        } else {
+            containerEl
+                .createDiv({
+                    attr: {
+                        style: "display: flex; justify-content: center; padding-bottom: 18px;"
+                    }
+                })
+                .createSpan({
+                    text: "Add a player to the party to see it here."
+                });
+        }
     }
 }

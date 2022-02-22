@@ -112,8 +112,28 @@ export default class TrackerView extends ItemView {
     get npcs() {
         return this.creatures.filter((c) => !c.player);
     }
-
+    party: string = this.plugin.data.defaultParty;
+    async switchParty(party: string) {
+        if (!this.plugin.data.parties.find((p) => p.name == party)) return;
+        this.party = party;
+        this.setAppState({ party: this.party });
+        this.creatures = this.creatures.filter((p) => !p.player);
+        for (const player of this.players) {
+            player.initiative = await this.getInitiativeValue(player.modifier);
+            this._addCreature(player);
+        }
+    }
     get players() {
+        if (this.party) {
+            let players = this.plugin.data.parties.find(
+                (p) => p.name == this.party
+            )?.players;
+            if (players) {
+                return Array.from(this.plugin.playerCreatures.values()).filter(
+                    (p) => players.includes(p.name)
+                );
+            }
+        }
         return Array.from(this.plugin.playerCreatures.values());
     }
 
@@ -490,6 +510,7 @@ export default class TrackerView extends ItemView {
         this._app = new App({
             target: this.contentEl,
             props: {
+                party: this.party,
                 creatures: this.ordered,
                 state: this.state,
                 xp: null,

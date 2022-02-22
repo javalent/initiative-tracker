@@ -24,6 +24,7 @@
     export let plugin: InitiativeTracker;
     export let view: TrackerView;
     export let round: number;
+    export let party: string = null;
 
     let map = plugin.data.leafletIntegration;
 
@@ -92,6 +93,9 @@
 </script>
 
 <div class="obsidian-initiative-tracker">
+    {#if party}
+        <h4 class="initiave-tracker-party">{party}</h4>
+    {/if}
     <Controls
         {state}
         {map}
@@ -245,7 +249,9 @@
                             editCreature.ac = creature.ac;
                             editCreature.initiative = creature.initiative;
                             editCreature.modifier = creature.modifier;
-                            view.updateCreature(editCreature, {name: creature.name});
+                            view.updateCreature(editCreature, {
+                                name: creature.name
+                            });
                         } else {
                             const number = Math.max(
                                 isNaN(creature.number) ? 1 : creature.number,
@@ -277,7 +283,8 @@
         margin: 0.5rem;
         min-width: 180px;
     }
-    .initiative-tracker-round-container {
+    .initiative-tracker-round-container,
+    .initiave-tracker-party {
         padding: 0 0.5rem;
     }
     .add-creature-container {

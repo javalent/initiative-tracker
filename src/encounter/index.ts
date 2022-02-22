@@ -17,6 +17,7 @@ type RawPlayers = boolean | "none" | string[];
 interface EncounterParameters {
     name?: string;
     players?: RawPlayers;
+    party?: string;
     hide?: "players" | "creatures" | string[];
     creatures?: RawCreatureArray;
     xp?: number;
@@ -45,6 +46,7 @@ export const equivalent = (
 export interface ParsedParams {
     name: string;
     players: string[];
+    party: string;
     hide: string[];
     creatures: Map<Creature, string | number>;
     xp: number;
@@ -55,6 +57,7 @@ export class EncounterParser {
     constructor(public plugin: InitiativeTracker) {}
     async parse(params: EncounterParameters): Promise<ParsedParams> {
         const name = params.name;
+        const party = params.party ?? this.plugin.data.defaultParty;
         const players: string[] = this.parsePlayers(params);
         const hide = this.parseHide(params);
         const rawMonsters = params.creatures ?? [];
@@ -69,6 +72,7 @@ export class EncounterParser {
         return {
             name,
             players,
+            party,
             hide,
             creatures,
             xp,
@@ -87,7 +91,19 @@ export class EncounterParser {
         return [];
     }
     parsePlayers(params: EncounterParameters) {
-        const players = params.players;
+        let partyName = params.party ?? this.plugin.data.defaultParty;
+        let players = params.players;
+        if (
+            partyName &&
+            this.plugin.data.parties.find(
+                (p) => p.name.toLowerCase() == partyName.toLowerCase()
+            )
+        ) {
+            const party = this.plugin.data.parties.find(
+                (p) => p.name.toLowerCase() == partyName.toLowerCase()
+            );
+            players = party.players;
+        }
         if (players == "none" || players == false) {
             return [];
         }
@@ -100,7 +116,7 @@ export class EncounterParser {
         if (Array.isArray(players)) {
             return (this.plugin.data.players ?? [])
                 .filter((p) =>
-                    players
+                    (players as string[])
                         .map((n) => n.toLowerCase())
                         .includes(p.name.toLowerCase())
                 )
@@ -207,6 +223,7 @@ class EncounterComponent {
             props: {
                 plugin: this.plugin,
                 name: this.params.name,
+                party: this.params.party,
                 players: this.params.players,
                 playerLevels: this.params.playerLevels,
                 creatures: this.params.creatures,
