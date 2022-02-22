@@ -258,9 +258,11 @@ If the encounter is active, this command can be used to make the next enabled co
 
 If the encounter is active, this command can be used to make the previous enabled combatant active (similar to clicking the `Previous` button).
 
-### Tracker Menu
+### The Tracker Menu
 
 The Initiative Tracker has a tracker menu located in the top right of the view. This can be used to do several things, such as creating a new encounter, resetting HP, or changing parties.
+
+![](https://raw.githubusercontent.com/valentine195/obsidian-initiative-tracker/master/assets/menu.gif)
 
 #### New Encounter
 
