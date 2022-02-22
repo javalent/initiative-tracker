@@ -57,19 +57,12 @@
     color: var(--text-normal);
 }
 
-.initiative-tracker-settings .initiative-sync {
-    border-top: 1px solid var(--background-modifier-border);
-    margin-top: 18px;
-    padding-top: 18px;
-}
-
-.initiative-tracker-settings .initiative-sync .initiative-synced {
+.initiative-tracker-settings .initiative-synced {
     border-top: 0px;
     margin: 0 2rem;
     padding-top: 0;
 }
 .initiative-tracker-settings
-    .initiative-sync
     .initiative-synced
     .setting-item-name {
     color: var(--interactive-success);

@@ -101,12 +101,11 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
     private async _displayIntegrations(containerEl: HTMLDivElement) {
         containerEl.empty();
         new Setting(containerEl).setHeading().setName("Plugin Integrations");
-        const syncEl = containerEl.createDiv("initiative-sync");
         if (!this.plugin.canUseStatBlocks) {
             this.plugin.data.sync = false;
             await this.plugin.saveSettings();
         }
-        new Setting(syncEl)
+        new Setting(containerEl)
             .setName("Sync Monsters from 5e Statblocks")
             .setDesc(
                 createFragment((e) => {
@@ -140,7 +139,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 });
             });
         if (this.plugin.data.sync) {
-            const synced = new Setting(syncEl).setDesc(
+            const synced = new Setting(containerEl).setDesc(
                 `${this.plugin.statblock_creatures.length} creatures synced.`
             );
             synced.settingEl.addClass("initiative-synced");
