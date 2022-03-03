@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.2.2](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.2.1...7.2.2) (2022-03-03)
+
+
+### Bug Fixes
+
+* Fixes issue where switching a party in the tracker wouldn't allow parties to be loaded from encounters ([9940382](https://github.com/valentine195/obsidian-initiative-tracker/commit/994038243738b162b7f951058cbce90a038a2956))
+
 ### [7.2.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.2.0...7.2.1) (2022-02-22)
 
 
