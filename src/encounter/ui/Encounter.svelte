@@ -73,6 +73,7 @@
             .flat();
 
         view?.newEncounter({
+            party,
             name,
             players,
             creatures,

@@ -231,7 +231,6 @@
                     }}
                     on:save={(evt) => {
                         const creature = evt.detail;
-                        console.log(creature.display);
                         const newCreature = new Creature(
                             {
                                 name: creature.name,

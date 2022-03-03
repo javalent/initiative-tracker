@@ -259,17 +259,22 @@ export default class TrackerView extends ItemView {
 
     async newEncounter({
         name,
+        party = this.party,
         players = true,
         creatures = [],
         roll = true,
         xp = null
     }: {
+        party?: string;
         name?: string;
         players?: boolean | string[];
         creatures?: Creature[];
         roll?: boolean;
         xp?: number;
     } = {}) {
+        if (party && party != this.party) {
+            this.party = party;
+        }
         if (players instanceof Array && players.length) {
             this.creatures = [
                 ...this.players.filter((p) => players.includes(p.name))
@@ -284,6 +289,7 @@ export default class TrackerView extends ItemView {
         this.name = name;
         this.round = 1;
         this.setAppState({
+            party: this.party,
             name: this.name,
             round: this.round,
             xp
