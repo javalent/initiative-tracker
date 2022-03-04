@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.3.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.2.2...7.3.0) (2022-03-04)
+
+
+### Features
+
+* Can now specify players and party separately (close [#31](https://github.com/valentine195/obsidian-initiative-tracker/issues/31)) ([113a78c](https://github.com/valentine195/obsidian-initiative-tracker/commit/113a78c124a448c6fc6f4f20a7f796fbe82ec569))
+* Player names in the tracker are now bolded and receive the `.player` class ([8ff9ab3](https://github.com/valentine195/obsidian-initiative-tracker/commit/8ff9ab34b083ef6374cc96876397c4f518a21e52))
+
 ### [7.2.2](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.2.1...7.2.2) (2022-03-03)
 
 
