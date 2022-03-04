@@ -39,7 +39,7 @@
 <td class="name-container">
     <div class="name-holder">
         {#if creature.player}
-            <span class="name">{creature.name}</span>
+            <strong class="name player">{creature.name}</strong>
         {:else}
             <span class="name">{name()}</span>
         {/if}
