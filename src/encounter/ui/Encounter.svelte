@@ -15,7 +15,7 @@
 
     export let name: string = "Encounter";
     export let creatures: Map<Creature, number | string>;
-    export let players: boolean | string[] = true;
+    export let players: string[];
     export let party: string = null;
     export let hide: string[] = [];
     export let xp: number;

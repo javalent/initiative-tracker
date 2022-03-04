@@ -145,6 +145,10 @@ export default class InitiativeTracker extends Plugin {
             return leaf.view;
     }
 
+    get defaultParty() {
+        return this.data.parties.find((p) => p.name == this.data.defaultParty);
+    }
+
     async onload() {
         registerIcons();
 

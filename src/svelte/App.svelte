@@ -14,7 +14,6 @@
     import Difficulty from "./Difficulty.svelte";
     import SaveEncounter from "./SaveEncounter.svelte";
     import LoadEncounter from "./LoadEncounter.svelte";
-    import { log } from "console";
 
     const dispatch = createEventDispatcher();
 
@@ -27,7 +26,7 @@
     export let round: number;
     export let party: string = null;
 
-    let map = plugin.data.leafletIntegration;
+    export let map = plugin.data.leafletIntegration;
 
     setContext("plugin", plugin);
     setContext("view", view);

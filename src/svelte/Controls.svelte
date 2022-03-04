@@ -95,7 +95,7 @@
                                 .onClick(() => {
                                     view.switchParty(party.name);
                                 })
-                                .setDisabled(view.party == party.name);
+                                .setDisabled(view.party?.name == party.name);
                         });
                     }
                     partyMenu.showAtMouseEvent(evt);

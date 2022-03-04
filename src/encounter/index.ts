@@ -91,8 +91,9 @@ export class EncounterParser {
         return [];
     }
     parsePlayers(params: EncounterParameters) {
-        let partyName = params.party ?? this.plugin.data.defaultParty;
-        let players = params.players;
+        const partyName = params.party ?? this.plugin.data.defaultParty;
+        const playersToReturn: string[] = [];
+        const players = params.players;
         if (
             partyName &&
             this.plugin.data.parties.find(
@@ -102,26 +103,29 @@ export class EncounterParser {
             const party = this.plugin.data.parties.find(
                 (p) => p.name.toLowerCase() == partyName.toLowerCase()
             );
-            players = party.players;
+            playersToReturn.push(...party.players);
         }
         if (players == "none" || players == false) {
-            return [];
+            playersToReturn.splice(0, playersToReturn.length);
+        } else if (players == true) {
+            playersToReturn.push(
+                ...this.plugin.data.players.map((p) => p.name)
+            );
+        } else if (!players && !params.party) {
+        } else if (typeof players == "string") {
+            playersToReturn.push(players);
+        } else if (Array.isArray(players)) {
+            playersToReturn.push(
+                ...(this.plugin.data.players ?? [])
+                    .map((p) => p.name)
+                    .filter((p) =>
+                        (players as string[])
+                            .map((n) => n.toLowerCase())
+                            .includes(p.toLowerCase())
+                    )
+            );
         }
-        if (!players || players == true) {
-            return [...this.plugin.data.players.map((p) => p.name)];
-        }
-        if (typeof players == "string") {
-            return [players];
-        }
-        if (Array.isArray(players)) {
-            return (this.plugin.data.players ?? [])
-                .filter((p) =>
-                    (players as string[])
-                        .map((n) => n.toLowerCase())
-                        .includes(p.name.toLowerCase())
-                )
-                .map((p) => p.name);
-        }
+        return Array.from(new Set(playersToReturn));
     }
     async parseRawCreatures(rawMonsters: RawCreatureArray) {
         const creatureMap: Map<Creature, number | string> = new Map();

@@ -22,6 +22,7 @@ import type {
     Condition,
     HomebrewCreature,
     InitiativeViewState,
+    Party,
     TrackerEvents,
     TrackerViewState
 } from "@types";
@@ -112,22 +113,21 @@ export default class TrackerView extends ItemView {
     get npcs() {
         return this.creatures.filter((c) => !c.player);
     }
-    party: string = this.plugin.data.defaultParty;
+    party: Party = this.plugin.defaultParty;
     async switchParty(party: string) {
         if (!this.plugin.data.parties.find((p) => p.name == party)) return;
-        this.party = party;
-        this.setAppState({ party: this.party });
+        this.party = this.plugin.data.parties.find((p) => p.name == party);
+        this.setAppState({ party: this.party.name });
         this.creatures = this.creatures.filter((p) => !p.player);
         for (const player of this.players) {
             player.initiative = await this.getInitiativeValue(player.modifier);
             this._addCreature(player);
         }
     }
+    playerNames: string[] = [];
     get players() {
         if (this.party) {
-            let players = this.plugin.data.parties.find(
-                (p) => p.name == this.party
-            )?.players;
+            let players = this.party.players;
             if (players) {
                 return Array.from(this.plugin.playerCreatures.values()).filter(
                     (p) => players.includes(p.name)
@@ -259,37 +259,38 @@ export default class TrackerView extends ItemView {
 
     async newEncounter({
         name,
-        party = this.party,
-        players = true,
+        party = this.party?.name,
+        players = [...this.plugin.data.players.map((p) => p.name)],
         creatures = [],
         roll = true,
         xp = null
     }: {
         party?: string;
         name?: string;
-        players?: boolean | string[];
+        players?: string[];
         creatures?: Creature[];
         roll?: boolean;
         xp?: number;
     } = {}) {
-        if (party && party != this.party) {
-            this.party = party;
+        this.creatures = [];
+        const playerNames: Set<string> = new Set(players ?? []);
+        if (party && party != this.party?.name) {
+            this.party = this.plugin.data.parties.find((p) => p.name == party);
+            for (const player of this.players) {
+                playerNames.add(player.name);
+            }
         }
-        if (players instanceof Array && players.length) {
-            this.creatures = [
-                ...this.players.filter((p) => players.includes(p.name))
-            ];
-        } else if (players === true) {
-            this.creatures = [...this.players];
-        } else {
-            this.creatures = [];
+        for (const player of playerNames) {
+            if (!this.plugin.playerCreatures.has(player)) continue;
+            this.creatures.push(this.plugin.playerCreatures.get(player));
         }
+
         if (creatures) this.setCreatures([...this.creatures, ...creatures]);
 
         this.name = name;
         this.round = 1;
         this.setAppState({
-            party: this.party,
+            party: this.party.name,
             name: this.name,
             round: this.round,
             xp
@@ -349,7 +350,7 @@ export default class TrackerView extends ItemView {
             creatures: this.ordered
         });
     }
-    get appState(): TrackerViewState {
+    get appState() {
         return {
             state: this.state,
             pcs: this.pcs,
@@ -508,7 +509,7 @@ export default class TrackerView extends ItemView {
         creature.enabled = false;
     }
 
-    setAppState(state: { [key: string]: any }) {
+    setAppState(state: Partial<App["$$prop_def"]>) {
         if (this._app && this._rendered) {
             this.plugin.app.workspace.trigger(
                 "initiative-tracker:state-change",
@@ -524,7 +525,7 @@ export default class TrackerView extends ItemView {
         this._app = new App({
             target: this.contentEl,
             props: {
-                party: this.party,
+                party: this.party.name,
                 creatures: this.ordered,
                 state: this.state,
                 xp: null,
