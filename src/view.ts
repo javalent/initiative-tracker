@@ -290,7 +290,7 @@ export default class TrackerView extends ItemView {
         this.name = name;
         this.round = 1;
         this.setAppState({
-            party: this.party.name,
+            party: this.party?.name,
             name: this.name,
             round: this.round,
             xp
@@ -525,7 +525,7 @@ export default class TrackerView extends ItemView {
         this._app = new App({
             target: this.contentEl,
             props: {
-                party: this.party.name,
+                party: this.party?.name,
                 creatures: this.ordered,
                 state: this.state,
                 xp: null,
