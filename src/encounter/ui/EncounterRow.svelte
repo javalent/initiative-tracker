@@ -143,31 +143,35 @@
 <tr class="encounter-row">
     <td>{name}</td>
     {#if headers.includes("creatures")}
-        <td class="encounter-creatures encounter-list">
-            {#if !hide.includes("creatures") && creatures.size}
-                {#each [...creatures] as [creature, count]}
-                    <li aria-label={label(creature)}>
-                        <strong
-                            use:rollerEl={creature}
-                        />&nbsp;{creature.name}{count == 1 ? "" : "s"}
-                    </li>
-                {/each}
-            {:else}
-                -
-            {/if}
+        <td>
+            <ul class="encounter-creatures encounter-list">
+                {#if !hide.includes("creatures") && creatures.size}
+                    {#each [...creatures] as [creature, count]}
+                        <li aria-label={label(creature)}>
+                            <strong
+                                use:rollerEl={creature}
+                            />&nbsp;{creature.name}{count == 1 ? "" : "s"}
+                        </li>
+                    {/each}
+                {:else}
+                    -
+                {/if}
+            </ul>
         </td>
     {/if}
     {#if headers.includes("players")}
-        <td class="encounter-players encounter-list">
-            {#if !hide.includes("players") && players instanceof Array && players.length}
-                {#each players as player}
-                    <li>
-                        {player}
-                    </li>
-                {/each}
-            {:else}
-                -
-            {/if}
+        <td>
+            <ul class="encounter-players encounter-list">
+                {#if !hide.includes("players") && players instanceof Array && players.length}
+                    {#each players as player}
+                        <li>
+                            {player}
+                        </li>
+                    {/each}
+                {:else}
+                    -
+                {/if}
+            </ul>
         </td>
     {/if}
     {#if plugin.data.displayDifficulty}
@@ -214,5 +218,8 @@
     }
     .icons > div:first-child :global(.clickable-icon) {
         margin-right: 0;
+    }
+    ul {
+        margin: 0;
     }
 </style>
