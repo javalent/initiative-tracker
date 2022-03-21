@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.3.3](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.3.2...7.3.3) (2022-03-21)
+
+
+### Bug Fixes
+
+* Encounter Tables now display as a list + have the `encounter-creatures`, `encounter-players` and `encounter-list` CSS classes ([706e7cc](https://github.com/valentine195/obsidian-initiative-tracker/commit/706e7ccbfac2b7eb5041fd5338dc51121b166c8e))
+
 ### [7.3.2](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.3.1...7.3.2) (2022-03-07)
 
 
