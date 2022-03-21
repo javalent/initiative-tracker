@@ -14,7 +14,7 @@
 
     export let name: string = "Encounter";
     export let creatures: Map<Creature, number | string>;
-    export let players: boolean | string[] = true;
+    export let players: string[];
 
     export let hide: string[] = [];
     export let xp: number;
@@ -143,15 +143,14 @@
 <tr class="encounter-row">
     <td>{name}</td>
     {#if headers.includes("creatures")}
-        <td>
+        <td class="encounter-creatures encounter-list">
             {#if !hide.includes("creatures") && creatures.size}
-                {#each [...creatures] as [creature, count], index}
-                    <span aria-label={label(creature)}>
-                        {joiner(index, creatures.size)}
+                {#each [...creatures] as [creature, count]}
+                    <li aria-label={label(creature)}>
                         <strong
                             use:rollerEl={creature}
                         />&nbsp;{creature.name}{count == 1 ? "" : "s"}
-                    </span>
+                    </li>
                 {/each}
             {:else}
                 -
@@ -159,10 +158,12 @@
         </td>
     {/if}
     {#if headers.includes("players")}
-        <td>
+        <td class="encounter-players encounter-list">
             {#if !hide.includes("players") && players instanceof Array && players.length}
-                {#each players as player, index}
-                    {joiner(index, players.length)}{player}
+                {#each players as player}
+                    <li>
+                        {player}
+                    </li>
                 {/each}
             {:else}
                 -
