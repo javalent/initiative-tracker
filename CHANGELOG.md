@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.4.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.3.4...7.4.0) (2022-03-22)
+
+
+### Features
+
+* Can now specify display name for creatures in encounter blocks ([b14acc4](https://github.com/valentine195/obsidian-initiative-tracker/commit/b14acc46cbd5c9677774848148b18f2f2f6fe2da))
+
 ### [7.3.4](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.3.3...7.3.4) (2022-03-21)
 
 
