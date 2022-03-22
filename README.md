@@ -201,7 +201,7 @@ creatures:
 ```
 ````
 
-Please note that any creature with a display name will be considered a different creature from the same base creature
+Please note that the plugin will still group equivalent creatures together, but it will take into account display name when grouping. 
 
 ##### Using Dice Rolls
 
