@@ -178,8 +178,8 @@ You can also create creatures using the any of the following syntaxes to give th
 ```encounter
 creatures:
   - [[Hobgoblin, Bob]]          # 1 Hobgoblin named Bob
-  -                             # 1 Hobgoblin named Jim with 12 HP, 13 AC, +2 to initiative that is worth 25 XP. 
-    - [Hobgoblin, Jim]          
+  -                             # 1 Hobgoblin named Jim with 12 HP, 13 AC, +2 to initiative that
+    - [Hobgoblin, Jim]          # is worth 25 XP
     - 12
     - 13
     - 2
