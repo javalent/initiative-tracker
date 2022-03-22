@@ -211,8 +211,8 @@ export class EncounterParser {
         } else if (Array.isArray(monster)) {
             if (typeof monster[0] == "string") {
                 //Hobgoblin, Jim
-                name = monster[0].split(/,\s?/)[0];
-                display = monster[0].split(/,\s?/)[1] ?? name;
+                name = monster[0];
+                display = monster[1];
             } else if (Array.isArray(monster[0])) {
                 //[Hobgoblin, Jim]
                 name = monster[0][0];
