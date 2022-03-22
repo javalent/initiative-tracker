@@ -172,7 +172,15 @@
                             >
                                 <strong use:rollerEl={creature} />
                                 <span>
-                                    &nbsp;{creature.name}{count == 1 ? "" : "s"}
+                                    {#if creature.display && creature.display != creature.name}
+                                        &nbsp;{creature.display}{count == 1
+                                            ? ""
+                                            : "s"} ({creature.name})
+                                    {:else}
+                                        &nbsp;{creature.name}{count == 1
+                                            ? ""
+                                            : "s"}
+                                    {/if}
                                 </span>
                                 {#if creature.xp && creatureMap.has(creature)}
                                     <span class="xp-parent">

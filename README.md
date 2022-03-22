@@ -155,7 +155,7 @@ Multiple of the same creature may be added using `X: [name, hp, ac, initiative m
 ```encounter
 creatures:
   - 3: Goblin, 7, 15, 2                 # 3 goblins with HP: 7, AC: 15, MOD: 2 will be added.
-  - 2: Goblin, 5, 15, 2, 25             # 3 goblins with HP: 7, AC: 15, MOD: 2 worth 25 XP will be added.
+  - 2: Goblin, 5, 15, 2, 25             # 2 goblins with HP: 7, AC: 15, MOD: 2 worth 25 XP will be added.
 ```
 ````
 
@@ -169,6 +169,39 @@ creatures:
   - Goblin, 9, 15, 2                    # 1 goblin with HP: 9, AC: 15, MOD: 2 will be added.
 ```
 ````
+
+##### Display Name
+
+You can also create creatures using the any of the following syntaxes to give them display names:
+
+````
+```encounter
+creatures:
+  - [[Hobgoblin, Bob]]          # 1 Hobgoblin named Bob
+  -                             # 1 Hobgoblin named Jim with 12 HP, 13 AC, +2 to initiative that is worth 25 XP. 
+    - [Hobgoblin, Jim]          
+    - 12
+    - 13
+    - 2
+    - 25
+  - 2:                          # 2 Hobgoblins named Jeff with 12 HP and 13 AC.
+    - [Hobgoblin, Jeff]
+    - 12
+    - 13
+  - 5:                          # 5 Hobgoblins named Ted with 12 HP and 13 AC.
+      creature: Hobgoblin
+      name: Ted
+      hp: 12
+      ac: 13
+  - 1d5:                        # 1d5 Hobgoblins named Sarah with 12 HP and 13 AC.
+      creature: Hobgoblin
+      name: Sarah
+      hp: 12
+      ac: 13
+```
+````
+
+Please note that any creature with a display name will be considered a different creature from the same base creature
 
 ##### Using Dice Rolls
 

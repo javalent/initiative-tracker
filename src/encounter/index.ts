@@ -28,6 +28,7 @@ interface CreatureStats {
     hp: number;
     modifier: number;
     xp: number;
+    display?: string;
 }
 
 export const equivalent = (
@@ -36,6 +37,7 @@ export const equivalent = (
 ) => {
     return (
         creature.name == existing.name &&
+        creature.display == existing.display &&
         creature.ac == existing.ac &&
         creature.hp == existing.hp &&
         creature.modifier == existing.modifier &&
@@ -137,6 +139,7 @@ export class EncounterParser {
 
                 const stats = {
                     name: creature.name,
+                    display: creature.display,
                     ac: creature.ac,
                     hp: creature.hp,
                     modifier: creature.modifier,
@@ -165,10 +168,11 @@ export class EncounterParser {
     }
     parseRawCreature(raw: RawCreature) {
         if (!raw) return {};
-        let monster: string,
+        let monster: string | string[] | Record<string, any>,
             number = 1;
+
         if (typeof raw == "string") {
-            const match = raw.match(/(\d+)?:?\s?(.+)/);
+            const match = raw.match(/(\d+)?:?\s?(.+)/) ?? [];
             number = isNaN(Number(match[1] ?? null))
                 ? number
                 : Number(match[1]);
@@ -191,18 +195,43 @@ export class EncounterParser {
         if (!isNaN(Number(number))) number = Number(number);
         if (!number || (typeof number == "number" && number < 1)) number = 1;
 
-        let name = monster.split(/,\s?/)[0];
-        let [hp, ac, mod, xp] = monster
-            .split(/,\s?/)
-            .slice(1)
-            .map((v) => (isNaN(Number(v)) ? null : Number(v)));
-        if (!name) return {};
+        let name: string,
+            display: string,
+            hp: number,
+            ac: number,
+            mod: number,
+            xp: number;
 
+        if (typeof monster == "string") {
+            name = monster.split(/,\s?/)[0];
+            [hp, ac, mod, xp] = monster
+                .split(/,\s?/)
+                .slice(1)
+                .map((v) => (isNaN(Number(v)) ? null : Number(v)));
+        } else if (Array.isArray(monster)) {
+            if (typeof monster[0] == "string") {
+                //Hobgoblin, Jim
+                name = monster[0].split(/,\s?/)[0];
+                display = monster[0].split(/,\s?/)[1] ?? name;
+            } else if (Array.isArray(monster[0])) {
+                //[Hobgoblin, Jim]
+                name = monster[0][0];
+                display = monster[0][1];
+            }
+            [hp, ac, mod, xp] = monster
+                .slice(1)
+                .map((v) => (isNaN(Number(v)) ? null : Number(v)));
+        } else if (typeof monster == "object") {
+            ({ creature: name, name: display, hp, ac, mod, xp } = monster);
+        }
+
+        if (!name || typeof name != "string") return {};
         let existing = this.plugin.bestiary.find((c) => c.name == name);
         let creature = existing
             ? Creature.from(existing)
             : new Creature({ name });
 
+        creature.display = display ?? creature.name;
         creature.hp = hp ?? creature.hp;
         creature.ac = ac ?? creature.ac;
         creature.modifier = mod ?? creature.modifier;
