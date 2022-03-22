@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.4.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.4.0...7.4.1) (2022-03-22)
+
+
+### Bug Fixes
+
+* Fixes parsing of display names defined in inline arrays. ([a2ef280](https://github.com/valentine195/obsidian-initiative-tracker/commit/a2ef280db7e37c6832f6dcca784632707a8be962))
+
 ## [7.4.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.3.4...7.4.0) (2022-03-22)
 
 
