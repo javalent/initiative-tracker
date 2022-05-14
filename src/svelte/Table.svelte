@@ -152,6 +152,7 @@
                         class:active={state && creature.active}
                         class:viewing={creature.viewing}
                         animate:flip={{ duration: flipDurationMs }}
+                        data-hp={creature.hp}
                         on:click={() => openView(creature)}
                         on:contextmenu={(evt) => hamburgerIcon(evt, creature)}
                     >
