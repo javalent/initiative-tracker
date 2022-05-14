@@ -153,6 +153,8 @@
                         class:viewing={creature.viewing}
                         animate:flip={{ duration: flipDurationMs }}
                         data-hp={creature.hp}
+                        data-hp-max={creature.max}
+                        data-hp-percent={Math.round((((creature.hp ?? 0) / creature.max) * 100) ?? 0)}
                         on:click={() => openView(creature)}
                         on:contextmenu={(evt) => hamburgerIcon(evt, creature)}
                     >
