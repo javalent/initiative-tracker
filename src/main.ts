@@ -57,9 +57,9 @@ export default class InitiativeTracker extends Plugin {
             .getPlugin("obsidian-dice-roller")
             .parseDice(text, "initiative-tracker");
     }
-    getRoller(str: string) {
+    async getRoller(str: string) {
         if (!this.canUseDiceRoller) return;
-        const roller = this.app.plugins
+        const roller = await this.app.plugins
             .getPlugin("obsidian-dice-roller")
             .getRoller(str, "statblock", true);
         return roller;
