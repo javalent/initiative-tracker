@@ -57,15 +57,22 @@ export default class InitiativeTracker extends Plugin {
             .getPlugin("obsidian-dice-roller")
             .parseDice(text, "initiative-tracker");
     }
-    async getRoller(str: string) {
+    getRoller(str: string) {
         if (!this.canUseDiceRoller) return;
-        const roller = await this.app.plugins
+        const roller = this.app.plugins
             .getPlugin("obsidian-dice-roller")
-            .getRoller(str, "statblock", true);
+            .getRollerSync(str, "statblock", true);
         return roller;
     }
     get canUseDiceRoller() {
-        return this.app.plugins.getPlugin("obsidian-dice-roller") != null;
+        if (this.app.plugins.getPlugin("obsidian-dice-roller") != null) {
+            if (! this.app.plugins.getPlugin("obsidian-dice-roller").getRollerSync) {
+                new Notice("Please update Dice Roller to the latest version to use with Initiative Tracker.");
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 
     async getInitiativeValue(modifier: number = 0): Promise<number> {
