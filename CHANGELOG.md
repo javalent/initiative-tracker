@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.4.4](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.4.3...7.4.4) (2022-06-09)
+
+
+### Bug Fixes
+
+* New encounters no longer add all players if a party is active (close [#41](https://github.com/valentine195/obsidian-initiative-tracker/issues/41)) ([f493ecf](https://github.com/valentine195/obsidian-initiative-tracker/commit/f493ecf3c92c0374a9a31276789fb036c6d4987a))
+
 ### [7.4.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.4.0...7.4.1) (2022-03-22)
 
 
