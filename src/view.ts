@@ -117,6 +117,7 @@ export default class TrackerView extends ItemView {
     async switchParty(party: string) {
         if (!this.plugin.data.parties.find((p) => p.name == party)) return;
         this.party = this.plugin.data.parties.find((p) => p.name == party);
+        console.log("🚀 ~ file: view.ts ~ line 120 ~ this.party", this.party);
         this.setAppState({ party: this.party.name });
         this.creatures = this.creatures.filter((p) => !p.player);
         for (const player of this.players) {
@@ -257,24 +258,32 @@ export default class TrackerView extends ItemView {
         }
     }
 
-    async newEncounter({
-        name,
-        party = this.party?.name,
-        players = [...this.plugin.data.players.map((p) => p.name)],
-        creatures = [],
-        roll = true,
-        xp = null
-    }: {
-        party?: string;
-        name?: string;
-        players?: string[];
-        creatures?: Creature[];
-        roll?: boolean;
-        xp?: number;
-    } = {}) {
+    async newEncounter(
+        {
+            name,
+            party,
+            players,
+            creatures,
+            roll,
+            xp
+        }: {
+            party?: string;
+            name?: string;
+            players?: string[];
+            creatures?: Creature[];
+            roll?: boolean;
+            xp?: number;
+        } = {
+            party: this.party?.name,
+            players: [...this.plugin.data.players.map((p) => p.name)],
+            creatures: [],
+            roll: true
+        }
+    ) {
         this.creatures = [];
         const playerNames: Set<string> = new Set(players ?? []);
-        if (party && party != this.party?.name) {
+        if (party) {
+            playerNames.clear();
             this.party = this.plugin.data.parties.find((p) => p.name == party);
             for (const player of this.players) {
                 playerNames.add(player.name);
