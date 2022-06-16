@@ -22,7 +22,8 @@
 
     export let playerLevels: number[];
 
-    const creatureMap: Map<Creature, number> = new Map();
+    let totalXP: number;
+    let creatureMap: Map<Creature, number> = new Map();
     const rollerMap: Map<Creature, StackRoller> = new Map();
 
     for (let [creature, count] of creatures) {
@@ -31,6 +32,7 @@
             let roller = plugin.getRoller(`${count}`) as StackRoller;
             roller.on("new-result", () => {
                 creatureMap.set(creature, roller.result);
+                creatureMap = creatureMap;
                 totalXP = [...creatureMap].reduce(
                     (a, c) => a + c[0].xp * c[1],
                     0
@@ -43,7 +45,7 @@
         }
     }
 
-    let totalXP = [...creatureMap].reduce((a, c) => a + c[0].xp * c[1], 0);
+    totalXP = [...creatureMap].reduce((a, c) => a + c[0].xp * c[1], 0);
     let difficulty: DifficultyReport;
     $: {
         if (!isNaN(totalXP)) {
