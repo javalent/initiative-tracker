@@ -394,10 +394,15 @@ export default class TrackerView extends ItemView {
         const previous = [...this.ordered].slice(0, active).reverse();
         const after = [...this.ordered].slice(active + 1).reverse();
         const creature = [...previous, ...after].find((c) => c.enabled);
-        if (this.ordered[active]) this.ordered[active].active = false;
         if (!creature) return;
-        if (active < this.ordered.indexOf(creature))
-            this.round = Math.max(1, this.round - 1);
+        if (active < this.ordered.indexOf(creature)) {
+            if (this.round == 1) {
+                return;
+            }
+            this.round = this.round - 1;
+            
+        }
+        if (this.ordered[active]) this.ordered[active].active = false;
         creature.active = true;
         this.trigger("initiative-tracker:active-change", creature);
         this.setAppState({
@@ -466,7 +471,16 @@ export default class TrackerView extends ItemView {
             creature.number = 0;
         }
         if (hp) {
+            if (this.plugin.data.clamp && creature.hp + Number(hp) < 0) {
+                hp = -creature.hp;
+            }
             creature.hp += Number(hp);
+            if (this.plugin.data.autoStatus && creature.hp <= 0) {
+                this.addStatus(
+                    creature,
+                    this.plugin.data.statuses.find((s) => s.name == "Unconscious")
+                );
+            }
         }
         if (max) {
             if (creature.hp == creature.max) {
