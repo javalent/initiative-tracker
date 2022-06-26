@@ -95,6 +95,8 @@ export interface InitiativeTrackerData {
     state: InitiativeViewState;
     encounters: { [key: string]: InitiativeViewState };
     condense: boolean;
+    clamp: boolean;
+    autoStatus: boolean;
     warnedAboutImports: boolean;
 }
 

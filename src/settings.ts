@@ -134,6 +134,28 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 });
             });
+            new Setting(containerEl)
+            .setName("Clamp Minimum HP")
+            .setDesc(
+                "When a creature takes damage that would reduce its HP below 0, its HP is set to 0 instead."
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.clamp).onChange(async (v) => {
+                    this.plugin.data.clamp = v;
+                    await this.plugin.saveSettings();
+                });
+            });
+            new Setting(containerEl)
+            .setName("Automatic Unconscious Status Application")
+            .setDesc(
+                "When a creature takes damage that would reduce its HP below 0, it gains the \"Unconscious\" status effect."
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.autoStatus).onChange(async (v) => {
+                    this.plugin.data.autoStatus = v;
+                    await this.plugin.saveSettings();
+                });
+            });
 
         /*         new Setting(containerEl)
             .setName("Monster Property used for Modifier")

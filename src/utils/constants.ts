@@ -29,6 +29,8 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
         round: null
     },
     condense: false,
+    clamp: false,
+    autoStatus: false,
     displayDifficulty: true,
     encounters: {},
     warnedAboutImports: false,

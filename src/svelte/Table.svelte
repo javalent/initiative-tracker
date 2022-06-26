@@ -205,6 +205,9 @@
     .initiative-tracker-creature.active {
         background-color: rgba(0, 0, 0, 0.1);
     }
+    :global(.theme-dark) .initiative-tracker-creature.active {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
     .initiative-tracker-creature.disabled :global(*) {
         color: var(--text-faint);
     }
