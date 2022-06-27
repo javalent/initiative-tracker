@@ -41,8 +41,11 @@
     }
 
     export let updatingHP: Creature = null;
-    const updateHP = (toAdd: number) => {
-        view.updateCreature(updatingHP, { hp: -1 * toAdd });
+    const updateHP = (toAdd: string) => {
+        if (toAdd[0] == 't')
+            view.updateCreature(updatingHP, { temp: Number(toAdd.slice(1)) })
+        else
+            view.updateCreature(updatingHP, { hp: -1 * Number(toAdd) });
         updatingHP = null;
     };
 
@@ -140,12 +143,13 @@
     <!-- This is disgusting. TODO: Fix it! -->
     {#if updatingHP}
         <div class="updating-hp">
-            <span>Apply damage(+) or healing(-):</span>
+            <span>Apply damage, healing(-) or temp HP(t):</span>
             <!-- svelte-ignore a11y-autofocus -->
             <input
-                type="number"
+                type="text"
+
                 on:blur={function (evt) {
-                    updateHP(Number(this.value));
+                    updateHP(this.value);
                 }}
                 on:keydown={function (evt) {
                     if (evt.key === "Enter" || evt.key === "Tab") {
@@ -159,8 +163,8 @@
                         return;
                     }
                     if (
-                        !/^(-?\d*\.?\d*|Backspace|Delete|Arrow\w+)$/.test(
-                            evt.key
+                        !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
+                            this.value + evt.key
                         )
                     ) {
                         evt.preventDefault();

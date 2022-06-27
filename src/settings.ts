@@ -37,12 +37,23 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             this._displayBase(containerEl.createDiv());
             if (!this.plugin.data.openState) {
                 this.plugin.data.openState = {
+                    battle: true,
                     player: true,
                     party: true,
                     plugin: true,
                     status: true
                 };
             }
+            this._displayBattle(
+                containerEl.createEl("details", {
+                    cls: "initiative-tracker-additional-container",
+                    attr: {
+                        ...(this.plugin.data.openState.player
+                            ? { open: true }
+                            : {})
+                    }
+                })
+            );
             this._displayPlayers(
                 containerEl.createEl("details", {
                     cls: "initiative-tracker-additional-container",
@@ -134,29 +145,6 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 });
             });
-            new Setting(containerEl)
-            .setName("Clamp Minimum HP")
-            .setDesc(
-                "When a creature takes damage that would reduce its HP below 0, its HP is set to 0 instead."
-            )
-            .addToggle((t) => {
-                t.setValue(this.plugin.data.clamp).onChange(async (v) => {
-                    this.plugin.data.clamp = v;
-                    await this.plugin.saveSettings();
-                });
-            });
-            new Setting(containerEl)
-            .setName("Automatic Unconscious Status Application")
-            .setDesc(
-                "When a creature takes damage that would reduce its HP below 0, it gains the \"Unconscious\" status effect."
-            )
-            .addToggle((t) => {
-                t.setValue(this.plugin.data.autoStatus).onChange(async (v) => {
-                    this.plugin.data.autoStatus = v;
-                    await this.plugin.saveSettings();
-                });
-            });
-
         /*         new Setting(containerEl)
             .setName("Monster Property used for Modifier")
             .setDesc(
@@ -172,6 +160,63 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 };
             }); */
+    }
+    private _displayBattle(additionalContainer: HTMLDetailsElement) {
+        additionalContainer.empty();
+        additionalContainer.ontoggle = () => {
+            this.plugin.data.openState.battle = additionalContainer.open;
+        };
+        const summary = additionalContainer.createEl("summary");
+        new Setting(summary).setHeading().setName("Battle");
+        summary.createDiv("collapser").createDiv("handle");
+        new Setting(additionalContainer)
+        .setName("Clamp Minimum HP")
+        .setDesc(
+            "When a creature takes damage that would reduce its HP below 0, its HP is set to 0 instead."
+        )
+        .addToggle((t) => {
+            t.setValue(this.plugin.data.clamp).onChange(async (v) => {
+                this.plugin.data.clamp = v;
+                await this.plugin.saveSettings();
+            });
+        });
+        new Setting(additionalContainer)
+        .setName("Overflow Healing")
+        .setDesc(
+            "Set what happens to healing which goes above creatures' max HP threshold."
+        )
+        .addDropdown((d) => {
+            d.addOption("ignore", "Ignore");
+            d.addOption("temp", "Add to temp HP");
+            d.addOption("current", "Add to current HP");
+            d.setValue(this.plugin.data.hpOverflow ?? "ignore");
+            d.onChange(async (v) => {
+                this.plugin.data.hpOverflow = v;
+                this.plugin.saveSettings();
+            });
+        });
+        new Setting(additionalContainer)
+        .setName("Automatic Unconscious Status Application")
+        .setDesc(
+            "When a creature takes damage that would reduce its HP below 0, it gains the \"Unconscious\" status effect."
+        )
+        .addToggle((t) => {
+            t.setValue(this.plugin.data.autoStatus).onChange(async (v) => {
+                this.plugin.data.autoStatus = v;
+                await this.plugin.saveSettings();
+            });
+        });
+        new Setting(additionalContainer)
+        .setName("Additive Temporary HP")
+        .setDesc(
+            "Any temporary HP added to a creature will be added on top of existing temporary HP."
+        )
+        .addToggle((t) => {
+            t.setValue(this.plugin.data.additiveTemp).onChange(async (v) => {
+                this.plugin.data.additiveTemp = v;
+                await this.plugin.saveSettings();
+            });
+        });
     }
     private _displayPlayers(additionalContainer: HTMLDetailsElement) {
         additionalContainer.empty();
