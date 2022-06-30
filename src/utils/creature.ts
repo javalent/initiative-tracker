@@ -4,7 +4,6 @@ import type {
     HomebrewCreature,
     SRDMonster
 } from "@types";
-import { stat } from "fs";
 import type InitiativeTracker from "src/main";
 import { Conditions, XP_PER_CR } from ".";
 import { DEFAULT_UNDEFINED } from "./constants";
@@ -68,7 +67,7 @@ export class Creature {
     }
     get hpDisplay() {
         if (this.max) {
-            const tempMods = this.temp > 0 ? `title="Temp HP: ${this.temp}" style="font-weight:bold"`:''
+            const tempMods = this.temp > 0 ? `aria-label="Temp HP: ${this.temp}" style="font-weight:bold"`:''
             return `
                 <span ${tempMods}>${this.hp + this.temp}</span><span>/${this.max}</span>
             `

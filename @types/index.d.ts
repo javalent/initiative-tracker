@@ -94,7 +94,7 @@ export interface InitiativeTrackerData {
     playerMarker: string;
     monsterMarker: string;
     state: InitiativeViewState;
-    encounters: string;
+    encounters: { [key: string]: InitiativeViewState };
     condense: boolean;
     clamp: boolean;
     hpOverflow: string;
