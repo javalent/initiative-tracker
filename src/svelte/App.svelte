@@ -17,6 +17,8 @@
 
     const dispatch = createEventDispatcher();
 
+    let multiSelect = false;
+
     export let creatures: Creature[] = [];
     export let name: string = null;
     export let state: boolean;
@@ -40,10 +42,19 @@
         }
     }
 
-    export let updatingHP: Creature = null;
-    const updateHP = (toAdd: number) => {
-        view.updateCreature(updatingHP, { hp: -1 * toAdd });
-        updatingHP = null;
+    let updatingHP: Creature[] = [];
+    let halfMod: number[] = [];
+    const updateHP = (toAddString: string) => {
+        const roundHalf = !toAddString.includes(".");
+
+        updatingHP.forEach((creature, index) => {
+            let toAdd = -1 * Number(toAddString) * halfMod[index];
+            toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
+            view.updateCreature(creature, { hp: toAdd });
+        })
+
+        updatingHP.length = 0;
+        halfMod.length = 0;
     };
 
     export let updatingStatus: Creature = null;
@@ -123,9 +134,27 @@
     {/if}
     <Table
         {creatures}
+        {updatingHP}
         {state}
         on:hp={(evt) => {
-            updatingHP = evt.detail;
+            multiSelect = evt.detail.ctrl;
+            let index = updatingHP.findIndex(creature => creature == evt.detail.creature)
+            if (index == -1) {
+                if (!multiSelect) {
+                    updatingHP.length = 0;
+                    halfMod.length = 0;
+                }
+                updatingHP.push(evt.detail.creature);
+                halfMod.push(evt.detail.shift ? 0.5 : 1);
+            }
+            else if (index >= 0 && multiSelect) {
+                updatingHP.splice(index, 1);
+                halfMod.splice(index, 1);
+            }
+            else if (!multiSelect) {
+                updatingHP.length = 0;
+                halfMod.length = 0;
+            }
         }}
         on:tag={(evt) => {
             updatingStatus = evt.detail;
@@ -138,24 +167,20 @@
         <Difficulty {creatures} />
     {/if}
     <!-- This is disgusting. TODO: Fix it! -->
-    {#if updatingHP}
+    {#if updatingHP.length}
         <div class="updating-hp">
             <span>Apply damage(+) or healing(-):</span>
             <!-- svelte-ignore a11y-autofocus -->
             <input
                 type="number"
-                on:blur={function (evt) {
-                    updateHP(Number(this.value));
-                }}
                 on:keydown={function (evt) {
                     if (evt.key === "Enter" || evt.key === "Tab") {
                         evt.preventDefault();
-                        this.blur();
+                        updateHP(this.value);
                         return;
                     }
                     if (evt.key === "Escape") {
                         this.value = "";
-                        this.blur();
                         return;
                     }
                     if (
