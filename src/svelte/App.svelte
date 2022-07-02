@@ -51,33 +51,27 @@
 
     let damage: string = "";
     let status: Condition = null;
-    let updatingList: Creature[] = [];
-    let saved: boolean[] = [];
-    let resist: boolean[] = [];
-    let customMod: string[] = [];
+    let updatingCreatures: {[key: string]: any}[] = [];
     const updateCreatures = (toAddString: string, tag: Condition) => {
         const roundHalf = !toAddString.includes(".");
 
-        updatingList.forEach((creature, index) => {
+        updatingCreatures.forEach(entry => {
             const modifier = (
-                (saved[index] ? 0.5 : 1) * 
-                (resist[index] ? 0.5 : 1) *
-                Number(customMod[index])
+                (entry.saved ? 0.5 : 1) * 
+                (entry.resist ? 0.5 : 1) *
+                Number(entry.customMod)
             );
             let toAdd = Number(toAddString);
             toAdd = -1 * Math.sign(toAdd) * Math.max(Math.abs(toAdd) * modifier, 1);
             toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
-            view.updateCreature(creature, { hp: toAdd });
-            tag && !saved[index] && view.addStatus(updatingList[index], tag);
+            view.updateCreature(entry.creature, { hp: toAdd });
+            tag && !entry.saved && view.addStatus(entry.creature, tag);
         });
         closeUpdateCreatures();
     };
 
     const closeUpdateCreatures = () => {
-        updatingList.length = 0;
-        saved.length = 0;
-        resist.length = 0;
-        customMod.length = 0;
+        updatingCreatures.length = 0;
         damage = "";
         status = null;
     }
@@ -157,35 +151,25 @@
         {state}
         on:hp={(evt) => {
             multiSelect = evt.detail.ctrl;
-            let index = updatingList.findIndex(creature => creature == evt.detail.creature)
+            let index = updatingCreatures.findIndex(creature => creature == evt.detail.creature);
             if (index == -1) {
                 if (!multiSelect) {
-                    updatingList.length = 0;
-                    saved.length = 0;
-                    resist.length = 0;
-                    customMod.length = 0;
+                    updatingCreatures.length = 0;
                 }
-                updatingList = [...updatingList, evt.detail.creature];
-                saved = [...saved, evt.detail.shift];
-                resist = [...resist, evt.detail.alt];
-                customMod = [...customMod, "1"];
+                updatingCreatures = [...updatingCreatures,  {
+                    creature:   evt.detail.creature,
+                    saved:      evt.detail.shift,
+                    resist:     evt.detail.alt,
+                    customMod:  "1",
+                }];
             }
-            else if (index >= 0 && multiSelect) {
-                updatingList.splice(index, 1);
-                saved.splice(index, 1);
-                resist.splice(index, 1);
-                customMod.splice(index, 1)
+            else if (index && multiSelect) {
+                updatingCreatures.splice(index, 0);
             }
             else if (!multiSelect) {
-                updatingList.length = 0;
-                saved.length = 0;
-                resist.length = 0;
-                customMod.length = 0;
+                updatingCreatures.length = 0;
             }
-            updatingList = updatingList;
-            saved = saved;
-            resist = resist;
-            customMod = customMod;
+            updatingCreatures = updatingCreatures;
         }}
         on:edit={(evt) => {
             editCreature = evt.detail;
@@ -195,7 +179,7 @@
         <Difficulty {creatures} />
     {/if}
     <!-- This is disgusting. TODO: Fix it! -->
-    {#if updatingList.length}
+    {#if updatingCreatures.length}
         <div class="updating-hp" style="margin: 0.5rem">
             <!-- svelte-ignore a11y-autofocus -->
             <tag
@@ -261,26 +245,26 @@
                     <th style="width:15%" class="center">Modifier</th>
                 </thead>
                 <tbody>
-                    {#each updatingList as { name }, i}
+                    {#each updatingCreatures as { creature, saved, resist, customMod}, i}
                         <tr class="updating-creature-table-row">
                             <td>
-                                <span>{name}</span>
+                                <span>{creature.name}</span>
                             </td>
                             <td class="center">
                                 <input 
                                     type="checkbox"
-                                    checked={saved[i]} 
+                                    checked={saved} 
                                     on:click={function (evt) {
-                                        saved[i] = !saved[i];
+                                        saved = !saved;
                                     }} 
                                 />
                             </td>
                             <td class="center">
                                 <input 
                                     type="checkbox" 
-                                    checked={resist[i]} 
+                                    checked={resist} 
                                     on:click={function (evt) {
-                                        resist[i] = !resist[i];
+                                        resist = !resist;
                                     }} 
                                 />
                             </td>
@@ -289,11 +273,10 @@
                                     type="number" 
                                     class="center"
                                     style="width:90%; padding:0"
-                                    bind:value={customMod[i]}
+                                    bind:value={updatingCreatures[i].customMod}
                                     on:keydown={function (evt) {
                                         if (evt.key === "Escape") {
-                                            console.log(this.value);
-                                            this.value = "";
+                                            this.value = "1";
                                             return;
                                         }
                                         if (evt.key === "Enter") {
