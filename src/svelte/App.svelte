@@ -63,19 +63,24 @@
                 (saved[index] ? 0.5 : 1) * 
                 (resist[index] ? 0.5 : 1) *
                 Number(customMod[index])
-            )
-            let toAdd = Number(toAddString)
+            );
+            let toAdd = Number(toAddString);
             toAdd = -1 * Math.sign(toAdd) * Math.max(Math.abs(toAdd) * modifier, 1);
             toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
             view.updateCreature(creature, { hp: toAdd });
             tag && !saved[index] && view.addStatus(updatingList[index], tag);
-        })
+        });
+        closeUpdateCreatures();
+    };
 
+    const closeUpdateCreatures = () => {
         updatingList.length = 0;
         saved.length = 0;
         resist.length = 0;
         customMod.length = 0;
-    };
+        damage = "";
+        status = null;
+    }
 
     let addNew = false;
     export let addNewAsync = false;
@@ -208,7 +213,7 @@
                         return;
                     }
                     if (evt.key === "Escape") {
-                        this.value = "";
+                        closeUpdateCreatures();
                         return;
                     }
                     if (
@@ -235,7 +240,7 @@
                 }}
                 on:keydown={function (evt) {
                     if (evt.key === "Escape") {
-                        this.value = "";
+                        closeUpdateCreatures();
                         return;
                     }
                     if (evt.key === "Enter") {
