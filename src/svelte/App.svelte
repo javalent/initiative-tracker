@@ -4,7 +4,7 @@
     import Create from "./Create.svelte";
     import type TrackerView from "src/view";
     import { Creature } from "src/utils/creature";
-    import { ExtraButtonComponent, setIcon, SliderComponent, ValueComponent } from "obsidian";
+    import { ExtraButtonComponent, setIcon } from "obsidian";
     import { ADD, COPY, HP, TAG } from "src/utils";
     import { ConditionSuggestionModal } from "src/utils/suggester";
     import type { Condition } from "@types";
@@ -14,8 +14,6 @@
     import Difficulty from "./Difficulty.svelte";
     import SaveEncounter from "./SaveEncounter.svelte";
     import LoadEncounter from "./LoadEncounter.svelte";
-import { log } from "console";
-import { attr } from "svelte/internal";
 
     const dispatch = createEventDispatcher();
 
@@ -66,7 +64,8 @@ import { attr } from "svelte/internal";
                 (resist[index] ? 0.5 : 1) *
                 Number(customMod[index])
             )
-            let toAdd = -1 * Number(toAddString) * modifier;
+            let toAdd = Number(toAddString)
+            toAdd = -1 * Math.sign(toAdd) * Math.max(Math.abs(toAdd) * modifier, 1);
             toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
             view.updateCreature(creature, { hp: toAdd });
             tag && !saved[index] && view.addStatus(updatingList[index], tag);
