@@ -10,7 +10,6 @@
     import { createEventDispatcher, getContext } from "svelte";
     import type TrackerView from "src/view";
 
-    export let updatingHP: Creature[] = [];
     export let creatures: Creature[] = [];
     export let state: boolean;
 
@@ -68,13 +67,6 @@
                 .setTitle("Edit")
                 .onClick(() => {
                     dispatch("edit", creature);
-                });
-        });
-        menu.addItem((item) => {
-            item.setIcon(TAG)
-                .setTitle("Add Status")
-                .onClick(() => {
-                    dispatch("tag", creature);
                 });
         });
         if (creature.enabled) {
@@ -159,7 +151,7 @@
                         on:click={() => openView(creature)}
                         on:contextmenu={(evt) => hamburgerIcon(evt, creature)}
                     >
-                        <CreatureTemplate {creature} {updatingHP} on:hp on:tag on:edit />
+                        <CreatureTemplate {creature} on:hp on:tag on:edit />
                     </tr>
                 {/each}
             </tbody>

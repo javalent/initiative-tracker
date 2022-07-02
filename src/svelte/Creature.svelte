@@ -9,7 +9,6 @@
     import Status from "./Status.svelte";
 
     export let creature: Creature;
-    export let updatingHP: Creature[] = [];
     $: statuses = creature.status;
 
     const dispatch = createEventDispatcher();
@@ -60,11 +59,7 @@
     </div>
 </td>
 
-<td class={`center hp-container ${updatingHP.find(
-        (entry) => (
-            entry.name == creature.name
-            )
-        ) ? "updating-this-hp" : ""}`}>
+<td class="center hp-container">
     <span
         class="editable"
         on:click={(e) => {
@@ -73,7 +68,8 @@
                 {
                     creature: creature, 
                     ctrl: e.getModifierState('Control'), 
-                    shift: e.getModifierState('Shift')
+                    shift: e.getModifierState('Shift'),
+                    alt: e.getModifierState('Alt')
                 }
             );
             e.stopPropagation();
@@ -128,12 +124,5 @@
     .controls-container {
         border-top-right-radius: 0.25rem;
         border-bottom-right-radius: 0.25rem;
-    }
-
-    .updating-this-hp {
-        background-color: rgba(0, 0, 0, 0.1);
-    }
-    :global(.theme-dark) .updating-this-hp {
-        background-color: rgba(255, 255, 255, 0.1);
     }
 </style>

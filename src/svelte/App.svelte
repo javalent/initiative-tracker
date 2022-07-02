@@ -4,8 +4,8 @@
     import Create from "./Create.svelte";
     import type TrackerView from "src/view";
     import { Creature } from "src/utils/creature";
-    import { ExtraButtonComponent } from "obsidian";
-    import { ADD, COPY } from "src/utils";
+    import { ExtraButtonComponent, setIcon, SliderComponent, ValueComponent } from "obsidian";
+    import { ADD, COPY, HP, TAG } from "src/utils";
     import { ConditionSuggestionModal } from "src/utils/suggester";
     import type { Condition } from "@types";
     import { createEventDispatcher } from "svelte";
@@ -14,6 +14,8 @@
     import Difficulty from "./Difficulty.svelte";
     import SaveEncounter from "./SaveEncounter.svelte";
     import LoadEncounter from "./LoadEncounter.svelte";
+import { log } from "console";
+import { attr } from "svelte/internal";
 
     const dispatch = createEventDispatcher();
 
@@ -42,25 +44,38 @@
         }
     }
 
-    let updatingHP: Creature[] = [];
-    let halfMod: number[] = [];
-    const updateHP = (toAddString: string) => {
-        const roundHalf = !toAddString.includes(".");
-
-        updatingHP.forEach((creature, index) => {
-            let toAdd = -1 * Number(toAddString) * halfMod[index];
-            toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
-            view.updateCreature(creature, { hp: toAdd });
-        })
-
-        updatingHP.length = 0;
-        halfMod.length = 0;
+    const hpIcon = (node: HTMLElement) => {
+        setIcon(node, HP);
+    };
+    const tagIcon = (node: HTMLElement) => {
+        setIcon(node, TAG);
     };
 
-    export let updatingStatus: Creature = null;
-    const addStatus = (tag: Condition) => {
-        view.addStatus(updatingStatus, tag);
-        updatingStatus = null;
+    let damage: string = "";
+    let status: Condition = null;
+    let updatingList: Creature[] = [];
+    let saved: boolean[] = [];
+    let resist: boolean[] = [];
+    let customMod: string[] = [];
+    const updateCreatures = (toAddString: string, tag: Condition) => {
+        const roundHalf = !toAddString.includes(".");
+
+        updatingList.forEach((creature, index) => {
+            const modifier = (
+                (saved[index] ? 0.5 : 1) * 
+                (resist[index] ? 0.5 : 1) *
+                Number(customMod[index])
+            )
+            let toAdd = -1 * Number(toAddString) * modifier;
+            toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
+            view.updateCreature(creature, { hp: toAdd });
+            tag && !saved[index] && view.addStatus(updatingList[index], tag);
+        })
+
+        updatingList.length = 0;
+        saved.length = 0;
+        resist.length = 0;
+        customMod.length = 0;
     };
 
     let addNew = false;
@@ -91,7 +106,8 @@
     const suggestConditions = (node: HTMLInputElement) => {
         modal = new ConditionSuggestionModal(view.plugin, node);
         modal.onClose = () => {
-            node.blur();
+            status=modal.condition;
+            node.focus();
         };
         modal.open();
     };
@@ -134,30 +150,38 @@
     {/if}
     <Table
         {creatures}
-        {updatingHP}
         {state}
         on:hp={(evt) => {
             multiSelect = evt.detail.ctrl;
-            let index = updatingHP.findIndex(creature => creature == evt.detail.creature)
+            let index = updatingList.findIndex(creature => creature == evt.detail.creature)
             if (index == -1) {
                 if (!multiSelect) {
-                    updatingHP.length = 0;
-                    halfMod.length = 0;
+                    updatingList.length = 0;
+                    saved.length = 0;
+                    resist.length = 0;
+                    customMod.length = 0;
                 }
-                updatingHP.push(evt.detail.creature);
-                halfMod.push(evt.detail.shift ? 0.5 : 1);
+                updatingList = [...updatingList, evt.detail.creature];
+                saved = [...saved, evt.detail.shift];
+                resist = [...resist, evt.detail.alt];
+                customMod = [...customMod, "1"];
             }
             else if (index >= 0 && multiSelect) {
-                updatingHP.splice(index, 1);
-                halfMod.splice(index, 1);
+                updatingList.splice(index, 1);
+                saved.splice(index, 1);
+                resist.splice(index, 1);
+                customMod.splice(index, 1)
             }
             else if (!multiSelect) {
-                updatingHP.length = 0;
-                halfMod.length = 0;
+                updatingList.length = 0;
+                saved.length = 0;
+                resist.length = 0;
+                customMod.length = 0;
             }
-        }}
-        on:tag={(evt) => {
-            updatingStatus = evt.detail;
+            updatingList = updatingList;
+            saved = saved;
+            resist = resist;
+            customMod = customMod;
         }}
         on:edit={(evt) => {
             editCreature = evt.detail;
@@ -167,16 +191,21 @@
         <Difficulty {creatures} />
     {/if}
     <!-- This is disgusting. TODO: Fix it! -->
-    {#if updatingHP.length}
-        <div class="updating-hp">
-            <span>Apply damage(+) or healing(-):</span>
+    {#if updatingList.length}
+        <div class="updating-hp" style="margin: 0.5rem">
             <!-- svelte-ignore a11y-autofocus -->
+            <tag
+                use:hpIcon
+                aria-label="Apply damage, healing(-) or temp HP(t)"
+                style="margin: 0 0.5rem 0 0"
+            />
             <input
-                type="number"
+                type="text"
+                bind:value={damage}
                 on:keydown={function (evt) {
-                    if (evt.key === "Enter" || evt.key === "Tab") {
+                    if (evt.key === "Enter") {
                         evt.preventDefault();
-                        updateHP(this.value);
+                        updateCreatures(damage, status);
                         return;
                     }
                     if (evt.key === "Escape") {
@@ -184,8 +213,8 @@
                         return;
                     }
                     if (
-                        !/^(-?\d*\.?\d*|Backspace|Delete|Arrow\w+)$/.test(
-                            evt.key
+                        !/^((-?\d*\.?\d*)|.*(Backspace|Delete|Arrow\w+|Tab).*)$/.test(
+                            this.value.slice(0, this.selectionStart) + evt.key + this.value.slice(this.selectionStart)
                         )
                     ) {
                         evt.preventDefault();
@@ -194,43 +223,86 @@
                 }}
                 use:init
             />
-        </div>
-    {:else if updatingStatus}
-        <div class="updating-hp">
-            <span>Apply status:</span>
-            <!-- svelte-ignore a11y-autofocus -->
+            <br/>
+            <tag
+            use:tagIcon
+            aria-label="Apply status effect to creatures that fail their saving throw"
+            style="margin: 0 0.5rem 0 0"
+            />
             <input
                 type="text"
                 on:focus={function (evt) {
                     suggestConditions(this);
                 }}
-                on:blur={function (evt) {
-                    if (!this.value.length) {
-                        updatingStatus = null;
-                        return;
-                    }
-
-                    addStatus(modal.condition);
-                }}
                 on:keydown={function (evt) {
                     if (evt.key === "Escape") {
                         this.value = "";
-                        this.blur();
                         return;
                     }
-                    if (evt.key === "Enter" || evt.key === "Tab") {
+                    if (evt.key === "Enter") {
                         evt.preventDefault();
-                        this.blur();
-                        return;
-                    }
-                    if (evt.key === "Escape") {
-                        this.value = "";
-                        this.blur();
+                        updateCreatures(damage, status);
                         return;
                     }
                 }}
-                use:init
             />
+        </div>
+        <br/>
+        <div style="margin: 0.5rem">
+            <table class="updating-creature-table">
+                <thead class="updating-creature-table-header">
+                    <th class="left" style="width:55%">Name</th>
+                    <th style="width:15%" class="center">Saved</th>
+                    <th style="width:15%" class="center">Resist</th>
+                    <th style="width:15%" class="center">Modifier</th>
+                </thead>
+                <tbody>
+                    {#each updatingList as { name }, i}
+                        <tr class="updating-creature-table-row">
+                            <td>
+                                <span>{name}</span>
+                            </td>
+                            <td class="center">
+                                <input 
+                                    type="checkbox"
+                                    checked={saved[i]} 
+                                    on:click={function (evt) {
+                                        saved[i] = !saved[i];
+                                    }} 
+                                />
+                            </td>
+                            <td class="center">
+                                <input 
+                                    type="checkbox" 
+                                    checked={resist[i]} 
+                                    on:click={function (evt) {
+                                        resist[i] = !resist[i];
+                                    }} 
+                                />
+                            </td>
+                            <td class="center">
+                                <input 
+                                    type="number" 
+                                    class="center"
+                                    style="width:90%; padding:0"
+                                    bind:value={customMod[i]}
+                                    on:keydown={function (evt) {
+                                        if (evt.key === "Escape") {
+                                            console.log(this.value);
+                                            this.value = "";
+                                            return;
+                                        }
+                                        if (evt.key === "Enter") {
+                                            evt.preventDefault();
+                                            return;
+                                        }
+                                    }}
+                                />
+                            </td>
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
         </div>
     {:else if saving}
         <SaveEncounter {name} on:cancel={() => (saving = false)} />
@@ -307,6 +379,13 @@
 </div>
 
 <style>
+    .left {
+        text-align: left;
+    }
+    .center {
+        text-align: center;
+    }
+
     .obsidian-initiative-tracker {
         margin: 0.5rem;
         min-width: 180px;
