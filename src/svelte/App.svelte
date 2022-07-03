@@ -151,7 +151,7 @@
         {state}
         on:hp={(evt) => {
             multiSelect = evt.detail.ctrl;
-            let index = updatingCreatures.findIndex(creature => creature == evt.detail.creature);
+            let index = updatingCreatures.findIndex(entry => entry.creature == evt.detail.creature);
             if (index == -1) {
                 if (!multiSelect) {
                     updatingCreatures.length = 0;
@@ -162,9 +162,10 @@
                     resist:     evt.detail.alt,
                     customMod:  "1",
                 }];
+                console.log(updatingCreatures)
             }
-            else if (index && multiSelect) {
-                updatingCreatures.splice(index, 0);
+            else if (index >= 0 && multiSelect) {
+                updatingCreatures.splice(index, 1);
             }
             else if (!multiSelect) {
                 updatingCreatures.length = 0;
