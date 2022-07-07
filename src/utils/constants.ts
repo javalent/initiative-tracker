@@ -29,12 +29,13 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
         round: null
     },
     condense: false,
-    clamp: false,
-    autoStatus: false,
+    clamp: true,
+    autoStatus: true,
     displayDifficulty: true,
     encounters: {},
     warnedAboutImports: false,
     openState: {
+        battle: true,
         party: true,
         status: true,
         plugin: true,
@@ -78,3 +79,9 @@ export const XP_PER_CR: Record<string, number> = {
     "29": 135000,
     "30": 155000
 };
+
+export const OVERFLOW_TYPE: {[key: string]: string} = {
+    ignore: "ignore",
+    current: "current",
+    temp: "temp"
+}

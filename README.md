@@ -255,7 +255,7 @@ Once all of the creatures in a given combat have been added, initiatives can be 
 
 ### HP
 
-Creatures can take damage or healing by clicking on their HP.
+Creatures can take damage, be healed or gain temporary HP by clicking on their HP.
 
 ### Actions
 
@@ -340,14 +340,42 @@ The setting tab has several options for adding and managing players and homebrew
 ## Basic Settings
 
 ### Display Encounter Difficulty
+`Default: Enabled`
 
 The plugin will calculate and display encounter difficulty based on the challenge rating of the creatures and levels of your party members.
 
 Creatures and players without this information will be ignored for the calculation.
 
 ### Roll Equivalent Creatures Together
+`Default: Enabled`
 
 Equivalent creatures (same HP, AC, and Name) will roll initiatives as a group.
+
+## Battle
+
+### Clamp Minimum HP
+`default: Enabled`
+
+When a creature takes damage that would reduce its HP below 0, its HP is set to 0 instead.
+
+### Overflow Healing
+`default: Ignore`
+
+Set what happens to healing which goes above creatures' max HP threshold.
+
+  - Ignore: Any healing above the creature's max HP is ignored
+  - Temp: Any healing above the creature's max HP is added as temporary HP
+  - Current: Any healing above the creature's max HP is added to the current HP total
+
+### Automatic Unconscious Status Application
+`Default: Enabled`
+
+When a creature takes damage that would reduce its HP below 0, it gains the "Unconscious" status effect.
+
+### Additive Temporary HP
+`Default: Disabled`
+
+Any temporary HP added to a creature will be added on top of exsiting temporary HP.
 
 ## Players
 
@@ -387,20 +415,19 @@ If any default statuses are deleted, you can re-add them by clicking the "Re-add
 ## Plugin Integrations
 
 ### Sync Monsters from TTRPG Statblocks Plugin
-
+`Default: Disabled`
 If the [5e Statblocks](https://github.com/valentine195/obsidian-5e-statblocks) plugin is installed, the homebrew creatures saved to that plugin can be used in this plugin by enabling the sync in settings.
 
 ### Initiative Formula
-
+`Default: 1d20 + %mod%`
 > This setting can only be modified when the [Dice Roller](https://github.com/valentine195/obsidian-dice-roller) plugin is installed.
 
-This setting can be used to modify how a creature's initiative is calculated by the plugin. Use `%mod` as a placeholder for the creature's initiative modifier.
-
-It defaults to `1d20 + %mod%`.
+This setting can be used to modify how a creature's initiative is calculated by the plugin. Use `%mod%` as a placeholder for the creature's initiative modifier.
 
 This will support any dice formula supported by the Dice Roller plugin.
 
 ### Integrate with Obsidian Leaflet
+`Default: Disabled`
 
 If the [Obsidian Leaflet](https://github.com/valentine195/obsidian-leaflet-plugin) plugin is installed, it can be used as a battle map for encounters by turning this setting on.
 

@@ -27,6 +27,7 @@ import type {
     TrackerViewState
 } from "@types";
 import { equivalent } from "./encounter";
+import {OVERFLOW_TYPE} from "./utils/constants"
 
 class LoadEncounterModal extends Modal {
     constructor(public plugin: InitiativeTracker) {
@@ -453,6 +454,7 @@ export default class TrackerView extends ItemView {
             ac,
             initiative,
             name,
+            temp,
             marker
         }: {
             hp?: number;
@@ -460,6 +462,7 @@ export default class TrackerView extends ItemView {
             initiative?: number;
             name?: string;
             marker?: string;
+            temp?: number;
             max?: number;
         }
     ) {
@@ -471,10 +474,33 @@ export default class TrackerView extends ItemView {
             creature.number = 0;
         }
         if (hp) {
-            if (this.plugin.data.clamp && creature.hp + Number(hp) < 0) {
+            // Reduce temp HP first
+            hp = Number(hp)
+            if (hp < 0 && creature.temp > 0) {
+                const remaining = creature.temp + hp;
+                creature.temp   = Math.max(0, remaining);
+                hp              = Math.min(0, remaining);
+            }
+            // Clamp HP at 0 if clamp is enabled in settings
+            if (this.plugin.data.clamp && creature.hp + hp < 0) {
                 hp = -creature.hp;
             }
-            creature.hp += Number(hp);
+            // Handle overflow healing according to settings
+            if (hp > 0 && hp + creature.hp > creature.max) {
+                switch (this.plugin.data.hpOverflow) {
+                    case OVERFLOW_TYPE.ignore:
+                        hp = Math.max((creature.max - creature.hp), 0);
+                        break;
+                    case OVERFLOW_TYPE.temp:
+                        // Gives temp a value, such that it will be set later
+                        temp = hp - Math.min((creature.max - creature.hp), 0)
+                        hp -= temp;
+                        break;
+                    case OVERFLOW_TYPE.current:
+                        break;
+                }
+            }
+            creature.hp += hp;
             if (this.plugin.data.autoStatus && creature.hp <= 0) {
                 this.addStatus(
                     creature,
@@ -490,6 +516,13 @@ export default class TrackerView extends ItemView {
         }
         if (ac) {
             creature.ac = ac;
+        }
+        if (temp) {
+            let baseline = 0;
+            if (this.plugin.data.additiveTemp) {
+                baseline = creature.temp;
+            }
+            creature.temp = Math.max(creature.temp, baseline + temp);
         }
         if (marker) {
             creature.marker = marker;
