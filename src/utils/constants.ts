@@ -40,7 +40,9 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
         status: true,
         plugin: true,
         player: true
-    }
+    },
+    hpOverflow: "ignore",
+    additiveTemp: false
 };
 
 export const XP_PER_CR: Record<string, number> = {
