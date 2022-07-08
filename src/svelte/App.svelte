@@ -51,21 +51,29 @@
 
     let damage: string = "";
     let status: Condition = null;
-    let updatingCreatures: {[key: string]: any}[] = [];
+    let updatingCreatures: { [key: string]: any }[] = [];
     const updateCreatures = (toAddString: string, tag: Condition) => {
         const roundHalf = !toAddString.includes(".");
 
-        updatingCreatures.forEach(entry => {
-            const modifier = (
-                (entry.saved ? 0.5 : 1) * 
+        updatingCreatures.forEach((entry) => {
+            const modifier =
+                (entry.saved ? 0.5 : 1) *
                 (entry.resist ? 0.5 : 1) *
-                Number(entry.customMod)
-            );
-            let toAdd = Number(toAddString);
-            toAdd = -1 * Math.sign(toAdd) * Math.max(Math.abs(toAdd) * modifier, 1);
-            toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
-            view.updateCreature(entry.creature, { hp: toAdd });
-            tag && !entry.saved && view.addStatus(entry.creature, tag);
+                Number(entry.customMod);
+
+            if (toAddString.charAt(0) == "t") {
+                let toAdd = Number(toAddString.slice(1));
+                view.updateCreature(entry.creature, { temp: toAdd });
+            } else {
+                let toAdd = Number(toAddString);
+                toAdd =
+                    -1 *
+                    Math.sign(toAdd) *
+                    Math.max(Math.abs(toAdd) * modifier, 1);
+                toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
+                view.updateCreature(entry.creature, { hp: toAdd });
+                tag && !entry.saved && view.addStatus(entry.creature, tag);
+            }
         });
         closeUpdateCreatures();
     };
@@ -74,7 +82,7 @@
         updatingCreatures.length = 0;
         damage = "";
         status = null;
-    }
+    };
 
     let addNew = false;
     export let addNewAsync = false;
@@ -104,7 +112,7 @@
     const suggestConditions = (node: HTMLInputElement) => {
         modal = new ConditionSuggestionModal(view.plugin, node);
         modal.onClose = () => {
-            status=modal.condition;
+            status = modal.condition;
             node.focus();
         };
         modal.open();
@@ -151,23 +159,26 @@
         {state}
         on:hp={(evt) => {
             multiSelect = evt.detail.ctrl;
-            let index = updatingCreatures.findIndex(entry => entry.creature == evt.detail.creature);
+            let index = updatingCreatures.findIndex(
+                (entry) => entry.creature == evt.detail.creature
+            );
             if (index == -1) {
                 if (!multiSelect) {
                     updatingCreatures.length = 0;
                 }
-                updatingCreatures = [...updatingCreatures,  {
-                    creature:   evt.detail.creature,
-                    saved:      evt.detail.shift,
-                    resist:     evt.detail.alt,
-                    customMod:  "1",
-                }];
-                console.log(updatingCreatures)
-            }
-            else if (index >= 0 && multiSelect) {
+                updatingCreatures = [
+                    ...updatingCreatures,
+                    {
+                        creature: evt.detail.creature,
+                        saved: evt.detail.shift,
+                        resist: evt.detail.alt,
+                        customMod: "1"
+                    }
+                ];
+                console.log(updatingCreatures);
+            } else if (index >= 0 && multiSelect) {
                 updatingCreatures.splice(index, 1);
-            }
-            else if (!multiSelect) {
+            } else if (!multiSelect) {
                 updatingCreatures.length = 0;
             }
             updatingCreatures = updatingCreatures;
@@ -181,7 +192,7 @@
     {/if}
     <!-- This is disgusting. TODO: Fix it! -->
     {#if updatingCreatures.length}
-        <div class="updating-hp" style="margin: 0.5rem">
+        <div class="updating-hp">
             <!-- svelte-ignore a11y-autofocus -->
             <tag
                 use:hpIcon
@@ -202,8 +213,8 @@
                         return;
                     }
                     if (
-                        !/^((-?\d*\.?\d*)|.*(Backspace|Delete|Arrow\w+|Tab).*)$/.test(
-                            this.value.slice(0, this.selectionStart) + evt.key + this.value.slice(this.selectionStart)
+                        !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
+                            this.value + evt.key
                         )
                     ) {
                         evt.preventDefault();
@@ -212,11 +223,11 @@
                 }}
                 use:init
             />
-            <br/>
+            <br />
             <tag
-            use:tagIcon
-            aria-label="Apply status effect to creatures that fail their saving throw"
-            style="margin: 0 0.5rem 0 0"
+                use:tagIcon
+                aria-label="Apply status effect to creatures that fail their saving throw"
+                style="margin: 0 0.5rem 0 0"
             />
             <input
                 type="text"
@@ -236,7 +247,7 @@
                 }}
             />
         </div>
-        <br/>
+        <br />
         <div style="margin: 0.5rem">
             <table class="updating-creature-table">
                 <thead class="updating-creature-table-header">
@@ -246,32 +257,32 @@
                     <th style="width:15%" class="center">Modifier</th>
                 </thead>
                 <tbody>
-                    {#each updatingCreatures as { creature, saved, resist, customMod}, i}
+                    {#each updatingCreatures as { creature, saved, resist, customMod }, i}
                         <tr class="updating-creature-table-row">
                             <td>
                                 <span>{creature.name}</span>
                             </td>
                             <td class="center">
-                                <input 
+                                <input
                                     type="checkbox"
-                                    checked={saved} 
+                                    checked={saved}
                                     on:click={function (evt) {
                                         saved = !saved;
-                                    }} 
+                                    }}
                                 />
                             </td>
                             <td class="center">
-                                <input 
-                                    type="checkbox" 
-                                    checked={resist} 
+                                <input
+                                    type="checkbox"
+                                    checked={resist}
                                     on:click={function (evt) {
                                         resist = !resist;
-                                    }} 
+                                    }}
                                 />
                             </td>
                             <td class="center">
-                                <input 
-                                    type="number" 
+                                <input
+                                    type="number"
                                     class="center"
                                     style="width:90%; padding:0"
                                     bind:value={updatingCreatures[i].customMod}

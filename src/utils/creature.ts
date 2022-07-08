@@ -21,6 +21,7 @@ export class Creature {
     name: string;
     modifier: number;
     hp: number;
+    temp: number;
     ac: number;
     note: string;
     enabled: boolean = true;
@@ -54,6 +55,7 @@ export class Creature {
         this.marker = creature.marker;
 
         this.hp = this.max;
+        this.temp = 0;
         this.source = creature.source;
 
         if ("xp" in creature) {
@@ -65,7 +67,10 @@ export class Creature {
     }
     get hpDisplay() {
         if (this.max) {
-            return `${this.hp}/${this.max}`;
+            const tempMods = this.temp > 0 ? `aria-label="Temp HP: ${this.temp}" style="font-weight:bold"`:''
+            return `
+                <span ${tempMods}>${this.hp + this.temp}</span><span>/${this.max}</span>
+            `
         }
         return DEFAULT_UNDEFINED;
     }
@@ -147,6 +152,7 @@ export class Creature {
             id: this.id,
             marker: this.marker,
             currentHP: this.hp,
+            tempHP: this.temp,
             status: Array.from(this.status).map((c) => c.name),
             enabled: this.enabled,
             level: this.level,
@@ -160,6 +166,7 @@ export class Creature {
         const creature = new Creature(state, state.initiative);
         creature.enabled = state.enabled;
 
+        creature.temp = state.tempHP ? state.tempHP : 0;
         creature.hp = state.currentHP;
         let statuses: Condition[] = [];
         for (const status of state.status) {

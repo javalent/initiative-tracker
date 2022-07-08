@@ -60,7 +60,7 @@
 </td>
 
 <td class="center hp-container">
-    <span
+    <div
         class="editable"
         on:click={(e) => {
             dispatch(
@@ -73,8 +73,9 @@
                 }
             );
             e.stopPropagation();
-        }}>{creature.hpDisplay}</span
-    >
+        }}>
+        {@html creature.hpDisplay}
+    </div>
 </td>
 
 <td class="center ac-container">{creature.ac ?? DEFAULT_UNDEFINED}</td>

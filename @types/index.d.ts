@@ -75,6 +75,7 @@ export interface InitiativeTrackerData {
     displayDifficulty: boolean;
     statuses: Condition[];
     openState: {
+        battle: boolean;
         party: boolean;
         status: boolean;
         plugin: boolean;
@@ -96,6 +97,8 @@ export interface InitiativeTrackerData {
     encounters: { [key: string]: InitiativeViewState };
     condense: boolean;
     clamp: boolean;
+    hpOverflow: string;
+    additiveTemp: boolean;
     autoStatus: boolean;
     warnedAboutImports: boolean;
 }
@@ -107,10 +110,12 @@ export interface InitiativeViewState {
     round: number;
 }
 
+
 export interface CreatureState extends HomebrewCreature {
     status: string[];
     enabled: boolean;
     currentHP: number;
+    tempHP: number;
     initiative: number;
     player: boolean;
     xp: number;
