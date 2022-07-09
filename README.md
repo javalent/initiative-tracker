@@ -259,7 +259,7 @@ Creatures can take damage, be healed or gain temporary HP by clicking on their H
 
 ### Actions
 
-Creatures may be edited, disabled / removed from the combat, or statuses (such as "poisoned") may be added to them in the `Actions` menu located to the right of each creature.
+Creatures may be edited, disabled / removed from the combat in the `Actions` menu located to the right of each creature.
 
 ### Controls
 
@@ -282,6 +282,15 @@ If the initiative tracker view has been closed for any reason, use this command 
 #### Toggle Encounter
 
 This command can be used to start or stop an encounter.
+
+#### Applying Damage And Status Effects
+
+A single creature can be selected for damage and status effect application by clicking on their HP display, making them appear in a separate table where application can be adjusted.
+
+The plugin's behaviour when selecting creatures in this fashion can be adjusted by holding the following buttons:
+  - CTRL/META: multiple creatures can be selected for damage and status effect application
+  - SHIFT: creature will be marked as having succeeded their saving throw (damage is halved and no status effect is applied)
+  - ALT: creature will be marked as having resistance to the damage type (damage is halved)
 
 #### Next Combatant
 
