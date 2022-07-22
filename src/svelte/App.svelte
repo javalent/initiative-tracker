@@ -5,7 +5,7 @@
     import type TrackerView from "src/view";
     import { Creature } from "src/utils/creature";
     import { ExtraButtonComponent, setIcon } from "obsidian";
-    import { ADD, COPY, HP, TAG } from "src/utils";
+    import { ADD, COPY, HP, TAG, REMOVE } from "src/utils";
     import { ConditionSuggestionModal } from "src/utils/suggester";
     import type { Condition } from "@types";
     import { createEventDispatcher } from "svelte";
@@ -16,8 +16,6 @@
     import LoadEncounter from "./LoadEncounter.svelte";
 
     const dispatch = createEventDispatcher();
-
-    let multiSelect = false;
 
     export let creatures: Creature[] = [];
     export let name: string = null;
@@ -47,6 +45,9 @@
     };
     const tagIcon = (node: HTMLElement) => {
         setIcon(node, TAG);
+    };
+    const removeIcon = (node: HTMLElement) => {
+        setIcon(node, REMOVE);
     };
 
     let damage: string = "";
@@ -157,29 +158,23 @@
     <Table
         {creatures}
         {state}
-        on:hp={(evt) => {
-            multiSelect = evt.detail.ctrl;
+        on:hp={(evt) => {            
             let index = updatingCreatures.findIndex(
                 (entry) => entry.creature == evt.detail.creature
             );
             if (index == -1) {
-                if (!multiSelect) {
-                    updatingCreatures.length = 0;
-                }
                 updatingCreatures = [
                     ...updatingCreatures,
                     {
                         creature: evt.detail.creature,
                         saved: evt.detail.shift,
-                        resist: evt.detail.alt,
-                        customMod: "1"
+                        resist: evt.detail.ctrl,
+                        customMod: evt.detail.alt ? "2" : "1"
                     }
                 ];
                 console.log(updatingCreatures);
-            } else if (index >= 0 && multiSelect) {
+            } else {
                 updatingCreatures.splice(index, 1);
-            } else if (!multiSelect) {
-                updatingCreatures.length = 0;
             }
             updatingCreatures = updatingCreatures;
         }}
@@ -187,7 +182,7 @@
             editCreature = evt.detail;
         }}
     />
-    {#if plugin.data.displayDifficulty}
+    {#if plugin.data.displayDifficulty && !updatingCreatures.length}
         <Difficulty {creatures} />
     {/if}
     <!-- This is disgusting. TODO: Fix it! -->
@@ -197,7 +192,7 @@
             <tag
                 use:hpIcon
                 aria-label="Apply damage, healing(-) or temp HP(t)"
-                style="margin: 0 0.5rem 0 0"
+                style="margin: 0 0.2rem 0 0.7rem"
             />
             <input
                 type="text"
@@ -227,7 +222,7 @@
             <tag
                 use:tagIcon
                 aria-label="Apply status effect to creatures that fail their saving throw"
-                style="margin: 0 0.5rem 0 0"
+                style="margin: 0 0.2rem 0 0.7rem"
             />
             <input
                 type="text"
@@ -247,20 +242,28 @@
                 }}
             />
         </div>
-        <br />
         <div style="margin: 0.5rem">
             <table class="updating-creature-table">
                 <thead class="updating-creature-table-header">
-                    <th class="left" style="width:55%">Name</th>
-                    <th style="width:15%" class="center">Saved</th>
-                    <th style="width:15%" class="center">Resist</th>
-                    <th style="width:15%" class="center">Modifier</th>
+                    <th style="padding:0 0.2rem 0 0; cursor:pointer" class="left" use:removeIcon on:click={closeUpdateCreatures}/>
+                    <th style="width:100%" class="left">Name</th>
+                    <th style="padding:0 0.2rem" class="center">Saved</th>
+                    <th style="padding:0 0.2rem" class="center">Resist</th>
+                    <th style="padding:0 0.2rem" class="center">Modifier</th>
                 </thead>
                 <tbody>
                     {#each updatingCreatures as { creature, saved, resist, customMod }, i}
                         <tr class="updating-creature-table-row">
+                            <td 
+                                use:removeIcon
+                                on:click={function (evt) {
+                                    updatingCreatures.splice(i, 1);
+                                    updatingCreatures = updatingCreatures;
+                                }}
+                                style="cursor:pointer"
+                            />
                             <td>
-                                <span>{creature.name}</span>
+                                <span>{creature.name + (creature.number ? (" " + creature.number) : "")}</span>
                             </td>
                             <td class="center">
                                 <input
@@ -284,8 +287,8 @@
                                 <input
                                     type="number"
                                     class="center"
-                                    style="width:90%; padding:0"
-                                    bind:value={updatingCreatures[i].customMod}
+                                    style="width:90%; height:80%; padding:0;"
+                                    bind:value={customMod}
                                     on:keydown={function (evt) {
                                         if (evt.key === "Escape") {
                                             this.value = "1";
@@ -386,12 +389,19 @@
     }
 
     .obsidian-initiative-tracker {
-        margin: 0.5rem;
+        margin: 0 0.5rem;
         min-width: 180px;
     }
-    .initiative-tracker-round-container,
+    .initiative-tracker-round-container {
+        padding: 0 0.5rem;
+    }
     .initiave-tracker-party {
         padding: 0 0.5rem;
+        margin: 0 0 1rem 0;
+    }
+    .updating-creature-table-row {
+        font-size: small;
+        height: 80%;
     }
     .add-creature-container {
         display: flex;
@@ -422,6 +432,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 0 0.5rem;
+        margin: 0;
     }
     .initiative-tracker-name {
         margin: 0;
