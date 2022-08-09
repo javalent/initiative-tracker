@@ -22,9 +22,9 @@
     export let plugin: InitiativeTracker;
     export let headers: string[];
 
-    const creatureMap: Map<Creature, number> = new Map();
+    let totalXP: number;
+    let creatureMap: Map<Creature, number> = new Map();
     const rollerMap: Map<Creature, StackRoller> = new Map();
-    let totalXP = [...creatureMap].reduce((a, c) => a + c[0].xp * c[1], 0);
 
     for (let [creature, count] of creatures) {
         let number: number = Number(count);
@@ -32,6 +32,7 @@
             let roller = plugin.getRoller(`${count}`) as StackRoller;
             roller.on("new-result", () => {
                 creatureMap.set(creature, roller.result);
+                creatureMap = creatureMap;
                 totalXP = [...creatureMap].reduce(
                     (a, c) => a + c[0].xp * c[1],
                     0
@@ -43,12 +44,15 @@
             creatureMap.set(creature, number);
         }
     }
+    totalXP = [...creatureMap].reduce((a, c) => a + c[0].xp * c[1], 0);
     let difficulty: DifficultyReport;
     $: {
         if (!isNaN(totalXP)) {
             difficulty = encounterDifficulty(
                 playerLevels,
-                [...creatures].map((creature) => creature[0].xp)
+                [...creatureMap]
+                .map((creature) => Array(creature[1]).fill(creature[0].xp))
+                .flat()
             );
         }
     }
