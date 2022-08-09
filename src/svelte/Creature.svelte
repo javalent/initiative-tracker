@@ -1,7 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher, getContext } from "svelte";
 
-    import { DEFAULT_UNDEFINED } from "src/utils";
+    import { DEFAULT_UNDEFINED, META_MODIFIER } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/view";
     import Initiative from "./Initiative.svelte";
@@ -63,7 +63,15 @@
     <div
         class="editable"
         on:click={(e) => {
-            dispatch("hp", creature);
+            dispatch(
+                "hp", 
+                {
+                    creature: creature, 
+                    ctrl: e.getModifierState(META_MODIFIER), 
+                    shift: e.getModifierState('Shift'),
+                    alt: e.getModifierState('Alt')
+                }
+            );
             e.stopPropagation();
         }}>
         {@html creature.hpDisplay}

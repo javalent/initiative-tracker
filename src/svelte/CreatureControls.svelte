@@ -26,13 +26,6 @@
                         dispatch("edit", creature);
                     });
             });
-            menu.addItem((item) => {
-                item.setIcon(TAG)
-                    .setTitle("Add Status")
-                    .onClick(() => {
-                        dispatch("tag", creature);
-                    });
-            });
             if (creature.enabled) {
                 menu.addItem((item) => {
                     item.setIcon(DISABLE)
