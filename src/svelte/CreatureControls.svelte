@@ -11,7 +11,6 @@
     export let view: TrackerView;
     export let creature: Creature;
 
-
     const hamburgerIcon = (node: HTMLElement) => {
         const hamburger = new ExtraButtonComponent(node)
             .setIcon("vertical-three-dots")
@@ -23,7 +22,7 @@
                 item.setIcon(HP)
                     .setTitle("Set Health/Status")
                     .onClick(() => {
-                        dispatch("hp", creature);
+                        dispatch("hp", { creature });
                     });
             });
             menu.addItem((item) => {

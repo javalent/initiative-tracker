@@ -79,8 +79,8 @@
                     Math.max(Math.abs(toAdd) * modifier, 1);
                 toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
                 view.updateCreature(entry.creature, { hp: toAdd });
-                tag && !entry.saved && view.addStatus(entry.creature, tag);
             }
+            tag && !entry.saved && view.addStatus(entry.creature, tag);
         });
         closeUpdateCreatures();
     };
@@ -195,58 +195,72 @@
     {#if updatingCreatures.length}
         <div class="updating-hp">
             <!-- svelte-ignore a11y-autofocus -->
-            <tag
-                use:hpIcon
-                aria-label="Apply damage, healing(-) or temp HP(t)"
-                style="margin: 0 0.2rem 0 0.7rem"
-            />
-            <input
-                type="text"
-                bind:value={damage}
-                on:keydown={function (evt) {
-                    if (evt.key === "Enter") {
-                        evt.preventDefault();
-                        updateCreatures(damage, status);
-                        return;
-                    }
-                    if (evt.key === "Escape") {
-                        closeUpdateCreatures();
-                        return;
-                    }
-                    if (
-                        !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
-                            this.value + evt.key
-                        )
-                    ) {
-                        evt.preventDefault();
-                        return false;
-                    }
-                }}
-                use:init
-            />
-            <br />
-            <tag
-                use:tagIcon
-                aria-label="Apply status effect to creatures that fail their saving throw"
-                style="margin: 0 0.2rem 0 0.7rem"
-            />
-            <input
-                type="text"
-                on:focus={function (evt) {
-                    suggestConditions(this);
-                }}
-                on:keydown={function (evt) {
-                    if (evt.key === "Escape") {
-                        closeUpdateCreatures();
-                        return;
-                    }
-                    if (evt.key === "Enter") {
-                        evt.preventDefault();
-                        updateCreatures(damage, status);
-                        return;
-                    }
-                }}
-            />
+            <div class="hp-status">
+                <small class="label">
+                    Apply damage, healing(-) or temp HP(t)
+                </small>
+                <div class="input">
+                    <tag
+                        use:hpIcon
+                        aria-label="Apply damage, healing(-) or temp HP(t)"
+                        style="margin: 0 0.2rem 0 0.7rem"
+                    />
+                    <input
+                        type="text"
+                        bind:value={damage}
+                        on:keydown={function (evt) {
+                            if (evt.key === "Enter") {
+                                evt.preventDefault();
+                                updateCreatures(damage, status);
+                                return;
+                            }
+                            if (evt.key === "Escape") {
+                                closeUpdateCreatures();
+                                return;
+                            }
+                            if (
+                                !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
+                                    this.value + evt.key
+                                )
+                            ) {
+                                evt.preventDefault();
+                                return false;
+                            }
+                        }}
+                        use:init
+                    />
+                </div>
+            </div>
+            <div class="hp-status">
+                <small class="label">
+                    Apply status effect to creatures that fail their saving
+                    throw
+                </small>
+                <div class="input">
+                    <tag
+                        use:tagIcon
+                        aria-label="Apply status effect to creatures that fail their saving throw"
+                        style="margin: 0 0.2rem 0 0.7rem"
+                    />
+                    <input
+                        type="text"
+                        on:focus={function (evt) {
+                            suggestConditions(this);
+                        }}
+                        on:keydown={function (evt) {
+                            if (evt.key === "Escape") {
+                                closeUpdateCreatures();
+                                return;
+                            }
+                            if (evt.key === "Enter") {
+                                evt.preventDefault();
+                                updateCreatures(damage, status);
+                                return;
+                            }
+                        }}
+                    />
+                </div>
+            </div>
         </div>
         <div class="updating-buttons">
             <span
@@ -259,7 +273,7 @@
                 use:cancelIcon
                 on:click={closeUpdateCreatures}
                 style="cursor:pointer"
-                aria-label="cancel"
+                aria-label="Cancel"
             />
         </div>
         <div>
@@ -471,6 +485,15 @@
         margin: 0;
     }
 
+    .updating-hp {
+        display: flex;
+        flex-flow: column;
+        gap: 0.5rem;
+    }
+    .hp-status {
+        display: flex;
+        flex-flow: column;
+    }
     .updating-buttons {
         display: flex;
         justify-content: flex-end;

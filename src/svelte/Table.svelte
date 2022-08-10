@@ -159,7 +159,7 @@
                                 evt.getModifierState(clickModifier)
                             );
                             if (evt.getModifierState(clickModifier)) {
-                                dispatch("hp", creature);
+                                dispatch("hp", { creature });
                                 return;
                             }
                             openView(creature);

@@ -85,6 +85,7 @@
         on:click={(e) => e.stopPropagation()}
         on:tag
         on:edit
+        on:hp
         {view}
         {creature}
     />
