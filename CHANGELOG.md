@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.4.5](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.6.0...7.4.5) (2022-08-10)
+
+
+### Bug Fixes
+
+* improved multi-creature hp and status ux ([30de922](https://github.com/valentine195/obsidian-initiative-tracker/commit/30de9220ea4b5dc6c3f6b7afba2784ab860792af))
+
 ### [7.4.4](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.4.3...7.4.4) (2022-06-09)
 
 

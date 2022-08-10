@@ -49,10 +49,16 @@
     const removeIcon = (node: HTMLElement) => {
         setIcon(node, REMOVE);
     };
+    const checkIcon = (node: HTMLElement) => {
+        setIcon(node, "check");
+    };
+    const cancelIcon = (node: HTMLElement) => {
+        setIcon(node, "cross-in-box");
+    };
 
     let damage: string = "";
     let status: Condition = null;
-    let updatingCreatures: { [key: string]: any }[] = [];
+    export let updatingCreatures: { [key: string]: any }[] = [];
     const updateCreatures = (toAddString: string, tag: Condition) => {
         const roundHalf = !toAddString.includes(".");
 
@@ -158,7 +164,7 @@
     <Table
         {creatures}
         {state}
-        on:hp={(evt) => {            
+        on:hp={(evt) => {
             let index = updatingCreatures.findIndex(
                 (entry) => entry.creature == evt.detail.creature
             );
@@ -242,10 +248,32 @@
                 }}
             />
         </div>
+        <div class="updating-buttons">
+            <span
+                use:checkIcon
+                on:click={() => updateCreatures(damage, status)}
+                style="cursor:pointer"
+                aria-label="Apply"
+            />
+            <span
+                use:cancelIcon
+                on:click={closeUpdateCreatures}
+                style="cursor:pointer"
+                aria-label="cancel"
+            />
+        </div>
+        <div>
+            <small>Multiple creatures can be selected at a time.</small>
+        </div>
         <div style="margin: 0.5rem">
             <table class="updating-creature-table">
                 <thead class="updating-creature-table-header">
-                    <th style="padding:0 0.2rem 0 0; cursor:pointer" class="left" use:removeIcon on:click={closeUpdateCreatures}/>
+                    <th
+                        style="padding:0 0.2rem 0 0; cursor:pointer"
+                        class="left"
+                        use:removeIcon
+                        on:click={closeUpdateCreatures}
+                    />
                     <th style="width:100%" class="left">Name</th>
                     <th style="padding:0 0.2rem" class="center">Saved</th>
                     <th style="padding:0 0.2rem" class="center">Resist</th>
@@ -254,7 +282,7 @@
                 <tbody>
                     {#each updatingCreatures as { creature, saved, resist, customMod }, i}
                         <tr class="updating-creature-table-row">
-                            <td 
+                            <td
                                 use:removeIcon
                                 on:click={function (evt) {
                                     updatingCreatures.splice(i, 1);
@@ -263,7 +291,12 @@
                                 style="cursor:pointer"
                             />
                             <td>
-                                <span>{creature.name + (creature.number ? (" " + creature.number) : "")}</span>
+                                <span
+                                    >{creature.name +
+                                        (creature.number
+                                            ? " " + creature.number
+                                            : "")}</span
+                                >
                             </td>
                             <td class="center">
                                 <input
@@ -436,5 +469,11 @@
     }
     .initiative-tracker-name {
         margin: 0;
+    }
+
+    .updating-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
     }
 </style>

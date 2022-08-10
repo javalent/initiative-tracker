@@ -1,7 +1,7 @@
 <script lang="ts">
     import { ExtraButtonComponent, Menu } from "obsidian";
     import type InitiativeTracker from "src/main";
-    import { DISABLE, ENABLE, MAPMARKER, REMOVE, TAG } from "src/utils";
+    import { DISABLE, ENABLE, HP, MAPMARKER, REMOVE, TAG } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/view";
     import { createEventDispatcher } from "svelte";
@@ -19,6 +19,13 @@
         hamburger.extraSettingsEl.onclick = (evt) => {
             evt.stopPropagation();
             const menu = new Menu(view.plugin.app);
+            menu.addItem((item) => {
+                item.setIcon(HP)
+                    .setTitle("Set Health/Status")
+                    .onClick(() => {
+                        dispatch("hp", creature);
+                    });
+            });
             menu.addItem((item) => {
                 item.setIcon("pencil")
                     .setTitle("Edit")
