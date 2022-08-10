@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Menu, setIcon } from "obsidian";
+    import { Menu, Platform, setIcon } from "obsidian";
     import { AC, DISABLE, ENABLE, HP, MAPMARKER, REMOVE, TAG } from "src/utils";
 
     import { flip } from "svelte/animate";
@@ -12,6 +12,9 @@
 
     export let creatures: Creature[] = [];
     export let state: boolean;
+
+    const clickModifier =
+        Platform.isMacOS || Platform.isIosApp ? "Meta" : "Control";
 
     const dispatch = createEventDispatcher();
 
@@ -147,8 +150,20 @@
                         animate:flip={{ duration: flipDurationMs }}
                         data-hp={creature.hp}
                         data-hp-max={creature.max}
-                        data-hp-percent={Math.round((((creature.hp ?? 0) / creature.max) * 100) ?? 0)}
-                        on:click={() => openView(creature)}
+                        data-hp-percent={Math.round(
+                            ((creature.hp ?? 0) / creature.max) * 100 ?? 0
+                        )}
+                        on:click={(evt) => {
+                            console.log(
+                                clickModifier,
+                                evt.getModifierState(clickModifier)
+                            );
+                            if (evt.getModifierState(clickModifier)) {
+                                dispatch("hp", creature);
+                                return;
+                            }
+                            openView(creature);
+                        }}
                         on:contextmenu={(evt) => hamburgerIcon(evt, creature)}
                     >
                         <CreatureTemplate {creature} on:hp on:tag on:edit />
