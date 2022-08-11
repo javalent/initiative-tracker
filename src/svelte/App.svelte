@@ -7,7 +7,7 @@
     import { ExtraButtonComponent, setIcon } from "obsidian";
     import { ADD, COPY, HP, TAG, REMOVE } from "src/utils";
     import { ConditionSuggestionModal } from "src/utils/suggester";
-    import type { Condition } from "@types";
+    import type { Condition, UpdateLogMessage } from "@types";
     import { createEventDispatcher } from "svelte";
     import type InitiativeTracker from "src/main";
     import { setContext } from "svelte";
@@ -62,15 +62,30 @@
     const updateCreatures = (toAddString: string, tag: Condition) => {
         const roundHalf = !toAddString.includes(".");
 
+        const messages: UpdateLogMessage[] = [];
         updatingCreatures.forEach((entry) => {
             const modifier =
                 (entry.saved ? 0.5 : 1) *
                 (entry.resist ? 0.5 : 1) *
                 Number(entry.customMod);
+            const name = [entry.creature.name];
+            if (entry.creature.number > 0) {
+                name.push(entry.creature.number);
+            }
+            const message: UpdateLogMessage = {
+                name: name.join(" "),
+                hp: null,
+                temp: false,
+                status: null,
+                saved: false,
+                unc: false
+            };
 
             if (toAddString.charAt(0) == "t") {
                 let toAdd = Number(toAddString.slice(1));
                 view.updateCreature(entry.creature, { temp: toAdd });
+                message.hp = toAdd;
+                message.temp = true;
             } else {
                 let toAdd = Number(toAddString);
                 toAdd =
@@ -78,10 +93,24 @@
                     Math.sign(toAdd) *
                     Math.max(Math.abs(toAdd) * modifier, 1);
                 toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
+                message.hp = toAdd;
                 view.updateCreature(entry.creature, { hp: toAdd });
+                if (entry.creature.hp <= 0) {
+                    message.unc = true;
+                }
             }
-            tag && !entry.saved && view.addStatus(entry.creature, tag);
+            if (tag) {
+                message.status = tag.name;
+                if (!entry.saved) {
+                    view.addStatus(entry.creature, tag);
+                } else {
+                    message.saved = true;
+                }
+            }
+            messages.push(message);
         });
+        view.logUpdate(messages);
+
         closeUpdateCreatures();
     };
 
@@ -178,7 +207,6 @@
                         customMod: evt.detail.alt ? "2" : "1"
                     }
                 ];
-                console.log(updatingCreatures);
             } else {
                 updatingCreatures.splice(index, 1);
             }
@@ -191,6 +219,7 @@
     {#if plugin.data.displayDifficulty && !updatingCreatures.length}
         <Difficulty {creatures} />
     {/if}
+
     <!-- This is disgusting. TODO: Fix it! -->
     {#if updatingCreatures.length}
         <div class="updating-hp">

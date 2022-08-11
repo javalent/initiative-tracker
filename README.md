@@ -287,10 +287,7 @@ This command can be used to start or stop an encounter.
 
 Creatures can be selected for damage and status effect application by clicking on their HP display, making them appear in a separate table where application can be adjusted.
 
-The plugin's behaviour when selecting creatures in this fashion can be adjusted by holding the following buttons:
-  - CTRL/META: creature will be marked as having resistance to the damage type (damage is halved)
-  - SHIFT: creature will be marked as having succeeded their saving throw (damage is halved and no status effect is applied)
-  - ALT: creature will have its custom damage modifier set to 2 (damage is doubled)
+Right clicking (or clicking the creature's edit menu) and selecting "Set HP/Status" or <kbd>Ctrl<kbd>-clicking a creature will also open or add them to the table.
 
 #### Next Combatant
 

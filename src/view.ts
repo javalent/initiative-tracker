@@ -24,35 +24,72 @@ import type {
     InitiativeViewState,
     Party,
     TrackerEvents,
-    TrackerViewState
+    TrackerViewState,
+    UpdateLogMessage
 } from "@types";
 import { equivalent } from "./encounter";
-import {OVERFLOW_TYPE} from "./utils/constants"
-
-class LoadEncounterModal extends Modal {
-    constructor(public plugin: InitiativeTracker) {
-        super(plugin.app);
-    }
-    onOpen() {
-        this.titleEl.setText("Load Encounter");
-
-        for (const encounter of Object.values(this.plugin.data.encounters)) {
-            new Setting(this.contentEl).setName(encounter.name);
-        }
-    }
-}
+import { OVERFLOW_TYPE } from "./utils/constants";
+import Logger from "./logger";
 
 export default class TrackerView extends ItemView {
+    logger = new Logger(this.plugin, this);
+
+    logUpdate(messages: UpdateLogMessage[]) {
+        const toLog: string[] = [];
+        for (const message of messages) {
+            const perCreature: string[] = [];
+            if (message.hp) {
+                if (message.temp) {
+                    perCreature.push(
+                        `${
+                            message.name
+                        } gained ${message.hp.toString()} temporary HP`
+                    );
+                } else if (message.hp < 0) {
+                    perCreature.push(
+                        `${message.name} took ${(
+                            -1 * message.hp
+                        ).toString()} damage${
+                            message.unc ? " and was knocked unconscious" : ""
+                        }`
+                    );
+                } else if (message.hp > 0) {
+                    perCreature.push(
+                        `${
+                            message.name
+                        } was healed for ${message.hp.toString()} HP`
+                    );
+                }
+            }
+            if (message.status) {
+                if (perCreature.length) {
+                    perCreature.push("and");
+                } else {
+                    perCreature.push(message.name);
+                }
+                if (message.saved) {
+                    perCreature.push(`saved against ${message.status}`);
+                } else {
+                    perCreature.push(`took ${message.status} status`);
+                }
+            }
+            toLog.push(perCreature.join(" "));
+        }
+        this.logger.log(`${toLog.join(". ")}.`);
+    }
+    xp: number;
     async saveEncounter(name: string) {
         if (!name) {
             new Notice("An encounter must have a name to be saved.");
             return;
         }
+
         this.plugin.data.encounters[name] = {
             creatures: [...this.ordered.map((c) => c.toJSON())],
             state: this.state,
             name,
-            round: this.round
+            round: this.round,
+            logFile: this.logger.enabled ? this.logger.getLogFile() : null
         };
         await this.plugin.saveSettings();
     }
@@ -118,7 +155,6 @@ export default class TrackerView extends ItemView {
     async switchParty(party: string) {
         if (!this.plugin.data.parties.find((p) => p.name == party)) return;
         this.party = this.plugin.data.parties.find((p) => p.name == party);
-        console.log("🚀 ~ file: view.ts ~ line 120 ~ this.party", this.party);
         this.setAppState({ party: this.party.name });
         this.creatures = this.creatures.filter((p) => !p.player);
         for (const player of this.players) {
@@ -176,6 +212,10 @@ export default class TrackerView extends ItemView {
             round: this.round,
             name: this.name
         });
+
+        if (initiativeState.logFile) {
+            this.logger.new(initiativeState.logFile);
+        }
     }
     private _addCreature(creature: Creature) {
         this.addCreatures([creature], false);
@@ -221,6 +261,13 @@ export default class TrackerView extends ItemView {
         this.setAppState({
             creatures: this.ordered
         });
+
+        if (this.state) {
+            this.logger.log(
+                this.logger.join(creatures.map((c) => c.name)),
+                "added to the combat."
+            );
+        }
     }
 
     removeCreature(...creatures: Creature[]) {
@@ -236,6 +283,14 @@ export default class TrackerView extends ItemView {
         this.setAppState({
             creatures: this.ordered
         });
+        if (this.state && creatures.some((c) => c.hp > 0)) {
+            this.logger.log(
+                this.logger.join(
+                    creatures.filter((c) => c.hp > 0).map((c) => c.name)
+                ),
+                "removed from the combat."
+            );
+        }
     }
 
     setCreatures(creatures: Creature[]) {
@@ -258,7 +313,6 @@ export default class TrackerView extends ItemView {
             creature.number = prior?.length ? Math.max(...prior) + 1 : 1;
         }
     }
-
     async newEncounter(
         {
             name,
@@ -297,9 +351,12 @@ export default class TrackerView extends ItemView {
 
         if (creatures) this.setCreatures([...this.creatures, ...creatures]);
 
+        this.state = false;
         this.name = name;
         this.round = 1;
+        this.xp = xp;
         this.setAppState({
+            state: this.state,
             party: this.party?.name,
             name: this.name,
             round: this.round,
@@ -318,6 +375,7 @@ export default class TrackerView extends ItemView {
                 creatures: this.ordered
             });
         }
+        this.logger.logging = false;
     }
 
     resetEncounter() {
@@ -336,6 +394,7 @@ export default class TrackerView extends ItemView {
         this.setAppState({
             creatures: this.ordered
         });
+        this.logger.log("Encounter HP & Statuses reset");
     }
     setMapState(v: boolean) {
         this.setAppState({
@@ -378,7 +437,12 @@ export default class TrackerView extends ItemView {
         const next = sliced.find((c) => c.enabled);
         if (this.ordered[active]) this.ordered[active].active = false;
         if (!next) return;
-        if (active > this.ordered.indexOf(next)) this.round++;
+
+        if (active > this.ordered.indexOf(next)) {
+            this.round++;
+            this.logger.log("###", `Round ${this.round}`);
+        }
+        this.logger.log("#####", `${next.name}'s turn`);
         next.active = true;
 
         this.trigger("initiative-tracker:active-change", next);
@@ -396,13 +460,16 @@ export default class TrackerView extends ItemView {
         const after = [...this.ordered].slice(active + 1).reverse();
         const creature = [...previous, ...after].find((c) => c.enabled);
         if (!creature) return;
+
         if (active < this.ordered.indexOf(creature)) {
             if (this.round == 1) {
                 return;
             }
             this.round = this.round - 1;
-            
+
+            this.logger.log("###", `Round ${this.round}`);
         }
+        this.logger.log("#####", `${creature.name}'s turn (backward)`);
         if (this.ordered[active]) this.ordered[active].active = false;
         creature.active = true;
         this.trigger("initiative-tracker:active-change", creature);
@@ -420,8 +487,21 @@ export default class TrackerView extends ItemView {
                 active.active = true;
                 this.trigger("initiative-tracker:active-change", active);
             }
+            if (!this.logger.logging) {
+                this.logger.new({
+                    name: this.name,
+                    players: this.players,
+                    creatures: this.creatures.filter(c => !c.player),
+                    round: this.round,
+                    xp: this.xp
+                });
+            } else {
+                this.logger.log(`Combat re-started`);
+            }
         } else {
             this.trigger("initiative-tracker:active-change", null);
+
+            this.logger.log(`Combat stopped`);
         }
 
         this.setAppState({
@@ -445,6 +525,8 @@ export default class TrackerView extends ItemView {
         this.setAppState({
             creatures: this.ordered
         });
+
+        this.logger.log(`${creature.name} relieved of status ${tag.name}`);
     }
     updateCreature(
         creature: Creature,
@@ -475,11 +557,11 @@ export default class TrackerView extends ItemView {
         }
         if (hp) {
             // Reduce temp HP first
-            hp = Number(hp)
+            hp = Number(hp);
             if (hp < 0 && creature.temp > 0) {
                 const remaining = creature.temp + hp;
-                creature.temp   = Math.max(0, remaining);
-                hp              = Math.min(0, remaining);
+                creature.temp = Math.max(0, remaining);
+                hp = Math.min(0, remaining);
             }
             // Clamp HP at 0 if clamp is enabled in settings
             if (this.plugin.data.clamp && creature.hp + hp < 0) {
@@ -489,11 +571,11 @@ export default class TrackerView extends ItemView {
             if (hp > 0 && hp + creature.hp > creature.max) {
                 switch (this.plugin.data.hpOverflow) {
                     case OVERFLOW_TYPE.ignore:
-                        hp = Math.max((creature.max - creature.hp), 0);
+                        hp = Math.max(creature.max - creature.hp, 0);
                         break;
                     case OVERFLOW_TYPE.temp:
                         // Gives temp a value, such that it will be set later
-                        temp = hp - Math.min((creature.max - creature.hp), 0)
+                        temp = hp - Math.min(creature.max - creature.hp, 0);
                         hp -= temp;
                         break;
                     case OVERFLOW_TYPE.current:
@@ -504,7 +586,9 @@ export default class TrackerView extends ItemView {
             if (this.plugin.data.autoStatus && creature.hp <= 0) {
                 this.addStatus(
                     creature,
-                    this.plugin.data.statuses.find((s) => s.name == "Unconscious")
+                    this.plugin.data.statuses.find(
+                        (s) => s.name == "Unconscious"
+                    )
                 );
             }
         }
@@ -620,7 +704,8 @@ export default class TrackerView extends ItemView {
             creatures: [...this.ordered.map((c) => c.toJSON())],
             state: this.state,
             name: this.name,
-            round: this.round
+            round: this.round,
+            logFile: this.logger.enabled ? this.logger.getLogFile() : null
         };
     }
     async onunload() {
@@ -703,7 +788,7 @@ export default class TrackerView extends ItemView {
 
                     if (existing) {
                         this.setAppState({
-                            updatingHP: existing
+                            updatingCreatures: [existing]
                         });
                     }
                 }
@@ -719,7 +804,7 @@ export default class TrackerView extends ItemView {
 
                     if (existing) {
                         this.setAppState({
-                            updatingStatus: existing
+                            updatingCreatures: [existing]
                         });
                     }
                 }
