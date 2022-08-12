@@ -73,6 +73,7 @@ export default class TrackerView extends ItemView {
         this.setAppState({ creatures: this.ordered });
     }
     async openCombatant(creature: Creature) {
+        if (!this.plugin.canUseStatBlocks) return;
         const view = this.plugin.combatant;
         if (!view) {
             const leaf = this.app.workspace.getRightLeaf(true);
