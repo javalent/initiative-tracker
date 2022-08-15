@@ -34,6 +34,7 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     condense: false,
     clamp: true,
     autoStatus: true,
+    beginnerTips: true,
     displayDifficulty: true,
     encounters: {},
     warnedAboutImports: false,
