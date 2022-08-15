@@ -118,6 +118,19 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         containerEl.empty();
         new Setting(containerEl).setHeading().setName("Basic Settings");
         new Setting(containerEl)
+        .setName("Display Beginner Tips")
+        .setDesc(
+            "Display instructions in the intiative tracker, helping you get used to the workflow."
+        )
+        .addToggle((t) => {
+            t.setValue(this.plugin.data.beginnerTips).onChange(
+                async (v) => {
+                    this.plugin.data.beginnerTips = v;
+                    await this.plugin.saveSettings();
+                }
+            );
+        });
+        new Setting(containerEl)
             .setName("Display Encounter Difficulty")
             .setDesc(
                 "Display encounter difficulty based on creature CR and player level. Creatures without CR or level will not be considered in the calculation."
