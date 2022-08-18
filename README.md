@@ -348,6 +348,11 @@ The setting tab has several options for adding and managing players and homebrew
 
 ## Basic Settings
 
+### Display Beginner Tips
+`Default: Enabled`
+
+Display instructions in the intiative tracker, helping you get used to the workflow.
+
 ### Display Encounter Difficulty
 `Default: Enabled`
 

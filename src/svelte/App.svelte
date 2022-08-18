@@ -195,9 +195,11 @@
         <div class="updating-hp">
             <!-- svelte-ignore a11y-autofocus -->
             <div class="hp-status">
-                <small class="label">
-                    Apply damage, healing(-) or temp HP(t)
-                </small>
+                {#if plugin.data.beginnerTips}
+                    <small class="label">
+                        Apply damage, healing(-) or temp HP(t)
+                    </small>
+                {/if}
                 <div class="input">
                     <tag
                         use:hpIcon
@@ -231,10 +233,12 @@
                 </div>
             </div>
             <div class="hp-status">
-                <small class="label">
-                    Apply status effect to creatures that fail their saving
-                    throw
-                </small>
+                {#if plugin.data.beginnerTips}
+                    <small class="label">
+                        Apply status effect to creatures that fail their saving
+                        throw
+                    </small>
+                {/if}
                 <div class="input">
                     <tag
                         use:tagIcon
@@ -275,9 +279,11 @@
                 aria-label="Cancel"
             />
         </div>
-        <div>
-            <small>Multiple creatures can be selected at a time.</small>
-        </div>
+        {#if plugin.data.beginnerTips}
+            <div>
+                <small>Multiple creatures can be selected at a time.</small>
+            </div>
+        {/if}
         <div style="margin: 0.5rem">
             <table class="updating-creature-table">
                 <thead class="updating-creature-table-header">
@@ -499,5 +505,6 @@
         display: flex;
         justify-content: flex-end;
         gap: 1rem;
+        margin-right: 1.2rem;
     }
 </style>

@@ -72,6 +72,7 @@ interface Party {
 }
 
 export interface InitiativeTrackerData {
+    beginnerTips: boolean;
     displayDifficulty: boolean;
     statuses: Condition[];
     openState: {
