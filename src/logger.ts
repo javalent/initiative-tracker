@@ -30,7 +30,6 @@ export default class Logger {
         if (file instanceof TFile) {
             this.file = file;
         }
-        console.log(file, this.file);
     }
     getFile(): TFile {
         return this.file;
@@ -110,10 +109,12 @@ export default class Logger {
             await this.log(`\n##### ${this.view.ordered[0].name}'s turn`);
         }
     }
-    log(...msg: string[]) {
-        console.log(this.file, msg);
+    async log(...msg: string[]) {
         if (!this.file) return;
-        this.vault.append(this.file, `${msg.join(" ")}\n`);
+        if (!(await this.adapter.exists(this.logFile))) {
+            await this.setLogFile(this.logFile);
+        }
+        await this.vault.append(this.file, `${msg.join(" ")}\n`);
     }
     public join(strings: string[], joiner: string = "and") {
         if (strings.length == 1) {
