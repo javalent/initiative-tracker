@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.4](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.3...8.0.4) (2022-08-18)
+
+
+### Bug Fixes
+
+* try again... ([3183c60](https://github.com/valentine195/obsidian-initiative-tracker/commit/3183c60e379678c87b95e3559e2378372900c443))
+
 ### [8.0.3](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.2...8.0.3) (2022-08-18)
 
 
