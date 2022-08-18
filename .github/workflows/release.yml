@@ -82,3 +82,23 @@ jobs:
                   asset_path: ./styles.css
                   asset_name: styles.css
                   asset_content_type: text/css
+    brat:
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: main
+            - env:
+                  VERSION: ${{needs.build.outputs.tag_name}}
+              run: |
+                  echo $VERSION
+                  mversion=$(grep 'version' manifest-beta.json | cut -d'"' -f4)
+                  if [ "$VERSION" != "$mversion" ]; then
+                    sed -i 's|\(version":\) "[0-9\.]*"|\1 "'$VERSION'"|' manifest-beta.json
+                    git config user.name github-actions
+                    git config user.email github-actions@github.com
+                    git add .
+                    git commit -m "🔨 brat release $VERSION"
+                    git push
+                  fi
