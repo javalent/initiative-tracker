@@ -99,6 +99,7 @@ jobs:
               run: |
                   echo $VERSION
                   mversion=$(grep 'version' manifest-beta.json | cut -d'"' -f4)
+                  echo $mversion
                   if [ "$VERSION" != "$mversion" ]; then
                     sed -i 's|\(version":\) "[0-9\.]*"|\1 "'$VERSION'"|' manifest-beta.json
                     git config user.name github-actions
