@@ -167,6 +167,7 @@ export interface HomebrewCreature {
     marker?: string;
     id?: string;
     xp?: number;
+    hidden?: boolean;
 }
 
 export type ability =

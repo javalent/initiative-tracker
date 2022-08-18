@@ -64,7 +64,7 @@
 
     const hamburgerIcon = (evt: MouseEvent, creature: Creature) => {
         evt.stopPropagation();
-        const menu = new Menu(view.plugin.app);
+        const menu = new Menu();
         menu.addItem((item) => {
             item.setIcon("pencil")
                 .setTitle("Edit")
@@ -93,8 +93,8 @@
             menu.addItem((item) => {
                 item.setIcon(MAPMARKER)
                     .setTitle("Change Marker")
-                    .onClick((evt) => {
-                        const markerMenu = new Menu(view.plugin.app);
+                    .onClick((evt: MouseEvent) => {
+                        const markerMenu = new Menu();
                         markerMenu.setNoIcon();
                         for (let marker of view.plugin.leaflet.markerIcons) {
                             markerMenu.addItem((item) => {
@@ -154,10 +154,6 @@
                             ((creature.hp ?? 0) / creature.max) * 100 ?? 0
                         )}
                         on:click={(evt) => {
-                            console.log(
-                                clickModifier,
-                                evt.getModifierState(clickModifier)
-                            );
                             if (evt.getModifierState(clickModifier)) {
                                 dispatch("hp", { creature });
                                 return;

@@ -13,6 +13,9 @@ import {
     INTIATIVE_TRACKER_VIEW,
     registerIcons
 } from "./utils";
+
+import { PLAYER_VIEW_VIEW } from "./utils/constants";
+
 import type {
     EventsOnArgs,
     HomebrewCreature,
@@ -31,6 +34,7 @@ import { BESTIARY } from "./utils/srd-bestiary";
 import TrackerView, { CreatureView } from "./view";
 
 import type { Plugins } from "../../obsidian-overload/index";
+import PlayerView from "./player-view/player-view";
 declare module "obsidian" {
     interface App {
         plugins: {
@@ -66,8 +70,13 @@ export default class InitiativeTracker extends Plugin {
     }
     get canUseDiceRoller() {
         if (this.app.plugins.getPlugin("obsidian-dice-roller") != null) {
-            if (! this.app.plugins.getPlugin("obsidian-dice-roller").getRollerSync) {
-                new Notice("Please update Dice Roller to the latest version to use with Initiative Tracker.");
+            if (
+                !this.app.plugins.getPlugin("obsidian-dice-roller")
+                    .getRollerSync
+            ) {
+                new Notice(
+                    "Please update Dice Roller to the latest version to use with Initiative Tracker."
+                );
             } else {
                 return true;
             }
@@ -166,6 +175,10 @@ export default class InitiativeTracker extends Plugin {
         this.registerView(
             INTIATIVE_TRACKER_VIEW,
             (leaf: WorkspaceLeaf) => new TrackerView(leaf, this)
+        );
+        this.registerView(
+            PLAYER_VIEW_VIEW,
+            (leaf: WorkspaceLeaf) => new PlayerView(leaf, this)
         );
         this.registerView(
             CREATURE_TRACKER_VIEW,

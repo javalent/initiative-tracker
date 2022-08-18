@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ExtraButtonComponent } from "obsidian";
+    import { ExtraButtonComponent, Platform } from "obsidian";
 
     import {
         BACKWARD,
@@ -22,6 +22,8 @@
 
     export let state: boolean = false;
     export let map: boolean = false;
+
+    const desktop = Platform.isDesktop;
 
     let view = getContext<TrackerView>("view");
 
@@ -66,7 +68,7 @@
         menu.showAtMouseEvent(evt);
     };
     /* const menu = (node: HTMLElement) => { */
-    const menu = new Menu(plugin.app);
+    const menu = new Menu();
     menu.addItem((item) => {
         item.setIcon(NEW)
             .setTitle("New Encounter")
@@ -86,9 +88,9 @@
         menu.addItem((item) => {
             item.setIcon("switch")
                 .setTitle("Switch Party")
-                .onClick((evt) => {
+                .onClick((evt: MouseEvent) => {
                     menu.hide();
-                    const partyMenu = new Menu(plugin.app).setNoIcon();
+                    const partyMenu = new Menu().setNoIcon();
                     for (const party of plugin.data.parties) {
                         partyMenu.addItem((item) => {
                             item.setTitle(party.name)
@@ -144,6 +146,9 @@
     const menuIcon = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("vertical-three-dots");
     };
+    const playerView = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon("view");
+    };
     /* }; */
 </script>
 
@@ -158,6 +163,15 @@
         {/if}
     </div>
     <div class="clean">
+        {#if desktop}
+            <div
+                use:playerView
+                aria-label="Open Player View"
+                on:click={(evt) => {
+                    view.openPlayerView();
+                }}
+            />
+        {/if}
         <div use:menuIcon on:click={(evt) => open(evt)} />
         <!-- <div use:diceButton />
         <div use:restoreButton />

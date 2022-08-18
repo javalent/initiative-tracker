@@ -23,26 +23,43 @@ import type {
     HomebrewCreature,
     InitiativeViewState,
     Party,
-    TrackerEvents,
-    TrackerViewState
+    TrackerEvents
 } from "@types";
 import { equivalent } from "./encounter";
-import {OVERFLOW_TYPE} from "./utils/constants"
-
-class LoadEncounterModal extends Modal {
-    constructor(public plugin: InitiativeTracker) {
-        super(plugin.app);
-    }
-    onOpen() {
-        this.titleEl.setText("Load Encounter");
-
-        for (const encounter of Object.values(this.plugin.data.encounters)) {
-            new Setting(this.contentEl).setName(encounter.name);
-        }
-    }
-}
+import { OVERFLOW_TYPE, PLAYER_VIEW_VIEW } from "./utils/constants";
+import type PlayerView from "./player-view/player-view";
 
 export default class TrackerView extends ItemView {
+    playerViewOpened = false;
+    getExistingPlayerView(): PlayerView {
+        const existing =
+            this.plugin.app.workspace.getLeavesOfType(PLAYER_VIEW_VIEW);
+        if (existing.length) {
+            return existing[0].view as PlayerView;
+        }
+    }
+    async getPlayerView(): Promise<PlayerView> {
+        const existing = this.getExistingPlayerView();
+        if (existing) return existing;
+        const leaf = await this.app.workspace.openPopoutLeaf();
+        await leaf.setViewState({
+            type: PLAYER_VIEW_VIEW
+        });
+        return leaf.view as PlayerView;
+    }
+    async openPlayerView() {
+        const view = await this.getPlayerView();
+        view?.reset(this.ordered);
+        this.playerViewOpened = true;
+    }
+    async setPlayerViewCreatures() {
+        if (!this.playerViewOpened) return;
+        const view = this.getExistingPlayerView();
+        if (view) {
+            view.reset(this.ordered);
+            view.setTrackerState(this.state);
+        }
+    }
     async saveEncounter(name: string) {
         if (!name) {
             new Notice("An encounter must have a name to be saved.");
@@ -119,7 +136,6 @@ export default class TrackerView extends ItemView {
     async switchParty(party: string) {
         if (!this.plugin.data.parties.find((p) => p.name == party)) return;
         this.party = this.plugin.data.parties.find((p) => p.name == party);
-        console.log("🚀 ~ file: view.ts ~ line 120 ~ this.party", this.party);
         this.setAppState({ party: this.party.name });
         this.creatures = this.creatures.filter((p) => !p.player);
         for (const player of this.players) {
@@ -258,6 +274,7 @@ export default class TrackerView extends ItemView {
                 .map((c) => c.number);
             creature.number = prior?.length ? Math.max(...prior) + 1 : 1;
         }
+        this.setAppState({});
     }
 
     async newEncounter(
@@ -293,7 +310,9 @@ export default class TrackerView extends ItemView {
         }
         for (const player of playerNames) {
             if (!this.plugin.playerCreatures.has(player)) continue;
-            this.creatures.push(this.plugin.playerCreatures.get(player));
+            const playerCreature = this.plugin.playerCreatures.get(player);
+            playerCreature.hidden = false;
+            this.creatures.push(playerCreature);
         }
 
         if (creatures) this.setCreatures([...this.creatures, ...creatures]);
@@ -325,6 +344,7 @@ export default class TrackerView extends ItemView {
         for (let creature of this.ordered) {
             creature.hp = creature.max;
             this.setCreatureState(creature, true);
+            this.setCreatureHidden(creature, false);
             const statuses = Array.from(creature.status);
             statuses.forEach((status) => {
                 this.removeStatus(creature, status);
@@ -402,7 +422,6 @@ export default class TrackerView extends ItemView {
                 return;
             }
             this.round = this.round - 1;
-            
         }
         if (this.ordered[active]) this.ordered[active].active = false;
         creature.active = true;
@@ -476,11 +495,11 @@ export default class TrackerView extends ItemView {
         }
         if (hp) {
             // Reduce temp HP first
-            hp = Number(hp)
+            hp = Number(hp);
             if (hp < 0 && creature.temp > 0) {
                 const remaining = creature.temp + hp;
-                creature.temp   = Math.max(0, remaining);
-                hp              = Math.min(0, remaining);
+                creature.temp = Math.max(0, remaining);
+                hp = Math.min(0, remaining);
             }
             // Clamp HP at 0 if clamp is enabled in settings
             if (this.plugin.data.clamp && creature.hp + hp < 0) {
@@ -490,11 +509,11 @@ export default class TrackerView extends ItemView {
             if (hp > 0 && hp + creature.hp > creature.max) {
                 switch (this.plugin.data.hpOverflow) {
                     case OVERFLOW_TYPE.ignore:
-                        hp = Math.max((creature.max - creature.hp), 0);
+                        hp = Math.max(creature.max - creature.hp, 0);
                         break;
                     case OVERFLOW_TYPE.temp:
                         // Gives temp a value, such that it will be set later
-                        temp = hp - Math.min((creature.max - creature.hp), 0)
+                        temp = hp - Math.min(creature.max - creature.hp, 0);
                         hp -= temp;
                         break;
                     case OVERFLOW_TYPE.current:
@@ -505,7 +524,9 @@ export default class TrackerView extends ItemView {
             if (this.plugin.data.autoStatus && creature.hp <= 0) {
                 this.addStatus(
                     creature,
-                    this.plugin.data.statuses.find((s) => s.name == "Unconscious")
+                    this.plugin.data.statuses.find(
+                        (s) => s.name == "Unconscious"
+                    )
                 );
             }
         }
@@ -553,6 +574,15 @@ export default class TrackerView extends ItemView {
             creatures: this.ordered
         });
     }
+    setCreatureHidden(creature: Creature, hidden: boolean) {
+        creature.hidden = hidden;
+
+        this.trigger("initiative-tracker:creature-updated", creature);
+
+        this.setAppState({
+            creatures: this.ordered
+        });
+    }
     private _enableCreature(creature: Creature) {
         creature.enabled = true;
         if (this.enabled.length == 1) {
@@ -576,6 +606,7 @@ export default class TrackerView extends ItemView {
         }
 
         this.plugin.data.state = this.toState();
+        this.setPlayerViewCreatures();
         this.trigger("initiative-tracker:should-save");
     }
     async onOpen() {
@@ -626,6 +657,10 @@ export default class TrackerView extends ItemView {
     }
     async onunload() {
         this.plugin.data.state = this.toState();
+        const playerview = this.getExistingPlayerView();
+        if (playerview) {
+            playerview?.leaf.detach();
+        }
         await this.plugin.saveSettings();
     }
     registerEvents() {
@@ -703,9 +738,7 @@ export default class TrackerView extends ItemView {
                     );
 
                     if (existing) {
-                        this.setAppState({
-                            updatingHP: existing
-                        });
+                        this.setAppState({});
                     }
                 }
             )
@@ -719,9 +752,7 @@ export default class TrackerView extends ItemView {
                     );
 
                     if (existing) {
-                        this.setAppState({
-                            updatingStatus: existing
-                        });
+                        this.setAppState({});
                     }
                 }
             )

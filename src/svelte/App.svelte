@@ -178,7 +178,6 @@
                         customMod: evt.detail.alt ? "2" : "1"
                     }
                 ];
-                console.log(updatingCreatures);
             } else {
                 updatingCreatures.splice(index, 1);
             }
@@ -386,7 +385,8 @@
                                 marker: view.plugin.data.monsterMarker,
                                 xp: creature.xp,
                                 player: creature.player,
-                                level: creature.level
+                                level: creature.level,
+                                hidden: creature.hidden
                             },
                             creature.initiative
                         );
@@ -398,6 +398,7 @@
                             editCreature.display = creature.display;
                             editCreature.initiative = creature.initiative;
                             editCreature.modifier = creature.modifier;
+                            editCreature.hidden = creature.hidden;
                             view.updateCreature(editCreature, {
                                 name: creature.name
                             });

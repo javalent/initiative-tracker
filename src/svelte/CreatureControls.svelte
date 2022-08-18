@@ -17,7 +17,7 @@
             .setTooltip("Actions");
         hamburger.extraSettingsEl.onclick = (evt) => {
             evt.stopPropagation();
-            const menu = new Menu(view.plugin.app);
+            const menu = new Menu();
             menu.addItem((item) => {
                 item.setIcon(HP)
                     .setTitle("Set Health/Status")
@@ -32,6 +32,23 @@
                         dispatch("edit", creature);
                     });
             });
+            if (creature.hidden) {
+                menu.addItem((item) => {
+                    item.setIcon("eye")
+                        .setTitle("Show")
+                        .onClick(() => {
+                            view.setCreatureHidden(creature, false);
+                        });
+                });
+            } else {
+                menu.addItem((item) => {
+                    item.setIcon("eye-off")
+                        .setTitle("Hide")
+                        .onClick(() => {
+                            view.setCreatureHidden(creature, true);
+                        });
+                });
+            }
             if (creature.enabled) {
                 menu.addItem((item) => {
                     item.setIcon(DISABLE)
@@ -53,8 +70,8 @@
                 menu.addItem((item) => {
                     item.setIcon(MAPMARKER)
                         .setTitle("Change Marker")
-                        .onClick((evt) => {
-                            const markerMenu = new Menu(view.plugin.app);
+                        .onClick((evt: MouseEvent) => {
+                            const markerMenu = new Menu();
                             markerMenu.setNoIcon();
                             for (let marker of view.plugin.leaflet
                                 .markerIcons) {

@@ -7,6 +7,7 @@
     import Initiative from "./Initiative.svelte";
     import CreatureControls from "./CreatureControls.svelte";
     import Status from "./Status.svelte";
+    import { setIcon } from "obsidian";
 
     export let creature: Creature;
     $: statuses = creature.status;
@@ -24,6 +25,9 @@
         }
         return creature.name;
     };
+    const hiddenIcon = (div: HTMLElement) => {
+        setIcon(div, "eye-off");
+    };
 </script>
 
 <td class="initiative-container" on:click={(e) => e.stopPropagation()}>
@@ -38,6 +42,9 @@
 </td>
 <td class="name-container">
     <div class="name-holder">
+        {#if creature.hidden}
+            <div class='centered-icon' use:hiddenIcon />
+        {/if}
         {#if creature.player}
             <strong class="name player">{creature.name}</strong>
         {:else}
@@ -63,17 +70,15 @@
     <div
         class="editable"
         on:click={(e) => {
-            dispatch(
-                "hp", 
-                {
-                    creature: creature, 
-                    ctrl: e.getModifierState(META_MODIFIER), 
-                    shift: e.getModifierState('Shift'),
-                    alt: e.getModifierState('Alt')
-                }
-            );
+            dispatch("hp", {
+                creature: creature,
+                ctrl: e.getModifierState(META_MODIFIER),
+                shift: e.getModifierState("Shift"),
+                alt: e.getModifierState("Alt")
+            });
             e.stopPropagation();
-        }}>
+        }}
+    >
         {@html creature.hpDisplay}
     </div>
 </td>
@@ -94,8 +99,13 @@
 <style>
     .name-holder {
         display: flex;
+        align-items: center;
         gap: 0.25rem;
         font-size: small;
+    }
+    .centered-icon {
+        display: flex;
+        align-items: center;
     }
     .name {
         display: block;
