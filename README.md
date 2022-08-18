@@ -4,6 +4,8 @@ This plugin can be used as an initiative tracker within Obsidian.md.
 
 When enabled, the plugin will add an additional view in the right pane, where players and creatures can be added to track their initiatives during combat.
 
+Now features a Player View!
+
 ## Creature View
 
 If the TTRPG Statblocks (version 2.0+) is installed, creatures may be viewed by clicking on them in the initiative tracker. A new view will open up with a rendered statblock.
@@ -387,6 +389,14 @@ When a creature takes damage that would reduce its HP below 0, it gains the "Unc
 `Default: Disabled`
 
 Any temporary HP added to a creature will be added on top of exsiting temporary HP.
+
+### Logging
+
+Enables a logging system that will log actions taken during encounters. Each new encounter will create a new log file.
+
+### Log folder
+
+New log files will be placed here.
 
 ## Players
 
