@@ -32,7 +32,7 @@ jobs:
                   npx rexreplace "^.*?#(#+\s\[.*?\n.*?)(?=\s*#+\s\[)" "_" -s -M -G -m -o "CHANGELOG.md" > release_notes.md
                   echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
 
-                  VERSION=$(grep '^  "version"' package.json | cut -d'"' -f4)
+                  VERSION=$(grep 'version' package.json | cut -d'"' -f4)
                   echo $VERSION
                   echo "::set-output name=version::${VERSION}"
             - name: Create Release
