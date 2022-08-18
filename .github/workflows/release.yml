@@ -95,7 +95,7 @@ jobs:
               with:
                   ref: master
             - env:
-                  VERSION: ${{ github.ref }}
+                  VERSION: ${{needs.build.outputs.version}}
               run: |
                   echo $VERSION
                   mversion=$(grep 'version' manifest-beta.json | cut -d'"' -f4)
