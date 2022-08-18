@@ -65,37 +65,43 @@ export default class Logger {
                 `**Combat started ${new Date().toLocaleString()}**\n\n`
             );
             await this.log("## Players");
-            await this.log("Player | Initiative | HP | Statuses");
-            await this.log("--- | :-: | :-: | :-:");
+            await this.log("| Player | Initiative | HP | Statuses |");
+            await this.log("| --- | :-: | :-: | :-: |");
             for (const player of param.players.sort(
                 (a, b) => b.initiative - a.initiative
             )) {
                 await this.log(
-                    player.name,
+                    "|",
+                    player.name.replace("|", "|"),
                     "|",
                     player.initiative.toString(),
                     "|",
                     player.hp ? `${player.hp}/${player.max}` : "-",
                     "|",
-                    [...(player.status.size ? player.status : ["-"])].join(", ")
+                    [...(player.status.size ? player.status : ["-"])]
+                        .join(", ")
+                        .replace("|", "|"),
+                    "|"
                 );
             }
             await this.log("## Creatures");
-            await this.log("Creature | Initiative  | HP | Statuses");
-            await this.log("--- | :-: | :-: | :-:");
+            await this.log("| Creature | Initiative  | HP | Statuses |");
+            await this.log("| --- | :-: | :-: | :-: |");
             for (const creature of param.creatures.sort(
                 (a, b) => b.initiative - a.initiative
             )) {
                 await this.log(
-                    creature.name,
+                    "|",
+                    creature.name.replace("|", "|"),
                     "|",
                     creature.initiative.toString(),
                     "|",
                     creature.hp ? `${creature.hp}/${creature.max}` : "-",
                     "|",
-                    [...(creature.status.size ? creature.status : ["-"])].join(
-                        ", "
-                    )
+                    [...(creature.status.size ? creature.status : ["-"])]
+                        .join(", ")
+                        .replace("|", "|"),
+                    "|"
                 );
             }
 
