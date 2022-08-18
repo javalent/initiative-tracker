@@ -47,7 +47,9 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
         player: true
     },
     hpOverflow: "ignore",
-    additiveTemp: false
+    additiveTemp: false,
+    logging: false,
+    logFolder: "/"
 };
 
 export const XP_PER_CR: Record<string, number> = {

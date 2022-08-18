@@ -1,16 +1,22 @@
 import {
     addIcon,
     ExtraButtonComponent,
+    normalizePath,
     Notice,
     PluginSettingTab,
     setIcon,
     Setting,
-    TextComponent
+    TextComponent,
+    TFolder
 } from "obsidian";
 
 import type InitiativeTracker from "./main";
 
-import { FileSuggestionModal, PlayerSuggestionModal } from "./utils/suggester";
+import {
+    FileSuggestionModal,
+    FolderSuggestionModal,
+    PlayerSuggestionModal
+} from "./utils/suggester";
 import {
     AC,
     Conditions,
@@ -174,7 +180,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 };
             }); */
     }
-    private _displayBattle(additionalContainer: HTMLDetailsElement) {
+    private async _displayBattle(additionalContainer: HTMLDetailsElement) {
         additionalContainer.empty();
         additionalContainer.ontoggle = () => {
             this.plugin.data.openState.battle = additionalContainer.open;
@@ -183,53 +189,113 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         new Setting(summary).setHeading().setName("Battle");
         summary.createDiv("collapser").createDiv("handle");
         new Setting(additionalContainer)
-        .setName("Clamp Minimum HP")
-        .setDesc(
-            "When a creature takes damage that would reduce its HP below 0, its HP is set to 0 instead."
-        )
-        .addToggle((t) => {
-            t.setValue(this.plugin.data.clamp).onChange(async (v) => {
-                this.plugin.data.clamp = v;
-                await this.plugin.saveSettings();
+            .setName("Clamp Minimum HP")
+            .setDesc(
+                "When a creature takes damage that would reduce its HP below 0, its HP is set to 0 instead."
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.clamp).onChange(async (v) => {
+                    this.plugin.data.clamp = v;
+                    await this.plugin.saveSettings();
+                });
             });
-        });
         new Setting(additionalContainer)
-        .setName("Overflow Healing")
-        .setDesc(
-            "Set what happens to healing which goes above creatures' max HP threshold."
-        )
-        .addDropdown((d) => {
-            d.addOption("ignore", "Ignore");
-            d.addOption("temp", "Add to temp HP");
-            d.addOption("current", "Add to current HP");
-            d.setValue(this.plugin.data.hpOverflow ?? "ignore");
-            d.onChange(async (v) => {
-                this.plugin.data.hpOverflow = v;
-                this.plugin.saveSettings();
+            .setName("Overflow Healing")
+            .setDesc(
+                "Set what happens to healing which goes above creatures' max HP threshold."
+            )
+            .addDropdown((d) => {
+                d.addOption("ignore", "Ignore");
+                d.addOption("temp", "Add to temp HP");
+                d.addOption("current", "Add to current HP");
+                d.setValue(this.plugin.data.hpOverflow ?? "ignore");
+                d.onChange(async (v) => {
+                    this.plugin.data.hpOverflow = v;
+                    this.plugin.saveSettings();
+                });
             });
-        });
         new Setting(additionalContainer)
-        .setName("Automatic Unconscious Status Application")
-        .setDesc(
-            "When a creature takes damage that would reduce its HP below 0, it gains the \"Unconscious\" status effect."
-        )
-        .addToggle((t) => {
-            t.setValue(this.plugin.data.autoStatus).onChange(async (v) => {
-                this.plugin.data.autoStatus = v;
-                await this.plugin.saveSettings();
+            .setName("Automatic Unconscious Status Application")
+            .setDesc(
+                'When a creature takes damage that would reduce its HP below 0, it gains the "Unconscious" status effect.'
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.autoStatus).onChange(async (v) => {
+                    this.plugin.data.autoStatus = v;
+                    await this.plugin.saveSettings();
+                });
             });
-        });
         new Setting(additionalContainer)
-        .setName("Additive Temporary HP")
-        .setDesc(
-            "Any temporary HP added to a creature will be added on top of existing temporary HP."
-        )
-        .addToggle((t) => {
-            t.setValue(this.plugin.data.additiveTemp).onChange(async (v) => {
-                this.plugin.data.additiveTemp = v;
-                await this.plugin.saveSettings();
+            .setName("Additive Temporary HP")
+            .setDesc(
+                "Any temporary HP added to a creature will be added on top of existing temporary HP."
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.additiveTemp).onChange(
+                    async (v) => {
+                        this.plugin.data.additiveTemp = v;
+                        await this.plugin.saveSettings();
+                    }
+                );
             });
-        });
+
+        new Setting(additionalContainer)
+            .setName("Log Battles")
+            .setDesc(
+                "Actions taken during battle will be logged to the specified log folder."
+            )
+            .addToggle((t) =>
+                t.setValue(this.plugin.data.logging).onChange(async (v) => {
+                    this.plugin.data.logging = v;
+                    await this.plugin.saveSettings();
+                })
+            );
+
+        const exists = await this.plugin.app.vault.adapter.exists(
+            this.plugin.data.logFolder
+        );
+        new Setting(additionalContainer)
+            .setName("Log Folder")
+            .setDesc(
+                createFragment(async (e) => {
+                    e.createSpan({
+                        text: "A new note will be created in this folder for each battle."
+                    });
+                    e.createEl("br");
+                    e.createSpan({ text: "Current: " });
+                    e.createEl("code", { text: this.plugin.data.logFolder });
+
+                    if (!exists) {
+                        e.createEl("br");
+                        const container = e.createDiv(
+                            "initiative-tracker-warning"
+                        );
+                        setIcon(container, "initiative-tracker-warning");
+                        container.createSpan({
+                            text: "This folder does not exist and will be created when a log file is written for the first time."
+                        });
+                    }
+                })
+            )
+            .addText((t) => {
+                t.setValue(this.plugin.data.logFolder);
+                let folders = this.app.vault
+                    .getAllLoadedFiles()
+                    .filter((f) => f instanceof TFolder);
+                const modal = new FolderSuggestionModal(
+                    this.app,
+                    t,
+                    folders as TFolder[]
+                );
+                modal.onClose = t.inputEl.onblur = async () => {
+                    const v = t.inputEl.value?.trim()
+                        ? t.inputEl.value.trim()
+                        : "/";
+                    this.plugin.data.logFolder = normalizePath(v);
+                    await this.plugin.saveSettings();
+                    this.display();
+                };
+            });
     }
     private _displayPlayers(additionalContainer: HTMLDetailsElement) {
         additionalContainer.empty();

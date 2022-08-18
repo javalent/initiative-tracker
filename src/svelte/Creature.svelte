@@ -57,8 +57,9 @@
                 <Status
                     {status}
                     on:remove={() => {
-                        creature.status.delete(status);
-                        statuses = creature.status;
+                        view.removeStatus(creature, status);
+                        /* creature.status.delete(status);
+                        statuses = creature.status; */
                     }}
                 />
             {/each}
@@ -79,7 +80,6 @@
         on:click={(e) => e.stopPropagation()}
         on:tag
         on:edit
-        on:hp
         {view}
         {creature}
     />

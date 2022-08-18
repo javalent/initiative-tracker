@@ -102,6 +102,8 @@ export interface InitiativeTrackerData {
     additiveTemp: boolean;
     autoStatus: boolean;
     warnedAboutImports: boolean;
+    logging: boolean;
+    logFolder: string;
 }
 
 export interface InitiativeViewState {
@@ -109,8 +111,8 @@ export interface InitiativeViewState {
     state: boolean;
     name: string;
     round: number;
+    logFile: string;
 }
-
 
 export interface CreatureState extends HomebrewCreature {
     status: string[];
@@ -185,4 +187,13 @@ export interface Trait {
     name: string;
     desc: string;
     [key: string]: any;
+}
+
+export interface UpdateLogMessage {
+    name: string;
+    hp: number;
+    temp: boolean;
+    status: string;
+    saved: boolean;
+    unc: boolean;
 }
