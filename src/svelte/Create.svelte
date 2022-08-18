@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ExtraButtonComponent, Notice } from "obsidian";
+    import { ExtraButtonComponent, Notice, ToggleComponent } from "obsidian";
 
     import { createEventDispatcher, getContext } from "svelte";
 
@@ -19,6 +19,7 @@
     export let initiative: number = null;
     export let ac: string = null;
     export let modifier: number = null;
+    export let hidden: boolean = false;
     let xp: number;
     let player: boolean;
     let level: number;
@@ -49,7 +50,8 @@
                     xp,
                     player,
                     level,
-                    number: Number(number)
+                    number: Number(number),
+                    hidden
                 });
             });
     };
@@ -89,6 +91,9 @@
             }
         };
         modal.open();
+    };
+    const hideToggle = (div: HTMLDivElement) => {
+        new ToggleComponent(div).setValue(hidden).onChange((v) => (hidden = v));
     };
 </script>
 
@@ -146,6 +151,7 @@
             tabindex="0"
         />
     </div>
+
     <div class="initiative">
         <label for="add-init">Initiative</label>
         <input
@@ -156,6 +162,11 @@
             tabindex="0"
         />
         <div class="dice" use:diceButton />
+    </div>
+
+    <div>
+        <label for="add-mod">Hidden</label>
+        <div use:hideToggle />
     </div>
     {#if !editing}
         <div class="amount">

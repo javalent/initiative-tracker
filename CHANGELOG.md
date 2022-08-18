@@ -2,12 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+
 ## [7.7.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.6.2...7.7.0) (2022-08-11)
 
 
 ### Features
 
 * Combat logs ([f968e9a](https://github.com/valentine195/obsidian-initiative-tracker/commit/f968e9abc34e66f965e1ba335625fa4b13faca88))
+
+## [7.6.3](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.6.2...7.6.3) (2022-08-12)
+
+
+### Bug Fixes
+
+* No longer open combatant if Statblocks isn’t installed ([3cd88cb](https://github.com/valentine195/obsidian-initiative-tracker/commit/3cd88cb4b31fb87cd2844e6eb4c28b58eeb20649))
 
 ### [7.6.2](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.6.1...7.6.2) (2022-08-10)
 

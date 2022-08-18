@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Menu, Platform, setIcon } from "obsidian";
-    import { AC, DISABLE, ENABLE, HP, MAPMARKER, REMOVE, TAG } from "src/utils";
+    import { AC, DISABLE, ENABLE, HP, MAPMARKER, REMOVE, META_MODIFIER } from "src/utils";
 
     import { flip } from "svelte/animate";
     import { dndzone } from "svelte-dnd-action";
@@ -12,9 +12,6 @@
 
     export let creatures: Creature[] = [];
     export let state: boolean;
-
-    const clickModifier =
-        Platform.isMacOS || Platform.isIosApp ? "Meta" : "Control";
 
     const dispatch = createEventDispatcher();
 
@@ -58,13 +55,9 @@
         view.setCreatures(items.map(({ creature }) => creature));
     }
 
-    const openView = (creature: Creature) => {
-        view.openCombatant(creature);
-    };
-
     const hamburgerIcon = (evt: MouseEvent, creature: Creature) => {
         evt.stopPropagation();
-        const menu = new Menu(view.plugin.app);
+        const menu = new Menu();
         menu.addItem((item) => {
             item.setIcon("pencil")
                 .setTitle("Edit")
@@ -93,8 +86,8 @@
             menu.addItem((item) => {
                 item.setIcon(MAPMARKER)
                     .setTitle("Change Marker")
-                    .onClick((evt) => {
-                        const markerMenu = new Menu(view.plugin.app);
+                    .onClick((evt: MouseEvent) => {
+                        const markerMenu = new Menu();
                         markerMenu.setNoIcon();
                         for (let marker of view.plugin.leaflet.markerIcons) {
                             markerMenu.addItem((item) => {
@@ -153,16 +146,17 @@
                         data-hp-percent={Math.round(
                             ((creature.hp ?? 0) / creature.max) * 100 ?? 0
                         )}
-                        on:click={(evt) => {
-                            console.log(
-                                clickModifier,
-                                evt.getModifierState(clickModifier)
+                        on:click={(e) => {
+                            dispatch(
+                                "hp", 
+                                {
+                                    creature: creature, 
+                                    ctrl: e.getModifierState(META_MODIFIER), 
+                                    shift: e.getModifierState('Shift'),
+                                    alt: e.getModifierState('Alt')
+                                }
                             );
-                            if (evt.getModifierState(clickModifier)) {
-                                dispatch("hp", { creature });
-                                return;
-                            }
-                            openView(creature);
+                            e.stopPropagation();
                         }}
                         on:contextmenu={(evt) => hamburgerIcon(evt, creature)}
                     >

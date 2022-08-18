@@ -72,6 +72,7 @@ interface Party {
 }
 
 export interface InitiativeTrackerData {
+    beginnerTips: boolean;
     displayDifficulty: boolean;
     statuses: Condition[];
     openState: {
@@ -169,6 +170,7 @@ export interface HomebrewCreature {
     marker?: string;
     id?: string;
     xp?: number;
+    hidden?: boolean;
 }
 
 export type ability =

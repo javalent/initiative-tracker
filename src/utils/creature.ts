@@ -25,6 +25,7 @@ export class Creature {
     ac: number;
     note: string;
     enabled: boolean = true;
+    hidden: boolean = false;
     max: number;
     level: number;
     player: boolean;
@@ -67,10 +68,15 @@ export class Creature {
     }
     get hpDisplay() {
         if (this.max) {
-            const tempMods = this.temp > 0 ? `aria-label="Temp HP: ${this.temp}" style="font-weight:bold"`:''
+            const tempMods =
+                this.temp > 0
+                    ? `aria-label="Temp HP: ${this.temp}" style="font-weight:bold"`
+                    : "";
             return `
-                <span ${tempMods}>${this.hp + this.temp}</span><span>/${this.max}</span>
-            `
+                <span ${tempMods}>${this.hp + this.temp}</span><span>/${
+                this.max
+            }</span>
+            `;
         }
         return DEFAULT_UNDEFINED;
     }
@@ -97,7 +103,8 @@ export class Creature {
     static new(creature: Creature) {
         return new Creature(
             {
-                ...creature
+                ...creature,
+                id: getId()
             },
             creature._initiative
         );
@@ -158,7 +165,8 @@ export class Creature {
             level: this.level,
             player: this.player,
             xp: this.xp,
-            active: this.active
+            active: this.active,
+            hidden: this.hidden
         };
     }
 

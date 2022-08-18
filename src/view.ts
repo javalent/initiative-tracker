@@ -28,10 +28,41 @@ import type {
     UpdateLogMessage
 } from "@types";
 import { equivalent } from "./encounter";
-import { OVERFLOW_TYPE } from "./utils/constants";
+import { OVERFLOW_TYPE, PLAYER_VIEW_VIEW } from "./utils/constants";
+import type PlayerView from "./player-view/player-view";
 import Logger from "./logger";
 
 export default class TrackerView extends ItemView {
+    playerViewOpened = false;
+    getExistingPlayerView(): PlayerView {
+        const existing =
+            this.plugin.app.workspace.getLeavesOfType(PLAYER_VIEW_VIEW);
+        if (existing.length) {
+            return existing[0].view as PlayerView;
+        }
+    }
+    async getPlayerView(): Promise<PlayerView> {
+        const existing = this.getExistingPlayerView();
+        if (existing) return existing;
+        const leaf = await this.app.workspace.openPopoutLeaf();
+        await leaf.setViewState({
+            type: PLAYER_VIEW_VIEW
+        });
+        return leaf.view as PlayerView;
+    }
+    async openPlayerView() {
+        const view = await this.getPlayerView();
+        view?.reset(this.ordered);
+        this.playerViewOpened = true;
+    }
+    async setPlayerViewCreatures() {
+        if (!this.playerViewOpened) return;
+        const view = this.getExistingPlayerView();
+        if (view) {
+            view.reset(this.ordered);
+            view.setTrackerState(this.state);
+        }
+    }
     logger = new Logger(this.plugin, this);
 
     logUpdate(messages: UpdateLogMessage[]) {
@@ -110,6 +141,7 @@ export default class TrackerView extends ItemView {
         this.setAppState({ creatures: this.ordered });
     }
     async openCombatant(creature: Creature) {
+        if (!this.plugin.canUseStatBlocks) return;
         const view = this.plugin.combatant;
         if (!view) {
             const leaf = this.app.workspace.getRightLeaf(true);
@@ -312,6 +344,7 @@ export default class TrackerView extends ItemView {
                 .map((c) => c.number);
             creature.number = prior?.length ? Math.max(...prior) + 1 : 1;
         }
+        this.setAppState({});
     }
     async newEncounter(
         {
@@ -346,7 +379,9 @@ export default class TrackerView extends ItemView {
         }
         for (const player of playerNames) {
             if (!this.plugin.playerCreatures.has(player)) continue;
-            this.creatures.push(this.plugin.playerCreatures.get(player));
+            const playerCreature = this.plugin.playerCreatures.get(player);
+            playerCreature.hidden = false;
+            this.creatures.push(playerCreature);
         }
 
         if (creatures) this.setCreatures([...this.creatures, ...creatures]);
@@ -382,6 +417,7 @@ export default class TrackerView extends ItemView {
         for (let creature of this.ordered) {
             creature.hp = creature.max;
             this.setCreatureState(creature, true);
+            this.setCreatureHidden(creature, false);
             const statuses = Array.from(creature.status);
             statuses.forEach((status) => {
                 this.removeStatus(creature, status);
@@ -466,7 +502,6 @@ export default class TrackerView extends ItemView {
                 return;
             }
             this.round = this.round - 1;
-
             this.logger.log("###", `Round ${this.round}`);
         }
         this.logger.log("#####", `${creature.name}'s turn (backward)`);
@@ -636,6 +671,15 @@ export default class TrackerView extends ItemView {
             creatures: this.ordered
         });
     }
+    setCreatureHidden(creature: Creature, hidden: boolean) {
+        creature.hidden = hidden;
+
+        this.trigger("initiative-tracker:creature-updated", creature);
+
+        this.setAppState({
+            creatures: this.ordered
+        });
+    }
     private _enableCreature(creature: Creature) {
         creature.enabled = true;
         if (this.enabled.length == 1) {
@@ -659,6 +703,7 @@ export default class TrackerView extends ItemView {
         }
 
         this.plugin.data.state = this.toState();
+        this.setPlayerViewCreatures();
         this.trigger("initiative-tracker:should-save");
     }
     async onOpen() {
@@ -710,6 +755,10 @@ export default class TrackerView extends ItemView {
     }
     async onunload() {
         this.plugin.data.state = this.toState();
+        const playerview = this.getExistingPlayerView();
+        if (playerview) {
+            playerview?.leaf.detach();
+        }
         await this.plugin.saveSettings();
     }
     registerEvents() {
@@ -787,9 +836,7 @@ export default class TrackerView extends ItemView {
                     );
 
                     if (existing) {
-                        this.setAppState({
-                            updatingCreatures: [existing]
-                        });
+                        this.setAppState({});
                     }
                 }
             )
@@ -803,9 +850,7 @@ export default class TrackerView extends ItemView {
                     );
 
                     if (existing) {
-                        this.setAppState({
-                            updatingCreatures: [existing]
-                        });
+                        this.setAppState({});
                     }
                 }
             )

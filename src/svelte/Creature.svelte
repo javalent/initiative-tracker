@@ -1,12 +1,13 @@
 <script lang="ts">
     import { createEventDispatcher, getContext } from "svelte";
 
-    import { DEFAULT_UNDEFINED, META_MODIFIER } from "src/utils";
+    import { DEFAULT_UNDEFINED } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/view";
     import Initiative from "./Initiative.svelte";
     import CreatureControls from "./CreatureControls.svelte";
     import Status from "./Status.svelte";
+    import { setIcon } from "obsidian";
 
     export let creature: Creature;
     $: statuses = creature.status;
@@ -24,6 +25,9 @@
         }
         return creature.name;
     };
+    const hiddenIcon = (div: HTMLElement) => {
+        setIcon(div, "eye-off");
+    };
 </script>
 
 <td class="initiative-container" on:click={(e) => e.stopPropagation()}>
@@ -37,7 +41,10 @@
     />
 </td>
 <td class="name-container">
-    <div class="name-holder">
+    <div class="name-holder" on:click={() => view.openCombatant(creature)}>
+        {#if creature.hidden}
+            <div class='centered-icon' use:hiddenIcon />
+        {/if}
         {#if creature.player}
             <strong class="name player">{creature.name}</strong>
         {:else}
@@ -60,26 +67,13 @@
     </div>
 </td>
 
-<td class="center hp-container">
-    <div
-        class="editable"
-        on:click={(e) => {
-            dispatch(
-                "hp", 
-                {
-                    creature: creature, 
-                    ctrl: e.getModifierState(META_MODIFIER), 
-                    shift: e.getModifierState('Shift'),
-                    alt: e.getModifierState('Alt')
-                }
-            );
-            e.stopPropagation();
-        }}>
+<td class="center hp-container creature-adder">
+    <div>
         {@html creature.hpDisplay}
     </div>
 </td>
 
-<td class="center ac-container">{creature.ac ?? DEFAULT_UNDEFINED}</td>
+<td class="center ac-container creature-adder">{creature.ac ?? DEFAULT_UNDEFINED}</td>
 
 <td class="controls-container">
     <CreatureControls
@@ -94,8 +88,13 @@
 <style>
     .name-holder {
         display: flex;
+        align-items: center;
         gap: 0.25rem;
         font-size: small;
+    }
+    .centered-icon {
+        display: flex;
+        align-items: center;
     }
     .name {
         display: block;
@@ -109,7 +108,7 @@
     .center {
         text-align: center;
     }
-    .editable:not(.player) {
+    .creature-adder {
         cursor: pointer;
     }
 

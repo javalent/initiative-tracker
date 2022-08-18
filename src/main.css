@@ -1,3 +1,8 @@
+body {
+    --text-warning: yellow;
+    --text-success: green;
+}
+
 .initiative-tracker-add-player-modal .has-error {
     border-color: var(--background-modifier-error-hover);
 }

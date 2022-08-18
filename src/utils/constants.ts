@@ -3,6 +3,7 @@ import { Platform } from "obsidian";
 import { Conditions } from "./conditions";
 
 export const INTIATIVE_TRACKER_VIEW = "initiative-tracker-view";
+export const PLAYER_VIEW_VIEW = "initiative-tracker-player-view";
 export const CREATURE_TRACKER_VIEW = "initiative-tracker-creature-view";
 
 export const MIN_WIDTH_FOR_HAMBURGER = 300;
@@ -34,6 +35,7 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     condense: false,
     clamp: true,
     autoStatus: true,
+    beginnerTips: true,
     displayDifficulty: true,
     encounters: {},
     warnedAboutImports: false,
