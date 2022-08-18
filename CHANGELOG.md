@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.0.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.6.4...8.0.0) (2022-08-18)
+
+
+### Features
+
+* Added a player view ([a7154ec](https://github.com/valentine195/obsidian-initiative-tracker/commit/a7154ec789ff62560afb4f8f2c4bac0e22931240))
+
+
+### Bug Fixes
+
+* Fixes issue where deleting the log file would cause errors ([7d91456](https://github.com/valentine195/obsidian-initiative-tracker/commit/7d9145681f624987bfbf7efc5c4be4fc5a478326))
+* remove creature selection shortcut overload ([e0e2ab7](https://github.com/valentine195/obsidian-initiative-tracker/commit/e0e2ab7346dcbddd6aac0de31d957309e7a1822a)), closes [#57](https://github.com/valentine195/obsidian-initiative-tracker/issues/57)
+
+## [7.7.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.6.2...7.7.0) (2022-08-11)
+
+
+### Features
+
+* Combat logs ([f968e9a](https://github.com/valentine195/obsidian-initiative-tracker/commit/f968e9abc34e66f965e1ba335625fa4b13faca88))
 
 ## [7.7.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/7.6.2...7.7.0) (2022-08-11)
 
