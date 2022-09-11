@@ -1,14 +1,19 @@
 <script lang="ts">
     import {
         encounterDifficulty,
-        formatDifficultyReport
+        formatDifficultyReport,
+        getCreatureXP
     } from "src/utils/encounter-difficulty";
     import type { DifficultyReport } from "src/utils/encounter-difficulty";
     import { tweened } from "svelte/motion";
     import { cubicOut } from "svelte/easing";
     import type { Creature } from "src/utils/creature";
+    import { getContext } from "svelte";
+    import type InitiativeTracker from "src/main";
 
     export let creatures: Creature[];
+
+    const plugin: InitiativeTracker = getContext("plugin");
 
     let canDisplayDifficulty = false;
     const difficultyBar = tweened(0, {
@@ -17,23 +22,21 @@
     });
 
     let dr: DifficultyReport;
+    $: playerLevels = creatures
+        ?.filter((creature) => creature.enabled && creature.player)
+        .map((p) => p.level);
+    $: monstersXp = creatures
+        ?.filter((creature) => creature.enabled && !creature.player)
+        ?.reduce((acc, cur) => acc + getCreatureXP(plugin, cur), 0);
+    $: numOfMonsters = creatures?.filter(
+        (creature) => creature.enabled && !creature.player
+    ).length;
+    $: dif = encounterDifficulty(
+        playerLevels.filter((p) => p),
+        monstersXp,
+        numOfMonsters
+    );
     $: {
-        let playerLevels: number[] = [];
-        let monstersXp: number[] = [];
-        creatures
-            ?.filter((creature) => creature.enabled)
-            ?.forEach((creature) => {
-                if (creature.level) {
-                    playerLevels.push(creature.level);
-                } else {
-                    monstersXp.push(creature.xp);
-                }
-            });
-        let dif = encounterDifficulty(
-            playerLevels.filter((p) => p),
-            monstersXp.filter((m) => m)
-        );
-
         if (!dif) {
             canDisplayDifficulty = false;
         } else {

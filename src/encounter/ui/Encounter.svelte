@@ -1,12 +1,13 @@
 <script lang="ts">
     import { ExtraButtonComponent, Platform } from "obsidian";
-    import { START_ENCOUNTER } from "src/utils";
+    import { START_ENCOUNTER, XP_PER_CR } from "src/utils";
 
     import { Creature } from "src/utils/creature";
     import {
         DifficultyReport,
         encounterDifficulty,
-        formatDifficultyReport
+        formatDifficultyReport,
+        getCreatureXP
     } from "src/utils/encounter-difficulty";
     import type InitiativeTracker from "src/main";
     import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
@@ -34,7 +35,7 @@
                 creatureMap.set(creature, roller.result);
                 creatureMap = creatureMap;
                 totalXP = [...creatureMap].reduce(
-                    (a, c) => a + c[0].xp * c[1],
+                    (a, c) => a + getCreatureXP(plugin, c[0]) * c[1],
                     0
                 );
             });
@@ -45,16 +46,18 @@
         }
     }
 
-    totalXP = [...creatureMap].reduce((a, c) => a + c[0].xp * c[1], 0);
+    totalXP = [...creatureMap].reduce(
+        (a, c) => a + getCreatureXP(plugin, c[0]) * c[1],
+        0
+    );
     let difficulty: DifficultyReport;
     $: {
         if (!isNaN(totalXP)) {
             difficulty = encounterDifficulty(
                 playerLevels,
-                [...creatureMap]
-                .map((creature) => Array(creature[1]).fill(creature[0].xp))
-                .flat()
-        );
+                totalXP,
+                [...creatureMap.values()].reduce((acc, curr) => acc + curr)
+            );
         }
     }
 
