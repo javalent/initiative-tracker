@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.9](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.7...8.0.9) (2022-09-11)
+
+
+### Bug Fixes
+
+* fixes several encounter difficulty calculation issues ([0a53891](https://github.com/valentine195/obsidian-initiative-tracker/commit/0a5389130705fe1b665def87e6549f08a7122f05))
+
 ### [8.0.7](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.6...8.0.7) (2022-08-21)
 
 
