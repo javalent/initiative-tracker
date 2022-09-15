@@ -352,21 +352,19 @@ export default class TrackerView extends ItemView {
             party,
             players,
             creatures,
-            roll,
             xp
         }: {
             party?: string;
             name?: string;
             players?: string[];
             creatures?: Creature[];
-            roll?: boolean;
             xp?: number;
         } = {
             party: this.party?.name,
             players: [...this.plugin.data.players.map((p) => p.name)],
-            creatures: [],
-            roll: true
-        }
+            creatures: []
+        },
+        roll = true
     ) {
         this.creatures = [];
         const playerNames: Set<string> = new Set(players ?? []);
@@ -526,7 +524,7 @@ export default class TrackerView extends ItemView {
                 this.logger.new({
                     name: this.name,
                     players: this.players,
-                    creatures: this.creatures.filter(c => !c.player),
+                    creatures: this.creatures.filter((c) => !c.player),
                     round: this.round,
                     xp: this.xp
                 });
