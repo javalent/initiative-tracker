@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.10](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.9...8.0.10) (2022-09-15)
+
+
+### Bug Fixes
+
+* fixes monsters not rolling initiatives when starting a new encounter ([fd8bbdd](https://github.com/valentine195/obsidian-initiative-tracker/commit/fd8bbddf762bf1590aabb3031db9cec001ea5370))
+
 ### [8.0.9](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.7...8.0.9) (2022-09-11)
 
 
