@@ -192,11 +192,6 @@
         white-space: nowrap;
     }
 
-    .cr-input {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
     input {
         text-align: center;
     }

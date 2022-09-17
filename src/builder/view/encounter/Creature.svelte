@@ -2,7 +2,6 @@
     import type { SRDMonster } from "@types";
     import { ExtraButtonComponent, setIcon } from "obsidian";
     import { convertFraction, DEFAULT_UNDEFINED, XP_PER_CR } from "src/utils";
-    import en from "../../../../../obsidian-leaflet-plugin/src/l10n/locales/en";
     import { encounter } from "../../stores/encounter";
     import Nullable from "../Nullable.svelte";
 
