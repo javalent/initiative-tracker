@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.0.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.10...9.0.0) (2022-09-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* Encounter Builder functionality
+
+### Features
+
+* Encounter Builder functionality ([0419ecd](https://github.com/valentine195/obsidian-initiative-tracker/commit/0419ecd4c04b615b2431deffd02aa0fd92d0f6b4))
+
 ### [8.0.10](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.9...8.0.10) (2022-09-15)
 
 
