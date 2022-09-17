@@ -4,13 +4,15 @@
         "baseUrl": ".",
         "inlineSources": true,
         "module": "ESNext",
-        "target": "es6",
+        "target": "es2021",
         "allowJs": true,
         "noImplicitAny": true,
         "moduleResolution": "node",
         "importHelpers": true,
         "types": ["node", "svelte"],
-        "lib": ["dom", "esnext", "scripthost", "es2015"]
+        "lib": ["dom", "esnext", "scripthost"],
+        "experimentalDecorators": true
     },
+    "experimentalDecorators": true,
     "include": ["src/*"]
 }

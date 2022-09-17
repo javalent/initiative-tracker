@@ -151,7 +151,7 @@ export interface SRDMonster {
     legendary_actions?: Trait[];
     reactions?: Trait[];
     monster?: string;
-    source?: string;
+    source?: string | string[];
 }
 
 export interface HomebrewCreature {
@@ -160,7 +160,7 @@ export interface HomebrewCreature {
     hp?: number;
     ac?: number;
     stats?: number[];
-    source?: string;
+    source?: string | string[];
     cr?: number | string;
     modifier?: number;
     note?: string;
@@ -196,4 +196,25 @@ export interface UpdateLogMessage {
     status: string;
     saved: boolean;
     unc: boolean;
+}
+
+export interface BuilderPartyPlayer {
+    level: number;
+    enabled: boolean;
+    name: string;
+}
+export interface BuilderGenericPlayer {
+    level: number;
+    enabled: boolean;
+    amount: number;
+}
+
+export type BuilderPlayer = BuilderPartyPlayer | BuilderGenericPlayer;
+
+export interface ExperienceThreshold {
+    Easy: number;
+    Medium: number;
+    Hard: number;
+    Deadly: number;
+    Daily: number;
 }

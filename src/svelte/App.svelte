@@ -329,7 +329,7 @@
                     <th style="padding:0 0.2rem" class="center">Modifier</th>
                 </thead>
                 <tbody>
-                    {#each updatingCreatures as { creature, saved, resist, customMod }, i}
+                    {#each updatingCreatures as updating, i}
                         <tr class="updating-creature-table-row">
                             <td
                                 use:removeIcon
@@ -341,27 +341,27 @@
                             />
                             <td>
                                 <span
-                                    >{creature.name +
-                                        (creature.number
-                                            ? " " + creature.number
+                                    >{updating.creature.name +
+                                        (updating.creature.number
+                                            ? " " + updating.creature.number
                                             : "")}</span
                                 >
                             </td>
                             <td class="center">
                                 <input
                                     type="checkbox"
-                                    checked={saved}
+                                    checked={updating.saved}
                                     on:click={function (evt) {
-                                        saved = !saved;
+                                        updating.saved = !updating.saved;
                                     }}
                                 />
                             </td>
                             <td class="center">
                                 <input
                                     type="checkbox"
-                                    checked={resist}
+                                    checked={updating.resist}
                                     on:click={function (evt) {
-                                        resist = !resist;
+                                        updating.resist = !updating.resist;
                                     }}
                                 />
                             </td>
@@ -370,7 +370,7 @@
                                     type="number"
                                     class="center"
                                     style="width:90%; height:80%; padding:0;"
-                                    bind:value={customMod}
+                                    bind:value={updating.customMod}
                                     on:keydown={function (evt) {
                                         if (evt.key === "Escape") {
                                             this.value = "1";
