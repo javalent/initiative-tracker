@@ -51,6 +51,16 @@
     };
 
     $: activeAndVisible = creatures.filter((c) => c.enabled && !c.hidden);
+
+    const name = (creature: Creature) => {
+        if (creature.display) {
+            return creature.display;
+        }
+        if (creature.number > 0) {
+            return `${creature.name} ${creature.number}`;
+        }
+        return creature.name;
+    };
 </script>
 
 {#if !loaded}
@@ -69,11 +79,9 @@
             {#each activeAndVisible as creature (creature.id)}
                 <tr class:active={amIActive(creature) && state}>
                     <td class="center">{creature.initiative}</td>
-                    <td
-                        >{creature.name}{creature.number
-                            ? ` ${creature.number}`
-                            : ""}</td
-                    >
+                    <td>
+                        {name(creature)}
+                    </td>
                     <td
                         class:center={true}
                         class={getHpStatus(
