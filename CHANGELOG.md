@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.11](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.10...8.0.11) (2022-09-26)
+
+
+### Bug Fixes
+
+* encounters generate unique creatures (close [#69](https://github.com/valentine195/obsidian-initiative-tracker/issues/69)) ([0a9c30d](https://github.com/valentine195/obsidian-initiative-tracker/commit/0a9c30dab40cf55fe4d260ff0d256dbefc9f74e5))
+* Player view now shows display name (close [#64](https://github.com/valentine195/obsidian-initiative-tracker/issues/64)) ([c35bdce](https://github.com/valentine195/obsidian-initiative-tracker/commit/c35bdce5090f9847d32f87402bc4b4d5fb3b7784))
+
 ### [8.0.10](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.9...8.0.10) (2022-09-15)
 
 
