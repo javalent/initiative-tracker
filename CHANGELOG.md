@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.0.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.11...10.0.0) (2022-09-27)
+
+### [9.0.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.0.0...9.0.1) (2022-09-17)
+
+
+### Bug Fixes
+
+* fixes accidentally import from leaflet ([a5b4892](https://github.com/valentine195/obsidian-initiative-tracker/commit/a5b4892b614f140b2cee77636a9168e3f30f0674))
+
+## [9.0.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.10...9.0.0) (2022-09-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* Encounter Builder functionality
+
+### Features
+
+* Encounter Builder functionality ([0419ecd](https://github.com/valentine195/obsidian-initiative-tracker/commit/0419ecd4c04b615b2431deffd02aa0fd92d0f6b4))
+
 ### [9.0.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.0.0...9.0.1) (2022-09-17)
 ### [8.0.11](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.10...8.0.11) (2022-09-26)
 
