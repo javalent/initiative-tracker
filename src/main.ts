@@ -23,7 +23,7 @@ import type {
     SRDMonster
 } from "../@types/index";
 
-import InitiativeTrackerSettings from "./settings";
+import InitiativeTrackerSettings from "./settings/settings";
 import { EncounterBlock, EncounterParser } from "./encounter";
 import EncounterLine from "./encounter/ui/EncounterLine.svelte";
 

@@ -10,13 +10,13 @@ import {
     TFolder
 } from "obsidian";
 
-import type InitiativeTracker from "./main";
+import type InitiativeTracker from "../main";
 
 import {
     FileSuggestionModal,
     FolderSuggestionModal,
     PlayerSuggestionModal
-} from "./utils/suggester";
+} from "../utils/suggester";
 import {
     AC,
     Conditions,
@@ -24,7 +24,7 @@ import {
     EDIT,
     HP,
     INITIATIVE
-} from "./utils";
+} from "../utils";
 import type { Condition, HomebrewCreature, InputValidate, Party } from "@types";
 
 export default class InitiativeTrackerSettings extends PluginSettingTab {
