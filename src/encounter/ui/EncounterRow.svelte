@@ -50,9 +50,8 @@
         if (!isNaN(totalXP)) {
             difficulty = encounterDifficulty(
                 playerLevels,
-                [...creatureMap]
-                .map((creature) => Array(creature[1]).fill(creature[0].xp))
-                .flat()
+                totalXP,
+                [...creatureMap.values()].reduce((acc, curr) => acc + curr)
             );
         }
     }
@@ -72,7 +71,7 @@
                         if (isNaN(Number(number)) || number < 1)
                             return [creature];
                         return [...Array(number).keys()].map((v) =>
-                            Creature.from(creature)
+                            Creature.new(creature)
                         );
                     })
                     .flat();
