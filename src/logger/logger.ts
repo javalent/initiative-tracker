@@ -1,7 +1,7 @@
 import { TFile } from "obsidian";
-import type InitiativeTracker from "./main";
-import type { Creature } from "./utils/creature";
-import type TrackerView from "./tracker/view";
+import type InitiativeTracker from "../main";
+import type { Creature } from "../utils/creature";
+import type TrackerView from "../tracker/view";
 
 export interface LogState {
     name?: string;

@@ -26,7 +26,7 @@ import type {
 import { equivalent } from "../encounter";
 import { OVERFLOW_TYPE, PLAYER_VIEW_VIEW } from "../utils/constants";
 import type PlayerView from "./player-view";
-import Logger from "../logger";
+import Logger from "../logger/logger";
 
 export default class TrackerView extends ItemView {
     playerViewOpened = false;
