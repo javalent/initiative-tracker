@@ -31,10 +31,10 @@ import { Creature } from "./utils/creature";
 
 import { BESTIARY } from "./utils/srd-bestiary";
 
-import TrackerView, { CreatureView } from "./view";
+import TrackerView, { CreatureView } from "./tracker/view";
 
 import type { Plugins } from "../../obsidian-overload/index";
-import PlayerView from "./player-view/player-view";
+import PlayerView from "./tracker/player-view";
 declare module "obsidian" {
     interface App {
         plugins: {

@@ -30,7 +30,7 @@ import Logger from "../logger";
 
 export default class TrackerView extends ItemView {
     playerViewOpened = false;
-    getExistingPlayerView(): PlayerView {
+    getExistingPlayerView(): PlayerView | undefined {
         const existing =
             this.plugin.app.workspace.getLeavesOfType(PLAYER_VIEW_VIEW);
         if (existing.length) {
