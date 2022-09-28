@@ -171,6 +171,7 @@ export interface HomebrewCreature {
     id?: string;
     xp?: number;
     hidden?: boolean;
+    friendly?: boolean;
 }
 
 export type ability =

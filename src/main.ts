@@ -54,13 +54,6 @@ export default class InitiativeTracker extends Plugin {
     playerCreatures: Map<string, Creature> = new Map();
     homebrewCreatures: Map<string, Creature> = new Map();
     watchers: Map<TFile, HomebrewCreature> = new Map();
-    async parseDice(text: string) {
-        if (!this.canUseDiceRoller) return null;
-
-        return await this.app.plugins
-            .getPlugin("obsidian-dice-roller")
-            .parseDice(text, "initiative-tracker");
-    }
     getRoller(str: string) {
         if (!this.canUseDiceRoller) return;
         const roller = this.app.plugins
@@ -84,19 +77,30 @@ export default class InitiativeTracker extends Plugin {
         return false;
     }
 
-    async getInitiativeValue(modifier: number = 0): Promise<number> {
+    getInitiativeValue(modifier: number = 0): number {
         let initiative = Math.floor(Math.random() * 19 + 1) + modifier;
         if (this.canUseDiceRoller) {
-            const num = await this.app.plugins
-                .getPlugin("obsidian-dice-roller")
-                .parseDice(
-                    this.data.initiative.replace(/%mod%/g, `(${modifier})`),
-                    "initiative-tracker"
-                );
-
-            initiative = num.result;
+            const roller = this.getRoller(
+                this.data.initiative.replace(/%mod%/g, `(${modifier})`)
+            );
+            if (roller) {
+                roller.roll();
+                if (!isNaN(roller.result)) initiative = roller.result;
+            }
         }
         return initiative;
+    }
+
+    getPlayerByName(name: string) {
+        return Creature.from(this.playerCreatures.get(name));
+    }
+    getPlayersForParty(party: string) {
+        return (
+            this.data.parties
+                ?.find((p) => p.name == party)
+                ?.players.map((p) => this.getPlayerByName(p))
+                ?.filter((p) => p) ?? []
+        );
     }
 
     get canUseStatBlocks() {

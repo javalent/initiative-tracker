@@ -38,6 +38,7 @@ export class Creature {
     viewing: boolean = false;
     number = 0;
     display: string;
+    friendly: boolean = false;
     constructor(public creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;
         this.display = creature.display;
@@ -58,6 +59,8 @@ export class Creature {
         this.hp = this.max;
         this.temp = 0;
         this.source = creature.source;
+
+        this.friendly = creature.friendly ?? this.friendly;
 
         if ("xp" in creature) {
             this.xp = creature.xp;
@@ -166,7 +169,8 @@ export class Creature {
             player: this.player,
             xp: this.xp,
             active: this.active,
-            hidden: this.hidden
+            hidden: this.hidden,
+            friendly: this.friendly
         };
     }
 

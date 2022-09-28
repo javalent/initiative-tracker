@@ -13,7 +13,7 @@ import {
 
 import type InitiativeTracker from "../main";
 
-import App from "./view/App.svelte";
+import App from "./ui/App.svelte";
 import { Creature } from "../utils/creature";
 import type {
     Condition,
@@ -29,6 +29,71 @@ import type PlayerView from "./player-view";
 import Logger from "../logger/logger";
 
 export default class TrackerView extends ItemView {
+    ui: App;
+    logger = new Logger(this.plugin, this);
+
+    constructor(public leaf: WorkspaceLeaf, public plugin: InitiativeTracker) {
+        super(leaf);
+        if (this.plugin.data.state?.creatures?.length) {
+        } else {
+        }
+    }
+    async onOpen() {
+        this.ui = new App({
+            target: this.contentEl,
+            props: {
+                plugin: this.plugin
+            }
+        });
+        this.ui.$on("player-view", () => this.openPlayerView());
+        this.ui.$on("open-map", () => this.openInitiativeView());
+    }
+    getViewType() {
+        return INTIATIVE_TRACKER_VIEW;
+    }
+    getDisplayText() {
+        return "Initiative Tracker";
+    }
+    getIcon() {
+        return BASE;
+    }
+
+    //legacy Leaflet support...
+    get pcs(): Creature[] {
+        return [];
+    }
+    get npcs(): Creature[] {
+        return [];
+    }
+    openInitiativeView() {
+        this.plugin.leaflet.openInitiativeView(this.pcs, this.npcs);
+    }
+
+    //open player view
+    playerViewOpened = false;
+    getExistingPlayerView(): PlayerView | undefined {
+        const existing =
+            this.plugin.app.workspace.getLeavesOfType(PLAYER_VIEW_VIEW);
+        if (existing.length) {
+            return existing[0].view as PlayerView;
+        }
+    }
+    async getPlayerView(): Promise<PlayerView> {
+        const existing = this.getExistingPlayerView();
+        if (existing) return existing;
+        const leaf = await this.app.workspace.openPopoutLeaf();
+        await leaf.setViewState({
+            type: PLAYER_VIEW_VIEW
+        });
+        return leaf.view as PlayerView;
+    }
+    async openPlayerView() {
+        await this.getPlayerView();
+        this.playerViewOpened = true;
+    }
+}
+
+export class TrackerView_Old extends ItemView {
     playerViewOpened = false;
     getExistingPlayerView(): PlayerView | undefined {
         const existing =
@@ -59,6 +124,7 @@ export default class TrackerView extends ItemView {
             view.setTrackerState(this.state);
         }
     }
+    //@ts-ignore
     logger = new Logger(this.plugin, this);
 
     logUpdate(messages: UpdateLogMessage[]) {
