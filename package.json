@@ -21,7 +21,7 @@
     "author": "",
     "license": "MIT",
     "devDependencies": {
-        "@popperjs/core": "^2.9.2",
+        "@popperjs/core": "^2.11.7",
         "@tsconfig/svelte": "^2.0.1",
         "@types/node": "^14.14.37",
         "builtin-modules": "^3.3.0",

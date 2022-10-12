@@ -129,12 +129,12 @@ function createTracker() {
                     // Handle overflow healing according to settings
                     if (
                         change.hp > 0 &&
-                        change.hp + creature.hp > creature.max
+                        change.hp + creature.hp > creature.current_max
                     ) {
                         switch (_settings.hpOverflow) {
                             case OVERFLOW_TYPE.ignore:
                                 change.hp = Math.max(
-                                    creature.max - creature.hp,
+                                    creature.current_max - creature.hp,
                                     0
                                 );
                                 break;
@@ -142,7 +142,7 @@ function createTracker() {
                                 // Gives temp a value, such that it will be set later
                                 change.temp =
                                     change.hp -
-                                    Math.min(creature.max - creature.hp, 0);
+                                    Math.min(creature.current_max - creature.hp, 0);
                                 change.hp -= change.temp;
                                 break;
                             case OVERFLOW_TYPE.current:
@@ -159,10 +159,10 @@ function createTracker() {
                     }
                 }
                 if (change.max) {
-                    if (creature.hp == creature.max) {
-                        creature.hp = Number(change.max);
+                    creature.current_max = Math.max(0, creature.current_max + change.max);
+                    if (creature.hp >= creature.current_max && _settings.hpOverflow !== OVERFLOW_TYPE.current) {
+                        creature.hp = creature.current_max;
                     }
-                    creature.max = Number(change.max);
                 }
                 if (change.ac) {
                     creature.ac = change.ac;
@@ -172,10 +172,18 @@ function createTracker() {
                     if (_settings.additiveTemp) {
                         baseline = creature.temp;
                     }
-                    creature.temp = Math.max(
-                        creature.temp,
-                        baseline + change.temp
-                    );
+                    if (change.temp > 0) {
+                        creature.temp = Math.max(
+                            creature.temp,
+                            baseline + change.temp
+                        );
+                    }
+                    else {
+                        creature.temp = Math.max(
+                            0,
+                            creature.temp + change.temp
+                        );
+                    };
                 }
                 if (change.marker) {
                     creature.marker = change.marker;
@@ -310,6 +318,7 @@ function createTracker() {
                         name: name.join(" "),
                         hp: null,
                         temp: false,
+                        max: false,
                         status: null,
                         saved: false,
                         unc: false
@@ -321,17 +330,22 @@ function createTracker() {
                         message.temp = true;
                         change.temp = toAdd;
                     } else {
-                        let toAdd = Number(toAddString);
+                        const maxHpDamage = toAddString.charAt(0) === "m";
+                        let toAdd = Number(toAddString.slice(+maxHpDamage));
                         toAdd =
                             -1 *
                             Math.sign(toAdd) *
                             Math.max(Math.abs(toAdd) * modifier, 1);
                         toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
                         message.hp = toAdd;
+                        if (maxHpDamage) {
+                            message.max = true;
+                            change.max = toAdd;
+                        }
+                        change.hp = toAdd;
                         if (creature.hp <= 0) {
                             message.unc = true;
                         }
-                        change.hp = toAdd;
                     }
                     if (tag) {
                         message.status = tag.name;
@@ -457,7 +471,7 @@ function createTracker() {
                         let roller = plugin.getRoller(
                             creature.hit_dice
                         ) as StackRoller;
-                        creature.hp = creature.max = roller.rollSync();
+                        creature.hp = creature.max = creature.current_max = roller.rollSync();
                     }
                 }
                 creatures.push(...items);
@@ -522,7 +536,7 @@ function createTracker() {
                             let roller = plugin.getRoller(
                                 creature.hit_dice
                             ) as StackRoller;
-                            creature.hp = creature.max = roller.rollSync();
+                            creature.hp = creature.max = creature.current_max = roller.rollSync();
                         }
                     }
                 }
@@ -541,7 +555,7 @@ function createTracker() {
         reset: () =>
             updateAndSave((creatures) => {
                 for (let creature of creatures) {
-                    creature.hp = creature.max;
+                    creature.hp = creature.current_max = creature.max;
                     creature.enabled = true;
                     creature.hidden = false;
                     creature.status.clear();
@@ -563,22 +577,44 @@ function createTracker() {
                                 message.name
                             } gained ${message.hp.toString()} temporary HP`
                         );
-                    } else if (message.hp < 0) {
-                        perCreature.push(
-                            `${message.name} took ${(
-                                -1 * message.hp
-                            ).toString()} damage${
-                                message.unc
-                                    ? " and was knocked unconscious"
-                                    : ""
-                            }`
-                        );
-                    } else if (message.hp > 0) {
-                        perCreature.push(
-                            `${
-                                message.name
-                            } was healed for ${message.hp.toString()} HP`
-                        );
+                    } else if (!message.max) {
+                        if (message.hp < 0) {
+                            perCreature.push(
+                                `${message.name} took ${(
+                                    -1 * message.hp
+                                ).toString()} damage${
+                                    message.unc
+                                        ? " and was knocked unconscious"
+                                        : ""
+                                }`
+                            );
+                        } else if (message.hp > 0) {
+                            perCreature.push(
+                                `${
+                                    message.name
+                                } was healed for ${message.hp.toString()} HP`
+                            );
+                        }
+                    }
+                     else if (message.max) {
+                        if (message.hp < 0) {
+                            perCreature.push(
+                                `${message.name} took ${(
+                                    -1 * message.hp
+                                ).toString()} max HP damage${
+                                    message.unc
+                                        ? " and died"
+                                        : ""
+                                }`
+                            );
+                        }
+                        else {
+                            perCreature.push(
+                                `${message.name} gained ${(
+                                    -1 * message.hp
+                                ).toString()} max HP`
+                            );
+                        }
                     }
                 }
                 if (message.status) {

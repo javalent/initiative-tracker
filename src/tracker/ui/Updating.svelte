@@ -59,13 +59,13 @@
             <div class="hp-status">
                 {#if plugin.data.beginnerTips}
                     <small class="label">
-                        Apply damage, healing(-) or temp HP(t)
+                        Apply damage, (m)max HP damage, (-)healing or (t)temp HP
                     </small>
                 {/if}
                 <div class="input">
                     <tag
                         use:hpIcon
-                        aria-label="Apply damage, healing(-) or temp HP(t)"
+                        aria-label="Apply damage, (m)max HP damage, (-)healing or (t)temp HP"
                         style="margin: 0 0.2rem 0 0.7rem"
                     />
                     <input
@@ -80,7 +80,7 @@
                                 return;
                             }
                             if (
-                                !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
+                                !/^((t|m)?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
                                     this.value + evt.key
                                 )
                             ) {
