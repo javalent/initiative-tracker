@@ -1,13 +1,14 @@
-import { TFile } from "obsidian";
+import { normalizePath, TFile } from "obsidian";
 import type InitiativeTracker from "../main";
 import type { Creature } from "../utils/creature";
-import type TrackerView from "../tracker/view";
+
+import { tracker } from "src/tracker/stores/tracker";
+import type { UpdateLogMessage } from "@types";
 
 export interface LogState {
     name?: string;
     players: Creature[];
     creatures: Creature[];
-    xp: number;
     round: number;
 }
 
@@ -19,12 +20,14 @@ export default class Logger {
         await this.setFile();
     }
     public getLogFile() {
-        return this.logFile;
+        return normalizePath(this.logFile);
     }
     private logFile: string;
     async setFile() {
-        const file = (await this.adapter.exists(this.logFile))
-            ? await this.vault.getAbstractFileByPath(this.logFile)
+        const file = (await this.adapter.exists(normalizePath(this.logFile)))
+            ? await this.vault.getAbstractFileByPath(
+                  normalizePath(this.logFile)
+              )
             : await this.vault.create(this.logFile, ``);
 
         if (file instanceof TFile) {
@@ -35,7 +38,7 @@ export default class Logger {
         return this.file;
     }
     private file: TFile;
-    constructor(public plugin: InitiativeTracker, public view: TrackerView) {}
+    constructor(public plugin: InitiativeTracker) {}
     get enabled() {
         return this.plugin.data.logging;
     }
@@ -52,6 +55,7 @@ export default class Logger {
     async new(logFile: string): Promise<void>;
     async new(state: LogState): Promise<void>;
     async new(param: string | LogState) {
+        console.log("🚀 ~ file: logger.ts ~ line 56 ~ param", param);
         if (!this.enabled) return;
 
         if (typeof param == "string") {
@@ -106,10 +110,14 @@ export default class Logger {
 
             await this.log("\n\n## Combat Log");
             await this.log("\n### Round 1");
-            await this.log(`\n##### ${this.view.ordered[0].name}'s turn`);
+            await this.log(
+                `\n##### ${tracker.getOrderedCreatures()[0].name}'s turn`
+            );
         }
     }
     async log(...msg: string[]) {
+        console.log(this.enabled, this.file);
+        if (!this.enabled) return;
         if (!this.file) return;
         if (!(await this.adapter.exists(this.logFile))) {
             await this.setLogFile(this.logFile);
@@ -123,5 +131,48 @@ export default class Logger {
         return `${strings.slice(0, -1).join(", ")} ${joiner} ${strings.slice(
             -1
         )}`;
+    }
+    logUpdate(messages: UpdateLogMessage[]) {
+        const toLog: string[] = [];
+        for (const message of messages) {
+            const perCreature: string[] = [];
+            if (message.hp) {
+                if (message.temp) {
+                    perCreature.push(
+                        `${
+                            message.name
+                        } gained ${message.hp.toString()} temporary HP`
+                    );
+                } else if (message.hp < 0) {
+                    perCreature.push(
+                        `${message.name} took ${(
+                            -1 * message.hp
+                        ).toString()} damage${
+                            message.unc ? " and was knocked unconscious" : ""
+                        }`
+                    );
+                } else if (message.hp > 0) {
+                    perCreature.push(
+                        `${
+                            message.name
+                        } was healed for ${message.hp.toString()} HP`
+                    );
+                }
+            }
+            if (message.status) {
+                if (perCreature.length) {
+                    perCreature.push("and");
+                } else {
+                    perCreature.push(message.name);
+                }
+                if (message.saved) {
+                    perCreature.push(`saved against ${message.status}`);
+                } else {
+                    perCreature.push(`took ${message.status} status`);
+                }
+            }
+            toLog.push(perCreature.join(" "));
+        }
+        this.log(`${toLog.join(". ")}.`);
     }
 }

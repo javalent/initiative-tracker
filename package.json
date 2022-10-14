@@ -37,7 +37,7 @@
         "esbuild-svelte": "^0.6.0",
         "gridjs": "^5.1.0",
         "gridjs-svelte": "^2.1.1",
-        "obsidian": "^0.15.9",
+        "obsidian": "^0.16.3",
         "rollup": "^2.32.1",
         "rollup-plugin-css-only": "^3.1.0",
         "rollup-plugin-svelte": "^7.1.0",

@@ -2,6 +2,7 @@
     import { ExtraButtonComponent } from "obsidian";
 
     import type InitiativeTracker from "src/main";
+    import { tracker } from "src/tracker/stores/tracker";
     import { START_ENCOUNTER } from "src/utils";
     import { Creature } from "src/utils/creature";
     import {
@@ -17,7 +18,6 @@
     export let players: string[];
 
     export let hide: string[] = [];
-    export let xp: number;
     export let playerLevels: number[];
     export let plugin: InitiativeTracker;
     export let headers: string[];
@@ -76,11 +76,12 @@
                     })
                     .flat();
 
-                view?.newEncounter({
+                tracker.new({
+                    creatures: creatures.map((c) => c.toJSON()),
                     name,
-                    players,
-                    creatures,
-                    xp
+                    round: 1,
+                    state: false,
+                    logFile: null
                 });
                 plugin.app.workspace.revealLeaf(view.leaf);
             });
@@ -103,7 +104,7 @@
                 );
             })
             .flat();
-        view.addCreatures(creatures, true);
+        tracker.add(...creatures);
     };
 
     const rollerEl = (node: HTMLElement, creature: Creature) => {

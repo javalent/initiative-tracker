@@ -30,7 +30,6 @@ import Logger from "../logger/logger";
 
 export default class TrackerView extends ItemView {
     ui: App;
-    logger = new Logger(this.plugin, this);
 
     constructor(public leaf: WorkspaceLeaf, public plugin: InitiativeTracker) {
         super(leaf);
@@ -587,8 +586,7 @@ export class TrackerView_Old extends ItemView {
                     name: this.name,
                     players: this.players,
                     creatures: this.creatures.filter((c) => !c.player),
-                    round: this.round,
-                    xp: this.xp
+                    round: this.round
                 });
             } else {
                 this.logger.log(`Combat re-started`);

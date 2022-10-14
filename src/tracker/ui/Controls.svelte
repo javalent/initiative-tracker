@@ -21,7 +21,7 @@
 
     import { tracker } from "../stores/tracker";
 
-    const { state } = tracker;
+    const { state, data } = tracker;
 
     const desktop = Platform.isDesktop;
 
@@ -52,87 +52,87 @@
 
     const plugin = getContext<InitiativeTracker>("plugin");
 
+    const dispatch = createEventDispatcher();
+
     const open = (evt: MouseEvent) => {
-        menu.showAtMouseEvent(evt);
-    };
-    const menu = new Menu();
-    menu.addItem((item) => {
-        item.setIcon(NEW)
-            .setTitle("New Encounter")
-            .onClick(() => tracker.new());
-    });
-    menu.addItem((item) => {
-        item.setIcon(REDO)
-            .setTitle("Reset HP & Status")
-            .onClick(() => tracker.reset());
-    });
-    menu.addItem((item) => {
-        item.setIcon(DICE)
-            .setTitle("Re-roll Initiatives")
-            .onClick(() => tracker.roll(plugin));
-    });
-    if (plugin.data.parties && plugin.data.parties.length) {
+        const menu = new Menu();
         menu.addItem((item) => {
-            item.setIcon("switch")
-                .setTitle("Switch Party")
-                .onClick((evt: MouseEvent) => {
-                    /* menu.hide(); */
-                    const partyMenu = new Menu().setNoIcon();
-                    for (const party of plugin.data.parties) {
-                        partyMenu.addItem((item) => {
-                            item.setTitle(party.name).onClick(() => {
-                                tracker.setParty(party.name, plugin);
-                            });
-                        });
-                    }
-                    partyMenu.showAtMouseEvent(evt);
-                });
+            item.setIcon(NEW)
+                .setTitle("New Encounter")
+                .onClick(() => tracker.new());
         });
-    }
-    menu.addItem((item) => {
-        item.setIcon(GROUP)
-            .setTitle(
-                /* view.condense */ true
-                    ? "Expand Creatures"
-                    : "Group Creatures"
-            )
-            .onClick(async () => {
-                plugin.data.condense = !plugin.data.condense;
-                tracker.setCondensed(plugin.data.condense);
-                await plugin.saveSettings();
-                item.setIcon(plugin.data.condense ? EXPAND : GROUP);
-                item.setTitle(
+        menu.addItem((item) => {
+            item.setIcon(REDO)
+                .setTitle("Reset HP & Status")
+                .onClick(() => tracker.reset());
+        });
+        menu.addItem((item) => {
+            item.setIcon(DICE)
+                .setTitle("Re-roll Initiatives")
+                .onClick(() => tracker.roll(plugin));
+        });
+        if ($data.parties && $data.parties.length) {
+            menu.addItem((item) => {
+                item.setIcon("switch")
+                    .setTitle("Switch Party")
+                    .onClick((evt: MouseEvent) => {
+                        /* menu.hide(); */
+                        const partyMenu = new Menu().setNoIcon();
+                        for (const party of $data.parties) {
+                            partyMenu.addItem((item) => {
+                                item.setTitle(party.name).onClick(() => {
+                                    tracker.setParty(party.name, plugin);
+                                });
+                            });
+                        }
+                        partyMenu.showAtMouseEvent(evt);
+                    });
+            });
+        }
+        menu.addItem((item) => {
+            item.setIcon(GROUP)
+                .setTitle(
                     plugin.data.condense
                         ? "Expand Creatures"
                         : "Group Creatures"
-                );
-            });
-    });
+                )
+                .onClick(async () => {
+                    plugin.data.condense = !plugin.data.condense;
+                    await plugin.saveSettings();
+                    item.setIcon(plugin.data.condense ? EXPAND : GROUP);
+                    item.setTitle(
+                        plugin.data.condense
+                            ? "Expand Creatures"
+                            : "Group Creatures"
+                    );
+                });
+        });
 
-    const dispatch = createEventDispatcher();
-    menu.addSeparator();
-    menu.addItem((item) => {
-        item.setIcon(SAVE)
-            .setTitle("Save Encounter")
-            .onClick(() => {
-                dispatch("save");
-            });
-    });
-    menu.addItem((item) => {
-        item.setIcon("open-elsewhere-glyph")
-            .setTitle("Load Encounter")
-            .onClick(() => {
-                dispatch("load");
-            });
-    });
-    if (plugin.data.leafletIntegration) {
         menu.addSeparator();
         menu.addItem((item) => {
-            item.setIcon(MAP)
-                .setTitle("Open Leaflet Map")
-                .onClick(() => dispatch("open-map"));
+            item.setIcon(SAVE)
+                .setTitle("Save Encounter")
+                .onClick(() => {
+                    dispatch("save");
+                });
         });
-    }
+        menu.addItem((item) => {
+            item.setIcon("open-elsewhere-glyph")
+                .setTitle("Load Encounter")
+                .onClick(() => {
+                    dispatch("load");
+                });
+        });
+        if ($data.leafletIntegration) {
+            menu.addSeparator();
+            menu.addItem((item) => {
+                item.setIcon(MAP)
+                    .setTitle("Open Leaflet Map")
+                    .onClick(() => dispatch("open-map"));
+            });
+        }
+        menu.showAtMouseEvent(evt);
+    };
 
     const menuIcon = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("vertical-three-dots");

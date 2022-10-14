@@ -1,6 +1,5 @@
 import "obsidian";
-import type Creature__SvelteComponent_ from "src/svelte/Creature.svelte";
-import type { Creature } from "src/utils/creature";
+import type { Creature } from "./src/utils/creature";
 
 //      CUSTOM EVENTS
 // ------------------------
@@ -40,6 +39,7 @@ export type TrackerEvents =
     | [name: "initiative-tracker:remove", creature: Creature]
     | [name: "initiative-tracker:closed"]
     | [name: "initiative-tracker:should-save"]
+    | [name: "initiative-tracker:save-state", state?: InitiativeViewState]
     /** This event can be used to start an event by sending an object with a name, HP, AC, and initiative modifier at minimum. */
     | [
           name: "initiative-tracker:start-encounter",
@@ -172,6 +172,7 @@ export interface HomebrewCreature {
     xp?: number;
     hidden?: boolean;
     friendly?: boolean;
+    active?: boolean;
 }
 
 export type ability =
@@ -192,9 +193,9 @@ export interface Trait {
 
 export interface UpdateLogMessage {
     name: string;
-    hp: number;
+    hp: number | null;
     temp: boolean;
-    status: string;
+    status: string | null;
     saved: boolean;
     unc: boolean;
 }

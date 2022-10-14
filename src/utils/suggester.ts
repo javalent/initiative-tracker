@@ -14,7 +14,7 @@ import { createPopper, Instance as PopperInstance } from "@popperjs/core";
 
 import { Conditions } from "./conditions";
 
-import type { HomebrewCreature, SRDMonster, Condition, Party } from "@types";
+import type { HomebrewCreature, SRDMonster, Condition, Party } from "src/@types";
 import type InitiativeTracker from "src/main";
 
 class Suggester<T> {

@@ -1,20 +1,17 @@
 <script lang="ts">
-    import { createEventDispatcher, getContext } from "svelte";
-
     import { DEFAULT_UNDEFINED } from "src/utils";
     import type { Creature } from "src/utils/creature";
-    import type TrackerView from "src/tracker/view";
     import Initiative from "./Initiative.svelte";
     import CreatureControls from "./CreatureControls.svelte";
     import Status from "./Status.svelte";
     import { setIcon } from "obsidian";
-
-    export let creature: Creature;
-    $: statuses = creature.status;
+    import { tracker } from "../../stores/tracker";
+    import { createEventDispatcher } from "svelte";
 
     const dispatch = createEventDispatcher();
 
-    let view = getContext<TrackerView>("view");
+    export let creature: Creature;
+    $: statuses = creature.status;
 
     const name = () => {
         if (creature.display) {
@@ -36,7 +33,10 @@
         modifier={creature.modifier}
         on:click={(e) => e.stopPropagation()}
         on:initiative={(e) => {
-            /* view.updateCreature(creature, { initiative: Number(e.detail) }); */
+            tracker.updateCreatures({
+                creature,
+                change: { initiative: Number(e.detail) }
+            });
         }}
     />
 </td>
@@ -44,7 +44,7 @@
     <div
         class="name-holder"
         on:click={() => {
-            /* view.openCombatant(creature) */
+            dispatch("open-combatant");
         }}
     >
         {#if creature.hidden}
@@ -62,9 +62,10 @@
                 <Status
                     {status}
                     on:remove={() => {
-                        /* view.removeStatus(creature, status); */
-                        /* creature.status.delete(status);
-                        statuses = creature.status; */
+                        tracker.updateCreatures({
+                            creature,
+                            change: { status: [status] }
+                        });
                     }}
                 />
             {/each}

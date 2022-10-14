@@ -20,6 +20,7 @@ import type {
     EventsOnArgs,
     HomebrewCreature,
     InitiativeTrackerData,
+    InitiativeViewState,
     SRDMonster
 } from "../@types/index";
 
@@ -35,6 +36,7 @@ import TrackerView, { CreatureView } from "./tracker/view";
 
 import type { Plugins } from "../../obsidian-overload/index";
 import PlayerView from "./tracker/player-view";
+import { tracker } from "./tracker/stores/tracker";
 declare module "obsidian" {
     interface App {
         plugins: {
@@ -190,6 +192,7 @@ export default class InitiativeTracker extends Plugin {
         );
 
         this.addCommands();
+        this.addEvents();
 
         this.registerMarkdownCodeBlockProcessor("encounter", (src, el, ctx) => {
             const handler = new EncounterBlock(this, src, el);
@@ -288,13 +291,16 @@ export default class InitiativeTracker extends Plugin {
                             Creature.from(player)
                         );
                         if (this.view) {
-                            const creature = this.view.ordered.find(
-                                (c) => c.name == player.name
-                            );
+                            const creature = tracker
+                                .getOrderedCreatures()
+                                .find((c) => c.name == player.name);
                             if (creature) {
-                                this.view.updateCreature(creature, {
-                                    max: player.hp,
-                                    ac: player.ac
+                                tracker.updateCreatures({
+                                    creature,
+                                    change: {
+                                        max: player.hp,
+                                        ac: player.ac
+                                    }
                                 });
                             }
                         }
@@ -353,7 +359,7 @@ export default class InitiativeTracker extends Plugin {
                 const view = this.view;
                 if (view) {
                     if (!checking) {
-                        view.toggleState();
+                        tracker.toggleState();
                     }
                     return true;
                 }
@@ -365,9 +371,9 @@ export default class InitiativeTracker extends Plugin {
             name: "Next Combatant",
             checkCallback: (checking) => {
                 const view = this.view;
-                if (view && view.state) {
+                if (view && tracker.getState()) {
                     if (!checking) {
-                        view.goToNext();
+                        tracker.goToNext();
                     }
                     return true;
                 }
@@ -379,9 +385,9 @@ export default class InitiativeTracker extends Plugin {
             name: "Previous Combatant",
             checkCallback: (checking) => {
                 const view = this.view;
-                if (view && view.state) {
+                if (view && tracker.getState()) {
                     if (!checking) {
-                        view.goToPrevious();
+                        tracker.goToPrevious();
                     }
                     return true;
                 }
@@ -397,12 +403,21 @@ export default class InitiativeTracker extends Plugin {
             )
         );
         this.registerEvent(
+            app.workspace.on(
+                "initiative-tracker:save-state",
+                async (state: InitiativeViewState) => {
+                    this.data.state = state;
+                    await this.saveSettings();
+                }
+            )
+        );
+        this.registerEvent(
             this.app.workspace.on(
                 "initiative-tracker:start-encounter",
                 async (homebrews: HomebrewCreature[]) => {
                     try {
                         const creatures = homebrews.map((h) =>
-                            Creature.from(h)
+                            Creature.from(h).toJSON()
                         );
 
                         const view = this.view;
@@ -410,8 +425,12 @@ export default class InitiativeTracker extends Plugin {
                             await this.addTrackerView();
                         }
                         if (view) {
-                            view?.newEncounter({
-                                creatures
+                            tracker?.new({
+                                creatures,
+                                state: false,
+                                name: null,
+                                round: 1,
+                                logFile: null
                             });
                             this.app.workspace.revealLeaf(view.leaf);
                         } else {
@@ -489,7 +508,7 @@ export default class InitiativeTracker extends Plugin {
 
         const view = this.view;
         if (view) {
-            view.updateState();
+            tracker.updateState();
         }
 
         await this.saveSettings();
@@ -514,7 +533,7 @@ export default class InitiativeTracker extends Plugin {
 
         const view = this.view;
         if (view) {
-            view.updateState();
+            tracker.updateState();
         }
 
         await this.saveSettings();
@@ -576,5 +595,6 @@ export default class InitiativeTracker extends Plugin {
         }
 
         await this.saveData(this.data);
+        tracker.setData(this.data);
     }
 }

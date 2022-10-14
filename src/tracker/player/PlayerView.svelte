@@ -7,11 +7,9 @@
     import type { Creature } from "src/utils/creature";
     import { createEventDispatcher } from "svelte";
 
+    import { tracker } from "../stores/tracker";
+    const { state, ordered } = tracker;
     const dispatch = createEventDispatcher();
-
-    export let creatures: Creature[] = [];
-    export let loaded = false;
-    export let state = false;
 
     const hpIcon = (node: HTMLElement) => {
         setIcon(node, HP);
@@ -28,29 +26,20 @@
         return "Healthy";
     };
 
-    const timeout = setTimeout(() => {
-        dispatch("try-load");
-    }, 1000);
-    $: {
-        if (loaded) {
-            clearTimeout(timeout);
-        }
-    }
-
     const amIActive = (creature: Creature) => {
         if (creature.hidden) return false;
         if (creature.active) return true;
 
-        const active = creatures.findIndex((c) => c.active);
-        const index = creatures.indexOf(creature);
+        const active = $ordered.findIndex((c) => c.active);
+        const index = $ordered.indexOf(creature);
         if (active == -1 || active < index) return false;
 
-        const remaining = creatures.slice(index + 1, active + 1);
+        const remaining = $ordered.slice(index + 1, active + 1);
         if (remaining.every((c) => c.hidden)) return true;
         return false;
     };
 
-    $: activeAndVisible = creatures.filter((c) => c.enabled && !c.hidden);
+    $: activeAndVisible = $ordered.filter((c) => c.enabled && !c.hidden);
 
     const name = (creature: Creature) => {
         if (creature.display) {
@@ -63,47 +52,37 @@
     };
 </script>
 
-{#if !loaded}
-    <div class="full-center">
-        <SyncLoader />
-    </div>
-{:else}
-    <table class="initiative-tracker-table" transition:fade>
-        <thead class="tracker-table-header">
-            <th style="width:5%"><strong use:iniIcon /></th>
-            <th class="left" style="width:30%"><strong>Name</strong></th>
-            <th style="width:15%" class="center"><strong use:hpIcon /></th>
-            <th><strong> Statuses </strong></th>
-        </thead>
-        <tbody>
-            {#each activeAndVisible as creature (creature.id)}
-                <tr class:active={amIActive(creature) && state}>
-                    <td class="center">{creature.initiative}</td>
-                    <td>
-                        {name(creature)}
-                    </td>
-                    <td
-                        class:center={true}
-                        class={getHpStatus(
-                            creature.hp,
-                            creature.max
-                        ).toLowerCase()}
-                    >
-                        {#if creature.player}
-                            <div class="center">{@html creature.hpDisplay}</div>
-                        {:else}
-                            <span>{getHpStatus(creature.hp, creature.max)}</span
-                            >
-                        {/if}
-                    </td>
-                    <td class="center">
-                        {[...creature.status].map((s) => s.name).join(", ")}
-                    </td>
-                </tr>
-            {/each}
-        </tbody>
-    </table>
-{/if}
+<table class="initiative-tracker-table" transition:fade>
+    <thead class="tracker-table-header">
+        <th style="width:5%"><strong use:iniIcon /></th>
+        <th class="left" style="width:30%"><strong>Name</strong></th>
+        <th style="width:15%" class="center"><strong use:hpIcon /></th>
+        <th><strong> Statuses </strong></th>
+    </thead>
+    <tbody>
+        {#each activeAndVisible as creature (creature.id)}
+            <tr class:active={amIActive(creature) && $state}>
+                <td class="center">{creature.initiative}</td>
+                <td>
+                    {name(creature)}
+                </td>
+                <td
+                    class:center={true}
+                    class={getHpStatus(creature.hp, creature.max).toLowerCase()}
+                >
+                    {#if creature.player}
+                        <div class="center">{@html creature.hpDisplay}</div>
+                    {:else}
+                        <span>{getHpStatus(creature.hp, creature.max)}</span>
+                    {/if}
+                </td>
+                <td class="center">
+                    {[...creature.status].map((s) => s.name).join(", ")}
+                </td>
+            </tr>
+        {/each}
+    </tbody>
+</table>
 
 <style scoped>
     .full-center {

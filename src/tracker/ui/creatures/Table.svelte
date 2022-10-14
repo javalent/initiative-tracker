@@ -28,14 +28,12 @@
     function handleDndConsider(
         e: CustomEvent<GenericDndEvent<{ creature: Creature; id: string }>>
     ) {
-        console.log("🚀 ~ file: Table.svelte ~ line 27 ~ e", e);
         items = e.detail.items;
     }
     function handleDndFinalize(
         e: CustomEvent<GenericDndEvent<{ creature: Creature; id: string }>>
     ) {
         if (e.detail.items.length > 1) {
-            console.log("🚀 ~ file: Table.svelte ~ line 32 ~ e", e);
             let dropped = e.detail.items.find(
                 ({ id }) => id == e.detail.info.id
             );
@@ -52,7 +50,6 @@
         }
         items = e.detail.items;
         $tracker = [...items.map(({ creature }) => creature)];
-        /* view.setCreatures(items.map(({ creature }) => creature)); */
     }
 </script>
 
@@ -88,12 +85,7 @@
                         ((creature.hp ?? 0) / creature.max) * 100 ?? 0
                     )}
                     on:click={(e) => {
-                        dispatch("hp", {
-                            creature: creature,
-                            ctrl: e.getModifierState(META_MODIFIER),
-                            shift: e.getModifierState("Shift"),
-                            alt: e.getModifierState("Alt")
-                        });
+                        tracker.setUpdate(creature, e);
                         e.stopPropagation();
                     }}
                 >

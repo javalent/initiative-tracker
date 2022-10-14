@@ -1,25 +1,25 @@
 <script lang="ts">
     import { ExtraButtonComponent } from "obsidian";
-
-    import type TrackerView from "src/tracker/view";
+    import type InitiativeTracker from "src/main";
 
     import { createEventDispatcher, getContext } from "svelte";
+    import { tracker } from "../stores/tracker";
 
     const dispatch = createEventDispatcher();
-    const view = getContext<TrackerView>("view");
+    const plugin = getContext<InitiativeTracker>("plugin");
 
     const cancel = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("cross").setTooltip("Cancel");
     };
 
-    $: encounters = view.plugin.data.encounters;
+    $: encounters = plugin.data.encounters;
 
     const load = (node: HTMLElement, encounter: string) => {
         new ExtraButtonComponent(node)
             .setIcon("open-elsewhere-glyph")
             .setTooltip("Load Encounter")
             .onClick(() => {
-                view.loadEncounter(encounter);
+                tracker.new(encounters[encounter]);
                 dispatch("cancel");
             });
     };
@@ -28,8 +28,8 @@
             .setIcon("trash")
             .setTooltip("Delete Encounter")
             .onClick(() => {
-                delete view.plugin.data.encounters[encounter];
-                encounters = view.plugin.data.encounters;
+                delete plugin.data.encounters[encounter];
+                encounters = plugin.data.encounters;
             });
     };
 </script>

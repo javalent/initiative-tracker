@@ -5,6 +5,7 @@
     import type TrackerView from "src/tracker/view";
     import { createEventDispatcher, getContext } from "svelte";
     import type InitiativeTracker from "src/main";
+    import { tracker } from "src/tracker/stores/tracker";
 
     const dispatch = createEventDispatcher();
 
@@ -38,7 +39,10 @@
                     item.setIcon("eye")
                         .setTitle("Show")
                         .onClick(() => {
-                            /* view.setCreatureHidden(creature, false); */
+                            tracker.updateCreatures({
+                                creature,
+                                change: { hidden: false }
+                            });
                         });
                 });
             } else {
@@ -46,7 +50,10 @@
                     item.setIcon("eye-off")
                         .setTitle("Hide")
                         .onClick(() => {
-                            /* view.setCreatureHidden(creature, true); */
+                            tracker.updateCreatures({
+                                creature,
+                                change: { hidden: true }
+                            });
                         });
                 });
             }
@@ -55,7 +62,10 @@
                     item.setIcon(DISABLE)
                         .setTitle("Disable")
                         .onClick(() => {
-                            /* view.setCreatureState(creature, false); */
+                            tracker.updateCreatures({
+                                creature,
+                                change: { enabled: false }
+                            });
                         });
                 });
             } else {
@@ -63,7 +73,10 @@
                     item.setIcon(ENABLE)
                         .setTitle("Enable")
                         .onClick(() => {
-                            /* view.setCreatureState(creature, true); */
+                            tracker.updateCreatures({
+                                creature,
+                                change: { enabled: true }
+                            });
                         });
                 });
             }
@@ -78,9 +91,10 @@
                                 markerMenu.addItem((item) => {
                                     item.setTitle(marker.type);
                                     item.onClick(() => {
-                                        /* view.updateCreature(creature, {
-                                            marker: marker.type
-                                        }); */
+                                        tracker.updateCreatures({
+                                            creature,
+                                            change: { marker: marker.type }
+                                        });
                                     });
                                 });
                             }
@@ -92,7 +106,7 @@
                 item.setIcon(REMOVE)
                     .setTitle("Remove")
                     .onClick(() => {
-                        /* view.removeCreature(creature); */
+                        tracker.remove(creature);
                     });
             });
             menu.showAtPosition(evt);
@@ -102,29 +116,6 @@
 
 <div class="controls">
     <div class="add-button icon" use:hamburgerIcon />
-    <!--       <div class="add-button icon" class:show use:hamburgerIcon />
-         <div class="add-button tags" class:show={!show} use:tagButton />
-        {#if creature.enabled}
-            <div
-                class="add-button enable"
-                class:show={!show}
-                use:disableButton
-            />
-        {:else}
-            <div
-                class="add-button enable"
-                class:show={!show}
-                use:enableButton
-            />
-        {/if}
-        {#if view.plugin.data.leafletIntegration}
-            <div
-                class="add-button marker"
-                class:show={!show}
-                use:markerButton
-            />
-        {/if}
-        <div class="add-button delete" class:show={!show} use:deleteButton /> -->
 </div>
 
 <style>

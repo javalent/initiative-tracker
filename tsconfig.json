@@ -12,5 +12,5 @@
         "types": ["node", "svelte"],
         "lib": ["dom", "esnext", "scripthost", "es2015"]
     },
-    "include": ["src/*"]
+    "include": ["src/*", "@types"]
 }

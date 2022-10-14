@@ -124,18 +124,18 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         containerEl.empty();
         new Setting(containerEl).setHeading().setName("Basic Settings");
         new Setting(containerEl)
-        .setName("Display Beginner Tips")
-        .setDesc(
-            "Display instructions in the intiative tracker, helping you get used to the workflow."
-        )
-        .addToggle((t) => {
-            t.setValue(this.plugin.data.beginnerTips).onChange(
-                async (v) => {
-                    this.plugin.data.beginnerTips = v;
-                    await this.plugin.saveSettings();
-                }
-            );
-        });
+            .setName("Display Beginner Tips")
+            .setDesc(
+                "Display instructions in the intiative tracker, helping you get used to the workflow."
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.beginnerTips).onChange(
+                    async (v) => {
+                        this.plugin.data.beginnerTips = v;
+                        await this.plugin.saveSettings();
+                    }
+                );
+            });
         new Setting(containerEl)
             .setName("Display Encounter Difficulty")
             .setDesc(
@@ -157,28 +157,9 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             .addToggle((t) => {
                 t.setValue(this.plugin.data.condense).onChange(async (v) => {
                     this.plugin.data.condense = v;
-                    const view = this.plugin.view;
-                    if (view) {
-                        view.setCondensed(this.plugin.data.condense);
-                    }
                     await this.plugin.saveSettings();
                 });
             });
-        /*         new Setting(containerEl)
-            .setName("Monster Property used for Modifier")
-            .setDesc(
-                "The tracker will try to use this property on a monster to calculate initiative."
-            )
-            .addText((t) => {
-                t.setValue(this.plugin.data.modifier).onChange((v) => {
-                    this.plugin.data.modifier = v;
-                });
-                t.inputEl.onblur = async () => {
-                    const view = this.plugin.view;
-                    if (view) view.rollInitiatives();
-                    await this.plugin.saveSettings();
-                };
-            }); */
     }
     private async _displayBattle(additionalContainer: HTMLDetailsElement) {
         additionalContainer.empty();
@@ -786,8 +767,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     this.plugin.data.initiative = v;
                 });
                 t.inputEl.onblur = async () => {
-                    const view = this.plugin.view;
-                    if (view) view.rollInitiatives();
+                    tracker.roll(this.plugin);
                     await this.plugin.saveSettings();
                 };
             });
@@ -830,7 +810,6 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 t.setValue(this.plugin.data.leafletIntegration);
                 t.onChange(async (v) => {
                     this.plugin.data.leafletIntegration = v;
-                    this.plugin.view.setMapState(v);
                     await this.plugin.saveSettings();
                     this._displayIntegrations(containerEl);
                 });
@@ -1231,6 +1210,7 @@ class NewPlayerModal extends Modal {
 }
 
 import { App, ButtonComponent, Modal } from "obsidian";
+import { tracker } from "src/tracker/stores/tracker";
 
 export async function confirmWithModal(
     app: App,

@@ -2,13 +2,14 @@
     import { ExtraButtonComponent } from "obsidian";
     import { SAVE } from "src/utils";
 
-    import type TrackerView from "src/tracker/view";
     import { getContext } from "svelte";
     import { createEventDispatcher } from "svelte";
+    import type InitiativeTracker from "src/main";
+    import { tracker } from "../stores/tracker";
 
-    export let name: string;
-    let encounterName = name;
-    const view = getContext<TrackerView>("view");
+    const { name } = tracker;
+    let encounterName = $name;
+    const plugin = getContext<InitiativeTracker>("plugin");
 
     let saveButton: ExtraButtonComponent;
     const checkSave = () => {
@@ -28,12 +29,16 @@
             .onClick(async () => {
                 if (
                     encounterName &&
-                    encounterName in view.plugin.data.encounters &&
+                    encounterName in plugin.data.encounters &&
                     !checking
                 ) {
                     checking = true;
                 } else {
-                    await view.saveEncounter(encounterName);
+                    plugin.data.encounters[encounterName] = {
+                        ...tracker.getEncounterState(),
+                        name: encounterName
+                    };
+                    await plugin.saveSettings();
                     dispatch("cancel");
                 }
             });

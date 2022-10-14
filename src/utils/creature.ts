@@ -4,7 +4,6 @@ import type {
     HomebrewCreature,
     SRDMonster
 } from "@types";
-import type InitiativeTracker from "src/main";
 import { Conditions, XP_PER_CR } from ".";
 import { DEFAULT_UNDEFINED } from "./constants";
 
@@ -61,6 +60,8 @@ export class Creature {
         this.source = creature.source;
 
         this.friendly = creature.friendly ?? this.friendly;
+
+        this.active = creature.active;
 
         if ("xp" in creature) {
             this.xp = creature.xp;

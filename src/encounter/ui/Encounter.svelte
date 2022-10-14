@@ -11,6 +11,7 @@
     } from "src/utils/encounter-difficulty";
     import type InitiativeTracker from "src/main";
     import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
+    import { tracker } from "src/tracker/stores/tracker";
 
     export let plugin: InitiativeTracker;
 
@@ -19,7 +20,6 @@
     export let players: string[];
     export let party: string = null;
     export let hide: string[] = [];
-    export let xp: number;
 
     export let playerLevels: number[];
 
@@ -80,12 +80,14 @@
             })
             .flat();
 
-        view?.newEncounter({
-            party,
+        tracker.new({
+            creatures: [...plugin.getPlayersForParty(party), ...creatures].map(
+                (c) => c.toJSON()
+            ),
             name,
-            players,
-            creatures,
-            xp
+            round: 1,
+            state: false,
+            logFile: null
         });
         plugin.app.workspace.revealLeaf(view.leaf);
     };
@@ -107,7 +109,7 @@
                 );
             })
             .flat();
-        view.addCreatures(creatures, true);
+        tracker.add(...creatures);
     };
 
     const rollerEl = (node: HTMLElement, creature: Creature) => {

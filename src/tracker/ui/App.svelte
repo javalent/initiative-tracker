@@ -5,103 +5,33 @@
     import Table from "./creatures/Table.svelte";
     import Metadata from "./Metadata.svelte";
     import Create from "./Create.svelte";
+    import SaveEncounter from "./SaveEncounter.svelte";
+    import LoadEncounter from "./LoadEncounter.svelte";
 
     import { tracker } from "../stores/tracker";
-    import { ConditionSuggestionModal } from "src/utils/suggester";
     import { Creature } from "src/utils/creature";
-    import { ExtraButtonComponent, setIcon } from "obsidian";
-    import { ADD, COPY, HP, REMOVE, TAG } from "src/utils";
-    import type { Condition, UpdateLogMessage } from "@types";
+    import { ExtraButtonComponent } from "obsidian";
+    import { ADD, COPY } from "src/utils";
+    import Updating from "./Updating.svelte";
+    import Logger from "src/logger/logger";
 
-    const { party } = tracker;
     export let plugin: InitiativeTracker;
 
-    tracker.setCondensed(plugin.data.condense);
-    tracker.setParty(plugin.data.defaultParty, plugin);
-    tracker.roll(plugin);
+    tracker.setData(plugin.data);
+    tracker.setLogger(new Logger(plugin));
+    if (plugin.data.state) {
+        tracker.new(plugin.data.state);
+    } else {
+        tracker.setParty(plugin.data.defaultParty, plugin);
+        tracker.roll(plugin);
+
+    }
 
     setContext<InitiativeTracker>("plugin", plugin);
 
-    const hpIcon = (node: HTMLElement) => {
-        setIcon(node, HP);
-    };
-    const tagIcon = (node: HTMLElement) => {
-        setIcon(node, TAG);
-    };
-    const removeIcon = (node: HTMLElement) => {
-        setIcon(node, REMOVE);
-    };
-    const checkIcon = (node: HTMLElement) => {
-        setIcon(node, "check");
-    };
-    const cancelIcon = (node: HTMLElement) => {
-        setIcon(node, "cross-in-box");
-    };
     let saving = false;
     let loading = false;
-    let damage: string = "";
-    let status: Condition = null;
-    export let updatingCreatures: { [key: string]: any }[] = [];
-    const updateCreatures = (toAddString: string, tag: Condition) => {
-        const roundHalf = !toAddString.includes(".");
 
-        const messages: UpdateLogMessage[] = [];
-        updatingCreatures.forEach((entry) => {
-            const modifier =
-                (entry.saved ? 0.5 : 1) *
-                (entry.resist ? 0.5 : 1) *
-                Number(entry.customMod);
-            const name = [entry.creature.name];
-            if (entry.creature.number > 0) {
-                name.push(entry.creature.number);
-            }
-            const message: UpdateLogMessage = {
-                name: name.join(" "),
-                hp: null,
-                temp: false,
-                status: null,
-                saved: false,
-                unc: false
-            };
-
-            if (toAddString.charAt(0) == "t") {
-                let toAdd = Number(toAddString.slice(1));
-                /* view.updateCreature(entry.creature, { temp: toAdd }); */
-                message.hp = toAdd;
-                message.temp = true;
-            } else {
-                let toAdd = Number(toAddString);
-                toAdd =
-                    -1 *
-                    Math.sign(toAdd) *
-                    Math.max(Math.abs(toAdd) * modifier, 1);
-                toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
-                message.hp = toAdd;
-                /* view.updateCreature(entry.creature, { hp: toAdd }); */
-                if (entry.creature.hp <= 0) {
-                    message.unc = true;
-                }
-            }
-            if (tag) {
-                message.status = tag.name;
-                if (!entry.saved) {
-                    /* view.addStatus(entry.creature, tag); */
-                } else {
-                    message.saved = true;
-                }
-            }
-            messages.push(message);
-        });
-        /*  view.logUpdate(messages); */
-
-        closeUpdateCreatures();
-    };
-
-    const closeUpdateCreatures = () => {
-        updatingCreatures.length = 0;
-        damage = "";
-        status = null;
-    };
     let addNew = false;
     export let addNewAsync = false;
     let editCreature: Creature = null;
@@ -126,18 +56,6 @@
                 await navigator.clipboard.writeText(contents);
             });
     };
-    let modal: ConditionSuggestionModal;
-    const suggestConditions = (node: HTMLInputElement) => {
-        modal = new ConditionSuggestionModal(plugin, node);
-        modal.onClose = () => {
-            status = modal.condition;
-            node.focus();
-        };
-        modal.open();
-    };
-    function init(el: HTMLInputElement) {
-        el.focus();
-    }
 </script>
 
 <div class="obsidian-initiative-tracker">
@@ -145,181 +63,16 @@
         on:save={() => (saving = true)}
         on:load={() => (loading = true)}
         on:player-view
+        on:open-map
     />
 
     <Metadata />
     <Table />
-    {#if updatingCreatures.length}
-        <div class="updating-hp">
-            <!-- svelte-ignore a11y-autofocus -->
-            <div class="hp-status">
-                {#if plugin.data.beginnerTips}
-                    <small class="label">
-                        Apply damage, healing(-) or temp HP(t)
-                    </small>
-                {/if}
-                <div class="input">
-                    <tag
-                        use:hpIcon
-                        aria-label="Apply damage, healing(-) or temp HP(t)"
-                        style="margin: 0 0.2rem 0 0.7rem"
-                    />
-                    <input
-                        type="text"
-                        bind:value={damage}
-                        on:keydown={function (evt) {
-                            if (evt.key === "Enter") {
-                                evt.preventDefault();
-                                updateCreatures(damage, status);
-                                return;
-                            }
-                            if (evt.key === "Escape") {
-                                closeUpdateCreatures();
-                                return;
-                            }
-                            if (
-                                !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
-                                    this.value + evt.key
-                                )
-                            ) {
-                                evt.preventDefault();
-                                return false;
-                            }
-                        }}
-                        use:init
-                    />
-                </div>
-            </div>
-            <div class="hp-status">
-                {#if plugin.data.beginnerTips}
-                    <small class="label">
-                        Apply status effect to creatures that fail their saving
-                        throw
-                    </small>
-                {/if}
-                <div class="input">
-                    <tag
-                        use:tagIcon
-                        aria-label="Apply status effect to creatures that fail their saving throw"
-                        style="margin: 0 0.2rem 0 0.7rem"
-                    />
-                    <input
-                        type="text"
-                        on:focus={function (evt) {
-                            suggestConditions(this);
-                        }}
-                        on:keydown={function (evt) {
-                            if (evt.key === "Escape") {
-                                closeUpdateCreatures();
-                                return;
-                            }
-                            if (evt.key === "Enter") {
-                                evt.preventDefault();
-                                updateCreatures(damage, status);
-                                return;
-                            }
-                        }}
-                    />
-                </div>
-            </div>
-        </div>
-        <div class="updating-buttons">
-            <span
-                use:checkIcon
-                on:click={() => updateCreatures(damage, status)}
-                style="cursor:pointer"
-                aria-label="Apply"
-            />
-            <span
-                use:cancelIcon
-                on:click={closeUpdateCreatures}
-                style="cursor:pointer"
-                aria-label="Cancel"
-            />
-        </div>
-        {#if plugin.data.beginnerTips}
-            <div>
-                <small>Multiple creatures can be selected at a time.</small>
-            </div>
-        {/if}
-        <div style="margin: 0.5rem">
-            <table class="updating-creature-table">
-                <thead class="updating-creature-table-header">
-                    <th
-                        style="padding:0 0.2rem 0 0; cursor:pointer"
-                        class="left"
-                        use:removeIcon
-                        on:click={closeUpdateCreatures}
-                    />
-                    <th style="width:100%" class="left">Name</th>
-                    <th style="padding:0 0.2rem" class="center">Saved</th>
-                    <th style="padding:0 0.2rem" class="center">Resist</th>
-                    <th style="padding:0 0.2rem" class="center">Modifier</th>
-                </thead>
-                <tbody>
-                    {#each updatingCreatures as updating, i}
-                        <tr class="updating-creature-table-row">
-                            <td
-                                use:removeIcon
-                                on:click={function (evt) {
-                                    updatingCreatures.splice(i, 1);
-                                    updatingCreatures = updatingCreatures;
-                                }}
-                                style="cursor:pointer"
-                            />
-                            <td>
-                                <span
-                                    >{updating.creature.name +
-                                        (updating.creature.number
-                                            ? " " + updating.creature.number
-                                            : "")}</span
-                                >
-                            </td>
-                            <td class="center">
-                                <input
-                                    type="checkbox"
-                                    checked={updating.saved}
-                                    on:click={function (evt) {
-                                        updating.saved = !updating.saved;
-                                    }}
-                                />
-                            </td>
-                            <td class="center">
-                                <input
-                                    type="checkbox"
-                                    checked={updating.resist}
-                                    on:click={function (evt) {
-                                        updating.resist = !updating.resist;
-                                    }}
-                                />
-                            </td>
-                            <td class="center">
-                                <input
-                                    type="number"
-                                    class="center"
-                                    style="width:90%; height:80%; padding:0;"
-                                    bind:value={updating.customMod}
-                                    on:keydown={function (evt) {
-                                        if (evt.key === "Escape") {
-                                            this.value = "1";
-                                            return;
-                                        }
-                                        if (evt.key === "Enter") {
-                                            evt.preventDefault();
-                                            return;
-                                        }
-                                    }}
-                                />
-                            </td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
-        </div>
-        <!--     {:else if saving}
-        <SaveEncounter {name} on:cancel={() => (saving = false)} />
+    <Updating />
+    {#if saving}
+        <SaveEncounter on:cancel={() => (saving = false)} />
     {:else if loading}
-        <LoadEncounter on:cancel={() => (loading = false)} /> -->
+        <LoadEncounter on:cancel={() => (loading = false)} />
     {:else}
         <div class="add-creature-container">
             {#if editCreature || addNew || addNewAsync}
@@ -391,27 +144,9 @@
 </div>
 
 <style scoped>
-    .left {
-        text-align: left;
-    }
-    .center {
-        text-align: center;
-    }
-
     .obsidian-initiative-tracker {
         margin: 0 0.5rem;
         min-width: 180px;
-    }
-    .initiative-tracker-round-container {
-        padding: 0 0.5rem;
-    }
-    .initiave-tracker-party {
-        padding: 0 0.5rem;
-        margin: 0 0 1rem 0;
-    }
-    .updating-creature-table-row {
-        font-size: small;
-        height: 80%;
     }
     .add-creature-container {
         display: flex;
@@ -436,31 +171,5 @@
     }
     .add-button :global(.clickable-icon) {
         margin: 0;
-    }
-    .initiative-tracker-name-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 0.5rem;
-        margin: 0;
-    }
-    .initiative-tracker-name {
-        margin: 0;
-    }
-
-    .updating-hp {
-        display: flex;
-        flex-flow: column;
-        gap: 0.5rem;
-    }
-    .hp-status {
-        display: flex;
-        flex-flow: column;
-    }
-    .updating-buttons {
-        display: flex;
-        justify-content: flex-end;
-        gap: 1rem;
-        margin-right: 1.2rem;
     }
 </style>

@@ -2,6 +2,7 @@
     import { ExtraButtonComponent } from "obsidian";
 
     import type InitiativeTracker from "src/main";
+    import { tracker } from "src/tracker/stores/tracker";
     import { START_ENCOUNTER } from "src/utils";
     import { Creature } from "src/utils/creature";
 
@@ -46,8 +47,12 @@
             })
             .flat();
 
-        view?.newEncounter({
-            creatures
+        tracker.new({
+            creatures: creatures.map((c) => c.toJSON()),
+            name: null,
+            state: false,
+            round: 1,
+            logFile: null
         });
         plugin.app.workspace.revealLeaf(view.leaf);
     };
@@ -69,7 +74,7 @@
                 );
             })
             .flat();
-        view.addCreatures(creatures, true);
+        tracker.add(...creatures);
     };
 
     const rollerEl = (node: HTMLElement, creature: Creature) => {
