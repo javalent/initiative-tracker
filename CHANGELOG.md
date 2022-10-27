@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.1.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.11...8.1.0) (2022-10-27)
+
+
+### Features
+
+* adds statblock-link support ([@ebullient](https://github.com/ebullient) :) ) ([340eca1](https://github.com/valentine195/obsidian-initiative-tracker/commit/340eca18d20809b94488cb7e721c5962cf7489c8))
+
 ### [8.0.11](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.10...8.0.11) (2022-09-26)
 
 
