@@ -123,6 +123,7 @@ export interface CreatureState extends HomebrewCreature {
     player: boolean;
     xp: number;
     active: boolean;
+    "statblock-link": string;
 }
 
 export interface SRDMonster {

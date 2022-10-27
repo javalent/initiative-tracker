@@ -28,6 +28,27 @@
     const hiddenIcon = (div: HTMLElement) => {
         setIcon(div, "eye-off");
     };
+
+    const tryHover = (evt: MouseEvent) => {
+        if (creature["statblock-link"]) {
+            let link = creature["statblock-link"];
+            if (/\[.+\]\(.+\)/.test(link)) {
+                //md
+                [, link] = link.match(/\[.+?\]\((.+?)\)/);
+            } else if (/\[\[.+\]\]/.test(link)) {
+                //wiki
+                [, link] = link.match(/\[\[(.+?)(?:\|.+?)?\]\]/);
+            }
+
+            app.workspace.trigger(
+                "link-hover",
+                {}, //hover popover, but don't need
+                evt.target, //targetEl
+                link, //linkText
+                "initiative-tracker " //source
+            );
+        }
+    };
 </script>
 
 <td class="initiative-container" on:click={(e) => e.stopPropagation()}>
@@ -41,9 +62,13 @@
     />
 </td>
 <td class="name-container">
-    <div class="name-holder" on:click={() => view.openCombatant(creature)}>
+    <div
+        class="name-holder"
+        on:click={() => view.openCombatant(creature)}
+        on:mouseenter={tryHover}
+    >
         {#if creature.hidden}
-            <div class='centered-icon' use:hiddenIcon />
+            <div class="centered-icon" use:hiddenIcon />
         {/if}
         {#if creature.player}
             <strong class="name player">{creature.name}</strong>
@@ -73,7 +98,9 @@
     </div>
 </td>
 
-<td class="center ac-container creature-adder">{creature.ac ?? DEFAULT_UNDEFINED}</td>
+<td class="center ac-container creature-adder"
+    >{creature.ac ?? DEFAULT_UNDEFINED}</td
+>
 
 <td class="controls-container">
     <CreatureControls

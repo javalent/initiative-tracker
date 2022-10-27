@@ -397,12 +397,7 @@
             {#if editCreature || addNew || addNewAsync}
                 <Create
                     editing={editCreature != null}
-                    name={editCreature?.name}
-                    display={editCreature?.display}
-                    hp={`${editCreature?.hp}`}
-                    initiative={editCreature?.initiative}
-                    modifier={editCreature?.modifier}
-                    ac={`${editCreature?.ac}`}
+                    creature={editCreature}
                     on:cancel={() => {
                         addNew = false;
                         addNewAsync = false;
@@ -411,21 +406,7 @@
                     }}
                     on:save={(evt) => {
                         const creature = evt.detail;
-                        const newCreature = new Creature(
-                            {
-                                name: creature.name,
-                                display: creature.display,
-                                hp: creature.hp,
-                                ac: creature.ac,
-                                modifier: creature.modifier,
-                                marker: view.plugin.data.monsterMarker,
-                                xp: creature.xp,
-                                player: creature.player,
-                                level: creature.level,
-                                hidden: creature.hidden
-                            },
-                            creature.initiative
-                        );
+                        const newCreature = Creature.new(creature);
                         if (addNewAsync) {
                             dispatch("add-new-async", newCreature);
                         } else if (editCreature) {

@@ -38,6 +38,7 @@ export class Creature {
     viewing: boolean = false;
     number = 0;
     display: string;
+    "statblock-link": string;
     constructor(public creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;
         this.display = creature.display;
@@ -65,6 +66,11 @@ export class Creature {
             this.xp = XP_PER_CR[`${creature.cr}`];
         }
         this.id = creature.id ?? getId();
+        if ("statblock-link" in creature) {
+            this["statblock-link"] = (creature as any)[
+                "statblock-link"
+            ] as string;
+        }
     }
     get hpDisplay() {
         if (this.max) {
@@ -166,7 +172,8 @@ export class Creature {
             player: this.player,
             xp: this.xp,
             active: this.active,
-            hidden: this.hidden
+            hidden: this.hidden,
+            "statblock-link": this["statblock-link"]
         };
     }
 
