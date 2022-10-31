@@ -231,7 +231,7 @@ export class EncounterParser {
             ? Creature.from(existing)
             : new Creature({ name });
 
-        creature.display = display ?? creature.name;
+        creature.display = display;
         creature.hp = hp ?? creature.hp;
         creature.ac = ac ?? creature.ac;
         creature.modifier = mod ?? creature.modifier;
