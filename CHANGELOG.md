@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.0...8.1.1) (2022-10-31)
+
+
+### Bug Fixes
+
+* fixes display of multiple creatures from encounter blocks ([ce3eb5e](https://github.com/valentine195/obsidian-initiative-tracker/commit/ce3eb5e9545c8ef4669e6b11fcb3c1815a67e469))
+
 ## [8.1.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.11...8.1.0) (2022-10-27)
 
 
