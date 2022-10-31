@@ -340,7 +340,7 @@ export default class TrackerView extends ItemView {
             if (creature.number > 0) continue;
             const prior = this.creatures
                 .slice(0, i)
-                .filter((c) => c.name == creature.name)
+                .filter((c) => c.display ? c.display == creature.display : c.name == creature.name)
                 .map((c) => c.number);
             creature.number = prior?.length ? Math.max(...prior) + 1 : 1;
         }
