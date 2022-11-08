@@ -405,7 +405,7 @@
                         dispatch("cancel-add-new-async");
                     }}
                     on:save={(evt) => {
-                        const creature = evt.detail;
+                        const { creature, number } = evt.detail;
                         const newCreature = Creature.new(creature);
                         if (addNewAsync) {
                             dispatch("add-new-async", newCreature);
@@ -420,12 +420,9 @@
                                 name: creature.name
                             });
                         } else {
-                            const number = Math.max(
-                                isNaN(creature.number) ? 1 : creature.number,
-                                1
-                            );
+                            let num = Math.max(isNaN(number) ? 1 : number, 1);
                             view.addCreatures(
-                                [...Array(number).keys()].map((k) =>
+                                [...Array(num).keys()].map((k) =>
                                     Creature.new(newCreature)
                                 )
                             );

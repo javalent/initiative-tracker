@@ -15,32 +15,32 @@
     export let editing = false;
     export let creature: Creature = new Creature({});
     if (!creature) {
-        creature = new Creature({})
+        creature = new Creature({});
     }
-    let initiative = creature.initiative;
-    let xp: number;
-    let player: boolean;
-    let level: number;
     let number: number = 1;
 
     const saveButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Add Creature")
             .setIcon(SAVE)
-            .onClick(() => {
+            .onClick(async () => {
                 if (!creature || !creature.name || !creature.name?.length) {
                     new Notice("Enter a name!");
                     return;
                 }
-                if (!creature?.modifier) {
+                if (!creature.modifier) {
                     creature.modifier = 0;
                 }
-                if (!creature?.initiative) {
-                    creature.initiative =
-                        (initiative ?? Math.floor(Math.random() * 19 + 1)) -
-                        creature.modifier;
+                if (
+                    creature.initiative <= 0 ||
+                    creature.initiative == null ||
+                    isNaN(creature.initiative)
+                ) {
+                    creature.initiative = await view.getInitiativeValue(
+                        creature.modifier
+                    );
                 }
-                dispatch("save", Creature.new(creature));
+                dispatch("save", { creature: Creature.new(creature), number });
             });
     };
     const cancelButton = (node: HTMLElement) => {
@@ -55,10 +55,10 @@
         new ExtraButtonComponent(node)
             .setIcon(DICE)
             .setTooltip("Roll Initiative")
-            .onClick(() => {
-                initiative =
-                    Math.floor(Math.random() * 19 + 1) +
-                    (creature.modifier ?? 0);
+            .onClick(async () => {
+                creature.initiative = await view.getInitiativeValue(
+                    creature.modifier
+                );
             });
     };
     const openModal = (nameInput: HTMLInputElement) => {
@@ -66,12 +66,10 @@
         modal.onClose = async () => {
             if (modal.creature) {
                 creature = Creature.from(modal.creature);
-                console.log(
-                    "🚀 ~ file: Create.svelte ~ line 70 ~ creature",
-                    creature
-                );
 
-                initiative = await view.getInitiativeValue(creature.modifier);
+                creature.initiative = await view.getInitiativeValue(
+                    creature.modifier
+                );
             }
         };
         modal.open();
@@ -141,7 +139,7 @@
     <div class="initiative">
         <label for="add-init">Initiative</label>
         <input
-            bind:value={initiative}
+            bind:value={creature.initiative}
             id="add-init"
             type="number"
             name="initiative"
