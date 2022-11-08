@@ -17,13 +17,11 @@
     let view = getContext<TrackerView>("view");
 
     const name = () => {
-        if (creature.display) {
-            return creature.display;
-        }
+        let name = creature.display ?? creature.name;
         if (creature.number > 0) {
-            return `${creature.name} ${creature.number}`;
+            return `${name} ${creature.number}`;
         }
-        return creature.name;
+        return name;
     };
     const hiddenIcon = (div: HTMLElement) => {
         setIcon(div, "eye-off");
