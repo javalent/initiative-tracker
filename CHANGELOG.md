@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.3](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.2...8.1.3) (2022-11-08)
+
+
+### Bug Fixes
+
+* creatures with display names display numbers properly ([8021c41](https://github.com/valentine195/obsidian-initiative-tracker/commit/8021c415c227304240deb2c11bf58fc284667992))
+* fixes issues with adding creatures from ui ([9dc5e56](https://github.com/valentine195/obsidian-initiative-tracker/commit/9dc5e560ba84a2ddc41adc931c43dd02c3522c98))
+
 ### [8.1.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.0...8.1.1) (2022-10-31)
 
 
