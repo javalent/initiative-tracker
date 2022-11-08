@@ -14,16 +14,35 @@
     $: statuses = creature.status;
 
     const name = () => {
-        if (creature.display) {
-            return creature.display;
-        }
+        let name = creature.display ?? creature.name;
         if (creature.number > 0) {
-            return `${creature.name} ${creature.number}`;
+            return `${name} ${creature.number}`;
         }
-        return creature.name;
+        return name;
     };
     const hiddenIcon = (div: HTMLElement) => {
         setIcon(div, "eye-off");
+    };
+
+    const tryHover = (evt: MouseEvent) => {
+        if (creature["statblock-link"]) {
+            let link = creature["statblock-link"];
+            if (/\[.+\]\(.+\)/.test(link)) {
+                //md
+                [, link] = link.match(/\[.+?\]\((.+?)\)/);
+            } else if (/\[\[.+\]\]/.test(link)) {
+                //wiki
+                [, link] = link.match(/\[\[(.+?)(?:\|.+?)?\]\]/);
+            }
+
+            app.workspace.trigger(
+                "link-hover",
+                {}, //hover popover, but don't need
+                evt.target, //targetEl
+                link, //linkText
+                "initiative-tracker " //source
+            );
+        }
     };
 </script>
 
@@ -46,6 +65,7 @@
         on:click={() => {
             dispatch("open-combatant");
         }}
+        on:mouseenter={tryHover}
     >
         {#if creature.hidden}
             <div class="centered-icon" use:hiddenIcon />

@@ -13,46 +13,34 @@
     const plugin = getContext<InitiativeTracker>("plugin");
 
     export let editing = false;
-    export let name: string = null;
-    export let display: string = null;
-    export let hp: string = null;
-    export let initiative: number = null;
-    export let ac: string = null;
-    export let modifier: number = null;
-    export let hidden: boolean = false;
-    let xp: number;
-    let player: boolean;
-    let level: number;
+    export let creature: Creature = new Creature({});
+    if (!creature) {
+        creature = new Creature({});
+    }
     let number: number = 1;
 
     const saveButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Add Creature")
             .setIcon(SAVE)
-            .onClick(() => {
-                if (!name || !name?.length) {
+            .onClick(async () => {
+                if (!creature || !creature.name || !creature.name?.length) {
                     new Notice("Enter a name!");
                     return;
                 }
-                if (!modifier) {
-                    modifier = 0;
+                if (!creature.modifier) {
+                    creature.modifier = 0;
                 }
-
-                dispatch("save", {
-                    name,
-                    hp,
-                    display,
-                    initiative:
-                        (initiative ?? Math.floor(Math.random() * 19 + 1)) -
-                        modifier,
-                    ac,
-                    modifier,
-                    xp,
-                    player,
-                    level,
-                    number: Number(number),
-                    hidden
-                });
+                if (
+                    creature.initiative <= 0 ||
+                    creature.initiative == null ||
+                    isNaN(creature.initiative)
+                ) {
+                    creature.initiative = await plugin.getInitiativeValue(
+                        creature.modifier
+                    );
+                }
+                dispatch("save", { creature: Creature.new(creature), number });
             });
     };
     const cancelButton = (node: HTMLElement) => {
@@ -67,33 +55,29 @@
         new ExtraButtonComponent(node)
             .setIcon(DICE)
             .setTooltip("Roll Initiative")
-            .onClick(() => {
-                initiative =
-                    Math.floor(Math.random() * 19 + 1) + (modifier ?? 0);
+            .onClick(async () => {
+                creature.initiative = await plugin.getInitiativeValue(
+                    creature.modifier
+                );
             });
     };
     const openModal = (nameInput: HTMLInputElement) => {
         const modal = new SRDMonsterSuggestionModal(plugin, nameInput);
         modal.onClose = async () => {
             if (modal.creature) {
-                let newCreature = Creature.from(modal.creature);
+                creature = Creature.from(modal.creature);
 
-                name = newCreature.name;
-                if (newCreature.hp) hp = `${newCreature.hp}`;
-                if (newCreature.ac) ac = `${newCreature.ac}`;
-                modifier = newCreature.modifier ?? 0;
-                xp = newCreature.xp;
-
-                player = newCreature.player;
-                level = newCreature.level;
-
-                initiative = plugin.getInitiativeValue(modifier);
+                creature.initiative = await plugin.getInitiativeValue(
+                    creature.modifier
+                );
             }
         };
         modal.open();
     };
     const hideToggle = (div: HTMLDivElement) => {
-        new ToggleComponent(div).setValue(hidden).onChange((v) => (hidden = v));
+        new ToggleComponent(div)
+            .setValue(creature.hidden)
+            .onChange((v) => (creature.hidden = v));
     };
 </script>
 
@@ -101,7 +85,7 @@
     <div>
         <label for="add-name">Creature</label>
         <input
-            bind:value={name}
+            bind:value={creature.name}
             on:focus={function () {
                 openModal(this);
             }}
@@ -114,7 +98,7 @@
     <div>
         <label for="add-display">Display Name</label>
         <input
-            bind:value={display}
+            bind:value={creature.display}
             id="add-display"
             type="text"
             name="display"
@@ -124,7 +108,7 @@
     <div>
         <label for="add-hp">HP</label>
         <input
-            bind:value={hp}
+            bind:value={creature.hp}
             id="add-hp"
             type="number"
             name="hp"
@@ -134,7 +118,7 @@
     <div>
         <label for="add-ac">AC</label>
         <input
-            bind:value={ac}
+            bind:value={creature.ac}
             id="add-ac"
             type="number"
             name="ac"
@@ -144,7 +128,7 @@
     <div>
         <label for="add-mod">Modifier</label>
         <input
-            bind:value={modifier}
+            bind:value={creature.modifier}
             id="add-mod"
             type="number"
             name="ac"
@@ -155,7 +139,7 @@
     <div class="initiative">
         <label for="add-init">Initiative</label>
         <input
-            bind:value={initiative}
+            bind:value={creature.initiative}
             id="add-init"
             type="number"
             name="initiative"
