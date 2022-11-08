@@ -8,6 +8,7 @@ import {
 } from "obsidian";
 
 import {
+    BUILDER_VIEW,
     CREATURE_TRACKER_VIEW,
     DEFAULT_SETTINGS,
     INTIATIVE_TRACKER_VIEW,
@@ -33,6 +34,7 @@ import { Creature } from "./utils/creature";
 import { BESTIARY } from "./utils/srd-bestiary";
 
 import TrackerView, { CreatureView } from "./tracker/view";
+import BuilderView from "./builder/view";
 
 import type { Plugins } from "../../obsidian-overload/index";
 import PlayerView from "./tracker/player-view";
@@ -189,6 +191,10 @@ export default class InitiativeTracker extends Plugin {
         this.registerView(
             CREATURE_TRACKER_VIEW,
             (leaf: WorkspaceLeaf) => new CreatureView(leaf, this)
+        );
+        this.registerView(
+            BUILDER_VIEW,
+            (leaf: WorkspaceLeaf) => new BuilderView(leaf, this)
         );
 
         this.addCommands();
@@ -351,6 +357,18 @@ export default class InitiativeTracker extends Plugin {
                 }
             }
         });
+        this.addCommand({
+            id: "open-builder",
+            name: "Open Encounter Builder",
+            checkCallback: (checking) => {
+                if (!this.builder) {
+                    if (!checking) {
+                        this.addBuilderView();
+                    }
+                    return true;
+                }
+            }
+        });
 
         this.addCommand({
             id: "toggle-encounter",
@@ -472,6 +490,22 @@ export default class InitiativeTracker extends Plugin {
         await this.app.workspace.getRightLeaf(false).setViewState({
             type: INTIATIVE_TRACKER_VIEW
         });
+    }
+    get builder() {
+        const leaves = this.app.workspace.getLeavesOfType(BUILDER_VIEW);
+        const leaf = leaves.length ? leaves[0] : null;
+        if (leaf && leaf.view && leaf.view instanceof BuilderView)
+            return leaf.view;
+            
+    }
+    async addBuilderView() {
+        if (this.app.workspace.getLeavesOfType(BUILDER_VIEW)?.length) {
+            return;
+        }
+        await this.app.workspace.getLeaf(true).setViewState({
+            type: BUILDER_VIEW
+        });
+        this.app.workspace.revealLeaf(this.builder.leaf);
     }
 
     async saveMonsters(importedMonsters: HomebrewCreature[]) {

@@ -31,7 +31,7 @@ export class Creature {
     status: Set<Condition> = new Set();
     marker: string;
     private _initiative: number;
-    source: string;
+    source: string | string[];
     id: string;
     xp: number;
     viewing: boolean = false;

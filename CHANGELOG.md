@@ -29,6 +29,18 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
+* fixes accidentally import from leaflet ([a5b4892](https://github.com/valentine195/obsidian-initiative-tracker/commit/a5b4892b614f140b2cee77636a9168e3f30f0674))
+
+## [9.0.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.0.10...9.0.0) (2022-09-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* Encounter Builder functionality
+
+### Features
+
+* Encounter Builder functionality ([0419ecd](https://github.com/valentine195/obsidian-initiative-tracker/commit/0419ecd4c04b615b2431deffd02aa0fd92d0f6b4))
 * encounters generate unique creatures (close [#69](https://github.com/valentine195/obsidian-initiative-tracker/issues/69)) ([0a9c30d](https://github.com/valentine195/obsidian-initiative-tracker/commit/0a9c30dab40cf55fe4d260ff0d256dbefc9f74e5))
 * Player view now shows display name (close [#64](https://github.com/valentine195/obsidian-initiative-tracker/issues/64)) ([c35bdce](https://github.com/valentine195/obsidian-initiative-tracker/commit/c35bdce5090f9847d32f87402bc4b4d5fb3b7784))
 
