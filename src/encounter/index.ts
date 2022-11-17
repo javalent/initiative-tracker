@@ -260,7 +260,6 @@ class EncounterComponent {
                 players: this.params.players,
                 playerLevels: this.params.playerLevels,
                 creatures: this.params.creatures,
-                xp: this.params.xp,
                 hide: this.params.hide
             }
         });
