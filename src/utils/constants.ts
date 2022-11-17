@@ -30,7 +30,8 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
         creatures: [],
         state: false,
         name: null,
-        round: null
+        round: null,
+        logFile: null
     },
     condense: false,
     clamp: true,

@@ -1,6 +1,9 @@
 import {
+    debounce,
     ExtraButtonComponent,
     ItemView,
+    MarkdownPreviewRenderer,
+    MarkdownPreviewView,
     Modal,
     Notice,
     Platform,
@@ -867,6 +870,27 @@ export class CreatureView extends ItemView {
         super(leaf);
         this.load();
         this.containerEl.addClass("creature-view-container");
+        this.containerEl.on(
+            "mouseover",
+            "a.internal-link",
+            debounce(
+                (ev) =>
+                    app.workspace.trigger(
+                        "link-hover",
+                        {}, //hover popover, but don't need
+                        ev.target, //targetEl
+                        (ev.target as HTMLAnchorElement).dataset.href, //linkText
+                        "initiative-tracker " //source
+                    ),
+                10
+            )
+        );
+        this.containerEl.on("click", "a.internal-link", (ev) =>
+            app.workspace.openLinkText(
+                (ev.target as HTMLAnchorElement).dataset.href,
+                "initiative-tracker"
+            )
+        );
     }
     onload() {
         new ExtraButtonComponent(this.buttonEl)
@@ -888,6 +912,7 @@ export class CreatureView extends ItemView {
             });
             return;
         }
+
         if (
             this.plugin.canUseStatBlocks &&
             this.plugin.statblockVersion?.major >= 2
@@ -897,9 +922,7 @@ export class CreatureView extends ItemView {
                 this.statblockEl,
                 creature.display
             );
-            if (statblock) {
-                this.addChild(statblock);
-            }
+            this.addChild(statblock);
         } else {
             this.statblockEl.createEl("em", {
                 text: "Install the TTRPG Statblocks plugin to use this feature!"
