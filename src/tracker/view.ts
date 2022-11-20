@@ -1,4 +1,5 @@
 import {
+    debounce,
     ExtraButtonComponent,
     ItemView,
     Notice,
@@ -14,7 +15,7 @@ import {
 import type InitiativeTracker from "../main";
 
 import App from "./ui/App.svelte";
-import { Creature } from "../utils/creature";
+import type { Creature } from "../utils/creature";
 import type {
     Condition,
     HomebrewCreature,
@@ -92,7 +93,7 @@ export default class TrackerView extends ItemView {
     }
 }
 
-export class TrackerView_Old extends ItemView {
+/* export class TrackerView_Old extends ItemView {
     playerViewOpened = false;
     getExistingPlayerView(): PlayerView | undefined {
         const existing =
@@ -312,11 +313,7 @@ export class TrackerView_Old extends ItemView {
     }
     private _addCreature(creature: Creature) {
         this.addCreatures([creature], false);
-        /* this.creatures.push(creature);
-
-        this.setAppState({
-            creatures: this.ordered
-        }); */
+        
     }
     get condensed() {
         if (this.condense) {
@@ -342,9 +339,7 @@ export class TrackerView_Old extends ItemView {
     }
 
     addCreatures(creatures: Creature[], trigger = true) {
-        /* for (let creature of creatures) {
-            this.creatures.push(creature);
-        } */
+        
 
         this.setCreatures([...(this.creatures ?? []), ...(creatures ?? [])]);
 
@@ -527,7 +522,6 @@ export class TrackerView_Old extends ItemView {
         };
     }
     goToNext(active = this.ordered.findIndex((c) => c.active)) {
-        /* const active = this.ordered.findIndex((c) => c.active); */
         if (active == -1) return;
         const sliced = [
             ...this.ordered.slice(active + 1),
@@ -552,7 +546,6 @@ export class TrackerView_Old extends ItemView {
         });
     }
     goToPrevious(active = this.ordered.findIndex((c) => c.active)) {
-        /* const active = this.ordered.findIndex((c) => c.active); */
         if (active == -1) return;
 
         const previous = [...this.ordered].slice(0, active).reverse();
@@ -918,7 +911,7 @@ export class TrackerView_Old extends ItemView {
             )
         );
     }
-}
+} */
 
 export class CreatureView extends ItemView {
     buttonEl = this.contentEl.createDiv("creature-view-button");
@@ -927,6 +920,27 @@ export class CreatureView extends ItemView {
         super(leaf);
         this.load();
         this.containerEl.addClass("creature-view-container");
+        this.containerEl.on(
+            "mouseover",
+            "a.internal-link",
+            debounce(
+                (ev) =>
+                    app.workspace.trigger(
+                        "link-hover",
+                        {}, //hover popover, but don't need
+                        ev.target, //targetEl
+                        (ev.target as HTMLAnchorElement).dataset.href, //linkText
+                        "initiative-tracker " //source
+                    ),
+                10
+            )
+        );
+        this.containerEl.on("click", "a.internal-link", (ev) =>
+            app.workspace.openLinkText(
+                (ev.target as HTMLAnchorElement).dataset.href,
+                "initiative-tracker"
+            )
+        );
     }
     onload() {
         new ExtraButtonComponent(this.buttonEl)
@@ -948,6 +962,7 @@ export class CreatureView extends ItemView {
             });
             return;
         }
+
         if (
             this.plugin.canUseStatBlocks &&
             this.plugin.statblockVersion?.major >= 2
@@ -957,9 +972,7 @@ export class CreatureView extends ItemView {
                 this.statblockEl,
                 creature.display
             );
-            if (statblock) {
-                this.addChild(statblock);
-            }
+            this.addChild(statblock);
         } else {
             this.statblockEl.createEl("em", {
                 text: "Install the TTRPG Statblocks plugin to use this feature!"

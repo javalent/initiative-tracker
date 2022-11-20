@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.4](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.3...8.1.4) (2022-11-17)
+
+
+### Bug Fixes
+
+* enables link events in rendered statblocks ([4668e88](https://github.com/valentine195/obsidian-initiative-tracker/commit/4668e88f59f2892f6f08fc73f95a268c3825668d))
+
 ### [8.1.3](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.2...8.1.3) (2022-11-08)
 
 
