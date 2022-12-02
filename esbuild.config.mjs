@@ -34,7 +34,10 @@ esbuild
         plugins: [
             sveltePlugin({
                 compilerOptions: { css: true },
-                preprocess: sveltePreprocess()
+                preprocess: sveltePreprocess(),
+                filterWarnings: (warning) => {
+                    return warning.code != "a11y-click-events-have-key-events";
+                }
             })
         ],
         outdir: dir
