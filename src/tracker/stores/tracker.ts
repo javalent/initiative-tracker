@@ -63,7 +63,7 @@ function createTracker() {
             return creatures;
         });
     };
-    const $name = writable<string | null>("Test Name");
+    const $name = writable<string | null>();
     const $party = writable<string | null>();
 
     const data = writable<InitiativeTrackerData>();
@@ -208,6 +208,29 @@ function createTracker() {
         trySave();
     }
 
+    const adding = writable<Map<Creature, number>>(new Map());
+
+    const setNumbers = (list: Creature[], sublist: Creature[] = list) => {
+        for (let i = 0; i < sublist.length; i++) {
+            const creature = sublist[i];
+            if (
+                creature.player ||
+                list.filter((c) => c.name == creature.name).length == 1
+            ) {
+                continue;
+            }
+            if (creature.number > 0) continue;
+            const prior = list
+                .filter((c) =>
+                    c.display
+                        ? c.display == creature.display
+                        : c.name == creature.name
+                )
+                .map((c) => c.number);
+            creature.number = prior?.length ? Math.max(...prior) + 1 : 1;
+        }
+    };
+
     return {
         subscribe,
         set,
@@ -242,10 +265,11 @@ function createTracker() {
             }),
         doUpdate: (toAddString: string, tag: Condition) =>
             updating.update((updatingCreatures) => {
-                const roundHalf = !toAddString.includes(".");
                 const messages: UpdateLogMessage[] = [];
                 const updates: CreatureUpdates[] = [];
+
                 updatingCreatures.forEach((entry, creature) => {
+                    const roundHalf = !toAddString.includes(".");
                     const change: CreatureUpdate = {};
                     const modifier =
                         (entry.saved ? 0.5 : 1) *
@@ -400,6 +424,7 @@ function createTracker() {
                     _logger?.join(items.map((c) => c.name)),
                     "added to the combat."
                 );
+                setNumbers(creatures, items);
                 return creatures;
             }),
         remove: (...items: Creature[]) =>
@@ -431,6 +456,8 @@ function createTracker() {
                 creatures = state?.creatures
                     ? state.creatures.map((c) => Creature.from(c))
                     : creatures.filter((c) => c.player);
+
+                setNumbers(creatures);
 
                 if (state?.logFile) _logger?.new(state.logFile);
                 if (!state && _logger) _logger.logging = false;

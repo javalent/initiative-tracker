@@ -1,6 +1,6 @@
 <script lang="ts">
     import { ExtraButtonComponent, Menu } from "obsidian";
-    import { DISABLE, ENABLE, HP, MAPMARKER, REMOVE, TAG } from "src/utils";
+    import { DISABLE, ENABLE, HIDDEN, HP, MAPMARKER, REMOVE, TAG } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/tracker/view";
     import { createEventDispatcher, getContext } from "svelte";
@@ -47,7 +47,7 @@
                 });
             } else {
                 menu.addItem((item) => {
-                    item.setIcon("eye-off")
+                    item.setIcon(HIDDEN)
                         .setTitle("Hide")
                         .onClick(() => {
                             tracker.updateCreatures({

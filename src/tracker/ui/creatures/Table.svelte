@@ -89,9 +89,6 @@
                         e.stopPropagation();
                     }}
                 >
-                    <!-- on:contextmenu={(evt) => hamburgerIcon(evt, creature)} -->
-                    <!-- <CreatureTemplate {creature} on:hp on:tag on:edit /> -->
-
                     <CreatureTemplate {creature} on:hp on:tag on:edit />
                 </tr>
             {/each}

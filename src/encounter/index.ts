@@ -29,6 +29,7 @@ interface CreatureStats {
     modifier: number;
     xp: number;
     display?: string;
+    hidden: boolean;
 }
 
 export const equivalent = (
@@ -41,7 +42,8 @@ export const equivalent = (
         creature.ac == existing.ac &&
         creature.hp == existing.hp &&
         creature.modifier == existing.modifier &&
-        creature.xp == existing.xp
+        creature.xp == existing.xp &&
+        creature.hidden == existing.hidden
     );
 };
 
@@ -143,7 +145,8 @@ export class EncounterParser {
                     ac: creature.ac,
                     hp: creature.hp,
                     modifier: creature.modifier,
-                    xp: creature.xp
+                    xp: creature.xp,
+                    hidden: creature.hidden
                 };
                 const existing = [...creatureMap].find(([c]) =>
                     equivalent(c, stats)

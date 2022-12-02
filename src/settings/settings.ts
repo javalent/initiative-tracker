@@ -160,6 +160,15 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 });
             });
+        new Setting(containerEl)
+            .setName("Use Legacy 'Add Creatures'")
+            .setDesc("Use the legacy way to add creatures.")
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.useLegacy).onChange(async (v) => {
+                    this.plugin.data.useLegacy = v;
+                    await this.plugin.saveSettings();
+                });
+            });
     }
     private async _displayBattle(additionalContainer: HTMLDetailsElement) {
         additionalContainer.empty();

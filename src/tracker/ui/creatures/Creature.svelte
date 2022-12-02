@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DEFAULT_UNDEFINED } from "src/utils";
+    import { DEFAULT_UNDEFINED, HIDDEN } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import Initiative from "./Initiative.svelte";
     import CreatureControls from "./CreatureControls.svelte";
@@ -13,15 +13,9 @@
     export let creature: Creature;
     $: statuses = creature.status;
 
-    const name = () => {
-        let name = creature.display ?? creature.name;
-        if (creature.number > 0) {
-            return `${name} ${creature.number}`;
-        }
-        return name;
-    };
+    const name = () => creature.getName();
     const hiddenIcon = (div: HTMLElement) => {
-        setIcon(div, "eye-off");
+        setIcon(div, HIDDEN);
     };
 
     const tryHover = (evt: MouseEvent) => {

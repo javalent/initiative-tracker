@@ -14,7 +14,12 @@ import { createPopper, Instance as PopperInstance } from "@popperjs/core";
 
 import { Conditions } from "./conditions";
 
-import type { HomebrewCreature, SRDMonster, Condition, Party } from "src/@types";
+import type {
+    HomebrewCreature,
+    SRDMonster,
+    Condition,
+    Party
+} from "../../@types";
 import type InitiativeTracker from "src/main";
 
 class Suggester<T> {
@@ -213,9 +218,7 @@ abstract class SuggestionModal<T> extends FuzzySuggestModal<T> {
     }
 
     close(): void {
-        // TODO: Figure out a better way to do this. Idea from Periodic Notes plugin
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (<any>this.app).keymap.popScope(this.scope);
+        this.app.keymap.popScope(this.scope);
 
         this.suggester.setSuggestions([]);
         if (this.popper) {
@@ -323,7 +326,7 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
     constructor(public plugin: InitiativeTracker, inputEl: HTMLInputElement) {
         super(plugin.app, inputEl);
         this.creatures = [...this.plugin.data.players, ...this.plugin.bestiary];
-        this.onInputChanged();
+        /* this.onInputChanged(); */
     }
     getItems() {
         return this.creatures;
@@ -334,6 +337,8 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
     onChooseItem(item: HomebrewCreature | SRDMonster) {
         this.inputEl.value = item.name;
         this.creature = item;
+        this.onClose();
+        this.close();
     }
     selectSuggestion({ item }: FuzzyMatch<HomebrewCreature | SRDMonster>) {
         this.inputEl.value = item.name;
@@ -376,7 +381,7 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
         }
         el.createDiv({
             cls: "suggestion-note",
-            text: item.source
+            text: [item.source].flat().join(", ")
         });
     }
 }
@@ -512,7 +517,7 @@ export class HomebrewMonsterSuggestionModal extends ElementSuggestionModal<Homeb
             content.nameEl.appendText(item.name[i]);
         }
 
-        content.setDesc(item.source ?? "");
+        content.setDesc([item.source ?? ""].flat().join(", "));
         content.addExtraButton((b) => {
             b.setIcon("pencil")
                 .setTooltip("Edit")

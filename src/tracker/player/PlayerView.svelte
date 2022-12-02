@@ -41,15 +41,7 @@
 
     $: activeAndVisible = $ordered.filter((c) => c.enabled && !c.hidden);
 
-    const name = (creature: Creature) => {
-        if (creature.display) {
-            return creature.display;
-        }
-        if (creature.number > 0) {
-            return `${creature.name} ${creature.number}`;
-        }
-        return creature.name;
-    };
+    const name = (creature: Creature) => creature.getName();
 </script>
 
 <table class="initiative-tracker-table" transition:fade>

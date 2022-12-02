@@ -4,16 +4,18 @@
     import Controls from "./Controls.svelte";
     import Table from "./creatures/Table.svelte";
     import Metadata from "./Metadata.svelte";
-    import Create from "./Create.svelte";
     import SaveEncounter from "./SaveEncounter.svelte";
     import LoadEncounter from "./LoadEncounter.svelte";
 
     import { tracker } from "../stores/tracker";
-    import { Creature } from "src/utils/creature";
-    import { ExtraButtonComponent } from "obsidian";
+    import { ExtraButtonComponent, Notice } from "obsidian";
     import { ADD, COPY } from "src/utils";
     import Updating from "./Updating.svelte";
     import Logger from "src/logger/logger";
+
+    import { AddCreatureModal } from "./create/modal";
+    import Legacy from "./create/Legacy.svelte";
+    import type { Creature } from "src/utils/creature";
 
     export let plugin: InitiativeTracker;
 
@@ -24,24 +26,26 @@
     } else {
         tracker.setParty(plugin.data.defaultParty, plugin);
         tracker.roll(plugin);
-
     }
 
     setContext<InitiativeTracker>("plugin", plugin);
 
     let saving = false;
     let loading = false;
-
-    let addNew = false;
-    export let addNewAsync = false;
-    let editCreature: Creature = null;
+    let legacy = false,
+        editing: Creature;
+    const editOrAdd = (creature?: Creature) => {
+        if (plugin.data.useLegacy) {
+            legacy = true;
+            editing = creature;
+        } else {
+            const modal = new AddCreatureModal(plugin, creature);
+            modal.onClose = () => {};
+            modal.open();
+        }
+    };
     const addButton = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setTooltip("Add Creature")
-            .setIcon(ADD)
-            .onClick(() => {
-                addNew = true;
-            });
+        new ExtraButtonComponent(node).setTooltip("Add Creature").setIcon(ADD);
     };
     const copyButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -53,7 +57,14 @@
                         (creature) => `${creature.initiative} ${creature.name}`
                     )
                     .join("\n");
-                await navigator.clipboard.writeText(contents);
+                try {
+                    await navigator.clipboard.writeText(contents);
+                    new Notice("Initiative order copied to clipboard.");
+                } catch (e) {
+                    new Notice(
+                        "Initiative order could not be copied to clipboard."
+                    );
+                }
             });
     };
 </script>
@@ -67,78 +78,31 @@
     />
 
     <Metadata />
-    <Table />
+    <Table on:edit={(evt) => editOrAdd(evt.detail)} />
     <Updating />
     {#if saving}
         <SaveEncounter on:cancel={() => (saving = false)} />
     {:else if loading}
         <LoadEncounter on:cancel={() => (loading = false)} />
+    {:else if legacy}
+        <Legacy
+            {plugin}
+            creature={editing}
+            on:close={() => {
+                legacy = false;
+                editing = null;
+            }}
+        />
     {:else}
         <div class="add-creature-container">
-            {#if editCreature || addNew || addNewAsync}
-                <Create
-                    editing={editCreature != null}
-                    name={editCreature?.name}
-                    display={editCreature?.display}
-                    hp={`${editCreature?.hp}`}
-                    initiative={editCreature?.initiative}
-                    modifier={editCreature?.modifier}
-                    ac={`${editCreature?.ac}`}
-                    on:cancel={() => {
-                        addNew = false;
-                        addNewAsync = false;
-                        editCreature = null;
-                    }}
-                    on:save={(evt) => {
-                        const creature = evt.detail;
-                        const newCreature = new Creature(
-                            {
-                                name: creature.name,
-                                display: creature.display,
-                                hp: creature.hp,
-                                ac: creature.ac,
-                                modifier: creature.modifier,
-                                marker: plugin.data.monsterMarker,
-                                xp: creature.xp,
-                                player: creature.player,
-                                level: creature.level,
-                                hidden: creature.hidden
-                            },
-                            creature.initiative
-                        );
-                        if (addNewAsync) {
-                        } else if (editCreature) {
-                            editCreature.name = creature.name;
-                            editCreature.ac = creature.ac;
-                            editCreature.display = creature.display;
-                            editCreature.initiative = creature.initiative;
-                            editCreature.modifier = creature.modifier;
-                            editCreature.hidden = creature.hidden;
-                            /* view.updateCreature(editCreature, {
-                                name: creature.name
-                            }); */
-                        } else {
-                            const number = Math.max(
-                                isNaN(creature.number) ? 1 : creature.number,
-                                1
-                            );
-                            tracker.add(
-                                ...[...Array(number).keys()].map((k) =>
-                                    Creature.new(newCreature)
-                                )
-                            );
-                        }
-                        addNew = false;
-                        addNewAsync = false;
-                        editCreature = null;
-                    }}
+            <div class="context-container">
+                <div use:copyButton class="copy-button" />
+                <div
+                    use:addButton
+                    class="add-button"
+                    on:click={() => editOrAdd()}
                 />
-            {:else}
-                <div class="context-container">
-                    <div use:copyButton class="copy-button" />
-                    <div use:addButton class="add-button" />
-                </div>
-            {/if}
+            </div>
         </div>
     {/if}
 </div>
@@ -147,6 +111,7 @@
     .obsidian-initiative-tracker {
         margin: 0 0.5rem;
         min-width: 180px;
+        overflow-y: auto;
     }
     .add-creature-container {
         display: flex;

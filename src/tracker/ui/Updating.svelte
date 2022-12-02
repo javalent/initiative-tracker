@@ -42,7 +42,7 @@
     }
     const performUpdate = (perform: boolean) => {
         if (perform) {
-            tracker.doUpdate(damage, status);
+            tracker.doUpdate(damage ?? "", status);
         } else {
             tracker.clearUpdate();
         }
@@ -53,79 +53,81 @@
 </script>
 
 {#if $updating.size}
-    <div class="updating-hp">
-        <!-- svelte-ignore a11y-autofocus -->
-        <div class="hp-status">
-            {#if plugin.data.beginnerTips}
-                <small class="label">
-                    Apply damage, healing(-) or temp HP(t)
-                </small>
-            {/if}
-            <div class="input">
-                <tag
-                    use:hpIcon
-                    aria-label="Apply damage, healing(-) or temp HP(t)"
-                    style="margin: 0 0.2rem 0 0.7rem"
-                />
-                <input
-                    type="text"
-                    bind:value={damage}
-                    on:keydown={function (evt) {
-                        if (evt.key == "Enter" || evt.key == "Escape") {
+    <div class="updating-container">
+        <div class="updating-hp">
+            <!-- svelte-ignore a11y-autofocus -->
+            <div class="hp-status">
+                {#if plugin.data.beginnerTips}
+                    <small class="label">
+                        Apply damage, healing(-) or temp HP(t)
+                    </small>
+                {/if}
+                <div class="input">
+                    <tag
+                        use:hpIcon
+                        aria-label="Apply damage, healing(-) or temp HP(t)"
+                        style="margin: 0 0.2rem 0 0.7rem"
+                    />
+                    <input
+                        type="text"
+                        bind:value={damage}
+                        on:keydown={function (evt) {
+                            if (evt.key == "Enter" || evt.key == "Escape") {
+                                performUpdate(evt.key == "Enter");
+                                return;
+                            }
+                            if (
+                                !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
+                                    this.value + evt.key
+                                )
+                            ) {
+                                evt.preventDefault();
+                                return false;
+                            }
+                        }}
+                        use:init
+                    />
+                </div>
+            </div>
+            <div class="hp-status">
+                {#if plugin.data.beginnerTips}
+                    <small class="label">
+                        Apply status effect to creatures that fail their saving
+                        throw
+                    </small>
+                {/if}
+                <div class="input">
+                    <tag
+                        use:tagIcon
+                        aria-label="Apply status effect to creatures that fail their saving throw"
+                        style="margin: 0 0.2rem 0 0.7rem"
+                    />
+                    <input
+                        type="text"
+                        on:focus={function (evt) {
+                            suggestConditions(this);
+                        }}
+                        on:keydown={function (evt) {
                             performUpdate(evt.key == "Enter");
-                            return;
-                        }
-                        if (
-                            !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
-                                this.value + evt.key
-                            )
-                        ) {
-                            evt.preventDefault();
-                            return false;
-                        }
-                    }}
-                    use:init
-                />
+                        }}
+                    />
+                </div>
             </div>
         </div>
-        <div class="hp-status">
-            {#if plugin.data.beginnerTips}
-                <small class="label">
-                    Apply status effect to creatures that fail their saving
-                    throw
-                </small>
-            {/if}
-            <div class="input">
-                <tag
-                    use:tagIcon
-                    aria-label="Apply status effect to creatures that fail their saving throw"
-                    style="margin: 0 0.2rem 0 0.7rem"
-                />
-                <input
-                    type="text"
-                    on:focus={function (evt) {
-                        suggestConditions(this);
-                    }}
-                    on:keydown={function (evt) {
-                        performUpdate(evt.key == "Enter");
-                    }}
-                />
-            </div>
+        <div class="updating-buttons">
+            <span
+                use:checkIcon
+                on:click={() => performUpdate(true)}
+                style="cursor:pointer"
+                aria-label="Apply"
+            />
+            <span
+                use:cancelIcon
+                on:click={() => performUpdate(false)}
+                style="cursor:pointer"
+                aria-label="Cancel"
+            />
         </div>
-    </div>
-    <div class="updating-buttons">
-        <span
-            use:checkIcon
-            on:click={() => performUpdate(true)}
-            style="cursor:pointer"
-            aria-label="Apply"
-        />
-        <span
-            use:cancelIcon
-            on:click={() => performUpdate(false)}
-            style="cursor:pointer"
-            aria-label="Cancel"
-        />
     </div>
     {#if plugin.data.beginnerTips}
         <div>
@@ -208,6 +210,11 @@
 {/if}
 
 <style scoped>
+    .input {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
     .left {
         text-align: left;
     }
@@ -217,6 +224,11 @@
     .updating-hp {
         display: flex;
         flex-flow: column;
+        gap: 0.5rem;
+    }
+    .updating-container {
+        display: flex;
+        flex-flow: column nowrap;
         gap: 0.5rem;
     }
     .hp-status {

@@ -1,4 +1,4 @@
-import type { InitiativeTrackerData } from "src/@types";
+import type { InitiativeTrackerData } from "@types";
 import { Platform } from "obsidian";
 import { Conditions } from "./conditions";
 
@@ -50,7 +50,8 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     hpOverflow: "ignore",
     additiveTemp: false,
     logging: false,
-    logFolder: "/"
+    logFolder: "/",
+    useLegacy: false
 };
 
 export const XP_PER_CR: Record<string, number> = {
@@ -90,8 +91,8 @@ export const XP_PER_CR: Record<string, number> = {
     "30": 155000
 };
 
-export const OVERFLOW_TYPE: {[key: string]: string} = {
+export const OVERFLOW_TYPE: { [key: string]: string } = {
     ignore: "ignore",
     current: "current",
     temp: "temp"
-}
+};

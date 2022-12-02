@@ -20,7 +20,7 @@ export default class Logger {
         await this.setFile();
     }
     public getLogFile() {
-        return normalizePath(this.logFile);
+        return this.logFile ? normalizePath(this.logFile) : "";
     }
     private logFile: string;
     async setFile() {
@@ -55,7 +55,6 @@ export default class Logger {
     async new(logFile: string): Promise<void>;
     async new(state: LogState): Promise<void>;
     async new(param: string | LogState) {
-        console.log("🚀 ~ file: logger.ts ~ line 56 ~ param", param);
         if (!this.enabled) return;
 
         if (typeof param == "string") {
@@ -75,7 +74,7 @@ export default class Logger {
             )) {
                 await this.log(
                     "|",
-                    player.name.replace("|", "|"),
+                    player.getName().replace("|", "\\|"),
                     "|",
                     player.initiative.toString(),
                     "|",
@@ -83,7 +82,7 @@ export default class Logger {
                     "|",
                     [...(player.status.size ? player.status : ["-"])]
                         .join(", ")
-                        .replace("|", "|"),
+                        .replace("|", "\\|"),
                     "|"
                 );
             }
@@ -95,7 +94,7 @@ export default class Logger {
             )) {
                 await this.log(
                     "|",
-                    creature.name.replace("|", "|"),
+                    creature.getName().replace("|", "\\|"),
                     "|",
                     creature.initiative.toString(),
                     "|",
@@ -103,7 +102,7 @@ export default class Logger {
                     "|",
                     [...(creature.status.size ? creature.status : ["-"])]
                         .join(", ")
-                        .replace("|", "|"),
+                        .replace("|", "\\|"),
                     "|"
                 );
             }
@@ -111,12 +110,11 @@ export default class Logger {
             await this.log("\n\n## Combat Log");
             await this.log("\n### Round 1");
             await this.log(
-                `\n##### ${tracker.getOrderedCreatures()[0].name}'s turn`
+                `\n##### ${tracker.getOrderedCreatures()[0].getName()}'s turn`
             );
         }
     }
     async log(...msg: string[]) {
-        console.log(this.enabled, this.file);
         if (!this.enabled) return;
         if (!this.file) return;
         if (!(await this.adapter.exists(this.logFile))) {

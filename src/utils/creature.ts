@@ -98,6 +98,17 @@ export class Creature {
         this._initiative = Number(x) - this.modifier;
     }
 
+    getName() {
+        let name = [this.display ?? this.name];
+        /* if (this.display) {
+            return this.display;
+        } */
+        if (this.number > 0) {
+            name.push(`${this.number}`);
+        }
+        return name.join(" ");
+    }
+
     *[Symbol.iterator]() {
         yield this.name;
         yield this.initiative;

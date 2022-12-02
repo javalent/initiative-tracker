@@ -104,6 +104,7 @@ export interface InitiativeTrackerData {
     warnedAboutImports: boolean;
     logging: boolean;
     logFolder: string;
+    useLegacy: boolean;
 }
 
 export interface InitiativeViewState {
