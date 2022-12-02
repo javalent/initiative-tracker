@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.0.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/11.0.0...11.0.1) (2022-12-02)
+
+
+### Bug Fixes
+
+* update packages ([1d11801](https://github.com/valentine195/obsidian-initiative-tracker/commit/1d11801ec0ff2b6ebcfe1384e9f4f5890a04eb6c))
+
 ## [11.0.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.4...11.0.0) (2022-12-02)
 
 
