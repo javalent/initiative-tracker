@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.0.2](https://github.com/valentine195/obsidian-initiative-tracker/compare/11.0.1...11.0.2) (2022-12-03)
+
+
+### Bug Fixes
+
+* Add Creatures -> Add to Encounter ([0e628f9](https://github.com/valentine195/obsidian-initiative-tracker/commit/0e628f93368b5ae954da525dff17e7ae3f1292f4))
+
 ### [11.0.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/11.0.0...11.0.1) (2022-12-02)
 
 
