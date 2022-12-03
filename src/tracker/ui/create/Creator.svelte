@@ -27,14 +27,16 @@
     };
 
     const add = (node: HTMLElement) => {
-        new ButtonComponent(node).setButtonText("Add Creatures").onClick(() => {
-            const creatures = $adding.flatMap(([creature, amount]) =>
-                [...Array(amount).keys()].map((k) => Creature.new(creature))
-            );
+        new ButtonComponent(node)
+            .setButtonText("Add to Encounter")
+            .onClick(() => {
+                const creatures = $adding.flatMap(([creature, amount]) =>
+                    [...Array(amount).keys()].map((k) => Creature.new(creature))
+                );
 
-            tracker.add(...creatures);
-            dispatch("close");
-        });
+                tracker.add(...creatures);
+                dispatch("close");
+            });
     };
 </script>
 
@@ -64,7 +66,7 @@
     .buttons {
         display: flex;
         margin-left: auto;
-        justify-content: center;
+        justify-content: flex-end;
         gap: 0.5rem;
     }
 </style>
