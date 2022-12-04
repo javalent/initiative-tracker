@@ -109,7 +109,7 @@
             .setTooltip("Cancel")
             .setIcon("reset")
             .onClick(() => {
-                dispatch("cancel");
+                creature = new Creature({});
             });
     };
     const diceButton = (node: HTMLElement) => {
