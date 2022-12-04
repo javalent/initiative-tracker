@@ -64,6 +64,8 @@ export class Creature {
 
         this.active = creature.active;
 
+        this.hidden = creature.hidden ?? false;
+
         if ("xp" in creature) {
             this.xp = creature.xp;
         } else if ("cr" in creature) {
@@ -119,6 +121,7 @@ export class Creature {
         yield this.id;
         yield this.marker;
         yield this.xp;
+        yield this.hidden;
     }
 
     static new(creature: Creature) {

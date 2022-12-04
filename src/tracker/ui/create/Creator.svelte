@@ -30,6 +30,7 @@
         new ButtonComponent(node)
             .setButtonText("Add to Encounter")
             .onClick(() => {
+                if (!$adding.length) return;
                 const creatures = $adding.flatMap(([creature, amount]) =>
                     [...Array(amount).keys()].map((k) => Creature.new(creature))
                 );
@@ -52,7 +53,7 @@
     </div>
     <div class="buttons">
         <div use:cancel />
-        <div use:add />
+        <div use:add disabled={!$adding.length} />
     </div>
 </div>
 
@@ -68,5 +69,9 @@
         margin-left: auto;
         justify-content: flex-end;
         gap: 0.5rem;
+    }
+
+    div[disabled="true"] > :global(button) {
+        cursor: not-allowed;
     }
 </style>

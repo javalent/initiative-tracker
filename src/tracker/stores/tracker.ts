@@ -179,6 +179,9 @@ function createTracker() {
                         }
                     }
                 }
+                if ("hidden" in change) {
+                    creature.hidden = change.hidden;
+                }
                 if (!creatures.includes(creature)) {
                     creatures.push(creature);
                 }
