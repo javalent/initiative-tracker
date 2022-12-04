@@ -73,6 +73,7 @@
     <Controls
         on:save={() => (saving = true)}
         on:load={() => (loading = true)}
+        on:add-creatures={() => editOrAdd()}
         on:player-view
         on:open-map
     />

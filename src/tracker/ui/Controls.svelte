@@ -62,6 +62,11 @@
                 .onClick(() => tracker.new());
         });
         menu.addItem((item) => {
+            item.setIcon(NEW)
+                .setTitle("Add Creatures")
+                .onClick(() => dispatch("add-creatures"));
+        });
+        menu.addItem((item) => {
             item.setIcon(REDO)
                 .setTitle("Reset HP & Status")
                 .onClick(() => tracker.reset());
@@ -154,19 +159,15 @@
     </div>
     <div class="clean">
         {#if desktop}
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div
                 use:playerView
                 aria-label="Open Player View"
                 on:click={(evt) => dispatch("player-view")}
             />
         {/if}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div use:menuIcon on:click={(evt) => open(evt)} />
-        <!-- <div use:diceButton />
-        <div use:restoreButton />
-        <div use:newButton />
-        {#if map}
-            <div use:mapButton />
-        {/if} -->
     </div>
 </div>
 
