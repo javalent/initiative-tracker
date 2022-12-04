@@ -113,7 +113,8 @@
 
 <style scoped>
     .obsidian-initiative-tracker {
-        margin: 0 0.5rem;
+        margin: 0.5rem;
+        /* margin-bottom: 0.5rem; */
         min-width: 180px;
         overflow-y: auto;
     }
