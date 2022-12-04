@@ -89,7 +89,7 @@
                         e.stopPropagation();
                     }}
                 >
-                    <CreatureTemplate {creature} on:hp on:tag on:edit />
+                    <CreatureTemplate {creature} on:hp on:tag on:edit on:open-combatant />
                 </tr>
             {/each}
         </tbody>

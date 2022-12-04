@@ -78,7 +78,10 @@
     />
 
     <Metadata />
-    <Table on:edit={(evt) => editOrAdd(evt.detail)} />
+    <Table
+        on:edit={(evt) => editOrAdd(evt.detail)}
+        on:open-combatant={(evt) => plugin.openCombatant(evt.detail)}
+    />
     <Updating />
     {#if saving}
         <SaveEncounter on:cancel={() => (saving = false)} />
@@ -97,6 +100,7 @@
         <div class="add-creature-container">
             <div class="context-container">
                 <div use:copyButton class="copy-button" />
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <div
                     use:addButton
                     class="add-button"

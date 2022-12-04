@@ -496,7 +496,6 @@ export default class InitiativeTracker extends Plugin {
         const leaf = leaves.length ? leaves[0] : null;
         if (leaf && leaf.view && leaf.view instanceof BuilderView)
             return leaf.view;
-            
     }
     async addBuilderView() {
         if (this.app.workspace.getLeavesOfType(BUILDER_VIEW)?.length) {
@@ -630,5 +629,17 @@ export default class InitiativeTracker extends Plugin {
 
         await this.saveData(this.data);
         tracker.setData(this.data);
+    }
+    async openCombatant(creature: Creature) {
+        if (!this.canUseStatBlocks) return;
+        const view = this.combatant;
+        if (!view) {
+            const leaf = this.app.workspace.getRightLeaf(true);
+            await leaf.setViewState({
+                type: CREATURE_TRACKER_VIEW
+            });
+        }
+
+        this.combatant.render(creature);
     }
 }

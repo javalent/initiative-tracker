@@ -40,6 +40,7 @@
     };
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <td class="initiative-container" on:click={(e) => e.stopPropagation()}>
     <Initiative
         initiative={creature.initiative}
@@ -54,10 +55,11 @@
     />
 </td>
 <td class="name-container">
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
         class="name-holder"
-        on:click={() => {
-            dispatch("open-combatant");
+        on:click|stopPropagation={(evt) => {
+            dispatch("open-combatant", creature);
         }}
         on:mouseenter={tryHover}
     >
@@ -70,6 +72,7 @@
             <span class="name">{name()}</span>
         {/if}
     </div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="statuses" on:click={(e) => e.stopPropagation()}>
         {#if statuses.size}
             {#each [...statuses] as status}
