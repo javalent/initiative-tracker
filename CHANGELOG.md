@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.0.4](https://github.com/valentine195/obsidian-initiative-tracker/compare/11.0.3...11.0.4) (2022-12-04)
+
+
+### Bug Fixes
+
+* adds "Add Creatures" to tracker context ([689e778](https://github.com/valentine195/obsidian-initiative-tracker/commit/689e77808c67033291239250fdb9b080cf52a3c1))
+* combatant view works ([0b3fcd6](https://github.com/valentine195/obsidian-initiative-tracker/commit/0b3fcd6f9143147375bfea981cedd28c31458431))
+* hidden works again ([6d6e451](https://github.com/valentine195/obsidian-initiative-tracker/commit/6d6e451a190748c060c5b55b83fc221488d6fedc))
+* margin around everything ([24d36c2](https://github.com/valentine195/obsidian-initiative-tracker/commit/24d36c24220e8cd2d867735ae639d37e03c42fd4))
+* reset creature button works now ([8c5fe84](https://github.com/valentine195/obsidian-initiative-tracker/commit/8c5fe847160a8449e33420dc0c3d9f7d4fc67081))
+
 ### [11.0.3](https://github.com/valentine195/obsidian-initiative-tracker/compare/11.0.1...11.0.3) (2022-12-03)
 
 
