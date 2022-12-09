@@ -72,6 +72,9 @@
                         type="text"
                         bind:value={damage}
                         on:keydown={function (evt) {
+                            if (evt.key == "Tab") {
+                                return true;
+                            }
                             if (evt.key == "Enter" || evt.key == "Escape") {
                                 performUpdate(evt.key == "Enter");
                                 return;
@@ -108,7 +111,9 @@
                             suggestConditions(this);
                         }}
                         on:keydown={function (evt) {
-                            performUpdate(evt.key == "Enter");
+                            if (["Enter", "Escape"].includes(evt.key)) {
+                                performUpdate(evt.key == "Enter");
+                            }
                         }}
                     />
                 </div>
