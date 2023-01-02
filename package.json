@@ -29,7 +29,7 @@
         "@rollup/plugin-typescript": "^8.2.1",
         "@tsconfig/svelte": "^2.0.1",
         "@types/node": "^14.14.37",
-        "babel-loader": "^8.2.2",
+        "babel-loader": "^8.3.0",
         "copy-webpack-plugin": "^9.0.1",
         "css-loader": "^5.2.6",
         "dotenv": "^10.0.0",
