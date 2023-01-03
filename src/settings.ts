@@ -164,6 +164,17 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 });
             });
+        new Setting(containerEl)
+            .setName("Embed statblock-link content in the Creature View")
+            .setDesc(
+                "Prefer embedded content from a statblock-link attribute when present. Fall back to the TTRPG plugin if the link is missing and the plugin is enabled."
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.preferStatblockLink).onChange(async (v) => {
+                    this.plugin.data.preferStatblockLink = v;
+                    await this.plugin.saveSettings();
+                });
+            });
         /*         new Setting(containerEl)
             .setName("Monster Property used for Modifier")
             .setDesc(
