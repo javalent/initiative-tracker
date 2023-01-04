@@ -27,25 +27,32 @@
         setIcon(div, "eye-off");
     };
 
+    var hoverTimeout = null;
     const tryHover = (evt: MouseEvent) => {
-        if (creature["statblock-link"]) {
-            let link = creature["statblock-link"];
-            if (/\[.+\]\(.+\)/.test(link)) {
-                //md
-                [, link] = link.match(/\[.+?\]\((.+?)\)/);
-            } else if (/\[\[.+\]\]/.test(link)) {
-                //wiki
-                [, link] = link.match(/\[\[(.+?)(?:\|.+?)?\]\]/);
-            }
+        hoverTimeout = setTimeout(() => {
+            if (creature["statblock-link"]) {
+                let link = creature["statblock-link"];
+                if (/\[.+\]\(.+\)/.test(link)) {
+                    //md
+                    [, link] = link.match(/\[.+?\]\((.+?)\)/);
+                } else if (/\[\[.+\]\]/.test(link)) {
+                    //wiki
+                    [, link] = link.match(/\[\[(.+?)(?:\|.+?)?\]\]/);
+                }
 
-            app.workspace.trigger(
-                "link-hover",
-                {}, //hover popover, but don't need
-                evt.target, //targetEl
-                link, //linkText
-                "initiative-tracker " //source
-            );
-        }
+                app.workspace.trigger(
+                    "link-hover",
+                    {}, //hover popover, but don't need
+                    evt.target, //targetEl
+                    link, //linkText
+                    "initiative-tracker " //source
+                );
+            }
+        }, 1000);
+    };
+    
+    const cancelHover = (evt: MouseEvent) => {
+        clearTimeout(hoverTimeout);
     };
 </script>
 
@@ -64,6 +71,7 @@
         class="name-holder"
         on:click={() => view.openCombatant(creature)}
         on:mouseenter={tryHover}
+        on:mouseleave={cancelHover}
     >
         {#if creature.hidden}
             <div class="centered-icon" use:hiddenIcon />
