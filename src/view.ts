@@ -947,7 +947,9 @@ export class CreatureView extends ItemView {
         if (subpath && fileContent) {
             const cache = app.metadataCache.getFileCache(file);
             const subpathResult = resolveSubpath(cache, subpath);
-            content = fileContent.slice(subpathResult.start.offset, subpathResult.end.offset);
+            if (subpathResult) {
+                content = fileContent.slice(subpathResult.start.offset, subpathResult.end.offset);
+            }
         } else if (fileContent) {
             content = fileContent;
         }

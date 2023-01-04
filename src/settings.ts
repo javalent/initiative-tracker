@@ -1038,12 +1038,14 @@ class NewPlayerModal extends Modal {
                     this.player.name = modal.file.basename;
 
                     if (!metaData || !metaData.frontmatter) return;
+                    const { ac, hp, modifier, level, name } = metaData.frontmatter;
+                    this.player.name = name ? name : this.player.name;
+                    this.player.ac = ac;
+                    this.player.hp = hp;
+                    this.player.level = level;
+                    this.player.modifier = modifier;
+                    this.plugin.setStatblockLink(this.player, metaData.frontmatter["statblock-link"]);
 
-                    const { ac, hp, modifier, level } = metaData.frontmatter;
-                    this.player = {
-                        ...this.player,
-                        ...{ ac, hp, modifier, level }
-                    };
                     this.display();
                 };
             });

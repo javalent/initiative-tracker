@@ -27,7 +27,7 @@
         setIcon(div, "eye-off");
     };
 
-    var hoverTimeout = null;
+    let hoverTimeout = null;
     const tryHover = (evt: MouseEvent) => {
         hoverTimeout = setTimeout(() => {
             if (creature["statblock-link"]) {
