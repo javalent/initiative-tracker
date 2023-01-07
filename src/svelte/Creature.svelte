@@ -27,7 +27,7 @@
         setIcon(div, "eye-off");
     };
 
-    let hoverTimeout = null;
+    let hoverTimeout: NodeJS.Timeout = null;
     const tryHover = (evt: MouseEvent) => {
         hoverTimeout = setTimeout(() => {
             if (creature["statblock-link"]) {
@@ -56,6 +56,7 @@
     };
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <td class="initiative-container" on:click={(e) => e.stopPropagation()}>
     <Initiative
         initiative={creature.initiative}
@@ -67,6 +68,7 @@
     />
 </td>
 <td class="name-container">
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
         class="name-holder"
         on:click={() => view.openCombatant(creature)}
@@ -82,6 +84,7 @@
             <span class="name">{name()}</span>
         {/if}
     </div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="statuses" on:click={(e) => e.stopPropagation()}>
         {#if statuses.size}
             {#each [...statuses] as status}
