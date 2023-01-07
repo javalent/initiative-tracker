@@ -20,6 +20,7 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     statuses: [...Conditions],
     version: null,
     canUseDiceRoll: false,
+    preferStatblockLink: false,
     initiative: "1d20 + %mod%",
     modifier: null,
     sync: false,

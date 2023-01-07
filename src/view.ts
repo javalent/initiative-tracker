@@ -2,13 +2,11 @@ import {
     debounce,
     ExtraButtonComponent,
     ItemView,
-    MarkdownPreviewRenderer,
-    MarkdownPreviewView,
-    Modal,
+    MarkdownRenderer,
     Notice,
-    Platform,
-    Setting,
-    WorkspaceLeaf
+    WorkspaceLeaf,
+    parseLinktext,
+    resolveSubpath
 } from "obsidian";
 import {
     BASE,
@@ -165,7 +163,7 @@ export default class TrackerView extends ItemView {
         );
         this.registerEvent(ref);
 
-        this.plugin.combatant.render(creature);
+        await this.plugin.combatant.render(creature);
     }
     protected creatures: Creature[] = [];
 
@@ -896,15 +894,15 @@ export class CreatureView extends ItemView {
         new ExtraButtonComponent(this.buttonEl)
             .setIcon("cross")
             .setTooltip("Close Statblock")
-            .onClick(() => {
-                this.render();
+            .onClick(async () => {
+                await this.render();
                 this.app.workspace.trigger("initiative-tracker:stop-viewing");
             });
     }
     onunload(): void {
         this.app.workspace.trigger("initiative-tracker:stop-viewing");
     }
-    render(creature?: HomebrewCreature) {
+    async render(creature?: HomebrewCreature) {
         this.statblockEl.empty();
         if (!creature) {
             this.statblockEl.createEl("em", {
@@ -912,11 +910,14 @@ export class CreatureView extends ItemView {
             });
             return;
         }
+        
+        const tryStatblockPlugin = this.plugin.canUseStatBlocks &&
+                this.plugin.statblockVersion?.major >= 2;
 
-        if (
-            this.plugin.canUseStatBlocks &&
-            this.plugin.statblockVersion?.major >= 2
-        ) {
+        if (creature["statblock-link"] && 
+            (this.plugin.data.preferStatblockLink || !tryStatblockPlugin)) {
+            await this.renderEmbed(creature["statblock-link"]);
+        } else if (tryStatblockPlugin) {
             const statblock = this.plugin.statblocks.render(
                 creature,
                 this.statblockEl,
@@ -925,9 +926,40 @@ export class CreatureView extends ItemView {
             this.addChild(statblock);
         } else {
             this.statblockEl.createEl("em", {
-                text: "Install the TTRPG Statblocks plugin to use this feature!"
+                text: "Install the TTRPG Statblocks plugin or add a statblock-link to your monster to use this feature!"
             });
         }
+    }
+    async renderEmbed(embedLink: string) {
+        if (/\[.+\]\(.+\)/.test(embedLink)) {
+            //md
+            [, embedLink] = embedLink.match(/\[.+?\]\((.+?)\)/);
+        } else if (/\[\[.+\]\]/.test(embedLink)) {
+            //wiki
+            [, embedLink] = embedLink.match(/\[\[(.+?)(?:\|.+?)?\]\]/);
+        }
+        
+        const {path, subpath} = parseLinktext(embedLink);
+        const file = this.app.metadataCache.getFirstLinkpathDest(path, '/');
+        const fileContent = await app.vault.cachedRead(file);
+        
+        let content = `Oops! Something is wrong with your statblock-link:<br />${embedLink}`;
+        if (subpath && fileContent) {
+            const cache = app.metadataCache.getFileCache(file);
+            const subpathResult = resolveSubpath(cache, subpath);
+            if (subpathResult) {
+                content = fileContent.slice(subpathResult.start.offset, subpathResult.end.offset);
+            }
+        } else if (fileContent) {
+            content = fileContent;
+        }
+        
+        await MarkdownRenderer.renderMarkdown(
+            content,
+            this.statblockEl.createDiv("markdown-rendered"),
+            path,
+            null
+        );
     }
     getDisplayText(): string {
         return "Combatant";

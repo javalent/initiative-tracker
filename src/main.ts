@@ -273,12 +273,14 @@ export default class InitiativeTracker extends Plugin {
                         this.app.metadataCache.getFileCache(file)?.frontmatter;
                     if (!frontmatter) return;
                     for (let player of players) {
-                        const { ac, hp, modifier, level } = frontmatter;
+                        const { ac, hp, modifier, level, name } = frontmatter;
                         player.ac = ac;
                         player.hp = hp;
                         player.modifier = modifier;
                         player.level = level;
-
+                        player.name = name ? name : player.name;
+                        this.setStatblockLink(player, frontmatter["statblock-link"]);
+                        
                         this.playerCreatures.set(
                             player.name,
                             Creature.from(player)
@@ -326,6 +328,14 @@ export default class InitiativeTracker extends Plugin {
         });
 
         console.log("Initiative Tracker v" + this.manifest.version + " loaded");
+    }
+    
+    setStatblockLink(player: HomebrewCreature, newValue: string) {
+        if (newValue) {
+            player["statblock-link"] = newValue.startsWith("#") 
+                    ? `[${player.name}](${player.path}${newValue})`
+                    : newValue;
+        }
     }
 
     addCommands() {

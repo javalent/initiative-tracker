@@ -27,28 +27,36 @@
         setIcon(div, "eye-off");
     };
 
+    let hoverTimeout: NodeJS.Timeout = null;
     const tryHover = (evt: MouseEvent) => {
-        if (creature["statblock-link"]) {
-            let link = creature["statblock-link"];
-            if (/\[.+\]\(.+\)/.test(link)) {
-                //md
-                [, link] = link.match(/\[.+?\]\((.+?)\)/);
-            } else if (/\[\[.+\]\]/.test(link)) {
-                //wiki
-                [, link] = link.match(/\[\[(.+?)(?:\|.+?)?\]\]/);
-            }
+        hoverTimeout = setTimeout(() => {
+            if (creature["statblock-link"]) {
+                let link = creature["statblock-link"];
+                if (/\[.+\]\(.+\)/.test(link)) {
+                    //md
+                    [, link] = link.match(/\[.+?\]\((.+?)\)/);
+                } else if (/\[\[.+\]\]/.test(link)) {
+                    //wiki
+                    [, link] = link.match(/\[\[(.+?)(?:\|.+?)?\]\]/);
+                }
 
-            app.workspace.trigger(
-                "link-hover",
-                {}, //hover popover, but don't need
-                evt.target, //targetEl
-                link, //linkText
-                "initiative-tracker " //source
-            );
-        }
+                app.workspace.trigger(
+                    "link-hover",
+                    {}, //hover popover, but don't need
+                    evt.target, //targetEl
+                    link, //linkText
+                    "initiative-tracker " //source
+                );
+            }
+        }, 1000);
+    };
+    
+    const cancelHover = (evt: MouseEvent) => {
+        clearTimeout(hoverTimeout);
     };
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <td class="initiative-container" on:click={(e) => e.stopPropagation()}>
     <Initiative
         initiative={creature.initiative}
@@ -60,10 +68,12 @@
     />
 </td>
 <td class="name-container">
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
         class="name-holder"
         on:click={() => view.openCombatant(creature)}
         on:mouseenter={tryHover}
+        on:mouseleave={cancelHover}
     >
         {#if creature.hidden}
             <div class="centered-icon" use:hiddenIcon />
@@ -74,6 +84,7 @@
             <span class="name">{name()}</span>
         {/if}
     </div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="statuses" on:click={(e) => e.stopPropagation()}>
         {#if statuses.size}
             {#each [...statuses] as status}
