@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.5](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.4...8.1.5) (2023-01-07)
+
+
+### Bug Fixes
+
+* adds typing to hoverTimeout ([4366490](https://github.com/valentine195/obsidian-initiative-tracker/commit/43664904c787410e4e5039b1c710f92be45e23b9))
+
 ### [8.1.4](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.3...8.1.4) (2022-11-17)
 
 
