@@ -263,7 +263,7 @@ export default class TrackerView extends ItemView {
             this.creatures.forEach((creature, _, arr) => {
                 const equiv = arr.filter((c) => equivalent(c, creature));
                 equiv.forEach((eq) => {
-                    eq.initiative = Math.max(...equiv.map((i) => i.initiative));
+                    eq.initiative = equiv[0].initiative;
                 });
             });
         }
@@ -910,12 +910,15 @@ export class CreatureView extends ItemView {
             });
             return;
         }
-        
-        const tryStatblockPlugin = this.plugin.canUseStatBlocks &&
-                this.plugin.statblockVersion?.major >= 2;
 
-        if (creature["statblock-link"] && 
-            (this.plugin.data.preferStatblockLink || !tryStatblockPlugin)) {
+        const tryStatblockPlugin =
+            this.plugin.canUseStatBlocks &&
+            this.plugin.statblockVersion?.major >= 2;
+
+        if (
+            creature["statblock-link"] &&
+            (this.plugin.data.preferStatblockLink || !tryStatblockPlugin)
+        ) {
             await this.renderEmbed(creature["statblock-link"]);
         } else if (tryStatblockPlugin) {
             const statblock = this.plugin.statblocks.render(
@@ -938,22 +941,25 @@ export class CreatureView extends ItemView {
             //wiki
             [, embedLink] = embedLink.match(/\[\[(.+?)(?:\|.+?)?\]\]/);
         }
-        
-        const {path, subpath} = parseLinktext(embedLink);
-        const file = this.app.metadataCache.getFirstLinkpathDest(path, '/');
+
+        const { path, subpath } = parseLinktext(embedLink);
+        const file = this.app.metadataCache.getFirstLinkpathDest(path, "/");
         const fileContent = await app.vault.cachedRead(file);
-        
+
         let content = `Oops! Something is wrong with your statblock-link:<br />${embedLink}`;
         if (subpath && fileContent) {
             const cache = app.metadataCache.getFileCache(file);
             const subpathResult = resolveSubpath(cache, subpath);
             if (subpathResult) {
-                content = fileContent.slice(subpathResult.start.offset, subpathResult.end.offset);
+                content = fileContent.slice(
+                    subpathResult.start.offset,
+                    subpathResult.end.offset
+                );
             }
         } else if (fileContent) {
             content = fileContent;
         }
-        
+
         await MarkdownRenderer.renderMarkdown(
             content,
             this.statblockEl.createDiv("markdown-rendered"),
