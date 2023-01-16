@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.6](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.5...8.1.6) (2023-01-16)
+
+
+### Bug Fixes
+
+* Remove super initiative behavior (close [#95](https://github.com/valentine195/obsidian-initiative-tracker/issues/95)) ([06d4cdd](https://github.com/valentine195/obsidian-initiative-tracker/commit/06d4cdda7759329930d83f37d7f3881819ff0038))
+
 ### [8.1.5](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.4...8.1.5) (2023-01-07)
 
 
