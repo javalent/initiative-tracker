@@ -105,6 +105,7 @@ export interface InitiativeTrackerData {
     warnedAboutImports: boolean;
     logging: boolean;
     logFolder: string;
+    integrateSRD: boolean;
 }
 
 export interface InitiativeViewState {

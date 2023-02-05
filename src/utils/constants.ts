@@ -51,7 +51,8 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     hpOverflow: "ignore",
     additiveTemp: false,
     logging: false,
-    logFolder: "/"
+    logFolder: "/",
+    integrateSRD: true
 };
 
 export const XP_PER_CR: Record<string, number> = {

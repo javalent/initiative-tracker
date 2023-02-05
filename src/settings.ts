@@ -175,6 +175,17 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 });
             });
+        new Setting(containerEl)
+            .setName("Include 5e SRD")
+            .setDesc(
+                "The 5e SRD will be available for use in the Initiative Tracker."
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.integrateSRD).onChange(async (v) => {
+                    this.plugin.data.integrateSRD = v;
+                    await this.plugin.saveSettings();
+                });
+            });
         /*         new Setting(containerEl)
             .setName("Monster Property used for Modifier")
             .setDesc(

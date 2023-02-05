@@ -141,7 +141,7 @@ export default class InitiativeTracker extends Plugin {
     }
 
     get bestiary() {
-        return [...BESTIARY, ...this.homebrew];
+        return [...(this.data.integrateSRD ? BESTIARY : []), ...this.homebrew];
     }
 
     get view() {
@@ -279,8 +279,11 @@ export default class InitiativeTracker extends Plugin {
                         player.modifier = modifier;
                         player.level = level;
                         player.name = name ? name : player.name;
-                        this.setStatblockLink(player, frontmatter["statblock-link"]);
-                        
+                        this.setStatblockLink(
+                            player,
+                            frontmatter["statblock-link"]
+                        );
+
                         this.playerCreatures.set(
                             player.name,
                             Creature.from(player)
@@ -329,12 +332,12 @@ export default class InitiativeTracker extends Plugin {
 
         console.log("Initiative Tracker v" + this.manifest.version + " loaded");
     }
-    
+
     setStatblockLink(player: HomebrewCreature, newValue: string) {
         if (newValue) {
-            player["statblock-link"] = newValue.startsWith("#") 
-                    ? `[${player.name}](${player.path}${newValue})`
-                    : newValue;
+            player["statblock-link"] = newValue.startsWith("#")
+                ? `[${player.name}](${player.path}${newValue})`
+                : newValue;
         }
     }
 
