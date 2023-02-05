@@ -50,7 +50,7 @@
             }
         }, 1000);
     };
-    
+
     const cancelHover = (evt: MouseEvent) => {
         clearTimeout(hoverTimeout);
     };
@@ -116,6 +116,7 @@
         on:click={(e) => e.stopPropagation()}
         on:tag
         on:edit
+        on:hp
         {view}
         {creature}
     />
