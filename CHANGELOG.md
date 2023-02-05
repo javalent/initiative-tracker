@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.8](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.7...8.1.8) (2023-02-05)
+
+
+### Bug Fixes
+
+* fixes Set Health/Status in creature menu ([38a6b92](https://github.com/valentine195/obsidian-initiative-tracker/commit/38a6b922bff1d7511948b643bd911d603ed1d183))
+
 ### [8.1.7](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.6...8.1.7) (2023-02-05)
 
 
