@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.7](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.6...8.1.7) (2023-02-05)
+
+
+### Bug Fixes
+
+* 5e SRD can now be disabled (close [#98](https://github.com/valentine195/obsidian-initiative-tracker/issues/98)) ([ae05879](https://github.com/valentine195/obsidian-initiative-tracker/commit/ae0587932a33e491baa8cb2333451322d996042c))
+
 ### [8.1.6](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.5...8.1.6) (2023-01-16)
 
 
