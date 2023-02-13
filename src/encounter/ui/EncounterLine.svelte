@@ -117,7 +117,16 @@
                     {joiner(index, creatures.size)}
                     <strong
                         use:rollerEl={creature}
-                    />&nbsp;{creature.name}{count == 1 ? "" : "s"}
+                    />&nbsp;
+                    {#if creature.display && creature.display != creature.name}
+                        {creature.display}{count == 1
+                            ? ""
+                            : "s"} ({creature.name})
+                    {:else}
+                        {creature.name}{count == 1
+                            ? ""
+                            : "s"}
+                    {/if}
                 </span>
             {/each}
         {:else}

@@ -77,9 +77,13 @@ For example:
 
 `` `encounter: 3: Hobgoblin, 1d5: Goblin, Custom Monster` ``
 
+The single-line array syntax from the regular encounter block can be used to control creature stats and display names:
+
+`` `encounter: [[Hobgoblin, Jim], 12, 13, 2, 25], 2: [[Hobgoblin, Jeff], 12, 13]` ``
+
 > :warning: **Please note:**
 >
-> It is not possible to customize monster stats or control players using the inline syntax.
+> It is not possible to control players using the inline syntax.
 
 This syntax enables Encounters to be used in [Dice Roller](https://github.com/valentine195/obsidian-dice-roller) lookup tables!
 
@@ -179,23 +183,25 @@ You can also create creatures using the any of the following syntaxes to give th
 ````
 ```encounter
 creatures:
-  - [[Hobgoblin, Bob]]          # 1 Hobgoblin named Bob
-  -                             # 1 Hobgoblin named Jim with 12 HP, 13 AC, +2 to initiative that
-    - [Hobgoblin, Jim]          # is worth 25 XP
+  - [[Hobgoblin, Bob]]                 # 1 Hobgoblin named Bob
+  -                                    # 1 Hobgoblin named Jim with 12 HP, 13 AC, +2
+    - [Hobgoblin, Jim]                 # to initiative that is worth 25 XP
     - 12
     - 13
     - 2
     - 25
-  - 2:                          # 2 Hobgoblins named Jeff with 12 HP and 13 AC.
+  - [[Hobgoblin, Jim], 12, 13, 2, 25]  # Same Hobgoblin named Jim defined in a single line
+  - 2:                                 # 2 Hobgoblins named Jeff with 12 HP and 13 AC.
     - [Hobgoblin, Jeff]
     - 12
     - 13
-  - 5:                          # 5 Hobgoblins named Ted with 12 HP and 13 AC.
+  - 2: [[Hobgoblin, Jim], 12, 13]      # Same Hobgoblins named Jeff defined in a single line
+  - 5:                                 # 5 Hobgoblins named Ted with 12 HP and 13 AC.
       creature: Hobgoblin
       name: Ted
       hp: 12
       ac: 13
-  - 1d5:                        # 1d5 Hobgoblins named Sarah with 12 HP and 13 AC.
+  - 1d5:                               # 1d5 Hobgoblins named Sarah with 12 HP and 13 AC.
       creature: Hobgoblin
       name: Sarah
       hp: 12
@@ -204,6 +210,32 @@ creatures:
 ````
 
 Please note that the plugin will still group equivalent creatures together, but it will take into account display name when grouping. 
+
+##### Creatures names containing a `,`
+
+Referencing creatures with a `,` in their name can be done as follows:
+
+````
+```encounter
+creatures:
+  - 2: [["Rat, Giant"]]                     # 2 'Rat, Giant'
+  - [["Rat, Giant", Snuggletooth], 12, 13]  # 1 'Rat, Giant' named Snuggletooth
+                                            # with 12 HP, 13 AC
+  -                                         # Snuggletooth but defined over multiple lines.
+    - ["Rat, Giant", Snuggletooth]          
+    - 12
+    - 13
+  - 1d5:                                    # 1d5 'Rat, Giant' named Snuggletooth
+      creature: "Rat, Giant"                # with 12 HP and 13 AC.
+      name: Sarah
+      hp: 12
+      ac: 13
+```
+````
+
+This also works for an inline encounter:
+
+`` `encounter: 2: [["Rat, Giant", Snuggletooth], 12, 13]` ``
 
 ##### Using Dice Rolls
 
