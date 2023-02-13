@@ -74,6 +74,7 @@ interface Party {
 export interface InitiativeTrackerData {
     beginnerTips: boolean;
     displayDifficulty: boolean;
+    preferStatblockLink: boolean;
     statuses: Condition[];
     openState: {
         battle: boolean;
@@ -105,6 +106,7 @@ export interface InitiativeTrackerData {
     logging: boolean;
     logFolder: string;
     useLegacy: boolean;
+    integrateSRD: boolean;
 }
 
 export interface InitiativeViewState {
@@ -124,7 +126,6 @@ export interface CreatureState extends HomebrewCreature {
     player: boolean;
     xp: number;
     active: boolean;
-    "statblock-link": string;
 }
 
 export interface SRDMonster {
@@ -175,6 +176,7 @@ export interface HomebrewCreature {
     hidden?: boolean;
     friendly?: boolean;
     active?: boolean;
+    "statblock-link"?: string;
 }
 
 export type ability =

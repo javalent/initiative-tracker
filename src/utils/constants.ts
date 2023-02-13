@@ -20,6 +20,7 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     statuses: [...Conditions],
     version: null,
     canUseDiceRoll: false,
+    preferStatblockLink: false,
     initiative: "1d20 + %mod%",
     modifier: null,
     sync: false,
@@ -51,7 +52,8 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     additiveTemp: false,
     logging: false,
     logFolder: "/",
-    useLegacy: false
+    useLegacy: false,
+    integrateSRD: true
 };
 
 export const XP_PER_CR: Record<string, number> = {

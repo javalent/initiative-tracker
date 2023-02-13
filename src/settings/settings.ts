@@ -169,6 +169,28 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 });
             });
+            new Setting(containerEl)
+            .setName("Embed statblock-link content in the Creature View")
+            .setDesc(
+                "Prefer embedded content from a statblock-link attribute when present. Fall back to the TTRPG plugin if the link is missing and the plugin is enabled."
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.preferStatblockLink).onChange(async (v) => {
+                    this.plugin.data.preferStatblockLink = v;
+                    await this.plugin.saveSettings();
+                });
+            });
+        new Setting(containerEl)
+            .setName("Include 5e SRD")
+            .setDesc(
+                "The 5e SRD will be available for use in the Initiative Tracker."
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.integrateSRD).onChange(async (v) => {
+                    this.plugin.data.integrateSRD = v;
+                    await this.plugin.saveSettings();
+                });
+            });
     }
     private async _displayBattle(additionalContainer: HTMLDetailsElement) {
         additionalContainer.empty();
@@ -1015,12 +1037,14 @@ class NewPlayerModal extends Modal {
                     this.player.name = modal.file.basename;
 
                     if (!metaData || !metaData.frontmatter) return;
+                    const { ac, hp, modifier, level, name } = metaData.frontmatter;
+                    this.player.name = name ? name : this.player.name;
+                    this.player.ac = ac;
+                    this.player.hp = hp;
+                    this.player.level = level;
+                    this.player.modifier = modifier;
+                    this.plugin.setStatblockLink(this.player, metaData.frontmatter["statblock-link"]);
 
-                    const { ac, hp, modifier, level } = metaData.frontmatter;
-                    this.player = {
-                        ...this.player,
-                        ...{ ac, hp, modifier, level }
-                    };
                     this.display();
                 };
             });

@@ -147,6 +147,9 @@ body {
 .creature-view-container .creature-view-button {
     display: flex;
     justify-content: flex-end;
+    position: absolute;
+    right: 5px;
+    top: 5px;
 }
 
 .initiative-tracker-encounter-line {

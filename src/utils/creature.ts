@@ -39,6 +39,7 @@ export class Creature {
     display: string;
     friendly: boolean = false;
     "statblock-link": string;
+    
     constructor(public creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;
         this.display = creature.display;
@@ -163,6 +164,7 @@ export class Creature {
         this.note = creature.note;
         this.level = creature.level;
         this.player = creature.player;
+        this["statblock-link"] = creature["statblock-link"];
 
         this.marker = creature.marker;
         this.source = creature.source;
