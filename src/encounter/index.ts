@@ -177,6 +177,8 @@ export class EncounterParser {
                 ? number
                 : Number(match[1]);
             monster = match[2];
+        } else if (Array.isArray(raw)) {
+            monster = raw;
         } else if (typeof raw == "object") {
             let entries = Object.entries(raw).flat();
             number = entries[0];
