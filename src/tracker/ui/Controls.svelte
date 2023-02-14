@@ -59,7 +59,7 @@
         menu.addItem((item) => {
             item.setIcon(NEW)
                 .setTitle("New Encounter")
-                .onClick(() => tracker.new());
+                .onClick(() => tracker.new(plugin));
         });
         menu.addItem((item) => {
             item.setIcon(NEW)

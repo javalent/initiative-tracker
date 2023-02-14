@@ -19,7 +19,7 @@
             .setIcon("open-elsewhere-glyph")
             .setTooltip("Load Encounter")
             .onClick(() => {
-                tracker.new(encounters[encounter]);
+                tracker.new(plugin, encounters[encounter]);
                 dispatch("cancel");
             });
     };

@@ -76,7 +76,7 @@
                     })
                     .flat();
 
-                tracker.new({
+                tracker.new(plugin, {
                     creatures: creatures.map((c) => c.toJSON()),
                     name,
                     round: 1,

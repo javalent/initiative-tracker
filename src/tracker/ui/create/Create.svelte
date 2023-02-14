@@ -16,13 +16,12 @@
     import { equivalent } from "src/encounter";
     import { confirmWithModal } from "./modal";
 
-    const dispatch = createEventDispatcher();
-
     let creature: Creature = new Creature({});
     export let amount = 1;
     export let plugin: InitiativeTracker;
     export let adding: Writable<Array<[Creature, number]>>;
     export let editing: Writable<Creature>;
+    export let isEditing: boolean;
 
     editing.subscribe((c) => {
         if (!c) return;
@@ -228,14 +227,16 @@
             />
         </div>
     </div>
-    <div class="context-buttons">
-        <div use:cancelButton class="add-button cancel-button" />
-        {#if $editing}
-            <div class="add-button" use:editButton />
-        {:else}
-            <div class="add-button" use:saveButton />
-        {/if}
-    </div>
+    {#if !isEditing}
+        <div class="context-buttons">
+            <div use:cancelButton class="add-button cancel-button" />
+            {#if $editing}
+                <div class="add-button" use:editButton />
+            {:else}
+                <div class="add-button" use:saveButton />
+            {/if}
+        </div>
+    {/if}
 </div>
 
 <style>

@@ -22,7 +22,7 @@
     tracker.setData(plugin.data);
     tracker.setLogger(new Logger(plugin));
     if (plugin.data.state) {
-        tracker.new(plugin.data.state);
+        tracker.new(plugin, plugin.data.state);
     } else {
         tracker.setParty(plugin.data.defaultParty, plugin);
         tracker.roll(plugin);

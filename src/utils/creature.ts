@@ -39,7 +39,7 @@ export class Creature {
     display: string;
     friendly: boolean = false;
     "statblock-link": string;
-    
+
     constructor(public creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;
         this.display = creature.display;
@@ -177,6 +177,7 @@ export class Creature {
     toJSON(): CreatureState {
         return {
             name: this.name,
+            display: this.display,
             initiative: this.initiative - this.modifier,
             modifier: this.modifier,
             hp: this.max,

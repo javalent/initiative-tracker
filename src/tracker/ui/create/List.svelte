@@ -1,6 +1,6 @@
 <script lang="ts">
     import { ExtraButtonComponent, setIcon } from "obsidian";
-    import { AC, HIDDEN, HP, INITIATIVE } from "src/utils";
+    import { AC, DEFAULT_UNDEFINED, HIDDEN, HP, INITIATIVE } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type { Writable } from "svelte/store";
 
@@ -63,21 +63,28 @@
                         <div
                             class="creature-minus"
                             use:plusIcon={creature}
-                            on:click|stopPropagation={(evt) =>
-                                add(evt, index)}
+                            on:click|stopPropagation={(evt) => add(evt, index)}
                         />
                         <div
                             class="creature-delete"
                             use:delIcon={creature}
-                            on:click|stopPropagation={(evt) =>
-                                del(evt, index)}
+                            on:click|stopPropagation={(evt) => del(evt, index)}
                         />
                     </div>
                 </div>
                 <small class="creature-data">
-                    <span>{creature.hp} <span use:heart /></span>
-                    <span>{creature.ac} <span use:ac /></span>
-                    <span>{creature.initiative} <span use:init /></span>
+                    <span
+                        >{creature.hp ?? DEFAULT_UNDEFINED}
+                        <span use:heart /></span
+                    >
+                    <span
+                        >{creature.ac ?? DEFAULT_UNDEFINED}
+                        <span use:ac /></span
+                    >
+                    <span
+                        >{creature.initiative ?? DEFAULT_UNDEFINED}
+                        <span use:init /></span
+                    >
                     {#if creature.hidden}
                         <span use:hidden />
                     {/if}

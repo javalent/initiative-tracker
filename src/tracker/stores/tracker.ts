@@ -182,6 +182,9 @@ function createTracker() {
                 if ("hidden" in change) {
                     creature.hidden = change.hidden;
                 }
+                if ("enabled" in change) {
+                    creature.enabled = change.enabled;
+                }
                 if (!creatures.includes(creature)) {
                     creatures.push(creature);
                 }
@@ -440,6 +443,13 @@ function createTracker() {
                 );
                 return creatures;
             }),
+        replace: (old: Creature, replacer: Creature) => {
+            updateAndSave((creatures) => {
+                creatures.splice(creatures.indexOf(old), 1, replacer);
+                setNumbers(creatures);
+                return creatures;
+            });
+        },
         update: () => update((c) => c),
         roll: (plugin: InitiativeTracker) =>
             updateAndSave((creatures) => {
@@ -451,7 +461,7 @@ function createTracker() {
                 }
                 return creatures;
             }),
-        new: (state?: InitiativeViewState) =>
+        new: (plugin: InitiativeTracker, state?: InitiativeViewState) =>
             updateAndSave((creatures) => {
                 $round.set(state?.round ?? 1);
                 $state.set(state?.state ?? false);
@@ -459,7 +469,14 @@ function createTracker() {
                 creatures = state?.creatures
                     ? state.creatures.map((c) => Creature.from(c))
                     : creatures.filter((c) => c.player);
-
+                if (!state) {
+                    for (let creature of creatures) {
+                        creature.initiative = plugin.getInitiativeValue(
+                            creature.modifier
+                        );
+                        creature.active = false;
+                    }
+                }
                 setNumbers(creatures);
 
                 if (state?.logFile) _logger?.new(state.logFile);
