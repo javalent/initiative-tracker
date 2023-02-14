@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.0.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.8...9.0.0) (2023-02-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* Rewrote the backend tracker store
+* Encounter Builder functionality
+
+### Features
+
+* Encounter Builder functionality ([0419ecd](https://github.com/valentine195/obsidian-initiative-tracker/commit/0419ecd4c04b615b2431deffd02aa0fd92d0f6b4))
+* Rewrote the backend tracker store ([373b365](https://github.com/valentine195/obsidian-initiative-tracker/commit/373b3655f25bd4a1f57d76cd5912bd82efc8216f))
+* tracker rewrite complete ([87b0178](https://github.com/valentine195/obsidian-initiative-tracker/commit/87b017885fe82fd1c54ad870d88949110c0b65cd))
+
+
+### Bug Fixes
+
+* Add Creatures -> Add to Encounter ([0e628f9](https://github.com/valentine195/obsidian-initiative-tracker/commit/0e628f93368b5ae954da525dff17e7ae3f1292f4))
+* adds "Add Creatures" to tracker context ([689e778](https://github.com/valentine195/obsidian-initiative-tracker/commit/689e77808c67033291239250fdb9b080cf52a3c1))
+* combatant view works ([0b3fcd6](https://github.com/valentine195/obsidian-initiative-tracker/commit/0b3fcd6f9143147375bfea981cedd28c31458431))
+* fix status entering ([c7f8994](https://github.com/valentine195/obsidian-initiative-tracker/commit/c7f8994ea139226bc64cb7aef1159980b42b7ae1))
+* fixes accidentally import from leaflet ([a5b4892](https://github.com/valentine195/obsidian-initiative-tracker/commit/a5b4892b614f140b2cee77636a9168e3f30f0674))
+* fixes creature re-use in encounter blocks ([6a66c9e](https://github.com/valentine195/obsidian-initiative-tracker/commit/6a66c9ef66e42a6d1e6907b6dbf617c348e4292f))
+* hidden works again ([6d6e451](https://github.com/valentine195/obsidian-initiative-tracker/commit/6d6e451a190748c060c5b55b83fc221488d6fedc))
+* margin around everything ([24d36c2](https://github.com/valentine195/obsidian-initiative-tracker/commit/24d36c24220e8cd2d867735ae639d37e03c42fd4))
+* reset creature button works now ([8c5fe84](https://github.com/valentine195/obsidian-initiative-tracker/commit/8c5fe847160a8449e33420dc0c3d9f7d4fc67081))
+* update packages ([1d11801](https://github.com/valentine195/obsidian-initiative-tracker/commit/1d11801ec0ff2b6ebcfe1384e9f4f5890a04eb6c))
+
 ### [11.0.5](https://github.com/valentine195/obsidian-initiative-tracker/compare/11.0.4...11.0.5) (2022-12-09)
 
 
