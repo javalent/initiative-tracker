@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.0.0...9.0.1) (2023-02-21)
+
+
+### Bug Fixes
+
+* fix issue loading players from encounter row ([6e5ff54](https://github.com/valentine195/obsidian-initiative-tracker/commit/6e5ff54c923b5b91d83ee74cc53e5c111e19cb7a))
+
 ## [9.0.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/8.1.8...9.0.0) (2023-02-14)
 
 
