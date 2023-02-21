@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.2](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.0.1...9.0.2) (2023-02-21)
+
+
+### Bug Fixes
+
+* encounters now roll initiative properly ([bc298c7](https://github.com/valentine195/obsidian-initiative-tracker/commit/bc298c7283f99da373f3100ac0ff295ffbfda2fd))
+
 ### [9.0.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.0.0...9.0.1) (2023-02-21)
 
 
