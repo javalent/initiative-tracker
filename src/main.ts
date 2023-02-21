@@ -456,7 +456,7 @@ export default class InitiativeTracker extends Plugin {
                             await this.addTrackerView();
                         }
                         if (view) {
-                            tracker?.new({
+                            tracker?.new(this, {
                                 creatures,
                                 state: false,
                                 name: null,

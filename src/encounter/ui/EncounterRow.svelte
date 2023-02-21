@@ -66,18 +66,21 @@
                 }
 
                 const view = plugin.view;
-                const creatures: Creature[] = [...creatureMap]
+                const creatures = [...creatureMap]
                     .map(([creature, number]) => {
                         if (isNaN(Number(number)) || number < 1)
-                            return [creature];
+                            return [creature.toJSON()];
                         return [...Array(number).keys()].map((v) =>
-                            Creature.new(creature)
+                            Creature.new(creature).toJSON()
                         );
                     })
                     .flat();
+                const playerList = players.map((p) =>
+                    plugin.getPlayerByName(p).toJSON()
+                );
 
                 tracker.new(plugin, {
-                    creatures: creatures.map((c) => c.toJSON()),
+                    creatures: [...playerList, ...creatures],
                     name,
                     round: 1,
                     state: false,

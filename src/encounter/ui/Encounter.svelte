@@ -79,8 +79,6 @@
                 );
             })
             .flat();
-        console.log("🚀 ~ file: Encounter.svelte:75 ~ creatures", creatures);
-
         tracker.new(plugin, {
             creatures: [...plugin.getPlayersForParty(party), ...creatures].map(
                 (c) => c.toJSON()
