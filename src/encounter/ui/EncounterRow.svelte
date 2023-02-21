@@ -84,7 +84,8 @@
                     name,
                     round: 1,
                     state: false,
-                    logFile: null
+                    logFile: null,
+            roll: true
                 });
                 plugin.app.workspace.revealLeaf(view.leaf);
             });

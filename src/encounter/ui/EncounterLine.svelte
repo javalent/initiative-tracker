@@ -52,7 +52,8 @@
             name: null,
             state: false,
             round: 1,
-            logFile: null
+            logFile: null,
+            roll: true
         });
         plugin.app.workspace.revealLeaf(view.leaf);
     };

@@ -115,6 +115,7 @@ export interface InitiativeViewState {
     name: string;
     round: number;
     logFile: string;
+    roll?: boolean;
 }
 
 export interface CreatureState extends HomebrewCreature {

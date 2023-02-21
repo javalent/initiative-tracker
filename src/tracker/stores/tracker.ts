@@ -469,7 +469,7 @@ function createTracker() {
                 creatures = state?.creatures
                     ? state.creatures.map((c) => Creature.from(c))
                     : creatures.filter((c) => c.player);
-                if (!state) {
+                if (!state || state?.roll) {
                     for (let creature of creatures) {
                         creature.initiative = plugin.getInitiativeValue(
                             creature.modifier

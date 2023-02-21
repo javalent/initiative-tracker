@@ -461,7 +461,8 @@ export default class InitiativeTracker extends Plugin {
                                 state: false,
                                 name: null,
                                 round: 1,
-                                logFile: null
+                                logFile: null,
+                                roll: true
                             });
                             this.app.workspace.revealLeaf(view.leaf);
                         } else {
