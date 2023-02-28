@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.0.3](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.0.2...9.0.3) (2023-02-28)
+
+
+### Bug Fixes
+
+* init encounters to render in canvas blocks ([db65db6](https://github.com/valentine195/obsidian-initiative-tracker/commit/db65db60fe79efbbfc820dfb7da149d1ea349cf0))
+
 ### [9.0.2](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.0.1...9.0.2) (2023-02-21)
 
 
