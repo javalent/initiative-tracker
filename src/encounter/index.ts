@@ -278,8 +278,9 @@ export class EncounterBlock extends MarkdownRenderChild {
         public table = false
     ) {
         super(containerEl);
+        this.init();
     }
-    onload(): void {
+    init(): void {
         if (this.table) {
             this.postprocessTable();
         } else {
