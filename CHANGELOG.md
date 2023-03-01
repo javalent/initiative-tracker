@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.1.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.0.3...9.1.0) (2023-03-01)
+
+
+### Features
+
+* adds Display Player HP Values setting ([0f93462](https://github.com/valentine195/obsidian-initiative-tracker/commit/0f9346293aaa4a48f8844c0a6398356f15862297))
+
 ### [9.0.3](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.0.2...9.0.3) (2023-02-28)
 
 
