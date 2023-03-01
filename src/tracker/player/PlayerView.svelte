@@ -8,8 +8,7 @@
     import { createEventDispatcher } from "svelte";
 
     import { tracker } from "../stores/tracker";
-    const { state, ordered } = tracker;
-    const dispatch = createEventDispatcher();
+    const { state, ordered, data } = tracker;
 
     const hpIcon = (node: HTMLElement) => {
         setIcon(node, HP);
@@ -62,7 +61,7 @@
                     class:center={true}
                     class={getHpStatus(creature.hp, creature.max).toLowerCase()}
                 >
-                    {#if creature.player}
+                    {#if creature.player && $data.diplayPlayerHPValues}
                         <div class="center">{@html creature.hpDisplay}</div>
                     {:else}
                         <span>{getHpStatus(creature.hp, creature.max)}</span>

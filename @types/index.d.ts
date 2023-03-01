@@ -107,6 +107,7 @@ export interface InitiativeTrackerData {
     logFolder: string;
     useLegacy: boolean;
     integrateSRD: boolean;
+    diplayPlayerHPValues: boolean;
 }
 
 export interface InitiativeViewState {

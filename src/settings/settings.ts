@@ -250,6 +250,21 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     }
                 );
             });
+        new Setting(additionalContainer)
+            .setName("Display Player HP in Player View")
+            .setDesc(
+                "If turned off, player health will display as 'Healthy', 'Hurt', etc."
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.diplayPlayerHPValues).onChange(
+                    async (v) => {
+                        this.plugin.data.diplayPlayerHPValues = v;
+                        await this.plugin.saveSettings();
+                    }
+                );
+            });
+
+        
 
         new Setting(additionalContainer)
             .setName("Log Battles")

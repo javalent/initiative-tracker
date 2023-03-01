@@ -53,7 +53,8 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     logging: false,
     logFolder: "/",
     useLegacy: false,
-    integrateSRD: true
+    integrateSRD: true,
+    diplayPlayerHPValues: true
 };
 
 export const XP_PER_CR: Record<string, number> = {
