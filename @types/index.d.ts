@@ -163,7 +163,7 @@ export interface HomebrewCreature {
     name?: string;
     display?: string;
     hp?: number;
-    ac?: number;
+    ac?: number | string;
     stats?: number[];
     source?: string | string[];
     cr?: number | string;

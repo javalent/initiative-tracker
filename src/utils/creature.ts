@@ -21,7 +21,7 @@ export class Creature {
     modifier: number;
     hp: number;
     temp: number;
-    ac: number;
+    ac: number | string;
     note: string;
     enabled: boolean = true;
     hidden: boolean = false;
@@ -50,7 +50,7 @@ export class Creature {
         this.modifier = Number(creature.modifier ?? 0);
 
         this.max = creature.hp ? Number(creature.hp) : undefined;
-        this.ac = creature.ac ? Number(creature.ac) : undefined;
+        this.ac = creature.ac ?? undefined;
         this.note = creature.note;
         this.level = creature.level;
         this.player = creature.player;
@@ -160,7 +160,7 @@ export class Creature {
 
         if (this.hp > this.max) this.hp = this.max;
 
-        this.ac = creature.ac ? Number(creature.ac) : undefined;
+        this.ac = creature.ac ?? undefined;
         this.note = creature.note;
         this.level = creature.level;
         this.player = creature.player;

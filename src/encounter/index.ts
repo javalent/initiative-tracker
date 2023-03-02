@@ -24,7 +24,7 @@ interface EncounterParameters {
 }
 interface CreatureStats {
     name: string;
-    ac: number;
+    ac: number | string;
     hp: number;
     modifier: number;
     xp: number;
@@ -201,7 +201,7 @@ export class EncounterParser {
         let name: string,
             display: string,
             hp: number,
-            ac: number,
+            ac: number | string,
             mod: number,
             xp: number;
 

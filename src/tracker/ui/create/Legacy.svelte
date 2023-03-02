@@ -131,7 +131,6 @@
             <input
                 bind:value={creature.ac}
                 id="add-ac"
-                type="number"
                 name="ac"
                 tabindex="0"
             />
