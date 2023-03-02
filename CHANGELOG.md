@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.1.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.1.0...9.1.1) (2023-03-02)
+
+
+### Bug Fixes
+
+* AC can now be a string ([bfb8d87](https://github.com/valentine195/obsidian-initiative-tracker/commit/bfb8d87f20fddd92d380187d6393e1844f476ab9))
+
 ## [9.1.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.0.3...9.1.0) (2023-03-01)
 
 
