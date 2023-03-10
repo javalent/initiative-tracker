@@ -1,6 +1,14 @@
 <script lang="ts">
     import { ExtraButtonComponent, Menu } from "obsidian";
-    import { DISABLE, ENABLE, HIDDEN, HP, MAPMARKER, REMOVE, TAG } from "src/utils";
+    import {
+        DISABLE,
+        ENABLE,
+        HIDDEN,
+        HP,
+        MAPMARKER,
+        REMOVE,
+        TAG
+    } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/tracker/view";
     import { createEventDispatcher, getContext } from "svelte";
@@ -23,8 +31,8 @@
             menu.addItem((item) => {
                 item.setIcon(HP)
                     .setTitle("Set Health/Status")
-                    .onClick(() => {
-                        dispatch("hp", { creature });
+                    .onClick((e: MouseEvent) => {
+                        tracker.setUpdate(creature, e);
                     });
             });
             menu.addItem((item) => {
