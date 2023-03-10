@@ -654,6 +654,6 @@ export default class InitiativeTracker extends Plugin {
             });
         }
 
-        this.combatant.render(creature);
+        await this.combatant.render(creature);
     }
 }
