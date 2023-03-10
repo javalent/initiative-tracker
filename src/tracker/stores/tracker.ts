@@ -11,6 +11,7 @@ import type {
 } from "../../../@types";
 import { OVERFLOW_TYPE } from "../../utils";
 import type Logger from "../../logger/logger";
+import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
 
 type HPUpdate = {
     saved: boolean;
@@ -19,7 +20,7 @@ type HPUpdate = {
 };
 type CreatureUpdate = {
     hp?: number;
-    ac?: number;
+    ac?: number | string;
     initiative?: number;
     name?: string;
     marker?: string;
@@ -213,8 +214,6 @@ function createTracker() {
         update(updater);
         trySave();
     }
-
-    const adding = writable<Map<Creature, number>>(new Map());
 
     const setNumbers = (list: Creature[], sublist: Creature[] = list) => {
         for (let i = 0; i < sublist.length; i++) {
@@ -423,8 +422,21 @@ function createTracker() {
 
         ordered,
 
-        add: (...items: Creature[]) =>
+        add: async (
+            plugin: InitiativeTracker,
+            roll: boolean = plugin.data.rollHP,
+            ...items: Creature[]
+        ) =>
             updateAndSave((creatures) => {
+                if (plugin.canUseDiceRoller && roll) {
+                    for (const creature of items) {
+                        if (!creature?.hit_dice?.length) continue;
+                        let roller = plugin.getRoller(
+                            creature.hit_dice
+                        ) as StackRoller;
+                        creature.hp = creature.max = roller.rollSync();
+                    }
+                }
                 creatures.push(...items);
                 _logger?.log(
                     _logger?.join(items.map((c) => c.name)),
@@ -478,6 +490,19 @@ function createTracker() {
                     }
                 }
                 setNumbers(creatures);
+                if (
+                    plugin.canUseDiceRoller &&
+                    (state?.rollHP ?? plugin.data.rollHP)
+                ) {
+                    for (const creature of creatures) {
+                        if (creature.hit_dice?.length) {
+                            let roller = plugin.getRoller(
+                                creature.hit_dice
+                            ) as StackRoller;
+                            creature.hp = creature.max = roller.rollSync();
+                        }
+                    }
+                }
 
                 if (state?.logFile) _logger?.new(state.logFile);
                 if (!state && _logger) _logger.logging = false;

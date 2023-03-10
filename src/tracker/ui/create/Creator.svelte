@@ -14,6 +14,8 @@
     export let isEditing = false;
     export let creature: Creature = null;
 
+    let rollHP = plugin.data.rollHP;
+
     const adding = writable<Array<[Creature, number]>>([]);
     const editing = writable<Creature>(creature);
 
@@ -43,7 +45,7 @@
                         )
                     );
 
-                    tracker.add(...creatures);
+                    tracker.add(plugin, rollHP, ...creatures);
                 }
                 dispatch("close");
             });
@@ -57,7 +59,18 @@
     <div class="initiative-tracker-creator" class:editing={isEditing}>
         <Create {plugin} {editing} {adding} {isEditing} />
         {#if !isEditing}
-            <List {adding} {editing} />
+            <div class="creator-list">
+                <List {adding} {editing} {rollHP} />
+                <div>
+                    <input
+                        type="checkbox"
+                        name="roll-hp"
+                        id="roll-hp"
+                        bind:checked={rollHP}
+                    />
+                    <label for="roll-hp">Roll for HP</label>
+                </div>
+            </div>
         {/if}
     </div>
     <div class="buttons">
@@ -85,5 +98,12 @@
 
     div[disabled="true"] > :global(button) {
         cursor: not-allowed;
+    }
+    .creator-list {
+        display: flex;
+        justify-content: space-between;
+        flex-flow: column nowrap;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
     }
 </style>

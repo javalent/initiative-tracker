@@ -21,6 +21,7 @@ interface EncounterParameters {
     hide?: "players" | "creatures" | string[];
     creatures?: RawCreatureArray;
     xp?: number;
+    rollHP?: boolean;
 }
 interface CreatureStats {
     name: string;
@@ -40,7 +41,6 @@ export const equivalent = (
         creature.name == existing.name &&
         creature.display == existing.display &&
         creature.ac == existing.ac &&
-        creature.hp == existing.hp &&
         creature.modifier == existing.modifier &&
         creature.xp == existing.xp &&
         creature.hidden == existing.hidden
@@ -55,6 +55,7 @@ export interface ParsedParams {
     creatures: Map<Creature, string | number>;
     xp: number;
     playerLevels: number[];
+    rollHP?: boolean;
 }
 
 export class EncounterParser {
@@ -65,6 +66,7 @@ export class EncounterParser {
         const players: string[] = this.parsePlayers(params);
         const hide = this.parseHide(params);
         const rawMonsters = params.creatures ?? [];
+        const rollHP = params.rollHP;
 
         let creatures = await this.parseRawCreatures(rawMonsters);
 
@@ -80,7 +82,8 @@ export class EncounterParser {
             hide,
             creatures,
             xp,
-            playerLevels
+            playerLevels,
+            rollHP
         };
     }
     parseHide(params: EncounterParameters): string[] {
@@ -263,7 +266,8 @@ class EncounterComponent {
                 players: this.params.players,
                 playerLevels: this.params.playerLevels,
                 creatures: this.params.creatures,
-                hide: this.params.hide
+                hide: this.params.hide,
+                rollHP: this.params.rollHP
             }
         });
     }

@@ -1,10 +1,11 @@
 <script lang="ts">
-    import { ExtraButtonComponent } from "obsidian";
+    import { ExtraButtonComponent, setIcon } from "obsidian";
 
     import type InitiativeTracker from "src/main";
     import { tracker } from "src/tracker/stores/tracker";
-    import { START_ENCOUNTER } from "src/utils";
+    import { RANDOM_HP, START_ENCOUNTER } from "src/utils";
     import { Creature } from "src/utils/creature";
+    import CreatureComponent from "./Creature.svelte";
     import {
         DifficultyReport,
         encounterDifficulty,
@@ -21,6 +22,7 @@
     export let playerLevels: number[];
     export let plugin: InitiativeTracker;
     export let headers: string[];
+    export let rollHP: boolean = plugin.data.rollHP;
 
     let totalXP: number;
     let creatureMap: Map<Creature, number> = new Map();
@@ -85,7 +87,8 @@
                     round: 1,
                     state: false,
                     logFile: null,
-            roll: true
+                    roll: true,
+                    rollHP
                 });
                 plugin.app.workspace.revealLeaf(view.leaf);
             });
@@ -108,7 +111,7 @@
                 );
             })
             .flat();
-        tracker.add(...creatures);
+        tracker.add(plugin, rollHP, ...creatures);
     };
 
     const rollerEl = (node: HTMLElement, creature: Creature) => {
@@ -146,6 +149,10 @@
         }
         return `${label.join(", ")}`;
     };
+
+    const rollEl = (node: HTMLElement) => {
+        setIcon(node, RANDOM_HP);
+    };
 </script>
 
 <tr class="encounter-row">
@@ -156,9 +163,17 @@
                 {#if !hide.includes("creatures") && creatures.size}
                     {#each [...creatures] as [creature, count]}
                         <li aria-label={label(creature)}>
-                            <strong
-                                use:rollerEl={creature}
-                            />&nbsp;{creature.name}{count == 1 ? "" : "s"}
+                            <CreatureComponent
+                                {creature}
+                                xp={creature.xp * creatureMap.get(creature)}
+                                shouldShowRoll={rollHP}
+                                {count}
+                            >
+                                <strong
+                                    class="creature-amount"
+                                    use:rollerEl={creature}
+                                />
+                            </CreatureComponent>
                         </li>
                     {/each}
                 {:else}

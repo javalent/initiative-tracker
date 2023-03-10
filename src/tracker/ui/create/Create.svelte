@@ -179,11 +179,22 @@
             />
         </div>
         <div>
+            <label for="add-hp">Hit Dice</label>
+            <input
+                bind:value={creature.hit_dice}
+                id="add-hp"
+                type="text"
+                name="hp"
+                tabindex="0"
+            />
+        </div>
+        <div>
             <label for="add-ac">AC</label>
             <input
                 bind:value={creature.ac}
                 id="add-ac"
                 name="ac"
+                type="text"
                 tabindex="0"
             />
         </div>

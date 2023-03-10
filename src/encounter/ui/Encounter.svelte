@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { ExtraButtonComponent, Platform } from "obsidian";
-    import { START_ENCOUNTER, XP_PER_CR } from "src/utils";
+    import { ExtraButtonComponent, setIcon } from "obsidian";
+    import { DICE, RANDOM_HP, START_ENCOUNTER } from "src/utils";
 
     import { Creature } from "src/utils/creature";
     import {
@@ -12,6 +12,8 @@
     import type InitiativeTracker from "src/main";
     import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
     import { tracker } from "src/tracker/stores/tracker";
+    import type { CreatureState } from "@types";
+    import CreatureComponent from "./Creature.svelte";
 
     export let plugin: InitiativeTracker;
 
@@ -20,6 +22,8 @@
     export let players: string[];
     export let party: string = null;
     export let hide: string[] = [];
+
+    export let rollHP: boolean = plugin.data.rollHP;
 
     export let playerLevels: number[];
 
@@ -79,15 +83,21 @@
                 );
             })
             .flat();
+        const transformedCreatures: CreatureState[] = [];
+        for (const creature of [
+            ...plugin.getPlayersForParty(party),
+            ...creatures
+        ]) {
+            transformedCreatures.push(creature.toJSON());
+        }
         tracker.new(plugin, {
-            creatures: [...plugin.getPlayersForParty(party), ...creatures].map(
-                (c) => c.toJSON()
-            ),
+            creatures: transformedCreatures,
             name,
             round: 1,
             state: false,
             logFile: null,
-            roll: true
+            roll: true,
+            rollHP
         });
         plugin.app.workspace.revealLeaf(view.leaf);
     };
@@ -100,7 +110,6 @@
         if (!plugin.view) {
             await plugin.addTrackerView();
         }
-        const view = plugin.view;
         const creatures: Creature[] = [...creatureMap]
             .map(([creature, number]) => {
                 if (isNaN(Number(number)) || number < 1) return [creature];
@@ -109,7 +118,7 @@
                 );
             })
             .flat();
-        tracker.add(...creatures);
+        tracker.add(plugin, rollHP, ...creatures);
     };
 
     const rollerEl = (node: HTMLElement, creature: Creature) => {
@@ -140,6 +149,15 @@
             label.push(`MOD: ${creature.modifier}`);
         }
         return `${label.join(", ")}`;
+    };
+
+    $: allRolling =
+        rollHP &&
+        [...creatures.keys()].filter((c) => c.hit_dice?.length).length ==
+            creatures.size;
+
+    const rollEl = (node: HTMLElement) => {
+        setIcon(node, RANDOM_HP);
     };
 </script>
 
@@ -172,7 +190,16 @@
         {/if}
         <div class="encounter-creatures">
             {#if !hide.includes("creatures")}
-                <h4>Creatures</h4>
+                <h4 class="creatures-header">
+                    Creatures
+                    {#if allRolling}
+                        <span
+                            class="has-icon"
+                            aria-label="Rolling for HP"
+                            use:rollEl
+                        />
+                    {/if}
+                </h4>
                 {#if creatures.size}
                     <ul>
                         {#each [...creatures] as [creature, count]}
@@ -180,31 +207,17 @@
                                 aria-label={label(creature)}
                                 class="creature-li"
                             >
-                                <strong use:rollerEl={creature} />
-                                <span>
-                                    {#if creature.display && creature.display != creature.name}
-                                        &nbsp;{creature.display}{count == 1
-                                            ? ""
-                                            : "s"} ({creature.name})
-                                    {:else}
-                                        &nbsp;{creature.name}{count == 1
-                                            ? ""
-                                            : "s"}
-                                    {/if}
-                                </span>
-                                {#if creature.xp && creatureMap.has(creature)}
-                                    <span class="xp-parent">
-                                        <span class="paren left">(</span>
-                                        <span class="xp-container">
-                                            <span class="xp number">
-                                                {creature.xp *
-                                                    creatureMap.get(creature)}
-                                            </span>
-                                            <span class="xp text">XP</span>
-                                        </span>
-                                        <span class="paren right">)</span>
-                                    </span>
-                                {/if}
+                                <CreatureComponent
+                                    {creature}
+                                    xp={creature.xp * creatureMap.get(creature)}
+                                    shouldShowRoll={!allRolling && rollHP}
+                                    {count}
+                                >
+                                    <strong
+                                        class="creature-amount"
+                                        use:rollerEl={creature}
+                                    />
+                                </CreatureComponent>
                             </li>
                         {/each}
                     </ul>
@@ -282,5 +295,15 @@
     }
     .icons > div:first-child :global(.clickable-icon) {
         margin-right: 0;
+    }
+    .creature-name,
+    .creatures-header {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    .has-icon {
+        display: flex;
+        align-items: center;
     }
 </style>

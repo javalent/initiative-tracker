@@ -152,7 +152,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         new Setting(containerEl)
             .setName("Roll Equivalent Creatures Together")
             .setDesc(
-                "Equivalent creatures (same HP, AC and Name) will roll the same initiative by default."
+                "Equivalent creatures (same Name and AC) will roll the same initiative by default."
             )
             .addToggle((t) => {
                 t.setValue(this.plugin.data.condense).onChange(async (v) => {
@@ -169,16 +169,18 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 });
             });
-            new Setting(containerEl)
+        new Setting(containerEl)
             .setName("Embed statblock-link content in the Creature View")
             .setDesc(
                 "Prefer embedded content from a statblock-link attribute when present. Fall back to the TTRPG plugin if the link is missing and the plugin is enabled."
             )
             .addToggle((t) => {
-                t.setValue(this.plugin.data.preferStatblockLink).onChange(async (v) => {
-                    this.plugin.data.preferStatblockLink = v;
-                    await this.plugin.saveSettings();
-                });
+                t.setValue(this.plugin.data.preferStatblockLink).onChange(
+                    async (v) => {
+                        this.plugin.data.preferStatblockLink = v;
+                        await this.plugin.saveSettings();
+                    }
+                );
             });
         new Setting(containerEl)
             .setName("Include 5e SRD")
@@ -186,10 +188,12 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 "The 5e SRD will be available for use in the Initiative Tracker."
             )
             .addToggle((t) => {
-                t.setValue(this.plugin.data.integrateSRD).onChange(async (v) => {
-                    this.plugin.data.integrateSRD = v;
-                    await this.plugin.saveSettings();
-                });
+                t.setValue(this.plugin.data.integrateSRD).onChange(
+                    async (v) => {
+                        this.plugin.data.integrateSRD = v;
+                        await this.plugin.saveSettings();
+                    }
+                );
             });
     }
     private async _displayBattle(additionalContainer: HTMLDetailsElement) {
@@ -263,8 +267,25 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     }
                 );
             });
-
-        
+        new Setting(additionalContainer)
+            .setName("Roll HP for Creatures")
+            .setDesc(
+                createFragment((e) => {
+                    e.createSpan({
+                        text: "Creatures added to encounters will automatically roll for HP if the "
+                    });
+                    e.createEl("code", { text: "hit_dice" });
+                    e.createSpan({
+                        text: " property is set for the creature."
+                    });
+                })
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.rollHP).onChange(async (v) => {
+                    this.plugin.data.rollHP = v;
+                    await this.plugin.saveSettings();
+                });
+            });
 
         new Setting(additionalContainer)
             .setName("Log Battles")
@@ -1052,13 +1073,17 @@ class NewPlayerModal extends Modal {
                     this.player.name = modal.file.basename;
 
                     if (!metaData || !metaData.frontmatter) return;
-                    const { ac, hp, modifier, level, name } = metaData.frontmatter;
+                    const { ac, hp, modifier, level, name } =
+                        metaData.frontmatter;
                     this.player.name = name ? name : this.player.name;
                     this.player.ac = ac;
                     this.player.hp = hp;
                     this.player.level = level;
                     this.player.modifier = modifier;
-                    this.plugin.setStatblockLink(this.player, metaData.frontmatter["statblock-link"]);
+                    this.plugin.setStatblockLink(
+                        this.player,
+                        metaData.frontmatter["statblock-link"]
+                    );
 
                     this.display();
                 };

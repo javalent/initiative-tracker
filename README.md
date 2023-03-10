@@ -101,6 +101,7 @@ There are 3 parameters for each encounter, with more detail below.
 ````
 ```encounter
 name: string                            # Name of the encounter. Optional.
+rollHP: boolean                         # Override the global plugin.
 party: string                           # Name of Party to use. Overrides any defined players. Optional.
 players: boolean | string | array       # Which players to include. Optional.
 creatures: array                        # Array of creatures to include in the encounter. Optional.
@@ -110,6 +111,10 @@ creatures: array                        # Array of creatures to include in the e
 #### Name
 
 The name of the encounter, which will be displayed both in Preview mode as well as in the Initiative Tracker when the encounter is launched.
+
+#### Roll HP
+
+This can be used to override the global Roll HP setting. Any creature in the encounter with the `hit_dice` property set will roll for HP when being added to the encounter.
 
 #### Party
 
@@ -203,7 +208,7 @@ creatures:
 ```
 ````
 
-Please note that the plugin will still group equivalent creatures together, but it will take into account display name when grouping. 
+Please note that the plugin will still group equivalent creatures together, but it will take into account display name when grouping.
 
 ##### Using Dice Rolls
 
@@ -215,7 +220,7 @@ Clicking the dice roller will re-roll the number of creatures. This number **is 
 
 ##### Creatures from the Bestiary
 
-Creatures from your bestiary can be added by their name. This includes the full SRD creature list as well as any homebrew creatures added in Settings.
+Creatures from your bestiary can be added by their name. This includes the full SRD creature list as well as any homebrew creatures added in Fantasy Statblocks.
 
 ````
 ```encounter
@@ -224,7 +229,7 @@ creatures:
 ```
 ````
 
-Creatures from the SRD Bestiary will auto-calculate their XP based on their challenge rating. Otherwise, you can supply a creature either a CR or an XP when creating it in settings.
+Creatures from the SRD Bestiary will auto-calculate their XP based on their challenge rating. Otherwise, you can supply a creature either a CR or an XP when creating it in the Fantasy Statblocks plugin.
 
 ### Multiple Encounters
 
@@ -258,6 +263,10 @@ Once all of the creatures in a given combat have been added, initiatives can be 
 ### HP
 
 Creatures can take damage, be healed or gain temporary HP by clicking on their HP.
+
+#### Rolling HP
+
+If a creature's `hit_dice` property is set (whether from the add menu or in the bestiary), there is the option to Roll for HP. This can be set globally in settings, per-encounter, or when adding creatures to a combat.
 
 ### Actions
 
@@ -325,7 +334,7 @@ Please note that if the same player is in both parties, they will receive a new 
 
 #### Group / Ungroup Creatures
 
-Any equivalent creatures (HP, AC and Name are the same) will be "grouped" and roll a single initiative value.
+Any equivalent creatures (Name and AC are the same) will be "grouped" and roll a single initiative value.
 
 #### Saving Encounters
 
@@ -348,11 +357,13 @@ The setting tab has several options for adding and managing players and homebrew
 ## Basic Settings
 
 ### Display Beginner Tips
+
 `Default: Enabled`
 
 Display instructions in the intiative tracker, helping you get used to the workflow.
 
 ### Display Encounter Difficulty
+
 `Default: Enabled`
 
 The plugin will calculate and display encounter difficulty based on the challenge rating of the creatures and levels of your party members.
@@ -360,6 +371,7 @@ The plugin will calculate and display encounter difficulty based on the challeng
 Creatures and players without this information will be ignored for the calculation.
 
 ### Roll Equivalent Creatures Together
+
 `Default: Enabled`
 
 Equivalent creatures (same HP, AC, and Name) will roll initiatives as a group.
@@ -367,28 +379,36 @@ Equivalent creatures (same HP, AC, and Name) will roll initiatives as a group.
 ## Battle
 
 ### Clamp Minimum HP
+
 `default: Enabled`
 
 When a creature takes damage that would reduce its HP below 0, its HP is set to 0 instead.
 
 ### Overflow Healing
+
 `default: Ignore`
 
 Set what happens to healing which goes above creatures' max HP threshold.
 
-  - Ignore: Any healing above the creature's max HP is ignored
-  - Temp: Any healing above the creature's max HP is added as temporary HP
-  - Current: Any healing above the creature's max HP is added to the current HP total
+-   Ignore: Any healing above the creature's max HP is ignored
+-   Temp: Any healing above the creature's max HP is added as temporary HP
+-   Current: Any healing above the creature's max HP is added to the current HP total
 
 ### Automatic Unconscious Status Application
+
 `Default: Enabled`
 
 When a creature takes damage that would reduce its HP below 0, it gains the "Unconscious" status effect.
 
 ### Additive Temporary HP
+
 `Default: Disabled`
 
 Any temporary HP added to a creature will be added on top of exsiting temporary HP.
+
+### Roll for HP
+
+Enable this setting to automatically roll HP for any creature that has the `hit_dice` property set in the bestiary.
 
 ### Logging
 
@@ -436,11 +456,14 @@ If any default statuses are deleted, you can re-add them by clicking the "Re-add
 ## Plugin Integrations
 
 ### Sync Monsters from TTRPG Statblocks Plugin
+
 `Default: Disabled`
 If the [5e Statblocks](https://github.com/valentine195/obsidian-5e-statblocks) plugin is installed, the homebrew creatures saved to that plugin can be used in this plugin by enabling the sync in settings.
 
 ### Initiative Formula
+
 `Default: 1d20 + %mod%`
+
 > This setting can only be modified when the [Dice Roller](https://github.com/valentine195/obsidian-dice-roller) plugin is installed.
 
 This setting can be used to modify how a creature's initiative is calculated by the plugin. Use `%mod%` as a placeholder for the creature's initiative modifier.
@@ -448,6 +471,7 @@ This setting can be used to modify how a creature's initiative is calculated by 
 This will support any dice formula supported by the Dice Roller plugin.
 
 ### Integrate with Obsidian Leaflet
+
 `Default: Disabled`
 
 If the [Obsidian Leaflet](https://github.com/valentine195/obsidian-leaflet-plugin) plugin is installed, it can be used as a battle map for encounters by turning this setting on.

@@ -20,6 +20,7 @@ export class Creature {
     name: string;
     modifier: number;
     hp: number;
+    hit_dice?: string;
     temp: number;
     ac: number | string;
     note: string;
@@ -78,6 +79,9 @@ export class Creature {
                 "statblock-link"
             ] as string;
         }
+        if ("hit_dice" in creature && typeof creature.hit_dice == "string") {
+            this.hit_dice = creature.hit_dice;
+        }
     }
     get hpDisplay() {
         if (this.max) {
@@ -123,6 +127,7 @@ export class Creature {
         yield this.marker;
         yield this.xp;
         yield this.hidden;
+        yield this.hit_dice;
     }
 
     static new(creature: Creature) {
@@ -195,7 +200,8 @@ export class Creature {
             active: this.active,
             hidden: this.hidden,
             friendly: this.friendly,
-            "statblock-link": this["statblock-link"]
+            "statblock-link": this["statblock-link"],
+            hit_dice: this.hit_dice
         };
     }
 

@@ -108,6 +108,7 @@ export interface InitiativeTrackerData {
     useLegacy: boolean;
     integrateSRD: boolean;
     diplayPlayerHPValues: boolean;
+    rollHP: boolean;
 }
 
 export interface InitiativeViewState {
@@ -117,6 +118,7 @@ export interface InitiativeViewState {
     round: number;
     logFile: string;
     roll?: boolean;
+    rollHP?: boolean;
 }
 
 export interface CreatureState extends HomebrewCreature {
@@ -128,6 +130,7 @@ export interface CreatureState extends HomebrewCreature {
     player: boolean;
     xp: number;
     active: boolean;
+    hit_dice: string;
 }
 
 export interface SRDMonster {

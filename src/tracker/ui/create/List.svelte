@@ -1,11 +1,19 @@
 <script lang="ts">
     import { ExtraButtonComponent, setIcon } from "obsidian";
-    import { AC, DEFAULT_UNDEFINED, HIDDEN, HP, INITIATIVE } from "src/utils";
+    import {
+        AC,
+        DEFAULT_UNDEFINED,
+        HIDDEN,
+        HP,
+        INITIATIVE,
+        RANDOM_HP
+    } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type { Writable } from "svelte/store";
 
     export let adding: Writable<Array<[Creature, number]>>;
     export let editing: Writable<Creature>;
+    export let rollHP: boolean;
 
     const minusIcon = (node: HTMLElement, creature: Creature) => {
         new ExtraButtonComponent(node).setIcon("minus");
@@ -35,6 +43,9 @@
     const heart = (node: HTMLElement) => {
         setIcon(node, HP);
     };
+    const random = (node: HTMLElement) => {
+        setIcon(node, RANDOM_HP);
+    };
     const ac = (node: HTMLElement) => {
         setIcon(node, AC);
     };
@@ -46,6 +57,7 @@
     };
 </script>
 
+<h5 class="list-header">Creatures</h5>
 <div class="initiative-tracker-list">
     {#if $adding.length}
         {#each $adding as [creature, number], index}
@@ -73,21 +85,25 @@
                     </div>
                 </div>
                 <small class="creature-data">
-                    <span
-                        >{creature.hp ?? DEFAULT_UNDEFINED}
-                        <span use:heart /></span
-                    >
-                    <span
-                        >{creature.ac ?? DEFAULT_UNDEFINED}
-                        <span use:ac /></span
-                    >
-                    <span
-                        >{creature.initiative ?? DEFAULT_UNDEFINED}
-                        <span use:init /></span
-                    >
-                    {#if creature.hidden}
-                        <span use:hidden />
-                    {/if}
+                    <span>
+                        {creature.hp ?? DEFAULT_UNDEFINED}
+                        {#if rollHP}
+                            <span use:random />
+                        {:else}
+                            <span use:heart />
+                        {/if}
+                        <span>
+                            {creature.ac ?? DEFAULT_UNDEFINED}
+                            <span use:ac />
+                        </span>
+                        <span>
+                            {creature.initiative ?? DEFAULT_UNDEFINED}
+                            <span use:init />
+                        </span>
+                        {#if creature.hidden}
+                            <span use:hidden />
+                        {/if}
+                    </span>
                 </small>
             </div>
         {/each}
@@ -99,8 +115,11 @@
 <style scoped>
     .initiative-tracker-list {
         display: flex;
+        flex: 1 1 auto;
         flex-flow: column nowrap;
-        gap: 0.5rem;
+        /* gap: 0.5rem; */
+        height: 0px;
+        overflow: scroll;
     }
 
     .creature {
@@ -128,5 +147,9 @@
         display: flex;
         align-items: center;
         gap: 0.375rem;
+    }
+    .list-header {
+        margin-top: 0;
+        margin-bottom: 0.5rem;
     }
 </style>
