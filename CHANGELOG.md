@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.2.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.1.1...9.2.0) (2023-03-10)
+
+
+### Features
+
+* Enables Hit Dice rolling ([3698aee](https://github.com/valentine195/obsidian-initiative-tracker/commit/3698aeed3987622a094fb7f84867ddb582bab1b0))
+
+
+### Bug Fixes
+
+* Fixes broken Set Health/Status option in creature control ([57cd592](https://github.com/valentine195/obsidian-initiative-tracker/commit/57cd592d71cb0df282c99c66c1c12314c8076dfc))
+
 ### [9.1.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.1.0...9.1.1) (2023-03-02)
 
 
