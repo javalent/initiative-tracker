@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.2.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.2.0...9.2.1) (2023-03-15)
+
+
+### Bug Fixes
+
+* fixes clash with Default New Tab Page plugin ([ecafed0](https://github.com/valentine195/obsidian-initiative-tracker/commit/ecafed04ca9fd17a57d15e8ea83d1317f05e64ba))
+
 ## [9.2.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.1.1...9.2.0) (2023-03-10)
 
 
