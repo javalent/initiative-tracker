@@ -62,7 +62,7 @@ export default class InitiativeTracker extends Plugin {
         if (!this.canUseDiceRoller) return;
         const roller = this.app.plugins
             .getPlugin("obsidian-dice-roller")
-            .getRollerSync(str, "statblock", true);
+            .getRollerSync(str, "statblock");
         return roller;
     }
     get canUseDiceRoller() {
