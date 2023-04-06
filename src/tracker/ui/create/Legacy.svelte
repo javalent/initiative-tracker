@@ -17,9 +17,9 @@
 
     const dispatch = createEventDispatcher();
 
-    export let creature: Creature = new Creature({});
     export let amount = 1;
     export let plugin: InitiativeTracker;
+    export let creature: Creature = new Creature(plugin, {});
 
     const add = async (close = true) => {
         if (!creature || !creature.name || !creature.name?.length) {
@@ -27,7 +27,7 @@
             return;
         }
         if (!creature.modifier) {
-            creature.modifier = 0;
+            creature.rawModifier = 0;
         }
         if (
             creature.initiative <= 0 ||
@@ -41,9 +41,11 @@
         tracker.add(
             plugin,
             plugin.data.rollHP,
-            ...[...Array(amount).keys()].map((k) => Creature.new(creature))
+            ...[...Array(amount).keys()].map((k) =>
+                Creature.new(plugin, creature)
+            )
         );
-        creature = new Creature({});
+        creature = new Creature(plugin, {});
         if (close) dispatch("close");
     };
 
@@ -76,7 +78,7 @@
         modal = new SRDMonsterSuggestionModal(plugin, nameInput);
         modal.onClose = async () => {
             if (modal.creature) {
-                creature = Creature.from(modal.creature);
+                creature = Creature.from(plugin, modal.creature);
 
                 creature.initiative = await plugin.getInitiativeValue(
                     creature.modifier
@@ -140,7 +142,7 @@
         <div>
             <label for="add-mod">Modifier</label>
             <input
-                bind:value={creature.modifier}
+                bind:value={creature.rawModifier}
                 id="add-mod"
                 type="number"
                 name="ac"

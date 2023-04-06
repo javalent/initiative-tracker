@@ -79,7 +79,7 @@
             .map(([creature, number]) => {
                 if (isNaN(Number(number)) || number < 1) return [creature];
                 return [...Array(number).keys()].map((v) =>
-                    Creature.new(creature)
+                    Creature.new(plugin, creature)
                 );
             })
             .flat();
@@ -114,7 +114,7 @@
             .map(([creature, number]) => {
                 if (isNaN(Number(number)) || number < 1) return [creature];
                 return [...Array(number).keys()].map((v) =>
-                    Creature.new(creature)
+                    Creature.new(plugin, creature)
                 );
             })
             .flat();

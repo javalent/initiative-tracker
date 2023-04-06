@@ -6,6 +6,7 @@ import type {
 } from "@types";
 import { Conditions, XP_PER_CR } from ".";
 import { DEFAULT_UNDEFINED } from "./constants";
+import type InitiativeTracker from "src/main";
 
 export function getId() {
     return "ID_xyxyxyxyxyxy".replace(/[xy]/g, function (c) {
@@ -18,7 +19,29 @@ export function getId() {
 export class Creature {
     active: boolean;
     name: string;
-    modifier: number;
+    get modifier() {
+        this.modifierFromDice = false;
+        if (!isNaN(Number(this.rawModifier))) {
+            return Number(this.rawModifier);
+        } else if (this.plugin.canUseDiceRoller) {
+            try {
+                const roller = this.plugin.getRoller(
+                    `${this.rawModifier ?? 0}`
+                );
+                roller.roll();
+                this.modifierFromDice = true;
+                return roller.result;
+            } catch (e) {
+                console.error(
+                    `Could not set modifier for ${this.name}: ` + `\n\n${e}`
+                );
+            }
+        }
+        return 0;
+    }
+    rawModifier: string | number;
+    modifierFromDice: boolean = false;
+
     hp: number;
     hit_dice?: string;
     temp: number;
@@ -41,14 +64,18 @@ export class Creature {
     friendly: boolean = false;
     "statblock-link": string;
 
-    constructor(public creature: HomebrewCreature, initiative: number = 0) {
+    constructor(
+        public plugin: InitiativeTracker,
+        public creature: HomebrewCreature,
+        initiative: number = 0
+    ) {
         this.name = creature.name;
         this.display = creature.display;
         this._initiative =
             "initiative" in creature
                 ? (creature as Creature).initiative
                 : Number(initiative ?? 0);
-        this.modifier = Number(creature.modifier ?? 0);
+        this.rawModifier = creature.modifier ?? 0;
 
         this.max = creature.hp ? Number(creature.hp) : undefined;
         this.ac = creature.ac ?? undefined;
@@ -130,8 +157,9 @@ export class Creature {
         yield this.hit_dice;
     }
 
-    static new(creature: Creature) {
+    static new(plugin: InitiativeTracker, creature: Creature) {
         return new Creature(
+            plugin,
             {
                 ...creature,
                 id: getId()
@@ -140,7 +168,10 @@ export class Creature {
         );
     }
 
-    static from(creature: HomebrewCreature | SRDMonster) {
+    static from(
+        plugin: InitiativeTracker,
+        creature: HomebrewCreature | SRDMonster
+    ) {
         const modifier =
             "modifier" in creature
                 ? creature.modifier
@@ -151,7 +182,7 @@ export class Creature {
                           10) /
                           2
                   );
-        return new Creature({
+        return new Creature(plugin, {
             ...creature,
             modifier: modifier
         });
@@ -159,7 +190,7 @@ export class Creature {
 
     update(creature: HomebrewCreature) {
         this.name = creature.name;
-        this.modifier = Number(creature.modifier ?? 0);
+        this.rawModifier = Number(creature.modifier ?? 0);
 
         this.max = creature.hp ? Number(creature.hp) : undefined;
 
@@ -205,8 +236,8 @@ export class Creature {
         };
     }
 
-    static fromJSON(state: CreatureState) {
-        const creature = new Creature(state, state.initiative);
+    static fromJSON(plugin: InitiativeTracker, state: CreatureState) {
+        const creature = new Creature(plugin, state, state.initiative);
         creature.enabled = state.enabled;
 
         creature.temp = state.tempHP ? state.tempHP : 0;

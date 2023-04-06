@@ -96,7 +96,7 @@ export default class InitiativeTracker extends Plugin {
     }
 
     getPlayerByName(name: string) {
-        return Creature.from(this.playerCreatures.get(name));
+        return Creature.from(this, this.playerCreatures.get(name));
     }
     getPlayersForParty(party: string) {
         return (
@@ -249,10 +249,10 @@ export default class InitiativeTracker extends Plugin {
         });
 
         this.playerCreatures = new Map(
-            this.data.players.map((p) => [p.name, Creature.from(p)])
+            this.data.players.map((p) => [p.name, Creature.from(this, p)])
         );
         this.homebrewCreatures = new Map(
-            this.bestiary.map((p) => [p.name, Creature.from(p)])
+            this.bestiary.map((p) => [p.name, Creature.from(this, p)])
         );
 
         this.app.workspace.onLayoutReady(async () => {
@@ -299,7 +299,7 @@ export default class InitiativeTracker extends Plugin {
 
                         this.playerCreatures.set(
                             player.name,
-                            Creature.from(player)
+                            Creature.from(this, player)
                         );
                         if (this.view) {
                             const creature = tracker
@@ -448,7 +448,7 @@ export default class InitiativeTracker extends Plugin {
                 async (homebrews: HomebrewCreature[]) => {
                     try {
                         const creatures = homebrews.map((h) =>
-                            Creature.from(h).toJSON()
+                            Creature.from(this, h).toJSON()
                         );
 
                         const view = this.view;
@@ -525,14 +525,17 @@ export default class InitiativeTracker extends Plugin {
         this.data.homebrew.push(...importedMonsters);
 
         for (let monster of importedMonsters) {
-            this.homebrewCreatures.set(monster.name, Creature.from(monster));
+            this.homebrewCreatures.set(
+                monster.name,
+                Creature.from(this, monster)
+            );
         }
 
         await this.saveSettings();
     }
     async saveMonster(monster: HomebrewCreature) {
         this.data.homebrew.push(monster);
-        this.homebrewCreatures.set(monster.name, Creature.from(monster));
+        this.homebrewCreatures.set(monster.name, Creature.from(this, monster));
         await this.saveSettings();
     }
     async updatePlayer(existing: HomebrewCreature, player: HomebrewCreature) {
@@ -594,13 +597,16 @@ export default class InitiativeTracker extends Plugin {
 
     async savePlayer(player: HomebrewCreature) {
         this.data.players.push(player);
-        this.playerCreatures.set(player.name, Creature.from(player));
+        this.playerCreatures.set(player.name, Creature.from(this, player));
         await this.saveSettings();
     }
     async savePlayers(...players: HomebrewCreature[]) {
         for (let monster of players) {
             this.data.players.push(monster);
-            this.playerCreatures.set(monster.name, Creature.from(monster));
+            this.playerCreatures.set(
+                monster.name,
+                Creature.from(this, monster)
+            );
         }
         await this.saveSettings();
     }

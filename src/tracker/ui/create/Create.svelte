@@ -15,14 +15,15 @@
     import type { Writable } from "svelte/store";
     import { equivalent } from "src/encounter";
     import { confirmWithModal } from "./modal";
+    import { getContext } from "svelte/internal";
 
-    let creature: Creature = new Creature({});
     export let amount = 1;
     export let plugin: InitiativeTracker;
     export let adding: Writable<Array<[Creature, number]>>;
     export let editing: Writable<Creature>;
     export let isEditing: boolean;
 
+    let creature: Creature = new Creature(plugin, {});
     editing.subscribe((c) => {
         if (!c) return;
         creature = c;
@@ -38,7 +39,7 @@
                     return;
                 }
                 if (!creature.modifier) {
-                    creature.modifier = 0;
+                    creature.rawModifier = 0;
                 }
                 if (
                     creature.initiative <= 0 ||
@@ -60,7 +61,7 @@
                 }
                 $adding = $adding;
                 $editing = null;
-                creature = new Creature({});
+                creature = new Creature(plugin, {});
             });
     };
     const editButton = (node: HTMLElement) => {
@@ -73,7 +74,7 @@
                     return;
                 }
                 if (!creature.modifier) {
-                    creature.modifier = 0;
+                    creature.rawModifier = 0;
                 }
                 if (
                     creature.initiative <= 0 ||
@@ -100,7 +101,7 @@
                 }
                 $adding = $adding;
                 $editing = null;
-                creature = new Creature({});
+                creature = new Creature(plugin, {});
             });
     };
     const cancelButton = (node: HTMLElement) => {
@@ -108,7 +109,7 @@
             .setTooltip("Cancel")
             .setIcon("reset")
             .onClick(() => {
-                creature = new Creature({});
+                creature = new Creature(plugin, {});
             });
     };
     const diceButton = (node: HTMLElement) => {
@@ -127,7 +128,7 @@
         modal = new SRDMonsterSuggestionModal(plugin, nameInput);
         modal.onClose = async () => {
             if (modal.creature) {
-                creature = Creature.from(modal.creature);
+                creature = Creature.from(plugin, modal.creature);
 
                 creature.initiative = await plugin.getInitiativeValue(
                     creature.modifier
@@ -140,6 +141,16 @@
             .setValue(creature.hidden)
             .onChange((v) => (creature.hidden = v));
     };
+
+    function setModifier(
+        ev: Event & { currentTarget: EventTarget & HTMLInputElement }
+    ): void {
+        creature.rawModifier = ev.currentTarget.value;
+        console.log(
+            "🚀 ~ file: Create.svelte:149 ~ creature:",
+            creature.modifierFromDice
+        );
+    }
 </script>
 
 <div class="initiative-tracker-editor">
@@ -201,9 +212,9 @@
         <div>
             <label for="add-mod">Modifier</label>
             <input
-                bind:value={creature.modifier}
+                bind:value={creature.rawModifier}
                 id="add-mod"
-                type="number"
+                type="text"
                 name="ac"
                 tabindex="0"
             />

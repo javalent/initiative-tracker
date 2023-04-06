@@ -479,7 +479,7 @@ function createTracker() {
                 $state.set(state?.state ?? false);
                 $name.set(state?.name ?? null);
                 creatures = state?.creatures
-                    ? state.creatures.map((c) => Creature.from(c))
+                    ? state.creatures.map((c) => Creature.from(plugin, c))
                     : creatures.filter((c) => c.player);
                 if (!state || state?.roll) {
                     for (let creature of creatures) {
