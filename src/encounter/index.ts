@@ -236,13 +236,13 @@ export class EncounterParser {
         if (!name || typeof name != "string") return {};
         let existing = this.plugin.bestiary.find((c) => c.name == name);
         let creature = existing
-            ? Creature.from(this.plugin, existing)
-            : new Creature(this.plugin, { name });
+            ? Creature.from(existing)
+            : new Creature({ name });
 
         creature.display = display;
         creature.hp = hp ?? creature.hp;
         creature.ac = ac ?? creature.ac;
-        creature.rawModifier = mod ?? creature.modifier;
+        creature.modifier = mod ?? creature.modifier;
         creature.xp = xp ?? creature.xp;
 
         return { creature, number };

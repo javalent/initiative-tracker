@@ -41,7 +41,7 @@
                 } else {
                     const creatures = $adding.flatMap(([creature, amount]) =>
                         [...Array(amount).keys()].map((k) =>
-                            Creature.new(plugin, creature)
+                            Creature.new(creature)
                         )
                     );
 
