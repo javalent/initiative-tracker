@@ -2,18 +2,6 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [9.3.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.2.2...9.3.0) (2023-04-06)
-
-
-### Features
-
-* enables dice strings as modifiers ([6217fe4](https://github.com/valentine195/obsidian-initiative-tracker/commit/6217fe45cced118f1979f39516ae7268daf34562))
-
-
-### Bug Fixes
-
-* sync with Dice Roller API ([795faca](https://github.com/valentine195/obsidian-initiative-tracker/commit/795faca44ee09084aca3e79622586c17cf333a70))
-
 ### [9.2.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.2.0...9.2.1) (2023-03-15)
 
 

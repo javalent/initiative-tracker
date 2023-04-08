@@ -1,6 +1,6 @@
 {
     "name": "initiative-tracker",
-    "version": "9.3.0",
+    "version": "9.2.2",
     "description": "TTRPG Initiative Tracker for Obsidian.md",
     "main": "main.js",
     "scripts": {
