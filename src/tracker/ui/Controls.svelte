@@ -21,7 +21,7 @@
 
     import { tracker } from "../stores/tracker";
 
-    const { state, data } = tracker;
+    const { state, data, logFile } = tracker;
 
     const desktop = Platform.isDesktop;
 
@@ -145,6 +145,15 @@
     const playerView = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("view");
     };
+    const logFileButton = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon("file-signature");
+    };
+    const openLogFile = async () => {
+        if ($logFile) {
+            const leaf = plugin.app.workspace.getLeaf();
+            leaf.openFile($logFile);
+        }
+    };
 </script>
 
 <div class="buttons">
@@ -158,6 +167,13 @@
         {/if}
     </div>
     <div class="clean">
+        {#if $logFile}
+            <div
+                use:logFileButton
+                aria-label="Open Log File"
+                on:click={openLogFile}
+            />
+        {/if}
         {#if desktop}
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div

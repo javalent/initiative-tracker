@@ -2,7 +2,7 @@ import { Creature } from "../../utils/creature";
 import type InitiativeTracker from "../../main";
 import { derived, get, Updater, writable } from "svelte/store";
 import { equivalent } from "../../encounter";
-import { Platform } from "obsidian";
+import { Platform, TFile } from "obsidian";
 import type {
     Condition,
     InitiativeTrackerData,
@@ -37,6 +37,8 @@ function createTracker() {
     const updating = writable<Map<Creature, HPUpdate>>(new Map());
     const { subscribe, set, update } = creatures;
 
+    const $logFile = writable<TFile | null>();
+
     let _logger: Logger;
 
     const $round = writable<number>(1);
@@ -45,12 +47,16 @@ function createTracker() {
         $state.set(state);
         if (state) {
             if (!_logger?.logging) {
-                _logger?.new({
-                    name: get($name),
-                    players: current_order.filter((c) => c.player),
-                    creatures: current_order.filter((c) => !c.player),
-                    round: get($round)
-                });
+                _logger
+                    ?.new({
+                        name: get($name),
+                        players: current_order.filter((c) => c.player),
+                        creatures: current_order.filter((c) => !c.player),
+                        round: get($round)
+                    })
+                    .then(() => {
+                        $logFile.set(_logger.getFile());
+                    });
             } else {
                 _logger?.log(`Combat re-started`);
             }
@@ -520,8 +526,15 @@ function createTracker() {
                     }
                 }
 
-                if (state?.logFile) _logger?.new(state.logFile);
-                if (!state && _logger) _logger.logging = false;
+                if (state?.logFile) {
+                    _logger?.new(state.logFile).then(() => {
+                        $logFile.set(_logger.getFile());
+                    });
+                }
+                if (!state && _logger) {
+                    _logger.logging = false;
+                    $logFile.set(null);
+                }
                 return creatures;
             }),
         reset: () =>
@@ -584,6 +597,8 @@ function createTracker() {
             _logger?.log(`${toLog.join(". ")}.`);
         },
         logNewInitiative,
+        logFile: $logFile,
+
         getEncounterState,
 
         updateState: () => update((c) => c)
