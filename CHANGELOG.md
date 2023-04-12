@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.4.3](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.4.2...9.4.3) (2023-04-12)
+
+
+### Bug Fixes
+
+* new "Open Log File" button when logging ([044cbcc](https://github.com/valentine195/obsidian-initiative-tracker/commit/044cbcc02fef81937075dcdbd2679806a4e84216))
+
 ### [9.4.2](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.4.1...9.4.2) (2023-04-12)
 
 
