@@ -91,12 +91,18 @@ function createTracker() {
         current_order = sort;
         return sort;
     });
+    const logNewInitiative = (creature: Creature) => {
+        _logger?.log(
+            `${creature.getName()} initiative changed to ${creature.initiative}`
+        );
+    };
 
     const updateCreatures = (...updates: CreatureUpdates[]) =>
-        update((creatures) => {
+        updateAndSave((creatures) => {
             for (const { creature, change } of updates) {
                 if (change.initiative) {
                     creature.initiative = Number(change.initiative);
+                    logNewInitiative(creature);
                 }
                 if (change.name) {
                     creature.name = change.name;
@@ -182,9 +188,19 @@ function createTracker() {
                 }
                 if ("hidden" in change) {
                     creature.hidden = change.hidden;
+                    _logger.log(
+                        `${creature.getName()} ${
+                            creature.hidden ? "hidden" : "revealed"
+                        }`
+                    );
                 }
                 if ("enabled" in change) {
                     creature.enabled = change.enabled;
+                    _logger.log(
+                        `${creature.getName()} ${
+                            creature.enabled ? "enabled" : "disabled"
+                        }`
+                    );
                 }
                 if (!creatures.includes(creature)) {
                     creatures.push(creature);
@@ -567,7 +583,7 @@ function createTracker() {
             }
             _logger?.log(`${toLog.join(". ")}.`);
         },
-
+        logNewInitiative,
         getEncounterState,
 
         updateState: () => update((c) => c)

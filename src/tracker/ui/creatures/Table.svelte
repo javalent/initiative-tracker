@@ -47,6 +47,7 @@
                 dropped.creature.initiative =
                     e.detail.items[index + 1].creature.initiative;
             }
+            tracker.logNewInitiative(dropped.creature);
         }
         items = e.detail.items;
         $tracker = [...items.map(({ creature }) => creature)];
