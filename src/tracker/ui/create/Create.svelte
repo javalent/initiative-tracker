@@ -140,6 +140,11 @@
             .setValue(creature.hidden)
             .onChange((v) => (creature.hidden = v));
     };
+    const friendToggle = (div: HTMLDivElement) => {
+        new ToggleComponent(div)
+            .setValue(creature.friendly)
+            .onChange((v) => (creature.friendly = v));
+    };
 </script>
 
 <div class="initiative-tracker-editor">
@@ -221,10 +226,16 @@
             <div class="dice" use:diceButton />
         </div>
 
-        <div>
-            <label for="add-mod">Hidden</label>
-            <div use:hideToggle />
-        </div>
+        {#key creature}
+            <div>
+                <label for="add-mod">Hidden</label>
+                <div use:hideToggle />
+            </div>
+            <div>
+                <label for="add-mod">Friendly</label>
+                <div use:friendToggle />
+            </div>
+        {/key}
 
         <div class="amount">
             <label for="add-init">Amount</label>

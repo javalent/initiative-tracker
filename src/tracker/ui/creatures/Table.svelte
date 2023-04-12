@@ -78,6 +78,7 @@
                     class:disabled={!creature.enabled}
                     class:active={$state && creature.active}
                     class:viewing={creature.viewing}
+                    class:friendly={creature.friendly}
                     animate:flip={{ duration: flipDurationMs }}
                     data-hp={creature.hp}
                     data-hp-max={creature.max}
@@ -89,7 +90,13 @@
                         e.stopPropagation();
                     }}
                 >
-                    <CreatureTemplate {creature} on:hp on:tag on:edit on:open-combatant />
+                    <CreatureTemplate
+                        {creature}
+                        on:hp
+                        on:tag
+                        on:edit
+                        on:open-combatant
+                    />
                 </tr>
             {/each}
         </tbody>

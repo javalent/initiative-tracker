@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DEFAULT_UNDEFINED, HIDDEN } from "src/utils";
+    import { DEFAULT_UNDEFINED, FRIENDLY, HIDDEN } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import Initiative from "./Initiative.svelte";
     import CreatureControls from "./CreatureControls.svelte";
@@ -16,6 +16,9 @@
     const name = () => creature.getName();
     const hiddenIcon = (div: HTMLElement) => {
         setIcon(div, HIDDEN);
+    };
+    const friendlyIcon = (div: HTMLElement) => {
+        setIcon(div, FRIENDLY);
     };
 
     let hoverTimeout: NodeJS.Timeout = null;
@@ -73,6 +76,9 @@
     >
         {#if creature.hidden}
             <div class="centered-icon" use:hiddenIcon />
+        {/if}
+        {#if creature.friendly}
+            <div class="centered-icon" use:friendlyIcon />
         {/if}
         {#if creature.player}
             <strong class="name player">{creature.name}</strong>

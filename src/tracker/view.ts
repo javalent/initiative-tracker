@@ -3,7 +3,6 @@ import {
     ExtraButtonComponent,
     ItemView,
     MarkdownRenderer,
-    Notice,
     parseLinktext,
     resolveSubpath,
     WorkspaceLeaf
@@ -19,18 +18,9 @@ import type InitiativeTracker from "../main";
 
 import App from "./ui/App.svelte";
 import type { Creature } from "../utils/creature";
-import type {
-    Condition,
-    HomebrewCreature,
-    InitiativeViewState,
-    Party,
-    TrackerEvents,
-    UpdateLogMessage
-} from "@types";
-import { equivalent } from "../encounter";
-import { OVERFLOW_TYPE, PLAYER_VIEW_VIEW } from "../utils/constants";
+import type { HomebrewCreature } from "@types";
+import { PLAYER_VIEW_VIEW } from "../utils/constants";
 import type PlayerView from "./player-view";
-import Logger from "../logger/logger";
 
 export default class TrackerView extends ItemView {
     ui: App;
@@ -166,7 +156,7 @@ export class CreatureView extends ItemView {
             this.addChild(statblock);
         } else {
             this.statblockEl.createEl("em", {
-                text: "Install the TTRPG Statblocks plugin or add a statblock-link to your monster to use this feature!",
+                text: "Install the TTRPG Statblocks plugin or add a statblock-link to your monster to use this feature!"
             });
         }
     }
@@ -180,8 +170,8 @@ export class CreatureView extends ItemView {
             [, embedLink] = embedLink.match(/\[\[(.+?)(?:\|.+?)?\]\]/);
         }
 
-        const {path, subpath} = parseLinktext(embedLink);
-        const file = this.app.metadataCache.getFirstLinkpathDest(path, '/');
+        const { path, subpath } = parseLinktext(embedLink);
+        const file = this.app.metadataCache.getFirstLinkpathDest(path, "/");
         const fileContent = await app.vault.cachedRead(file);
 
         let content = `Oops! Something is wrong with your statblock-link:<br />${embedLink}`;
@@ -189,7 +179,10 @@ export class CreatureView extends ItemView {
             const cache = app.metadataCache.getFileCache(file);
             const subpathResult = resolveSubpath(cache, subpath);
             if (subpathResult) {
-                content = fileContent.slice(subpathResult.start.offset, subpathResult.end.offset);
+                content = fileContent.slice(
+                    subpathResult.start.offset,
+                    subpathResult.end.offset
+                );
             }
         } else if (fileContent) {
             content = fileContent;

@@ -3,6 +3,7 @@
     import {
         AC,
         DEFAULT_UNDEFINED,
+        FRIENDLY,
         HIDDEN,
         HP,
         INITIATIVE,
@@ -55,6 +56,9 @@
     const hidden = (node: HTMLElement) => {
         setIcon(node, HIDDEN);
     };
+    const friendly = (node: HTMLElement) => {
+        setIcon(node, FRIENDLY);
+    };
 </script>
 
 <h5 class="list-header">Creatures</h5>
@@ -102,6 +106,9 @@
                         </span>
                         {#if creature.hidden}
                             <span use:hidden />
+                        {/if}
+                        {#if creature.friendly}
+                            <span use:friendly />
                         {/if}
                     </span>
                 </small>
