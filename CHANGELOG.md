@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.4.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.3.2...9.4.0) (2023-04-12)
+
+
+### Features
+
+* Can now mark creatures friendly in creator ([47bb840](https://github.com/valentine195/obsidian-initiative-tracker/commit/47bb8404af6d0dadadd4fef44a89ed509850c1a6))
+
 ### [9.3.2](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.3.1...9.3.2) (2023-04-08)
 
 ### [9.3.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.3.0...9.3.1) (2023-04-08)
