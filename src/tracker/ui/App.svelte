@@ -28,6 +28,8 @@
         tracker.roll(plugin);
     }
 
+    const { ordered } = tracker;
+
     setContext<InitiativeTracker>("plugin", plugin);
 
     let saving = false;
@@ -52,7 +54,7 @@
             .setTooltip("Copy Initiative Order")
             .setIcon(COPY)
             .onClick(async () => {
-                const contents = $tracker
+                const contents = $ordered
                     .map(
                         (creature) => `${creature.initiative} ${creature.name}`
                     )
