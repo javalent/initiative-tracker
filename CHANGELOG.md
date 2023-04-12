@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.4.1](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.4.0...9.4.1) (2023-04-12)
+
+
+### Bug Fixes
+
+* fixes initiative order when copying ([5090c0c](https://github.com/valentine195/obsidian-initiative-tracker/commit/5090c0ca1355a4e71ae4cd5cbaea1f7ac35db045))
+
 ## [9.4.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.3.2...9.4.0) (2023-04-12)
 
 
