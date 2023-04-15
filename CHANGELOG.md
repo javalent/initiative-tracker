@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [9.4.4](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.4.3...9.4.4) (2023-04-15)
+
 ### [9.4.3](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.4.2...9.4.3) (2023-04-12)
 
 
