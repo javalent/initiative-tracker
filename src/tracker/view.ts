@@ -129,7 +129,7 @@ export class CreatureView extends ItemView {
     onunload(): void {
         this.app.workspace.trigger("initiative-tracker:stop-viewing");
     }
-    async render(creature?: HomebrewCreature) {
+    async render(creature?: Creature) {
         this.statblockEl.empty();
         if (!creature) {
             this.statblockEl.createEl("em", {
@@ -146,7 +146,7 @@ export class CreatureView extends ItemView {
             creature["statblock-link"] &&
             (this.plugin.data.preferStatblockLink || !tryStatblockPlugin)
         ) {
-            await this.renderEmbed(creature["statblock-link"]);
+            await this.renderEmbed(creature.getStatblockLink());
         } else if (tryStatblockPlugin) {
             const statblock = this.plugin.statblocks.render(
                 creature,

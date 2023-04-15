@@ -14,6 +14,7 @@
     $: statuses = creature.status;
 
     const name = () => creature.getName();
+    const statblockLink = () => creature.getStatblockLink();
     const hiddenIcon = (div: HTMLElement) => {
         setIcon(div, HIDDEN);
     };
@@ -25,7 +26,7 @@
     const tryHover = (evt: MouseEvent) => {
         hoverTimeout = setTimeout(() => {
             if (creature["statblock-link"]) {
-                let link = creature["statblock-link"];
+                let link = statblockLink();
                 if (/\[.+\]\(.+\)/.test(link)) {
                     //md
                     [, link] = link.match(/\[.+?\]\((.+?)\)/);

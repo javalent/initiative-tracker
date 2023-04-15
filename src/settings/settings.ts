@@ -1080,11 +1080,7 @@ class NewPlayerModal extends Modal {
                     this.player.hp = hp;
                     this.player.level = level;
                     this.player.modifier = modifier;
-                    this.plugin.setStatblockLink(
-                        this.player,
-                        metaData.frontmatter["statblock-link"]
-                    );
-
+                    this.player["statblock-link"] = metaData.frontmatter["statblock-link"];
                     this.display();
                 };
             });
