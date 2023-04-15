@@ -383,17 +383,17 @@ function createTracker() {
                 if (current == -1) {
                     current_order[0].active = true;
                 } else {
-                    let enabled = current_order.filter((c) => c.enabled);
+                    let next;
+                    let nextIndex = current;
+                    do {
+                        nextIndex = (((nextIndex + 1) % current_order.length) + current_order.length) %
+                            current_order.length;
+                        next = current_order[nextIndex];
+                        if (nextIndex == current) {
+                            break;
+                        }
+                    } while( !next.enabled );
 
-                    let nextIndex =
-                        (((current + 1) % enabled.length) + enabled.length) %
-                        enabled.length;
-                    const next =
-                        current_order[
-                            current_order.findIndex(
-                                (c) => c == enabled[nextIndex]
-                            )
-                        ];
                     if (next) {
                         current_order[current].active = false;
                         if (nextIndex < current) {
@@ -401,7 +401,8 @@ function createTracker() {
                             $round.set(round);
                             _logger?.log("###", `Round ${round}`);
                         }
-                        _logger?.log("#####", `${next.name}'s turn`);
+                        const name = next.name + (next.number > 0 ? ` ${next.number}` : '');
+                        _logger?.log("#####", `${name}'s turn`);
                         next.active = true;
                     }
                 }
@@ -412,31 +413,33 @@ function createTracker() {
                 const current = current_order.findIndex((c) => {
                     return c.active;
                 });
-                if (current == 0 && get($round) == 1) return creatures;
+                if (current == 0 && get($round) == 1) 
+                    return creatures;
+
                 if (current == -1) {
                     current_order[0].active = true;
                 } else {
-                    let enabled = current_order.filter((c) => c.enabled);
+                    let prev;
+                    let prevIndex = current;
+                    do {
+                        prevIndex = (((prevIndex - 1) % current_order.length) + current_order.length) %
+                            current_order.length;
+                        prev = current_order[prevIndex];
+                        if (prevIndex == current) {
+                            break;
+                        }
+                    } while( !prev.enabled);
 
-                    let nextIndex =
-                        (((current - 1) % enabled.length) + enabled.length) %
-                        enabled.length;
-
-                    const next =
-                        current_order[
-                            current_order.findIndex(
-                                (c) => c == enabled[nextIndex]
-                            )
-                        ];
-                    if (next) {
+                    if (prev) {
                         current_order[current].active = false;
-                        if (nextIndex > current) {
+                        if (prevIndex > current) {
                             const round = get($round) - 1;
                             $round.set(round);
                             _logger?.log("###", `Round ${round}`);
                         }
-                        _logger?.log("#####", `${next.name}'s turn`);
-                        next.active = true;
+                        const name = prev.name + (prev.number > 0 ? ` ${prev.number}` : '');
+                        _logger?.log("#####", `${name}'s turn`);
+                        prev.active = true;
                     }
                 }
                 return creatures;
