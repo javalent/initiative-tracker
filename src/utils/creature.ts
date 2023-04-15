@@ -115,6 +115,14 @@ export class Creature {
         }
         return name.join(" ");
     }
+    getStatblockLink(): string {
+        if ("statblock-link" in this) {
+            const value = this["statblock-link"];
+            return value.startsWith("#")
+                ? `[${this.name}](${this.note}${value})`
+                : value;
+        }
+    }
 
     *[Symbol.iterator]() {
         yield this.name;
