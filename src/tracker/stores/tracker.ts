@@ -401,8 +401,7 @@ function createTracker() {
                             $round.set(round);
                             _logger?.log("###", `Round ${round}`);
                         }
-                        const name = next.name + (next.number > 0 ? ` ${next.number}` : '');
-                        _logger?.log("#####", `${name}'s turn`);
+                        _logger?.log("#####", `${next.getName()}'s turn`);
                         next.active = true;
                     }
                 }
@@ -437,8 +436,7 @@ function createTracker() {
                             $round.set(round);
                             _logger?.log("###", `Round ${round}`);
                         }
-                        const name = prev.name + (prev.number > 0 ? ` ${prev.number}` : '');
-                        _logger?.log("#####", `${name}'s turn`);
+                        _logger?.log("#####", `${prev.getName()}'s turn`);
                         prev.active = true;
                     }
                 }
