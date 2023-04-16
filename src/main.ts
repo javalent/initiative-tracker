@@ -224,11 +224,10 @@ export default class InitiativeTracker extends Plugin {
             if (!codes.length) return;
 
             for (const code of codes) {
-                const creatures = code.innerText
-                    .replace(`encounter:`, "")
-                    .trim()
-                    .split(",")
-                    .map((s) => parseYaml(s.trim()));
+                const definitions = code.innerText
+                    .replace(`encounter:`, "");
+
+                const creatures = parseYaml('[' + definitions.trim() + ']');
                 const parser = new EncounterParser(this);
                 const parsed = await parser.parse({ creatures });
 
