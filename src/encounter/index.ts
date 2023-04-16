@@ -14,7 +14,7 @@ import EncounterTable from "./ui/EncounterTable.svelte";
 type RawCreatureArray = string | Array<string | { [key: number]: string }>;
 type RawCreature = string | { [key: number]: string };
 type RawPlayers = boolean | "none" | string[];
-interface EncounterParameters {
+export interface EncounterParameters {
     name?: string;
     players?: RawPlayers;
     party?: string;
@@ -31,6 +31,7 @@ interface CreatureStats {
     xp: number;
     display?: string;
     hidden: boolean;
+    friendly?: boolean;
 }
 
 export const equivalent = (
@@ -43,7 +44,8 @@ export const equivalent = (
         creature.ac == existing.ac &&
         creature.modifier == existing.modifier &&
         creature.xp == existing.xp &&
-        creature.hidden == existing.hidden
+        creature.hidden == existing.hidden &&
+        creature.friendly == existing.friendly
     );
 };
 
@@ -149,7 +151,8 @@ export class EncounterParser {
                     hp: creature.hp,
                     modifier: creature.modifier,
                     xp: creature.xp,
-                    hidden: creature.hidden
+                    hidden: creature.hidden,
+                    friendly: creature.friendly
                 };
                 const existing = [...creatureMap].find(([c]) =>
                     equivalent(c, stats)
@@ -175,7 +178,7 @@ export class EncounterParser {
     parseRawCreature(raw: RawCreature) {
         if (!raw) return {};
         let monster: string | string[] | Record<string, any>,
-            number = 1;
+            number: string | number = 1;
 
         if (typeof raw == "string") {
             const match = raw.match(/(\d+)?:?\s?(.+)/) ?? [];
@@ -208,9 +211,14 @@ export class EncounterParser {
             hp: number,
             ac: number | string,
             mod: number,
-            xp: number;
+            xp: number,
+            friendly: boolean = false;
 
         if (typeof monster == "string") {
+            if (monster.match(/,\s+friend/) || monster.match(/,\s+ally/)) {
+                friendly = true;
+                monster = monster.replace(/,\s*friend/, "").replace(/,\s*ally/, "");
+            }
             name = monster.split(/,\s?/)[0];
             [hp, ac, mod, xp] = monster
                 .split(/,\s?/)
@@ -226,11 +234,18 @@ export class EncounterParser {
                 name = monster[0][0];
                 display = monster[0][1];
             }
+
+            friendly = monster
+                .slice(1)
+                .find((v) => v == "friend" || v == "ally") != undefined;
+
             [hp, ac, mod, xp] = monster
                 .slice(1)
+                .filter((v) => v != "friend" && v != "ally")
                 .map((v) => (isNaN(Number(v)) ? null : Number(v)));
         } else if (typeof monster == "object") {
             ({ creature: name, name: display, hp, ac, mod, xp } = monster);
+            friendly = monster.friend || monster.ally || false;
         }
 
         if (!name || typeof name != "string") return {};
@@ -244,6 +259,7 @@ export class EncounterParser {
         creature.ac = ac ?? creature.ac;
         creature.modifier = mod ?? creature.modifier;
         creature.xp = xp ?? creature.xp;
+        creature.friendly = friendly ?? creature.friendly;
 
         return { creature, number };
     }
