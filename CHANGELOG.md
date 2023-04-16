@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.5.0](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.4.4...9.5.0) (2023-04-16)
+
+
+### Features
+
+* enable inline encounter creature stats & display name changes ([#102](https://github.com/valentine195/obsidian-initiative-tracker/issues/102)) ([717f4e7](https://github.com/valentine195/obsidian-initiative-tracker/commit/717f4e7eca88a77f7f06b9ab61a72a62c52febf4))
+
 ### [9.4.4](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.4.3...9.4.4) (2023-04-15)
 
 ### [9.4.3](https://github.com/valentine195/obsidian-initiative-tracker/compare/9.4.2...9.4.3) (2023-04-12)
