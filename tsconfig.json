@@ -9,7 +9,7 @@
         "noImplicitAny": true,
         "moduleResolution": "node",
         "importHelpers": true,
-        "types": ["node", "svelte"],
+        "types": ["node", "svelte", "jest"],
         "lib": ["dom", "esnext", "scripthost"],
         "experimentalDecorators": true
     },
