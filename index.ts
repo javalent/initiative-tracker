@@ -126,6 +126,7 @@ export interface CreatureState extends HomebrewCreature {
     enabled: boolean;
     currentHP: number;
     tempHP: number;
+    currentAC: number | string;
     initiative: number;
     player: boolean;
     xp: number;

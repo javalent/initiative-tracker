@@ -26,6 +26,7 @@ type HPUpdate = {
 type CreatureUpdate = {
     hp?: number;
     ac?: number | string;
+    current_ac?: number | string;
     initiative?: number;
     name?: string;
     marker?: string;
@@ -171,7 +172,7 @@ function createTracker() {
                     creature.max = Number(change.max);
                 }
                 if (change.ac) {
-                    creature.ac = change.ac;
+                    creature.current_ac = creature.ac = change.ac;
                 }
                 if (change.temp) {
                     let baseline = 0;
@@ -551,6 +552,7 @@ function createTracker() {
             updateAndSave((creatures) => {
                 for (let creature of creatures) {
                     creature.hp = creature.max;
+                    creature.current_ac = creature.ac;
                     creature.enabled = true;
                     creature.hidden = false;
                     creature.status.clear();

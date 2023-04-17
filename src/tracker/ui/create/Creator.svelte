@@ -37,8 +37,12 @@
                     if ($editing.hp != creature.max) {
                         creature.max = $editing.hp;
                     }
+                    if (creature.dirty_ac) {
+                        creature.current_ac = $editing.ac;
+                        creature.dirty_ac = false;
+                    }
                     tracker.replace(creature, $editing);
-                } else {
+                } else { 
                     const creatures = $adding.flatMap(([creature, amount]) =>
                         [...Array(amount).keys()].map((k) =>
                             Creature.new(creature)

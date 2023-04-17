@@ -1088,7 +1088,6 @@ class NewPlayerModal extends Modal {
         let nameInput: InputValidate,
             levelInput: InputValidate,
             hpInput: InputValidate,
-            acInput: InputValidate,
             modInput: InputValidate;
 
         new Setting(contentEl)
@@ -1158,21 +1157,9 @@ class NewPlayerModal extends Modal {
             });
         });
         new Setting(contentEl).setName("Armor Class").addText((t) => {
-            acInput = {
-                input: t.inputEl,
-                validate: (i) => {
-                    let error = false;
-                    if (isNaN(Number(i.value))) {
-                        t.inputEl.addClass("has-error");
-                        error = true;
-                    }
-                    return error;
-                }
-            };
             t.setValue(`${this.player.ac ?? ""}`);
             t.onChange((v) => {
-                t.inputEl.removeClass("has-error");
-                this.player.ac = Number(v);
+                this.player.ac = v;
             });
         });
         new Setting(contentEl)
@@ -1237,7 +1224,6 @@ class NewPlayerModal extends Modal {
                 .onClick(async () => {
                     let error = this.validateInputs(
                         nameInput,
-                        acInput,
                         hpInput,
                         modInput
                     );
@@ -1260,7 +1246,7 @@ class NewPlayerModal extends Modal {
             return b;
         });
 
-        this.validateInputs(nameInput, acInput, hpInput, modInput);
+        this.validateInputs(nameInput, hpInput, modInput);
     }
     validateInputs(...inputs: InputValidate[]) {
         let error = false;

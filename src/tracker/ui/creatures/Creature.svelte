@@ -105,15 +105,47 @@
     </div>
 </td>
 
-<td class="center hp-container creature-adder">
+<td class="center hp-container creature-adder" 
+    on:click|stopPropagation={(evt) => {
+    tracker.setUpdate(creature, evt);
+}}>
     <div>
         {@html creature.hpDisplay}
     </div>
 </td>
 
-<td class="center ac-container creature-adder"
-    >{creature.ac ?? DEFAULT_UNDEFINED}</td
->
+<td class="center ac-container"
+    on:click|stopPropagation={e => {
+        const el = e.targetNode.firstChild ? e.targetNode.firstChild : e.targetNode;
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }}
+    on:focusout={(e) => {
+        const sel = window.getSelection();
+        sel.empty();
+        if (e.targetNode.textContent == "") {
+            e.targetNode.textContent = DEFAULT_UNDEFINED;
+        }
+}}>
+    <div 
+        contenteditable
+        on:keydown={function (evt) {
+            if (evt.key === "Enter" || evt.key === "Tab") {
+                evt.preventDefault();
+                this.blur();
+                return;
+            }
+        }}
+        on:input={v => {
+            creature.current_ac = v.currentTarget.textContent;
+        }}
+        aria-label={creature.current_ac != creature.ac ? String(creature.ac) : ""}
+        style={`font-weight: ${creature.current_ac != creature.ac ? "bold" : ""}`}
+        >{creature.current_ac ? creature.current_ac : DEFAULT_UNDEFINED}</div>
+</td>
 
 <td class="controls-container">
     <CreatureControls
@@ -165,5 +197,8 @@
     .controls-container {
         border-top-right-radius: 0.25rem;
         border-bottom-right-radius: 0.25rem;
+    }
+    .ac-container {
+        cursor: text;
     }
 </style>

@@ -300,6 +300,10 @@ Creatures can take damage, be healed or gain temporary HP by clicking on their H
 
 If a creature's `hit_dice` property is set (whether from the add menu or in the bestiary), there is the option to Roll for HP. This can be set globally in settings, per-encounter, or when adding creatures to a combat.
 
+### AC
+
+Creatures can have their ACs temporarily adjusted for effects such as the Shield spell by typing directly into the AC field.
+
 ### Actions
 
 Creatures may be edited, disabled / removed from the combat in the `Actions` menu located to the right of each creature.
