@@ -9,12 +9,9 @@ import type {
     InitiativeViewState,
     UpdateLogMessage
 } from "../../../@types";
-import type { 
-    StackRoller 
-} from "../../../@types/plugins";
+import type { StackRoller } from "../../../@types/plugins";
 import { OVERFLOW_TYPE } from "../../utils";
 import type Logger from "../../logger/logger";
-
 
 type HPUpdate = {
     saved: boolean;
@@ -52,7 +49,7 @@ function createTracker() {
             if (!_logger?.logging) {
                 _logger
                     ?.new({
-                        name: get($name),
+                        name: get($name)!,
                         players: current_order.filter((c) => c.player),
                         creatures: current_order.filter((c) => !c.player),
                         round: get($round)
@@ -196,7 +193,7 @@ function createTracker() {
                     }
                 }
                 if ("hidden" in change) {
-                    creature.hidden = change.hidden;
+                    creature.hidden = change.hidden!;
                     _logger.log(
                         `${creature.getName()} ${
                             creature.hidden ? "hidden" : "revealed"
@@ -204,7 +201,7 @@ function createTracker() {
                     );
                 }
                 if ("enabled" in change) {
-                    creature.enabled = change.enabled;
+                    creature.enabled = change.enabled!;
                     _logger.log(
                         `${creature.getName()} ${
                             creature.enabled ? "enabled" : "disabled"
@@ -222,7 +219,7 @@ function createTracker() {
         return {
             creatures: get(creatures).map((c) => c.toJSON()),
             state: get($state),
-            name: get($name),
+            name: get($name)!,
             round: get($round),
             logFile: _logger?.getLogFile() ?? null
         };
@@ -389,13 +386,15 @@ function createTracker() {
                     let next;
                     let nextIndex = current;
                     do {
-                        nextIndex = (((nextIndex + 1) % current_order.length) + current_order.length) %
+                        nextIndex =
+                            (((nextIndex + 1) % current_order.length) +
+                                current_order.length) %
                             current_order.length;
                         next = current_order[nextIndex];
                         if (nextIndex == current) {
                             break;
                         }
-                    } while( !next.enabled );
+                    } while (!next.enabled);
 
                     if (next) {
                         current_order[current].active = false;
@@ -415,8 +414,7 @@ function createTracker() {
                 const current = current_order.findIndex((c) => {
                     return c.active;
                 });
-                if (current == 0 && get($round) == 1) 
-                    return creatures;
+                if (current == 0 && get($round) == 1) return creatures;
 
                 if (current == -1) {
                     current_order[0].active = true;
@@ -424,13 +422,15 @@ function createTracker() {
                     let prev;
                     let prevIndex = current;
                     do {
-                        prevIndex = (((prevIndex - 1) % current_order.length) + current_order.length) %
+                        prevIndex =
+                            (((prevIndex - 1) % current_order.length) +
+                                current_order.length) %
                             current_order.length;
                         prev = current_order[prevIndex];
                         if (prevIndex == current) {
                             break;
                         }
-                    } while( !prev.enabled);
+                    } while (!prev.enabled);
 
                     if (prev) {
                         current_order[current].active = false;
