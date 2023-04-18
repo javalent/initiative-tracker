@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.6.2](https://github.com/valentine195/initiative-tracker/compare/v9.6.1...9.6.2) (2023-04-18)
+
+
+### Bug Fixes
+
+* fixes release config tag ([226f8e5](https://github.com/valentine195/initiative-tracker/commit/226f8e583dfb83640c59a7f044addea6a51a4cda))
+* switch to Dice Roller package ([49d1b4a](https://github.com/valentine195/initiative-tracker/commit/49d1b4aa8a6d918649d206811c64346db443d865))
+
 ## [9.6.1](https://github.com/valentine195/initiative-tracker/compare/v9.6.0...v9.6.1) (2023-04-18)
 
 
