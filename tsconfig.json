@@ -4,7 +4,7 @@
         "baseUrl": ".",
         "inlineSources": true,
         "module": "ESNext",
-        "target": "es2021",
+        "target": "ESNext",
         "allowJs": true,
         "noImplicitAny": true,
         "moduleResolution": "node",
