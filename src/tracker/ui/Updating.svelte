@@ -2,16 +2,19 @@
     import type { Condition, UpdateLogMessage } from "index";
     import { setIcon } from "obsidian";
     import type InitiativeTracker from "src/main";
-    import { HP, REMOVE, TAG } from "src/utils";
+    import { AC, HP, REMOVE, TAG } from "src/utils";
     import { ConditionSuggestionModal } from "src/utils/suggester";
     import { getContext } from "svelte";
 
     import { tracker } from "../stores/tracker";
-    const { updating } = tracker;
+    const { updating, updateTarget } = tracker;
 
     const plugin = getContext<InitiativeTracker>("plugin");
     const hpIcon = (node: HTMLElement) => {
         setIcon(node, HP);
+    };
+    const acIcon = (node: HTMLElement) => {
+        setIcon(node, AC);
     };
     const tagIcon = (node: HTMLElement) => {
         setIcon(node, TAG);
@@ -26,6 +29,7 @@
         setIcon(node, "cross-in-box");
     };
     let damage: string = "";
+    let ac: string = "";
     let status: Condition = null;
 
     let modal: ConditionSuggestionModal;
@@ -37,12 +41,12 @@
         };
         modal.open();
     };
-    function init(el: HTMLInputElement) {
-        el.focus();
+    function init(el: HTMLInputElement, target: "hp" | "ac") {
+        if ($updateTarget == target) el.focus();
     }
     const performUpdate = (perform: boolean) => {
         if (perform) {
-            tracker.doUpdate(damage ?? "", status);
+            tracker.doUpdate(damage ?? "", status, ac);
         } else {
             tracker.clearUpdate();
         }
@@ -88,8 +92,42 @@
                                 return false;
                             }
                         }}
-                        use:init
+                        use:init={"hp"}
                     />
+                </div>
+                <div class="hp-status">
+                    {#if plugin.data.beginnerTips}
+                        <small class="label"> Set AC </small>
+                    {/if}
+                    <div class="input">
+                        <tag
+                            use:acIcon
+                            aria-label="Apply damage, healing(-) or temp HP(t)"
+                            style="margin: 0 0.2rem 0 0.7rem"
+                        />
+                        <input
+                            type="text"
+                            bind:value={ac}
+                            on:keydown={function (evt) {
+                                if (evt.key == "Tab") {
+                                    return true;
+                                }
+                                if (evt.key == "Enter" || evt.key == "Escape") {
+                                    performUpdate(evt.key == "Enter");
+                                    return;
+                                }
+                                if (
+                                    !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
+                                        this.value + evt.key
+                                    )
+                                ) {
+                                    evt.preventDefault();
+                                    return false;
+                                }
+                            }}
+                            use:init={"ac"}
+                        />
+                    </div>
                 </div>
             </div>
             <div class="hp-status">

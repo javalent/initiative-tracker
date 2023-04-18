@@ -30,11 +30,21 @@
             const menu = new Menu();
             menu.addItem((item) => {
                 item.setIcon(HP)
-                    .setTitle("Set Health/Status")
+                    .setTitle("Set Health/AC/Status")
                     .onClick((e: MouseEvent) => {
                         tracker.setUpdate(creature, e);
                     });
             });
+            if (creature.current_ac != creature.ac) {
+                menu.addItem((item) => {
+                    item.setIcon(HP)
+                        .setTitle("Reset AC")
+                        .onClick((e: MouseEvent) => {
+                            creature.current_ac = creature.ac;
+                            tracker.update();
+                        });
+                });
+            }
             menu.addItem((item) => {
                 item.setIcon("pencil")
                     .setTitle("Edit")

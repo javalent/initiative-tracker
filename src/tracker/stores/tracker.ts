@@ -41,6 +41,7 @@ const modifier = Platform.isMacOS ? "Meta" : "Control";
 function createTracker() {
     const creatures = writable<Creature[]>([]);
     const updating = writable<Map<Creature, HPUpdate>>(new Map());
+    const updateTarget = writable<"ac" | "hp">();
     const { subscribe, set, update } = creatures;
 
     const $logFile = writable<TFile | null>();
@@ -282,6 +283,7 @@ function createTracker() {
         },
 
         updating,
+        updateTarget,
         updateCreatures,
 
         setUpdate: (creature: Creature, evt: MouseEvent) =>
@@ -297,7 +299,7 @@ function createTracker() {
                 }
                 return creatures;
             }),
-        doUpdate: (toAddString: string, tag: Condition) =>
+        doUpdate: (toAddString: string, tag: Condition, ac: string) =>
             updating.update((updatingCreatures) => {
                 const messages: UpdateLogMessage[] = [];
                 const updates: CreatureUpdates[] = [];
@@ -319,7 +321,8 @@ function createTracker() {
                         temp: false,
                         status: null,
                         saved: false,
-                        unc: false
+                        unc: false,
+                        ac: null
                     };
 
                     if (toAddString.charAt(0) == "t") {
@@ -347,6 +350,9 @@ function createTracker() {
                         } else {
                             message.saved = true;
                         }
+                    }
+                    if (ac) {
+                        creature.current_ac = ac;
                     }
                     messages.push(message);
                     updates.push({ creature, change });
@@ -512,7 +518,7 @@ function createTracker() {
                 $state.set(state?.state ?? false);
                 $name.set(state?.name ?? null);
                 creatures = state?.creatures
-                    ? state.creatures.map((c) => Creature.from(c))
+                    ? state.creatures.map((c) => Creature.fromJSON(c))
                     : creatures.filter((c) => c.player);
                 if (!state || state?.roll) {
                     for (let creature of creatures) {

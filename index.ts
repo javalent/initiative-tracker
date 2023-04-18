@@ -208,6 +208,7 @@ export interface UpdateLogMessage {
     status: string | null;
     saved: boolean;
     unc: boolean;
+    ac: string;
 }
 
 export interface BuilderPartyPlayer {

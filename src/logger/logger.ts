@@ -157,6 +157,15 @@ export default class Logger {
                     );
                 }
             }
+            if (message.ac) {
+                if (perCreature.length && !message.status) {
+                    perCreature.push("and");
+                } else if (perCreature.length) {
+                    perCreature.push(",");
+                }
+
+                perCreature.push(`${message.name} AC set to ${message.ac}`);
+            }
             if (message.status) {
                 if (perCreature.length) {
                     perCreature.push("and");

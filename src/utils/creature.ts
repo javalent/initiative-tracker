@@ -151,6 +151,7 @@ export class Creature {
         yield this.xp;
         yield this.hidden;
         yield this.hit_dice;
+        yield this.current_ac;
     }
 
     static new(creature: Creature) {
