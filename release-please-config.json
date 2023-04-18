@@ -6,7 +6,6 @@
         }
     },
     "include-component-in-tag": false,
-    "last-release-sha": "4a5b2a95224c9ef638765c8d3982018e551670d1",
     "extra-files": [
         {
             "type": "json",
