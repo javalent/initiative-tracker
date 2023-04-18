@@ -24,6 +24,11 @@ import type {
     InitiativeViewState,
     SRDMonster
 } from "../@types/index";
+import type { 
+    DiceRollerAPI, 
+    LeafletAPI, 
+    StatblockAPI 
+} from "../@types/plugins";
 
 import InitiativeTrackerSettings from "./settings/settings";
 import { EncounterBlock, EncounterParser } from "./encounter";
@@ -36,10 +41,14 @@ import { BESTIARY } from "./utils/srd-bestiary";
 import TrackerView, { CreatureView } from "./tracker/view";
 import BuilderView from "./builder/view";
 
-import type { Plugins } from "../../obsidian-overload/index";
 import PlayerView from "./tracker/player-view";
 import { tracker } from "./tracker/stores/tracker";
 declare module "obsidian" {
+    interface Plugins {
+        "obsidian-dice-roller": DiceRollerAPI;
+        "obsidian-5e-statblocks": StatblockAPI;
+        "obsidian-leaflet-plugin": LeafletAPI;
+    }
     interface App {
         plugins: {
             getPlugin<T extends keyof Plugins>(plugin: T): Plugins[T];

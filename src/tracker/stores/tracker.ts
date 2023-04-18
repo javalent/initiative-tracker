@@ -9,9 +9,12 @@ import type {
     InitiativeViewState,
     UpdateLogMessage
 } from "../../../@types";
+import type { 
+    StackRoller 
+} from "../../../@types/plugins";
 import { OVERFLOW_TYPE } from "../../utils";
 import type Logger from "../../logger/logger";
-import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
+
 
 type HPUpdate = {
     saved: boolean;
