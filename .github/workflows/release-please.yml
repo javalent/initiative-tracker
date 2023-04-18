@@ -1,0 +1,21 @@
+on:
+    workflow_dispatch:
+
+    push:
+        # Sequence of patterns matched against refs/tags
+        tags:
+            - "*" # Push events to matching any tag format, i.e. 1.0, 20.15.10
+
+permissions:
+    contents: write
+    pull-requests: write
+
+name: release-please
+
+jobs:
+    release-please:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: google-github-actions/release-please-action@v3
+              with:
+                  command: manifest
