@@ -26,8 +26,8 @@ export default class Logger {
     async setFile() {
         const file = (await this.adapter.exists(normalizePath(this.logFile)))
             ? await this.vault.getAbstractFileByPath(
-                  normalizePath(this.logFile)
-              )
+                normalizePath(this.logFile)
+            )
             : await this.vault.create(this.logFile, ``);
 
         if (file instanceof TFile) {
@@ -38,7 +38,7 @@ export default class Logger {
         return this.file;
     }
     private file: TFile;
-    constructor(public plugin: InitiativeTracker) {}
+    constructor(public plugin: InitiativeTracker) { }
     get enabled() {
         return this.plugin.data.logging;
     }
@@ -137,22 +137,19 @@ export default class Logger {
             if (message.hp) {
                 if (message.temp) {
                     perCreature.push(
-                        `${
-                            message.name
+                        `${message.name
                         } gained ${message.hp.toString()} temporary HP`
                     );
                 } else if (message.hp < 0) {
                     perCreature.push(
                         `${message.name} took ${(
                             -1 * message.hp
-                        ).toString()} damage${
-                            message.unc ? " and was knocked unconscious" : ""
+                        ).toString()} damage${message.unc ? " and was knocked unconscious" : ""
                         }`
                     );
                 } else if (message.hp > 0) {
                     perCreature.push(
-                        `${
-                            message.name
+                        `${message.name
                         } was healed for ${message.hp.toString()} HP`
                     );
                 }
@@ -164,7 +161,11 @@ export default class Logger {
                     perCreature.push(",");
                 }
 
-                perCreature.push(`${message.name} AC set to ${message.ac}`);
+                if (message.ac_add) {
+                    perCreature.push(`${message.name} added ${message.ac} to AC`);
+                } else {
+                    perCreature.push(`${message.name} AC set to ${message.ac}`);
+                }
             }
             if (message.status) {
                 if (perCreature.length) {

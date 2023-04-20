@@ -203,16 +203,14 @@ function createTracker() {
                 if ("hidden" in change) {
                     creature.hidden = change.hidden!;
                     _logger.log(
-                        `${creature.getName()} ${
-                            creature.hidden ? "hidden" : "revealed"
+                        `${creature.getName()} ${creature.hidden ? "hidden" : "revealed"
                         }`
                     );
                 }
                 if ("enabled" in change) {
                     creature.enabled = change.enabled!;
                     _logger.log(
-                        `${creature.getName()} ${
-                            creature.enabled ? "enabled" : "disabled"
+                        `${creature.getName()} ${creature.enabled ? "enabled" : "disabled"
                         }`
                     );
                 }
@@ -322,7 +320,8 @@ function createTracker() {
                         status: null,
                         saved: false,
                         unc: false,
-                        ac: null
+                        ac: null,
+                        ac_add: false,
                     };
 
                     if (toAddString.charAt(0) == "t") {
@@ -351,8 +350,19 @@ function createTracker() {
                             message.saved = true;
                         }
                     }
-                    if (ac) {
-                        creature.current_ac = ac;
+                    if (ac != null) {
+                        if (ac.charAt(0) == "+" || ac.charAt(0) == "-") {
+                            const current_ac = parseInt(String(creature.current_ac));
+                            if (isNaN(current_ac)) {
+                                creature.current_ac = creature.current_ac + ac;
+                            } else {
+                                creature.current_ac = current_ac + parseInt(ac);
+                            }
+                            message.ac_add = true;
+                        } else {
+                            creature.current_ac = ac.slice(Number(ac.charAt(0) == "\\"));
+                        }
+                        message.ac = ac;
                     }
                     messages.push(message);
                     updates.push({ creature, change });
@@ -576,24 +586,21 @@ function createTracker() {
                 if (message.hp) {
                     if (message.temp) {
                         perCreature.push(
-                            `${
-                                message.name
+                            `${message.name
                             } gained ${message.hp.toString()} temporary HP`
                         );
                     } else if (message.hp < 0) {
                         perCreature.push(
                             `${message.name} took ${(
                                 -1 * message.hp
-                            ).toString()} damage${
-                                message.unc
-                                    ? " and was knocked unconscious"
-                                    : ""
+                            ).toString()} damage${message.unc
+                                ? " and was knocked unconscious"
+                                : ""
                             }`
                         );
                     } else if (message.hp > 0) {
                         perCreature.push(
-                            `${
-                                message.name
+                            `${message.name
                             } was healed for ${message.hp.toString()} HP`
                         );
                     }

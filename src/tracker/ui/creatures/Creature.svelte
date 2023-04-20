@@ -60,7 +60,7 @@
         on:initiative={(e) => {
             tracker.updateCreatures({
                 creature,
-                change: { initiative: Number(e.detail) }
+                change: { initiative: Number(e.detail) },
             });
         }}
     />
@@ -96,7 +96,7 @@
                     on:remove={() => {
                         tracker.updateCreatures({
                             creature,
-                            change: { status: [status] }
+                            change: { status: [status] },
                         });
                     }}
                 />
@@ -128,7 +128,7 @@
         class:dirty-ac={creature.current_ac != creature.ac}
         aria-label={creature.current_ac != creature.ac ? `${creature.ac}` : ""}
     >
-        {creature.current_ac ?? DEFAULT_UNDEFINED}
+        {creature.current_ac ? creature.current_ac : DEFAULT_UNDEFINED}
     </div>
 </td>
 

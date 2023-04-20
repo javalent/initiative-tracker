@@ -52,62 +52,31 @@
         }
         damage = null;
         status = null;
+        ac = null;
         return;
     };
 </script>
 
 {#if $updating.size}
     <div class="updating-container">
-        <div class="updating-hp">
-            <!-- svelte-ignore a11y-autofocus -->
-            <div class="hp-status">
-                {#if plugin.data.beginnerTips}
-                    <small class="label">
-                        Apply damage, healing(-) or temp HP(t)
-                    </small>
-                {/if}
-                <div class="input">
-                    <tag
-                        use:hpIcon
-                        aria-label="Apply damage, healing(-) or temp HP(t)"
-                        style="margin: 0 0.2rem 0 0.7rem"
-                    />
-                    <input
-                        type="text"
-                        bind:value={damage}
-                        on:keydown={function (evt) {
-                            if (evt.key == "Tab") {
-                                return true;
-                            }
-                            if (evt.key == "Enter" || evt.key == "Escape") {
-                                performUpdate(evt.key == "Enter");
-                                return;
-                            }
-                            if (
-                                !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
-                                    this.value + evt.key
-                                )
-                            ) {
-                                evt.preventDefault();
-                                return false;
-                            }
-                        }}
-                        use:init={"hp"}
-                    />
-                </div>
+        {#if $updateTarget == "hp"}
+            <div class="updating-hp">
+                <!-- svelte-ignore a11y-autofocus -->
                 <div class="hp-status">
                     {#if plugin.data.beginnerTips}
-                        <small class="label"> Set AC </small>
+                        <small class="label">
+                            Apply damage, healing(-) or temp HP(t)
+                        </small>
                     {/if}
                     <div class="input">
                         <tag
-                            use:acIcon
+                            use:hpIcon
                             aria-label="Apply damage, healing(-) or temp HP(t)"
                             style="margin: 0 0.2rem 0 0.7rem"
                         />
                         <input
                             type="text"
-                            bind:value={ac}
+                            bind:value={damage}
                             on:keydown={function (evt) {
                                 if (evt.key == "Tab") {
                                     return true;
@@ -125,52 +94,79 @@
                                     return false;
                                 }
                             }}
-                            use:init={"ac"}
+                            use:init={"hp"}
+                        />
+                    </div>
+                </div>
+                <div class="hp-status">
+                    {#if plugin.data.beginnerTips}
+                        <small class="label">
+                            Apply status effect to creatures that fail their
+                            saving throw
+                        </small>
+                    {/if}
+                    <div class="input">
+                        <tag
+                            use:tagIcon
+                            aria-label="Apply status effect to creatures that fail their saving throw"
+                            style="margin: 0 0.2rem 0 0.7rem"
+                        />
+                        <input
+                            type="text"
+                            on:focus={function (evt) {
+                                suggestConditions(this);
+                            }}
+                            on:keydown={function (evt) {
+                                if (["Enter", "Escape"].includes(evt.key)) {
+                                    performUpdate(evt.key == "Enter");
+                                }
+                            }}
                         />
                     </div>
                 </div>
             </div>
+            <div class="updating-buttons">
+                <span
+                    use:checkIcon
+                    on:click={() => performUpdate(true)}
+                    style="cursor:pointer"
+                    aria-label="Apply"
+                />
+                <span
+                    use:cancelIcon
+                    on:click={() => performUpdate(false)}
+                    style="cursor:pointer"
+                    aria-label="Cancel"
+                />
+            </div>
+        {:else}
             <div class="hp-status">
                 {#if plugin.data.beginnerTips}
-                    <small class="label">
-                        Apply status effect to creatures that fail their saving
-                        throw
-                    </small>
+                    <small class="label"> Set AC </small>
                 {/if}
                 <div class="input">
                     <tag
-                        use:tagIcon
-                        aria-label="Apply status effect to creatures that fail their saving throw"
+                        use:acIcon
+                        aria-label="Apply damage, healing(-) or temp HP(t)"
                         style="margin: 0 0.2rem 0 0.7rem"
                     />
                     <input
                         type="text"
-                        on:focus={function (evt) {
-                            suggestConditions(this);
-                        }}
+                        bind:value={ac}
                         on:keydown={function (evt) {
-                            if (["Enter", "Escape"].includes(evt.key)) {
+                            if (evt.key == "Tab") {
+                                return true;
+                            }
+                            if (evt.key == "Enter" || evt.key == "Escape") {
                                 performUpdate(evt.key == "Enter");
+                                return;
                             }
                         }}
+                        use:init={"ac"}
                     />
                 </div>
             </div>
-        </div>
-        <div class="updating-buttons">
-            <span
-                use:checkIcon
-                on:click={() => performUpdate(true)}
-                style="cursor:pointer"
-                aria-label="Apply"
-            />
-            <span
-                use:cancelIcon
-                on:click={() => performUpdate(false)}
-                style="cursor:pointer"
-                aria-label="Cancel"
-            />
-        </div>
+        {/if}
     </div>
     {#if plugin.data.beginnerTips}
         <div>
@@ -187,9 +183,11 @@
                     on:click={() => performUpdate(false)}
                 />
                 <th style="width:100%" class="left">Name</th>
-                <th style="padding:0 0.2rem" class="center">Saved</th>
-                <th style="padding:0 0.2rem" class="center">Resist</th>
-                <th style="padding:0 0.2rem" class="center">Modifier</th>
+                {#if $updateTarget == "hp"}
+                    <th style="padding:0 0.2rem" class="center">Saved</th>
+                    <th style="padding:0 0.2rem" class="center">Resist</th>
+                    <th style="padding:0 0.2rem" class="center">Modifier</th>
+                {/if}
             </thead>
             <tbody>
                 {#each [...$updating.entries()] as [creature, update], i}
@@ -209,42 +207,44 @@
                                         : "")}
                             </span>
                         </td>
-                        <td class="center">
-                            <input
-                                type="checkbox"
-                                checked={update.saved}
-                                on:click={function (evt) {
-                                    update.saved = !update.saved;
-                                }}
-                            />
-                        </td>
-                        <td class="center">
-                            <input
-                                type="checkbox"
-                                checked={update.resist}
-                                on:click={function (evt) {
-                                    update.resist = !update.resist;
-                                }}
-                            />
-                        </td>
-                        <td class="center">
-                            <input
-                                type="number"
-                                class="center"
-                                style="width:90%; height:80%; padding:0;"
-                                bind:value={update.customMod}
-                                on:keydown={function (evt) {
-                                    if (evt.key === "Escape") {
-                                        this.value = "1";
-                                        return;
-                                    }
-                                    if (evt.key === "Enter") {
-                                        evt.preventDefault();
-                                        return;
-                                    }
-                                }}
-                            />
-                        </td>
+                        {#if $updateTarget == "hp"}
+                            <td class="center">
+                                <input
+                                    type="checkbox"
+                                    checked={update.saved}
+                                    on:click={function (evt) {
+                                        update.saved = !update.saved;
+                                    }}
+                                />
+                            </td>
+                            <td class="center">
+                                <input
+                                    type="checkbox"
+                                    checked={update.resist}
+                                    on:click={function (evt) {
+                                        update.resist = !update.resist;
+                                    }}
+                                />
+                            </td>
+                            <td class="center">
+                                <input
+                                    type="number"
+                                    class="center"
+                                    style="width:90%; height:80%; padding:0;"
+                                    bind:value={update.customMod}
+                                    on:keydown={function (evt) {
+                                        if (evt.key === "Escape") {
+                                            this.value = "1";
+                                            return;
+                                        }
+                                        if (evt.key === "Enter") {
+                                            evt.preventDefault();
+                                            return;
+                                        }
+                                    }}
+                                />
+                            </td>
+                        {/if}
                     </tr>
                 {/each}
             </tbody>
