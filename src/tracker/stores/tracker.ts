@@ -8,8 +8,8 @@ import type {
     InitiativeTrackerData,
     InitiativeViewState,
     UpdateLogMessage
-} from "../../../@types";
-import type { StackRoller } from "../../../@types/plugins";
+} from "../../../index";
+import type { StackRoller } from "../../../index/plugins";
 import { OVERFLOW_TYPE } from "../../utils";
 import type Logger from "../../logger/logger";
 

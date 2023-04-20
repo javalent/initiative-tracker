@@ -14,7 +14,7 @@
 
     import FilterModal from "./FilterModal.svelte";
 
-    import type { SRDMonster } from "@types";
+    import type { SRDMonster } from "index";
 
     import {
         cr,

@@ -2,7 +2,7 @@
     import Creature from "./Creature.svelte";
     import { getContext } from "svelte";
     import Filters from "./Filters.svelte";
-    import type { SRDMonster } from "@types";
+    import type { SRDMonster } from "index";
     import { prepareFuzzySearch, prepareSimpleSearch, setIcon } from "obsidian";
     import Pagination from "./Pagination.svelte";
     import {

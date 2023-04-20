@@ -19,7 +19,7 @@ import type {
     SRDMonster,
     Condition,
     Party
-} from "../../@types";
+} from "../../index";
 import type InitiativeTracker from "src/main";
 
 class Suggester<T> {
@@ -194,7 +194,7 @@ abstract class SuggestionModal<T> extends FuzzySuggestModal<T> {
     }
     open(): void {
         // TODO: Figure out a better way to do this. Idea from Periodic Notes plugin
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line indexcript-eslint/no-explicit-any
         (<any>this.app).keymap.pushScope(this.scope);
 
         document.body.appendChild(this.suggestEl);

@@ -12,7 +12,7 @@
     import type InitiativeTracker from "src/main";
     import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
     import { tracker } from "src/tracker/stores/tracker";
-    import type { CreatureState } from "@types";
+    import type { CreatureState } from "index";
     import CreatureComponent from "./Creature.svelte";
 
     export let plugin: InitiativeTracker;

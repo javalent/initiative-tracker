@@ -3,7 +3,7 @@ import type InitiativeTracker from "../main";
 import type { Creature } from "../utils/creature";
 
 import { tracker } from "src/tracker/stores/tracker";
-import type { UpdateLogMessage } from "@types";
+import type { UpdateLogMessage } from "index";
 
 export interface LogState {
     name?: string;

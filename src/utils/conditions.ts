@@ -1,4 +1,4 @@
-import type { Condition } from "../../@types";
+import type { Condition } from "../../index";
 
 export const Conditions: Condition[] = [
     {

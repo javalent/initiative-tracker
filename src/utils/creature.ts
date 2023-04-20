@@ -3,7 +3,7 @@ import type {
     CreatureState,
     HomebrewCreature,
     SRDMonster
-} from "@types";
+} from "index";
 import { Conditions, XP_PER_CR } from ".";
 import { DEFAULT_UNDEFINED } from "./constants";
 

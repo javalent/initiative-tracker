@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { SRDMonster } from "@types";
+    import type { SRDMonster } from "index";
     import { ExtraButtonComponent, HoverPopover } from "obsidian";
     import { DEFAULT_UNDEFINED } from "src/utils";
     import { getContext } from "svelte";

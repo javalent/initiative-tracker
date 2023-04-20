@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Condition, UpdateLogMessage } from "@types";
+    import type { Condition, UpdateLogMessage } from "index";
     import { setIcon } from "obsidian";
     import type InitiativeTracker from "src/main";
     import { HP, REMOVE, TAG } from "src/utils";

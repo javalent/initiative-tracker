@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { SRDMonster } from "@types";
+    import type { SRDMonster } from "index";
     import { ExtraButtonComponent, setIcon } from "obsidian";
     import { convertFraction, DEFAULT_UNDEFINED, XP_PER_CR } from "src/utils";
     import { encounter } from "../../stores/encounter";

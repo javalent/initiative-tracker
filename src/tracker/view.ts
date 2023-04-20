@@ -18,7 +18,7 @@ import type InitiativeTracker from "../main";
 
 import App from "./ui/App.svelte";
 import type { Creature } from "../utils/creature";
-import type { HomebrewCreature } from "@types";
+import type { HomebrewCreature } from "index";
 import { PLAYER_VIEW_VIEW } from "../utils/constants";
 import type PlayerView from "./player-view";
 

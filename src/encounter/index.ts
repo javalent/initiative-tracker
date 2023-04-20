@@ -222,7 +222,9 @@ export class EncounterParser {
             }
             if (monster.match(/,\s+friend/) || monster.match(/,\s+ally/)) {
                 friendly = true;
-                monster = monster.replace(/,\s*friend/, "").replace(/,\s*ally/, "");
+                monster = monster
+                    .replace(/,\s*friend/, "")
+                    .replace(/,\s*ally/, "");
             }
             name = monster.split(/,\s?/)[0];
             [hp, ac, mod, xp] = monster
@@ -240,13 +242,11 @@ export class EncounterParser {
                 display = monster[0][1];
             }
 
-            hidden = monster
-                .slice(1)
-                .find((v) => v == "hidden") != undefined;
+            hidden = monster.slice(1).find((v) => v == "hidden") != undefined;
 
-            friendly = monster
-                .slice(1)
-                .find((v) => v == "friend" || v == "ally") != undefined;
+            friendly =
+                monster.slice(1).find((v) => v == "friend" || v == "ally") !=
+                undefined;
 
             [hp, ac, mod, xp] = monster
                 .slice(1)
@@ -303,7 +303,7 @@ class EncounterComponent {
 }
 
 export class EncounterBlock extends MarkdownRenderChild {
-    parser = new EncounterParser(this.plugin);
+    parser: EncounterParser;
     constructor(
         public plugin: InitiativeTracker,
         public src: string,
@@ -311,6 +311,7 @@ export class EncounterBlock extends MarkdownRenderChild {
         public table = false
     ) {
         super(containerEl);
+        this.parser = new EncounterParser(this.plugin);
         this.init();
     }
     init(): void {

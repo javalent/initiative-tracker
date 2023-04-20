@@ -1,3 +1,4 @@
+
 declare type DndEventInfo = import("svelte-dnd-action").DndEventInfo;
 declare interface GenericDndEvent<T extends Record<string, any>> {
     items: T[];

@@ -23,12 +23,9 @@ import type {
     InitiativeTrackerData,
     InitiativeViewState,
     SRDMonster
-} from "../@types/index";
-import type { 
-    DiceRollerAPI, 
-    LeafletAPI, 
-    StatblockAPI 
-} from "../@types/plugins";
+} from "../index";
+
+import type { Plugins } from "obsidian-overload";
 
 import InitiativeTrackerSettings from "./settings/settings";
 import { EncounterBlock, EncounterParser } from "./encounter";
@@ -44,11 +41,11 @@ import BuilderView from "./builder/view";
 import PlayerView from "./tracker/player-view";
 import { tracker } from "./tracker/stores/tracker";
 declare module "obsidian" {
-    interface Plugins {
+    /* interface Plugins {
         "obsidian-dice-roller": DiceRollerAPI;
         "obsidian-5e-statblocks": StatblockAPI;
         "obsidian-leaflet-plugin": LeafletAPI;
-    }
+    } */
     interface App {
         plugins: {
             getPlugin<T extends keyof Plugins>(plugin: T): Plugins[T];
@@ -233,10 +230,9 @@ export default class InitiativeTracker extends Plugin {
             if (!codes.length) return;
 
             for (const code of codes) {
-                const definitions = code.innerText
-                    .replace(`encounter:`, "");
+                const definitions = code.innerText.replace(`encounter:`, "");
 
-                const creatures = parseYaml('[' + definitions.trim() + ']');
+                const creatures = parseYaml("[" + definitions.trim() + "]");
                 const parser = new EncounterParser(this);
                 const parsed = await parser.parse({ creatures });
 
@@ -300,7 +296,8 @@ export default class InitiativeTracker extends Plugin {
                         player.modifier = modifier;
                         player.level = level;
                         player.name = name ? name : player.name;
-                        player["statblock-link"] = frontmatter["statblock-link"];
+                        player["statblock-link"] =
+                            frontmatter["statblock-link"];
 
                         this.playerCreatures.set(
                             player.name,

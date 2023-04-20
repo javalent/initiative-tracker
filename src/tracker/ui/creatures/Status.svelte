@@ -3,7 +3,7 @@
     import { createEventDispatcher } from "svelte";
     const dispatch = createEventDispatcher();
 
-    import type { Condition } from "@types";
+    import type { Condition } from "index";
 
     export let status: Condition;
 

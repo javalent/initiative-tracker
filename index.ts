@@ -16,9 +16,9 @@ export type TrackerEvents =
     | [
           name: "initiative-tracker:creature-added-at-location",
           creature: Creature,
-          latlng: L.LatLng
+          latlng: any
       ]
-    | [name: "initiative-tracker:add-creature-here", latlng: L.LatLng]
+    | [name: "initiative-tracker:add-creature-here", latlng: any]
     | [name: "initiative-tracker:creature-updated", creature: Creature]
     | [
           name: "initiative-tracker:creature-updated-in-settings",

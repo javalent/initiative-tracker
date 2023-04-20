@@ -1,4 +1,4 @@
-import type { SRDMonster } from "../../../@types";
+import type { SRDMonster } from "../../../index";
 import { writable } from "svelte/store";
 import { players } from "./players";
 function createEncounter() {

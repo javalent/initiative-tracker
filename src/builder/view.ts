@@ -1,4 +1,4 @@
-import type { ExperienceThreshold } from "@types";
+import type { ExperienceThreshold } from "index";
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import type InitiativeTracker from "src/main";
 import { BUILDER_VIEW } from "../utils";

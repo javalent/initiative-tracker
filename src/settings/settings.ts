@@ -25,7 +25,7 @@ import {
     HP,
     INITIATIVE
 } from "../utils";
-import type { Condition, HomebrewCreature, InputValidate, Party } from "@types";
+import type { Condition, HomebrewCreature, InputValidate, Party } from "index";
 
 export default class InitiativeTrackerSettings extends PluginSettingTab {
     constructor(private plugin: InitiativeTracker) {

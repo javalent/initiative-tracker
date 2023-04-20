@@ -1,5 +1,5 @@
 import { derived, get, writable } from "svelte/store";
-import type { CreatureState } from "../../../@types";
+import type { CreatureState } from "../../../index";
 import { EXPERIENCE_PER_LEVEL } from "../constants";
 
 export const playerCount = writable(0);
