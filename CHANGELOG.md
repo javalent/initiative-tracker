@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.6.3](https://github.com/javalent/initiative-tracker/compare/9.6.2...9.6.3) (2023-04-20)
+
+
+### Bug Fixes
+
+* npm release ([9f8658c](https://github.com/javalent/initiative-tracker/commit/9f8658c05cfef08c0b65268af1c07890418a4411))
+
 ## [9.6.2](https://github.com/valentine195/initiative-tracker/compare/v9.6.1...9.6.2) (2023-04-18)
 
 
