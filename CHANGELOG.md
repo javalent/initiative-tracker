@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.6.4](https://github.com/javalent/initiative-tracker/compare/9.6.3...9.6.4) (2023-04-21)
+
+
+### Bug Fixes
+
+* fixes difficulty & xp calculation (close [#113](https://github.com/javalent/initiative-tracker/issues/113), close [#110](https://github.com/javalent/initiative-tracker/issues/110)) ([41e0168](https://github.com/javalent/initiative-tracker/commit/41e0168cac6ee7c2411fa0a7f4498dbb17b29513))
+
 ## [9.6.3](https://github.com/javalent/initiative-tracker/compare/9.6.2...9.6.3) (2023-04-20)
 
 
