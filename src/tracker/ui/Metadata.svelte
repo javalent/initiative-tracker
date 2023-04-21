@@ -1,9 +1,13 @@
 <script lang="ts">
+    import { getContext } from "svelte/internal";
     import { tracker } from "../stores/tracker";
+    import Difficulty from "./Difficulty.svelte";
 
-    const { state, name, round, party } = tracker;
+    const { state, name, round, party, difficulty } = tracker;
 
-    let totalXP = 100;
+    const plugin = getContext("plugin");
+
+    const dif = difficulty(plugin);
 </script>
 
 <div class="initiatie-tracker-metadata">
@@ -11,10 +15,15 @@
         {#if $name && $name.length}
             <h2 class="initiative-tracker-name">{$name}</h2>
         {/if}
-        {#if totalXP > 0}
-            <span class="initiative-tracker-xp encounter-xp">{totalXP} XP</span>
+        {#if $dif?.totalXp > 0}
+            <span class="initiative-tracker-xp encounter-xp"
+                >{$dif?.totalXp} XP</span
+            >
         {/if}
     </div>
+    {#if $dif}
+        <Difficulty />
+    {/if}
     {#if $party}
         <h4 class="initiave-tracker-party">{$party}</h4>
     {/if}
@@ -40,6 +49,7 @@
         align-items: center;
         padding: 0 0.5rem;
         margin: 0;
+        margin-bottom: 0.5rem;
     }
     .initiative-tracker-name {
         margin: 0;

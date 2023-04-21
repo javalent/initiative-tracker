@@ -1,6 +1,6 @@
 import { XP_PER_CR } from "./constants";
 import type InitiativeTracker from "../main";
-import { Creature } from "./creature";
+import type { Creature } from "./creature";
 
 type XpBudget = { easy: number; medium: number; hard: number; deadly: number };
 export type DifficultyReport = {
@@ -15,7 +15,10 @@ interface BudgetDict {
     [index: number]: XpBudget;
 }
 
-export const getCreatureXP = (plugin: InitiativeTracker, creature: Creature) => {
+export const getCreatureXP = (
+    plugin: InitiativeTracker,
+    creature: Creature
+) => {
     if (creature.xp) return creature.xp;
     let existing = plugin.bestiary.find((c) => c.name == creature.name);
     if (existing && existing.cr && existing.cr in XP_PER_CR) {

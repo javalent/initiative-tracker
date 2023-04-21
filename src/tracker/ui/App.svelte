@@ -16,8 +16,13 @@
     import { AddCreatureModal } from "./create/modal";
     import Legacy from "./create/Legacy.svelte";
     import type { Creature } from "src/utils/creature";
+    import Difficulty from "./Difficulty.svelte";
 
     export let plugin: InitiativeTracker;
+
+    const { data } = tracker;
+
+    $: difficulty = $data.displayDifficulty;
 
     tracker.setData(plugin.data);
     tracker.setLogger(new Logger(plugin));

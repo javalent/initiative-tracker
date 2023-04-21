@@ -1,6 +1,6 @@
 import { Creature } from "../../utils/creature";
 import type InitiativeTracker from "../../main";
-import { derived, get, Updater, writable } from "svelte/store";
+import { derived, get, Updater, Writable, writable } from "svelte/store";
 import { equivalent } from "../../encounter";
 import { Platform, TFile } from "obsidian";
 import type {
@@ -9,9 +9,14 @@ import type {
     InitiativeViewState,
     UpdateLogMessage
 } from "../../../index";
-import type { StackRoller } from "../../../index/plugins";
+import type { StackRoller } from "obsidian-overload";
 import { OVERFLOW_TYPE } from "../../utils";
 import type Logger from "../../logger/logger";
+import {
+    DifficultyReport,
+    encounterDifficulty,
+    getCreatureXP
+} from "src/utils/encounter-difficulty";
 
 type HPUpdate = {
     saved: boolean;
@@ -97,6 +102,7 @@ function createTracker() {
         current_order = sort;
         return sort;
     });
+
     const logNewInitiative = (creature: Creature) => {
         _logger?.log(
             `${creature.getName()} initiative changed to ${creature.initiative}`
@@ -605,7 +611,32 @@ function createTracker() {
 
         getEncounterState,
 
-        updateState: () => update((c) => c)
+        updateState: () => update((c) => c),
+
+        difficulty: (plugin: InitiativeTracker) =>
+            derived<Writable<Creature[]>, DifficultyReport>(
+                creatures,
+                (values) => {
+                    const players = [];
+                    let xp = 0;
+                    let amount = 0;
+
+                    for (const creature of values) {
+                        if (!creature.enabled) continue;
+                        if (creature.friendly) continue;
+                        if (creature.player && creature.level) {
+                            players.push(creature.level);
+                            continue;
+                        }
+                        const creatureXP = creature.getXP(plugin);
+                        if (creatureXP) {
+                            xp += creatureXP;
+                            amount++;
+                        }
+                    }
+                    return encounterDifficulty(players, xp, amount);
+                }
+            )
     };
 }
 

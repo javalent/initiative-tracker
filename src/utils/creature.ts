@@ -6,6 +6,7 @@ import type {
 } from "index";
 import { Conditions, XP_PER_CR } from ".";
 import { DEFAULT_UNDEFINED } from "./constants";
+import type InitiativeTracker from "src/main";
 
 export function getId() {
     return "ID_xyxyxyxyxyxy".replace(/[xy]/g, function (c) {
@@ -40,6 +41,17 @@ export class Creature {
     display: string;
     friendly: boolean = false;
     "statblock-link": string;
+
+    getXP(plugin: InitiativeTracker) {
+        if (this.xp) return this.xp;
+        if (this.creature.cr) {
+            return XP_PER_CR[this.creature.cr] ?? 0;
+        }
+        const base = plugin.bestiary.find((c) => c.name == this.name);
+        if (base && base.cr) {
+            return XP_PER_CR[base.cr] ?? 0;
+        }
+    }
 
     constructor(public creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;

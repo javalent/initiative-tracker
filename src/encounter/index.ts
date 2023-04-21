@@ -73,7 +73,8 @@ export class EncounterParser {
         let creatures = await this.parseRawCreatures(rawMonsters);
 
         const xp = params.xp ?? null;
-        const playerLevels = this.plugin.data.players
+        const playerLevels = players
+            .map((p) => this.plugin.getPlayerByName(p))
             .map((p) => p.level)
             .filter((p) => p);
 
