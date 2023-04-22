@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.6.5](https://github.com/javalent/initiative-tracker/compare/9.6.4...9.6.5) (2023-04-22)
+
+
+### Bug Fixes
+
+* use types from statblocks ([db46505](https://github.com/javalent/initiative-tracker/commit/db465051fb782c4874f04a86607579bf4931f56b))
+
 ## [9.6.4](https://github.com/javalent/initiative-tracker/compare/9.6.3...9.6.4) (2023-04-21)
 
 
