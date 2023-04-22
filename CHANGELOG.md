@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.6.7](https://github.com/javalent/initiative-tracker/compare/9.6.6...9.6.7) (2023-04-22)
+
+
+### Bug Fixes
+
+* Extends functionality works from Statblocks (close [#100](https://github.com/javalent/initiative-tracker/issues/100)) ([055f07e](https://github.com/javalent/initiative-tracker/commit/055f07ed50ad8a15ebd4fc90dfdce3d6129e8127))
+* properly log automatic unconscious status (close [#132](https://github.com/javalent/initiative-tracker/issues/132)) ([#133](https://github.com/javalent/initiative-tracker/issues/133)) ([0065bf6](https://github.com/javalent/initiative-tracker/commit/0065bf668d9c9ed7c1a5ac0fb462778c10e02fa3))
+* Unconscious status can now be removed or reset (close [#129](https://github.com/javalent/initiative-tracker/issues/129)) ([f61d524](https://github.com/javalent/initiative-tracker/commit/f61d524273148f24845f0ac9a869c099d09e63df))
+
 ## [9.6.6](https://github.com/javalent/initiative-tracker/compare/9.6.5...9.6.6) (2023-04-22)
 
 
