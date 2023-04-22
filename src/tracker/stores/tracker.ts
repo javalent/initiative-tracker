@@ -333,7 +333,10 @@ function createTracker() {
                             Math.max(Math.abs(toAdd) * modifier, 1);
                         toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
                         message.hp = toAdd;
-                        if (creature.hp <= 0) {
+                        if (
+                            toAdd < 0 &&
+                            creature.hp + creature.temp + toAdd <= 0
+                           ) {
                             message.unc = true;
                         }
                         change.hp = toAdd;
