@@ -1,5 +1,6 @@
 import "obsidian";
 import type { Creature } from "./src/utils/creature";
+import type { Spell, Trait, ability } from "obsidian-overload";
 
 //      CUSTOM EVENTS
 // ------------------------
@@ -182,22 +183,6 @@ export interface HomebrewCreature {
     friendly?: boolean;
     active?: boolean;
     "statblock-link"?: string;
-}
-
-export type ability =
-    | "strength"
-    | "dexterity"
-    | "constitution"
-    | "intelligence"
-    | "wisdom"
-    | "charisma";
-
-export type Spell = string | { [key: string]: string };
-
-export interface Trait {
-    name: string;
-    desc: string;
-    [key: string]: any;
 }
 
 export interface UpdateLogMessage {
