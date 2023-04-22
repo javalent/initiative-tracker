@@ -157,11 +157,10 @@ function createTracker() {
                     }
                     creature.hp += change.hp;
                     if (_settings.autoStatus && creature.hp <= 0) {
-                        creature.status.add(
-                            _settings.statuses.find(
-                                (s) => s.name == "Unconscious"
-                            )
+                        const unc = _settings.statuses.find(
+                            (s) => s.id == _settings.unconsciousId
                         );
+                        if (unc) creature.status.add(unc);
                     }
                 }
                 if (change.max) {

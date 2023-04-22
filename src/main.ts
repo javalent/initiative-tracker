@@ -9,6 +9,7 @@ import {
 
 import {
     BUILDER_VIEW,
+    Conditions,
     CREATURE_TRACKER_VIEW,
     DEFAULT_SETTINGS,
     INTIATIVE_TRACKER_VIEW,
@@ -31,7 +32,7 @@ import InitiativeTrackerSettings from "./settings/settings";
 import { EncounterBlock, EncounterParser } from "./encounter";
 import EncounterLine from "./encounter/ui/EncounterLine.svelte";
 
-import { Creature } from "./utils/creature";
+import { Creature, getId } from "./utils/creature";
 
 import { BESTIARY } from "./utils/srd-bestiary";
 
@@ -177,6 +178,20 @@ export default class InitiativeTracker extends Plugin {
 
     get defaultParty() {
         return this.data.parties.find((p) => p.name == this.data.defaultParty);
+    }
+
+    getBaseCreatureFromBestiary(name: string) {
+        /** Check statblocks first. */
+        try {
+            if (this.canUseStatBlocks && this.statblocks.hasCreature(name)) {
+                return this.statblocks.getCreatureFromBestiary(name);
+            }
+        } catch (e) {}
+        return this.bestiary.find((n) => name == n);
+    }
+    getCreatureFromBestiary(name: string) {
+        let creature = this.getBaseCreatureFromBestiary(name);
+        if (creature) return Creature.from(creature);
     }
 
     async onload() {
@@ -621,6 +636,15 @@ export default class InitiativeTracker extends Plugin {
                 p.marker = p.marker ?? this.data.playerMarker;
                 return p;
             });
+        }
+        if (this.data.statuses?.some((c) => !c.id)) {
+            for (const condition of this.data.statuses) {
+                condition.id =
+                    condition.id ??
+                    Conditions.find((c) => c.name == condition.name)?.id ??
+                    getId();
+            }
+            await this.saveSettings();
         }
     }
 

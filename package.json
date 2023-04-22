@@ -32,7 +32,7 @@
         "esbuild-svelte": "^0.6.0",
         "jest": "^29.5.0",
         "obsidian": "^0.16.3",
-        "obsidian-overload": "^1.14.0",
+        "obsidian-overload": "^1.17.0",
         "standard-version": "^9.3.2",
         "svelte": "^3.49.0",
         "svelte-dnd-action": "^0.9.13",

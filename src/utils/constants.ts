@@ -18,6 +18,7 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     defaultParty: null,
     homebrew: [],
     statuses: [...Conditions],
+    unconsciousId: "Unconscious",
     version: null,
     canUseDiceRoll: false,
     preferStatblockLink: false,
