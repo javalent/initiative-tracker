@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.6.6](https://github.com/javalent/initiative-tracker/compare/9.6.5...9.6.6) (2023-04-22)
+
+
+### Bug Fixes
+
+* Expose Creature interface ([418d8bb](https://github.com/javalent/initiative-tracker/commit/418d8bb4303c48f62d5127d3d9f6f0e6801160c2))
+
 ## [9.6.5](https://github.com/javalent/initiative-tracker/compare/9.6.4...9.6.5) (2023-04-22)
 
 
