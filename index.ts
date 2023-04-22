@@ -1,5 +1,4 @@
 import "obsidian";
-import type { Creature } from "./src/utils/creature";
 import type { Spell, Trait, ability } from "obsidian-overload";
 
 //      CUSTOM EVENTS
@@ -213,4 +212,48 @@ export interface ExperienceThreshold {
     Hard: number;
     Deadly: number;
     Daily: number;
+}
+
+import type InitiativeTracker from "src/main";
+export declare function getId(): string;
+export declare class Creature {
+    creature: HomebrewCreature;
+    active: boolean;
+    name: string;
+    modifier: number;
+    hp: number;
+    hit_dice?: string;
+    temp: number;
+    ac: number | string;
+    note: string;
+    enabled: boolean;
+    hidden: boolean;
+    max: number;
+    level: number;
+    player: boolean;
+    status: Set<Condition>;
+    marker: string;
+    private _initiative;
+    source: string | string[];
+    id: string;
+    xp: number;
+    viewing: boolean;
+    number: number;
+    display: string;
+    friendly: boolean;
+    "statblock-link": string;
+    getXP(plugin: InitiativeTracker): number;
+    constructor(creature: HomebrewCreature, initiative?: number);
+    get hpDisplay(): string;
+    get initiative(): number;
+    set initiative(x: number);
+    getName(): string;
+    getStatblockLink(): string;
+    [Symbol.iterator](): Generator<string | number | boolean, void, unknown>;
+    static new(creature: Creature): Creature;
+    static from(creature: HomebrewCreature | SRDMonster): Creature;
+    update(creature: HomebrewCreature): void;
+    toProperties(): this;
+    toJSON(): CreatureState;
+    static fromJSON(state: CreatureState): Creature;
 }
