@@ -59,6 +59,7 @@ export interface TrackerViewState {
 export interface Condition {
     name: string;
     description: string;
+    id: string;
 }
 
 export interface InputValidate {
@@ -66,7 +67,7 @@ export interface InputValidate {
     validate: (i: HTMLInputElement) => boolean;
 }
 
-interface Party {
+export interface Party {
     players: string[];
     name: string;
 }
@@ -76,6 +77,7 @@ export interface InitiativeTrackerData {
     displayDifficulty: boolean;
     preferStatblockLink: boolean;
     statuses: Condition[];
+    unconsciousId: string;
     openState: {
         battle: boolean;
         party: boolean;
