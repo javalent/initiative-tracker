@@ -336,14 +336,13 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
     }
     onChooseItem(item: HomebrewCreature | SRDMonster) {
         this.inputEl.value = item.name;
-        this.creature = item;
+        this.creature = this.plugin.getBaseCreatureFromBestiary(item.name);
         this.onClose();
         this.close();
     }
     selectSuggestion({ item }: FuzzyMatch<HomebrewCreature | SRDMonster>) {
         this.inputEl.value = item.name;
-        this.creature = item;
-
+        this.creature = this.plugin.getBaseCreatureFromBestiary(item.name);
         this.onClose();
         this.close();
     }

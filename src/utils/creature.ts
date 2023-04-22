@@ -47,7 +47,7 @@ export class Creature {
         if (this.creature.cr) {
             return XP_PER_CR[this.creature.cr] ?? 0;
         }
-        const base = plugin.bestiary.find((c) => c.name == this.name);
+        const base = plugin.getBaseCreatureFromBestiary(this.name);
         if (base && base.cr) {
             return XP_PER_CR[base.cr] ?? 0;
         }
