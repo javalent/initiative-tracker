@@ -1,12 +1,13 @@
 <script lang="ts">
     import type { Condition, UpdateLogMessage } from "index";
-    import { setIcon } from "obsidian";
+    import { ExtraButtonComponent, setIcon } from "obsidian";
     import type InitiativeTracker from "src/main";
     import { HP, REMOVE, TAG } from "src/utils";
     import { ConditionSuggestionModal } from "src/utils/suggester";
     import { getContext } from "svelte";
 
     import { tracker } from "../stores/tracker";
+    import { Writable, writable } from "svelte/store";
     const { updating } = tracker;
 
     const plugin = getContext<InitiativeTracker>("plugin");
@@ -15,6 +16,10 @@
     };
     const tagIcon = (node: HTMLElement) => {
         setIcon(node, TAG);
+    };
+    let statusBtn: ExtraButtonComponent;
+    const applyStatusIcon = (node: HTMLElement) => {
+        statusBtn = new ExtraButtonComponent(node).setIcon("plus-circle");
     };
     const removeIcon = (node: HTMLElement) => {
         setIcon(node, REMOVE);
@@ -26,15 +31,40 @@
         setIcon(node, "cross-in-box");
     };
     let damage: string = "";
-    let status: Condition = null;
-
+    let status: string = null;
+    $: {
+        if (statusBtn) statusBtn.setDisabled(!status);
+    }
+    const statuses = writable<Condition[]>([]);
+    const applyStatus = () => {
+        if (status) {
+            $statuses = [
+                ...$statuses,
+                {
+                    ...plugin.data.statuses.find((s) => s.id == status)
+                }
+            ];
+            status = null;
+        }
+    };
     let modal: ConditionSuggestionModal;
     const suggestConditions = (node: HTMLInputElement) => {
-        modal = new ConditionSuggestionModal(plugin, node);
-        modal.onClose = () => {
-            status = modal.condition;
-            node.focus();
-        };
+        if (!modal) {
+            modal = new ConditionSuggestionModal(
+                plugin.data.statuses
+                    .filter((s) => !$statuses.find((a) => a.id == s.id))
+                    .map((s) => s.id),
+                node
+            );
+            modal.onClose = () => {
+                status = modal.condition;
+                node.focus();
+            };
+        } else {
+            modal.items = plugin.data.statuses
+                .filter((s) => !$statuses.find((a) => a.id == s.id))
+                .map((s) => s.id);
+        }
         modal.open();
     };
     function init(el: HTMLInputElement) {
@@ -42,12 +72,14 @@
     }
     const performUpdate = (perform: boolean) => {
         if (perform) {
-            tracker.doUpdate(damage ?? "", status);
+            tracker.doUpdate(damage ?? "", $statuses);
         } else {
             tracker.clearUpdate();
         }
         damage = null;
         status = null;
+        $statuses = [];
+        modal = null;
         return;
     };
 </script>
@@ -99,40 +131,67 @@
                         throw
                     </small>
                 {/if}
-                <div class="input">
-                    <tag
-                        use:tagIcon
-                        aria-label="Apply status effect to creatures that fail their saving throw"
-                        style="margin: 0 0.2rem 0 0.7rem"
-                    />
-                    <input
-                        type="text"
-                        on:focus={function (evt) {
-                            suggestConditions(this);
-                        }}
-                        on:keydown={function (evt) {
-                            if (["Enter", "Escape"].includes(evt.key)) {
-                                performUpdate(evt.key == "Enter");
-                            }
-                        }}
+                <div class="input-status">
+                    <div class="input">
+                        <div
+                            use:tagIcon
+                            aria-label="Apply status effect to creatures that fail their saving throw"
+                            style="margin: 0 0.2rem 0 0.7rem"
+                        />
+                        <input
+                            type="text"
+                            bind:value={status}
+                            on:focus={function (evt) {
+                                suggestConditions(this);
+                            }}
+                            on:keydown={function (evt) {
+                                if (["Enter", "Escape"].includes(evt.key)) {
+                                    performUpdate(evt.key == "Enter");
+                                }
+                            }}
+                        />
+                    </div>
+                    <div
+                        use:applyStatusIcon
+                        aria-label="Add Status"
+                        on:click={applyStatus}
                     />
                 </div>
             </div>
         </div>
-        <div class="updating-buttons">
-            <span
-                use:checkIcon
-                on:click={() => performUpdate(true)}
-                style="cursor:pointer"
-                aria-label="Apply"
-            />
-            <span
-                use:cancelIcon
-                on:click={() => performUpdate(false)}
-                style="cursor:pointer"
-                aria-label="Cancel"
-            />
-        </div>
+    </div>
+    <div class="statuses">
+        <table class="updating-creature-table">
+            <thead class="updating-creature-table-header">
+                <th style="width:100%" class="left">Status</th>
+                <th
+                    style="cursor:pointer"
+                    class="left"
+                    use:removeIcon
+                    on:click={() => performUpdate(false)}
+                />
+            </thead>
+            <tbody>
+                {#each $statuses as status}
+                    <tr class="updating-creature-table-row">
+                        <td>
+                            <span>
+                                {status.name}
+                            </span>
+                        </td>
+
+                        <td
+                            use:removeIcon
+                            on:click={function (evt) {
+                                $statuses.remove(status);
+                                $statuses = $statuses;
+                            }}
+                            style="cursor:pointer"
+                        />
+                    </tr>
+                {/each}
+            </tbody>
+        </table>
     </div>
     {#if plugin.data.beginnerTips}
         <div>
@@ -142,27 +201,20 @@
     <div style="margin: 0.5rem">
         <table class="updating-creature-table">
             <thead class="updating-creature-table-header">
-                <th
-                    style="padding:0 0.2rem 0 0; cursor:pointer"
-                    class="left"
-                    use:removeIcon
-                    on:click={() => performUpdate(false)}
-                />
                 <th style="width:100%" class="left">Name</th>
                 <th style="padding:0 0.2rem" class="center">Saved</th>
                 <th style="padding:0 0.2rem" class="center">Resist</th>
                 <th style="padding:0 0.2rem" class="center">Modifier</th>
+                <th
+                    style="cursor:pointer"
+                    class="left"
+                    use:removeIcon
+                    on:click={() => performUpdate(false)}
+                />
             </thead>
             <tbody>
                 {#each [...$updating.entries()] as [creature, update], i}
                     <tr class="updating-creature-table-row">
-                        <td
-                            use:removeIcon
-                            on:click={function (evt) {
-                                tracker.setUpdate(creature, evt);
-                            }}
-                            style="cursor:pointer"
-                        />
                         <td>
                             <span>
                                 {creature.name +
@@ -207,10 +259,31 @@
                                 }}
                             />
                         </td>
+                        <td
+                            use:removeIcon
+                            on:click={function (evt) {
+                                tracker.setUpdate(creature, evt);
+                            }}
+                            style="cursor:pointer"
+                        />
                     </tr>
                 {/each}
             </tbody>
         </table>
+    </div>
+    <div class="updating-buttons">
+        <span
+            use:checkIcon
+            on:click={() => performUpdate(true)}
+            style="cursor:pointer"
+            aria-label="Apply"
+        />
+        <span
+            use:cancelIcon
+            on:click={() => performUpdate(false)}
+            style="cursor:pointer"
+            aria-label="Cancel"
+        />
     </div>
 {/if}
 
@@ -219,6 +292,20 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+    }
+    :global(.is-disabled) {
+        cursor: not-allowed;
+    }
+    .input-status {
+        display: flex;
+        justify-content: space-between;
+    }
+    .input > div,
+    .input-status > div,
+    td:has(> svg),
+    th:has(> svg) {
+        display: flex;
+        align-items: center;
     }
     .left {
         text-align: left;
@@ -245,5 +332,8 @@
         justify-content: flex-end;
         gap: 1rem;
         margin-right: 1.2rem;
+    }
+    td > input {
+        margin: 0;
     }
 </style>
