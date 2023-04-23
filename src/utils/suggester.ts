@@ -21,6 +21,7 @@ import type {
     Party
 } from "../../index";
 import type InitiativeTracker from "src/main";
+import { getId } from "./creature";
 
 class Suggester<T> {
     owner: SuggestModal<T>;
@@ -532,23 +533,21 @@ export class HomebrewMonsterSuggestionModal extends ElementSuggestionModal<Homeb
     onRemoveItem(item: HomebrewCreature) {}
 }
 
-export class ConditionSuggestionModal extends SuggestionModal<Condition> {
-    items: Condition[] = [];
-    condition: Condition;
-    constructor(public plugin: InitiativeTracker, inputEl: HTMLInputElement) {
-        super(plugin.app, inputEl);
-        this.items = this.plugin.data.statuses;
+export class ConditionSuggestionModal extends SuggestionModal<string> {
+    condition: string;
+    constructor(public items: string[], inputEl: HTMLInputElement) {
+        super(app, inputEl);
         this.suggestEl.style.removeProperty("min-width");
         this.onInputChanged();
     }
-    getItemText(item: Condition) {
-        return item.name;
+    getItemText(item: string) {
+        return item;
     }
     getItems() {
         return this.items;
     }
-    onChooseItem(item: Condition) {
-        this.inputEl.value = item.name;
+    onChooseItem(item: string) {
+        this.inputEl.value = item;
         this.condition = item;
     }
     onNoSuggestion() {
@@ -559,21 +558,18 @@ export class ConditionSuggestionModal extends SuggestionModal<Condition> {
         );
         this.condition = null;
     }
-    selectSuggestion({ item }: FuzzyMatch<Condition>) {
+    selectSuggestion({ item }: FuzzyMatch<string>) {
         if (this.condition !== null) {
-            this.inputEl.value = item.name;
+            this.inputEl.value = item;
             this.condition = item;
         } else {
-            this.condition = {
-                name: this.inputEl.value,
-                description: ""
-            };
+            this.condition = null;
         }
 
         this.onClose();
         this.close();
     }
-    renderSuggestion(result: FuzzyMatch<Condition>, el: HTMLElement) {
+    renderSuggestion(result: FuzzyMatch<string>, el: HTMLElement) {
         let { item, match: matches } = result || {};
         let content = new Setting(el); /* el.createDiv({
             cls: "suggestion-content"
@@ -587,18 +583,18 @@ export class ConditionSuggestionModal extends SuggestionModal<Condition> {
         const matchElements = matches.matches.map((m) => {
             return createSpan("suggestion-highlight");
         });
-        for (let i = 0; i < item.name.length; i++) {
+        for (let i = 0; i < item.length; i++) {
             let match = matches.matches.find((m) => m[0] === i);
             if (match) {
                 let element = matchElements[matches.matches.indexOf(match)];
                 content.nameEl.appendChild(element);
-                element.appendText(item.name.substring(match[0], match[1]));
+                element.appendText(item.substring(match[0], match[1]));
 
                 i += match[1] - match[0] - 1;
                 continue;
             }
 
-            content.nameEl.appendText(item.name[i]);
+            content.nameEl.appendText(item[i]);
         }
     }
 }
@@ -606,13 +602,13 @@ export class ConditionSuggestionModal extends SuggestionModal<Condition> {
 export class PlayerSuggestionModal extends SuggestionModal<HomebrewCreature> {
     player: HomebrewCreature;
     text: TextComponent;
-    items = this.plugin.data.players;
     constructor(
         public plugin: InitiativeTracker,
         input: TextComponent,
         public party: Party
     ) {
         super(plugin.app, input.inputEl);
+        this.items = this.plugin.data.players;
         this.text = input;
 
         this.createPrompts();

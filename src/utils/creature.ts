@@ -239,7 +239,8 @@ export class Creature {
             } else {
                 statuses.push({
                     name: status,
-                    description: null
+                    description: null,
+                    id: getId()
                 });
             }
         }
