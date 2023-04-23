@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.7.0](https://github.com/javalent/initiative-tracker/compare/9.6.7...9.7.0) (2023-04-23)
+
+
+### Features
+
+* Can now add multiple statuses to creatures at a time ([afb603e](https://github.com/javalent/initiative-tracker/commit/afb603eac3e34966a72376eaf4cf968a04a622c5))
+* Statuses can now be set to reset each round (close [#139](https://github.com/javalent/initiative-tracker/issues/139)) ([28f63cf](https://github.com/javalent/initiative-tracker/commit/28f63cf1012aaea3e70bfd7586edcb90ad801a60))
+* Statuses can now have amounts associated ([84b358b](https://github.com/javalent/initiative-tracker/commit/84b358b2a50550a969b2aa0b63389291730449cd))
+
 ## [9.6.7](https://github.com/javalent/initiative-tracker/compare/9.6.6...9.6.7) (2023-04-22)
 
 
