@@ -163,10 +163,21 @@ export default class Logger {
                 } else {
                     perCreature.push(message.name);
                 }
-                if (message.saved) {
-                    perCreature.push(`saved against ${message.status}`);
+                let status;
+                if (message.status.length > 1) {
+                    status = [
+                        message.status
+                            .slice(0, Math.min(message.status.length - 1, 1))
+                            .join(", ")
+                    ];
+                    status.push(message.status[message.status.length - 1]);
                 } else {
-                    perCreature.push(`took ${message.status} status`);
+                    status = [message.status[0]];
+                }
+                if (message.saved) {
+                    perCreature.push(`saved against ${status.join(" and ")}`);
+                } else {
+                    perCreature.push(`took ${status.join(" and ")} status`);
                 }
             }
             toLog.push(perCreature.join(" "));

@@ -694,7 +694,34 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         const additional = additionalContainer.createDiv("additional");
         for (const status of this.plugin.data.statuses) {
             new Setting(additional)
-                .setName(status.name)
+                .setName(
+                    createFragment((e) => {
+                        const div = e.createDiv("status-name-container");
+                        div.createSpan({ text: status.name });
+
+                        div.createDiv("status-metadata-container");
+                        if (status.resetOnRound) {
+                            setIcon(
+                                div.createDiv({
+                                    attr: {
+                                        "aria-label": "Reset Each Round"
+                                    }
+                                }),
+                                "timer-reset"
+                            );
+                        }
+                        if (status.hasAmount) {
+                            setIcon(
+                                div.createDiv({
+                                    attr: {
+                                        "aria-label": "Has Amount"
+                                    }
+                                }),
+                                "hash"
+                            );
+                        }
+                    })
+                )
                 .setDesc(status.description)
                 .addExtraButton((b) =>
                     b.setIcon("pencil").onClick(() => {
@@ -1378,7 +1405,7 @@ class StatusModal extends Modal {
     warned = false;
     onOpen() {
         this.titleEl.setText(this.editing ? "Edit Status" : "New Status");
-
+        this.contentEl.empty();
         const name = new Setting(this.contentEl)
             .setName("Name")
             .addText((t) => {
@@ -1417,6 +1444,40 @@ class StatusModal extends Modal {
                 (v) => (this.status.description = v)
             );
         });
+        new Setting(this.contentEl)
+            .setName("Remove Each Round")
+            .setDesc(
+                "This status will be removed from all creatures at the start of a new round."
+            )
+            .addToggle((t) =>
+                t
+                    .setValue(this.status.resetOnRound)
+                    .onChange((v) => (this.status.resetOnRound = v))
+            );
+        new Setting(this.contentEl)
+            .setName("Has Amount")
+            .setDesc(
+                "This status has an amount that can be increased or decreased during combat."
+            )
+            .addToggle((t) =>
+                t.setValue(this.status.hasAmount).onChange((v) => {
+                    this.status.hasAmount = v;
+                    this.onOpen();
+                })
+            );
+        if (this.status.hasAmount) {
+            new Setting(this.contentEl)
+                .setName("Starting Amount")
+                .setDesc("The status will default to this amount when added.")
+                .addText(
+                    (t) =>
+                        (t
+                            .setValue(`${this.status.startingAmount}`)
+                            .onChange((v) => {
+                                this.status.startingAmount = Number(v);
+                            }).inputEl.type = "number")
+                );
+        }
 
         new ButtonComponent(
             this.contentEl.createDiv("initiative-tracker-cancel")

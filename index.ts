@@ -56,11 +56,20 @@ export interface TrackerViewState {
     creatures: HomebrewCreature[];
 }
 
-export interface Condition {
+export type Condition = {
     name: string;
     description: string;
     id: string;
-}
+    resetOnRound?: boolean;
+    hasAmount?: boolean;
+    startingAmount?: number;
+} & (
+    | {
+          hasAmount: true;
+          startingAmount: number;
+      }
+    | {}
+);
 
 export interface InputValidate {
     input: HTMLInputElement;
@@ -190,7 +199,7 @@ export interface UpdateLogMessage {
     name: string;
     hp: number | null;
     temp: boolean;
-    status: string | null;
+    status: string[] | null;
     saved: boolean;
     unc: boolean;
 }
