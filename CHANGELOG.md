@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.7.1](https://github.com/javalent/initiative-tracker/compare/9.7.0...9.7.1) (2023-04-24)
+
+
+### Bug Fixes
+
+* handling of status amounts and logging of receiving multiple statuses ([#141](https://github.com/javalent/initiative-tracker/issues/141)) ([2821442](https://github.com/javalent/initiative-tracker/commit/28214427a6af672a63ae562351dd4761fbb2d53a))
+* show statuses' names rather than their IDs ([#145](https://github.com/javalent/initiative-tracker/issues/145)) ([d8cf7c8](https://github.com/javalent/initiative-tracker/commit/d8cf7c8b22304ec12ed9ec5f985da3e3bfd83b2a))
+
 ## [9.7.0](https://github.com/javalent/initiative-tracker/compare/9.6.7...9.7.0) (2023-04-23)
 
 
