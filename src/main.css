@@ -1,6 +1,12 @@
 body {
-    --text-warning: #EAAF00;
+    --text-warning: #eaaf00;
     --text-success: green;
+}
+
+.status-metadata-container,
+.status-name-container {
+    display: flex;
+    gap: 0.5rem;
 }
 
 .initiative-tracker-add-player-modal .has-error {

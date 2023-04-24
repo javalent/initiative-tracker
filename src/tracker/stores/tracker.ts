@@ -14,8 +14,7 @@ import { OVERFLOW_TYPE } from "../../utils";
 import type Logger from "../../logger/logger";
 import {
     DifficultyReport,
-    encounterDifficulty,
-    getCreatureXP
+    encounterDifficulty
 } from "src/utils/encounter-difficulty";
 
 type HPUpdate = {
@@ -159,11 +158,10 @@ function createTracker() {
                     }
                     creature.hp += change.hp;
                     if (_settings.autoStatus && creature.hp <= 0) {
-                        creature.status.add(
-                            _settings.statuses.find(
-                                (s) => s.name == "Unconscious"
-                            )
+                        const unc = _settings.statuses.find(
+                            (s) => s.id == _settings.unconsciousId
                         );
+                        if (unc) creature.status.add(unc);
                     }
                 }
                 if (change.max) {
@@ -190,8 +188,14 @@ function createTracker() {
                 }
                 if (change.status?.length) {
                     for (const status of change.status) {
-                        if (creature.status.has(status)) {
-                            creature.status.delete(status);
+                        if (
+                            [...creature.status].find((s) => s.id == status.id)
+                        ) {
+                            creature.status = new Set(
+                                [...creature.status].filter(
+                                    (s) => s.id != status.id
+                                )
+                            );
                             _logger?.log(
                                 `${creature.name} relieved of status ${status.name}`
                             );
@@ -297,7 +301,7 @@ function createTracker() {
                 }
                 return creatures;
             }),
-        doUpdate: (toAddString: string, tag: Condition, ac: string) =>
+        doUpdate: (toAddString: string, statuses: Condition[], ac: string) =>
             updating.update((updatingCreatures) => {
                 const messages: UpdateLogMessage[] = [];
                 const updates: CreatureUpdates[] = [];
@@ -337,15 +341,18 @@ function createTracker() {
                             Math.max(Math.abs(toAdd) * modifier, 1);
                         toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
                         message.hp = toAdd;
-                        if (creature.hp <= 0) {
+                        if (
+                            toAdd < 0 &&
+                            creature.hp + creature.temp + toAdd <= 0
+                        ) {
                             message.unc = true;
                         }
                         change.hp = toAdd;
                     }
-                    if (tag) {
-                        message.status = tag.name;
+                    if (statuses.length) {
+                        message.status = statuses.map((s) => s.name);
                         if (!entry.saved) {
-                            change.status = [tag];
+                            change.status = [...statuses];
                         } else {
                             message.saved = true;
                         }
@@ -424,6 +431,15 @@ function createTracker() {
                         if (nextIndex < current) {
                             const round = get($round) + 1;
                             $round.set(round);
+
+                            for (const creature of creatures) {
+                                creature.status = new Set(
+                                    [...creature.status].filter(
+                                        (s) => !s.resetOnRound
+                                    )
+                                );
+                            }
+
                             _logger?.log("###", `Round ${round}`);
                         }
                         _logger?.log("#####", `${next.getName()}'s turn`);
@@ -460,6 +476,13 @@ function createTracker() {
                         if (prevIndex > current) {
                             const round = get($round) - 1;
                             $round.set(round);
+                            for (const creature of creatures) {
+                                creature.status = new Set(
+                                    [...creature.status].filter(
+                                        (s) => !s.resetOnRound
+                                    )
+                                );
+                            }
                             _logger?.log("###", `Round ${round}`);
                         }
                         _logger?.log("#####", `${prev.getName()}'s turn`);

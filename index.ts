@@ -1,5 +1,5 @@
 import "obsidian";
-import type { Creature } from "./src/utils/creature";
+import type { Spell, Trait, ability } from "obsidian-overload";
 
 //      CUSTOM EVENTS
 // ------------------------
@@ -56,17 +56,29 @@ export interface TrackerViewState {
     creatures: HomebrewCreature[];
 }
 
-export interface Condition {
+export type Condition = {
     name: string;
     description: string;
-}
+    id: string;
+    resetOnRound?: boolean;
+    hasAmount?: boolean;
+    startingAmount?: number;
+    amount?:number;
+} & (
+    | {
+          hasAmount: true;
+          startingAmount: number;
+          amount: number;
+      }
+    | {}
+);
 
 export interface InputValidate {
     input: HTMLInputElement;
     validate: (i: HTMLInputElement) => boolean;
 }
 
-interface Party {
+export interface Party {
     players: string[];
     name: string;
 }
@@ -76,6 +88,7 @@ export interface InitiativeTrackerData {
     displayDifficulty: boolean;
     preferStatblockLink: boolean;
     statuses: Condition[];
+    unconsciousId: string;
     openState: {
         battle: boolean;
         party: boolean;
@@ -185,27 +198,11 @@ export interface HomebrewCreature {
     "statblock-link"?: string;
 }
 
-export type ability =
-    | "strength"
-    | "dexterity"
-    | "constitution"
-    | "intelligence"
-    | "wisdom"
-    | "charisma";
-
-export type Spell = string | { [key: string]: string };
-
-export interface Trait {
-    name: string;
-    desc: string;
-    [key: string]: any;
-}
-
 export interface UpdateLogMessage {
     name: string;
     hp: number | null;
     temp: boolean;
-    status: string | null;
+    status: string[] | null;
     saved: boolean;
     unc: boolean;
     ac: string;
@@ -230,4 +227,48 @@ export interface ExperienceThreshold {
     Hard: number;
     Deadly: number;
     Daily: number;
+}
+
+import type InitiativeTracker from "src/main";
+export declare function getId(): string;
+export declare class Creature {
+    creature: HomebrewCreature;
+    active: boolean;
+    name: string;
+    modifier: number;
+    hp: number;
+    hit_dice?: string;
+    temp: number;
+    ac: number | string;
+    note: string;
+    enabled: boolean;
+    hidden: boolean;
+    max: number;
+    level: number;
+    player: boolean;
+    status: Set<Condition>;
+    marker: string;
+    private _initiative;
+    source: string | string[];
+    id: string;
+    xp: number;
+    viewing: boolean;
+    number: number;
+    display: string;
+    friendly: boolean;
+    "statblock-link": string;
+    getXP(plugin: InitiativeTracker): number;
+    constructor(creature: HomebrewCreature, initiative?: number);
+    get hpDisplay(): string;
+    get initiative(): number;
+    set initiative(x: number);
+    getName(): string;
+    getStatblockLink(): string;
+    [Symbol.iterator](): Generator<string | number | boolean, void, unknown>;
+    static new(creature: Creature): Creature;
+    static from(creature: HomebrewCreature | SRDMonster): Creature;
+    update(creature: HomebrewCreature): void;
+    toProperties(): this;
+    toJSON(): CreatureState;
+    static fromJSON(state: CreatureState): Creature;
 }

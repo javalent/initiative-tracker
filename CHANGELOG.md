@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.7.0](https://github.com/javalent/initiative-tracker/compare/9.6.7...9.7.0) (2023-04-23)
+
+
+### Features
+
+* Can now add multiple statuses to creatures at a time ([afb603e](https://github.com/javalent/initiative-tracker/commit/afb603eac3e34966a72376eaf4cf968a04a622c5))
+* Statuses can now be set to reset each round (close [#139](https://github.com/javalent/initiative-tracker/issues/139)) ([28f63cf](https://github.com/javalent/initiative-tracker/commit/28f63cf1012aaea3e70bfd7586edcb90ad801a60))
+* Statuses can now have amounts associated ([84b358b](https://github.com/javalent/initiative-tracker/commit/84b358b2a50550a969b2aa0b63389291730449cd))
+
+## [9.6.7](https://github.com/javalent/initiative-tracker/compare/9.6.6...9.6.7) (2023-04-22)
+
+
+### Bug Fixes
+
+* Extends functionality works from Statblocks (close [#100](https://github.com/javalent/initiative-tracker/issues/100)) ([055f07e](https://github.com/javalent/initiative-tracker/commit/055f07ed50ad8a15ebd4fc90dfdce3d6129e8127))
+* properly log automatic unconscious status (close [#132](https://github.com/javalent/initiative-tracker/issues/132)) ([#133](https://github.com/javalent/initiative-tracker/issues/133)) ([0065bf6](https://github.com/javalent/initiative-tracker/commit/0065bf668d9c9ed7c1a5ac0fb462778c10e02fa3))
+* Unconscious status can now be removed or reset (close [#129](https://github.com/javalent/initiative-tracker/issues/129)) ([f61d524](https://github.com/javalent/initiative-tracker/commit/f61d524273148f24845f0ac9a869c099d09e63df))
+
+## [9.6.6](https://github.com/javalent/initiative-tracker/compare/9.6.5...9.6.6) (2023-04-22)
+
+
+### Bug Fixes
+
+* Expose Creature interface ([418d8bb](https://github.com/javalent/initiative-tracker/commit/418d8bb4303c48f62d5127d3d9f6f0e6801160c2))
+
+## [9.6.5](https://github.com/javalent/initiative-tracker/compare/9.6.4...9.6.5) (2023-04-22)
+
+
+### Bug Fixes
+
+* use types from statblocks ([db46505](https://github.com/javalent/initiative-tracker/commit/db465051fb782c4874f04a86607579bf4931f56b))
+
 ## [9.6.4](https://github.com/javalent/initiative-tracker/compare/9.6.3...9.6.4) (2023-04-21)
 
 
