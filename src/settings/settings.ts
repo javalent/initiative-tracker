@@ -1474,7 +1474,7 @@ class StatusModal extends Modal {
                         (t
                             .setValue(`${this.status.startingAmount}`)
                             .onChange((v) => {
-                                this.status.startingAmount = Number(v);
+                                this.status.amount = this.status.startingAmount = Number(v);
                             }).inputEl.type = "number")
                 );
         }

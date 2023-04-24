@@ -6,7 +6,6 @@
     import type { Condition } from "index";
 
     export let status: Condition;
-    $: amount = status.startingAmount;
     const deleteIcon = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("cross-in-box");
     };
@@ -31,12 +30,12 @@
                 class="icon"
                 use:minus
                 on:click={() => {
-                    amount--;
-                    if (amount <= 0) dispatch("remove");
+                    status.amount--;
+                    if (status.amount <= 0) dispatch("remove");
                 }}
             />
-            <span>{amount}</span>
-            <div class="icon" use:plus on:click={() => amount++} />
+            <span>{status.amount}</span>
+            <div class="icon" use:plus on:click={() => status.amount++} />
         </div>
     {/if}
     <div use:deleteIcon on:click={() => dispatch("remove")} />
