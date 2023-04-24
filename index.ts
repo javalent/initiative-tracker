@@ -63,10 +63,12 @@ export type Condition = {
     resetOnRound?: boolean;
     hasAmount?: boolean;
     startingAmount?: number;
+    amount?:number;
 } & (
     | {
           hasAmount: true;
           startingAmount: number;
+          amount: number;
       }
     | {}
 );
