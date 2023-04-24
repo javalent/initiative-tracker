@@ -41,7 +41,7 @@
             $statuses = [
                 ...$statuses,
                 {
-                    ...plugin.data.statuses.find((s) => s.id == status)
+                    ...plugin.data.statuses.find((s) => s.name == status)
                 }
             ];
             status = null;
@@ -53,7 +53,7 @@
             modal = new ConditionSuggestionModal(
                 plugin.data.statuses
                     .filter((s) => !$statuses.find((a) => a.id == s.id))
-                    .map((s) => s.id),
+                    .map((s) => s.name),
                 node
             );
             modal.onClose = () => {
@@ -63,7 +63,7 @@
         } else {
             modal.items = plugin.data.statuses
                 .filter((s) => !$statuses.find((a) => a.id == s.id))
-                .map((s) => s.id);
+                .map((s) => s.name);
         }
         modal.open();
     };
