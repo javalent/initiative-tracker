@@ -87,7 +87,7 @@
                         ((creature.hp ?? 0) / creature.max) * 100 ?? 0
                     )}
                     on:click={(e) => {
-                        tracker.setUpdate(creature, e);
+                        dispatch("open-combatant", creature);
                         e.stopPropagation();
                     }}
                 >

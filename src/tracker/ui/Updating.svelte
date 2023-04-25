@@ -2,17 +2,20 @@
     import type { Condition, UpdateLogMessage } from "index";
     import { ExtraButtonComponent, setIcon } from "obsidian";
     import type InitiativeTracker from "src/main";
-    import { HP, REMOVE, TAG } from "src/utils";
+    import { AC, HP, REMOVE, TAG } from "src/utils";
     import { ConditionSuggestionModal } from "src/utils/suggester";
     import { getContext } from "svelte";
 
     import { tracker } from "../stores/tracker";
+    const { updating, updateTarget } = tracker;
     import { Writable, writable } from "svelte/store";
-    const { updating } = tracker;
 
     const plugin = getContext<InitiativeTracker>("plugin");
     const hpIcon = (node: HTMLElement) => {
         setIcon(node, HP);
+    };
+    const acIcon = (node: HTMLElement) => {
+        setIcon(node, AC);
     };
     const tagIcon = (node: HTMLElement) => {
         setIcon(node, TAG);
@@ -31,6 +34,7 @@
         setIcon(node, "cross-in-box");
     };
     let damage: string = "";
+    let ac: string = "";
     let status: string = null;
     $: {
         if (statusBtn) statusBtn.setDisabled(!status);
@@ -67,8 +71,8 @@
         }
         modal.open();
     };
-    function init(el: HTMLInputElement) {
-        el.focus();
+    function init(el: HTMLInputElement, target: "hp" | "ac") {
+        if ($updateTarget == target) el.focus();
     }
     const performUpdate = (perform: boolean) => {
         if (perform) {
@@ -78,31 +82,106 @@
         }
         damage = null;
         status = null;
+        ac = null;
         $statuses = [];
         modal = null;
+
+        $updateTarget = null;
+        
         return;
     };
 </script>
 
 {#if $updating.size}
     <div class="updating-container">
-        <div class="updating-hp">
-            <!-- svelte-ignore a11y-autofocus -->
+        {#if $updateTarget == "hp"}
+            <div class="updating-hp">
+                <!-- svelte-ignore a11y-autofocus -->
+                <div class="hp-status">
+                    {#if plugin.data.beginnerTips}
+                        <small class="label">
+                            Apply damage, healing(-) or temp HP(t)
+                        </small>
+                    {/if}
+                    <div class="input">
+                        <tag
+                            use:hpIcon
+                            aria-label="Apply damage, healing(-) or temp HP(t)"
+                            style="margin: 0 0.2rem 0 0.7rem"
+                        />
+                        <input
+                            type="text"
+                            bind:value={damage}
+                            on:keydown={function (evt) {
+                                if (evt.key == "Tab") {
+                                    return true;
+                                }
+                                if (evt.key == "Enter" || evt.key == "Escape") {
+                                    performUpdate(evt.key == "Enter");
+                                    return;
+                                }
+                                if (
+                                    !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
+                                        this.value + evt.key
+                                    )
+                                ) {
+                                    evt.preventDefault();
+                                    return false;
+                                }
+                            }}
+                            use:init={"hp"}
+                        />
+                    </div>
+                </div>
+                <div class="hp-status">
+                    {#if plugin.data.beginnerTips}
+                        <small class="label">
+                            Apply status effect to creatures that fail their
+                            saving throw
+                        </small>
+                    {/if}
+                    <div class="input-status">
+                        <div class="input">
+                            <div
+                                use:tagIcon
+                                aria-label="Apply status effect to creatures that fail their saving throw"
+                                style="margin: 0 0.2rem 0 0.7rem"
+                            />
+                            <input
+                                type="text"
+                                bind:value={status}
+                                on:focus={function (evt) {
+                                    suggestConditions(this);
+                                }}
+                                on:keydown={function (evt) {
+                                    if (["Enter", "Escape"].includes(evt.key)) {
+                                        performUpdate(evt.key == "Enter");
+                                    }
+                                }}
+                            />
+                        </div>
+                        <div
+                            use:applyStatusIcon
+                            aria-label="Add Status"
+                            on:click={applyStatus}
+                        />
+                    </div>
+                </div>
+            </div>
+        {:else}
             <div class="hp-status">
                 {#if plugin.data.beginnerTips}
-                    <small class="label">
-                        Apply damage, (m)max HP damage, (-)healing or (t)temp HP
-                    </small>
+                    <small class="label"> Set AC </small>
                 {/if}
                 <div class="input">
                     <tag
-                        use:hpIcon
-                        aria-label="Apply damage, (m)max HP damage, (-)healing or (t)temp HP"
+                        use:acIcon
+                        aria-label="Set or (+/-)modify the AC of creatures"
                         style="margin: 0 0.2rem 0 0.7rem"
                     />
                     <input
                         type="text"
-                        bind:value={damage}
+                        bind:value={ac}
                         on:keydown={function (evt) {
                             if (evt.key == "Tab") {
                                 return true;
@@ -111,88 +190,48 @@
                                 performUpdate(evt.key == "Enter");
                                 return;
                             }
-                            if (
-                                !/^((t|m)?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
-                                    this.value + evt.key
-                                )
-                            ) {
-                                evt.preventDefault();
-                                return false;
-                            }
                         }}
-                        use:init
+                        use:init={"ac"}
                     />
                 </div>
             </div>
-            <div class="hp-status">
-                {#if plugin.data.beginnerTips}
-                    <small class="label">
-                        Apply status effect to creatures that fail their saving
-                        throw
-                    </small>
-                {/if}
-                <div class="input-status">
-                    <div class="input">
-                        <div
-                            use:tagIcon
-                            aria-label="Apply status effect to creatures that fail their saving throw"
-                            style="margin: 0 0.2rem 0 0.7rem"
-                        />
-                        <input
-                            type="text"
-                            bind:value={status}
-                            on:focus={function (evt) {
-                                suggestConditions(this);
-                            }}
-                            on:keydown={function (evt) {
-                                if (["Enter", "Escape"].includes(evt.key)) {
-                                    performUpdate(evt.key == "Enter");
-                                }
-                            }}
-                        />
-                    </div>
-                    <div
-                        use:applyStatusIcon
-                        aria-label="Add Status"
-                        on:click={applyStatus}
-                    />
-                </div>
-            </div>
-        </div>
+        {/if}
     </div>
-    <div class="statuses">
-        <table class="updating-creature-table">
-            <thead class="updating-creature-table-header">
-                <th style="width:100%" class="left">Status</th>
-                <th
-                    style="cursor:pointer"
-                    class="left"
-                    use:removeIcon
-                    on:click={() => performUpdate(false)}
-                />
-            </thead>
-            <tbody>
-                {#each $statuses as status}
-                    <tr class="updating-creature-table-row">
-                        <td>
-                            <span>
-                                {status.name}
-                            </span>
-                        </td>
+    {#if $updateTarget == "hp"}
+        <div class="statuses">
+            <table class="updating-creature-table">
+                <thead class="updating-creature-table-header">
+                    <th style="width:100%" class="left">Status</th>
+                    <th
+                        style="cursor:pointer"
+                        class="left"
+                        use:removeIcon
+                        on:click={() => performUpdate(false)}
+                    />
+                </thead>
+                <tbody>
+                    {#each $statuses as status}
+                        <tr class="updating-creature-table-row">
+                            <td>
+                                <span>
+                                    {status.name}
+                                </span>
+                            </td>
 
-                        <td
-                            use:removeIcon
-                            on:click={function (evt) {
-                                $statuses.remove(status);
-                                $statuses = $statuses;
-                            }}
-                            style="cursor:pointer"
-                        />
-                    </tr>
-                {/each}
-            </tbody>
-        </table>
-    </div>
+                            <td
+                                use:removeIcon
+                                on:click={function (evt) {
+                                    $statuses.remove(status);
+                                    $statuses = $statuses;
+                                }}
+                                style="cursor:pointer"
+                            />
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
+        </div>
+    {/if}
     {#if plugin.data.beginnerTips}
         <div>
             <small>Multiple creatures can be selected at a time.</small>
@@ -202,15 +241,17 @@
         <table class="updating-creature-table">
             <thead class="updating-creature-table-header">
                 <th style="width:100%" class="left">Name</th>
-                <th style="padding:0 0.2rem" class="center">Saved</th>
-                <th style="padding:0 0.2rem" class="center">Resist</th>
-                <th style="padding:0 0.2rem" class="center">Modifier</th>
-                <th
-                    style="cursor:pointer"
-                    class="left"
-                    use:removeIcon
-                    on:click={() => performUpdate(false)}
-                />
+                {#if $updateTarget == "hp"}
+                    <th style="padding:0 0.2rem" class="center">Saved</th>
+                    <th style="padding:0 0.2rem" class="center">Resist</th>
+                    <th style="padding:0 0.2rem" class="center">Modifier</th>
+                    <th
+                        style="cursor:pointer"
+                        class="left"
+                        use:removeIcon
+                        on:click={() => performUpdate(false)}
+                    />
+                {/if}
             </thead>
             <tbody>
                 {#each [...$updating.entries()] as [creature, update], i}
@@ -223,42 +264,44 @@
                                         : "")}
                             </span>
                         </td>
-                        <td class="center">
-                            <input
-                                type="checkbox"
-                                checked={update.saved}
-                                on:click={function (evt) {
-                                    update.saved = !update.saved;
-                                }}
-                            />
-                        </td>
-                        <td class="center">
-                            <input
-                                type="checkbox"
-                                checked={update.resist}
-                                on:click={function (evt) {
-                                    update.resist = !update.resist;
-                                }}
-                            />
-                        </td>
-                        <td class="center">
-                            <input
-                                type="number"
-                                class="center"
-                                style="width:90%; height:80%; padding:0;"
-                                bind:value={update.customMod}
-                                on:keydown={function (evt) {
-                                    if (evt.key === "Escape") {
-                                        this.value = "1";
-                                        return;
-                                    }
-                                    if (evt.key === "Enter") {
-                                        evt.preventDefault();
-                                        return;
-                                    }
-                                }}
-                            />
-                        </td>
+                        {#if $updateTarget == "hp"}
+                            <td class="center">
+                                <input
+                                    type="checkbox"
+                                    checked={update.saved}
+                                    on:click={function (evt) {
+                                        update.saved = !update.saved;
+                                    }}
+                                />
+                            </td>
+                            <td class="center">
+                                <input
+                                    type="checkbox"
+                                    checked={update.resist}
+                                    on:click={function (evt) {
+                                        update.resist = !update.resist;
+                                    }}
+                                />
+                            </td>
+                            <td class="center">
+                                <input
+                                    type="number"
+                                    class="center"
+                                    style="width:90%; height:80%; padding:0;"
+                                    bind:value={update.customMod}
+                                    on:keydown={function (evt) {
+                                        if (evt.key === "Escape") {
+                                            this.value = "1";
+                                            return;
+                                        }
+                                        if (evt.key === "Enter") {
+                                            evt.preventDefault();
+                                            return;
+                                        }
+                                    }}
+                                />
+                            </td>
+                        {/if}
                         <td
                             use:removeIcon
                             on:click={function (evt) {

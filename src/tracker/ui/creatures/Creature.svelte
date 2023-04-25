@@ -9,6 +9,7 @@
     import { createEventDispatcher } from "svelte";
 
     const dispatch = createEventDispatcher();
+    const { updateTarget } = tracker;
 
     export let creature: Creature;
     $: statuses = creature.status;
@@ -105,15 +106,36 @@
     </div>
 </td>
 
-<td class="center hp-container creature-adder">
+<td
+    class="center hp-container creature-adder"
+    on:click|stopPropagation={(evt) => {
+        const prev = $updateTarget;
+        $updateTarget = "hp";
+        if (prev == "ac") return;
+        tracker.setUpdate(creature, evt);
+    }}
+>
     <div>
         {@html creature.hpDisplay}
     </div>
 </td>
 
-<td class="center ac-container creature-adder"
-    >{creature.ac ?? DEFAULT_UNDEFINED}</td
+<td
+    class="center ac-container creature-adder"
+    on:click|stopPropagation={(evt) => {
+        const prev = $updateTarget;
+        $updateTarget = "ac";
+        if (prev == "hp") return;
+        tracker.setUpdate(creature, evt);
+    }}
 >
+    <div
+        class:dirty-ac={creature.current_ac != creature.ac}
+        aria-label={creature.current_ac != creature.ac ? `${creature.ac}` : ""}
+    >
+        {creature.current_ac ? creature.current_ac : DEFAULT_UNDEFINED}
+    </div>
+</td>
 
 <td class="controls-container">
     <CreatureControls
@@ -165,5 +187,8 @@
     .controls-container {
         border-top-right-radius: 0.25rem;
         border-bottom-right-radius: 0.25rem;
+    }
+    .dirty-ac {
+        font-weight: var(--font-bold);
     }
 </style>

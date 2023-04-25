@@ -25,6 +25,7 @@ type HPUpdate = {
 type CreatureUpdate = {
     hp?: number;
     ac?: number | string;
+    current_ac?: number | string;
     initiative?: number;
     name?: string;
     marker?: string;
@@ -39,6 +40,7 @@ const modifier = Platform.isMacOS ? "Meta" : "Control";
 function createTracker() {
     const creatures = writable<Creature[]>([]);
     const updating = writable<Map<Creature, HPUpdate>>(new Map());
+    const updateTarget = writable<"ac" | "hp">();
     const { subscribe, set, update } = creatures;
 
     const $logFile = writable<TFile | null>();
@@ -147,7 +149,10 @@ function createTracker() {
                                 // Gives temp a value, such that it will be set later
                                 change.temp =
                                     change.hp -
-                                    Math.min(creature.current_max - creature.hp, 0);
+                                    Math.min(
+                                        creature.current_max - creature.hp,
+                                        0
+                                    );
                                 change.hp -= change.temp;
                                 break;
                             case OVERFLOW_TYPE.current:
@@ -163,13 +168,19 @@ function createTracker() {
                     }
                 }
                 if (change.max) {
-                    creature.current_max = Math.max(0, creature.current_max + change.max);
-                    if (creature.hp >= creature.current_max && _settings.hpOverflow !== OVERFLOW_TYPE.current) {
+                    creature.current_max = Math.max(
+                        0,
+                        creature.current_max + change.max
+                    );
+                    if (
+                        creature.hp >= creature.current_max &&
+                        _settings.hpOverflow !== OVERFLOW_TYPE.current
+                    ) {
                         creature.hp = creature.current_max;
                     }
                 }
                 if (change.ac) {
-                    creature.ac = change.ac;
+                    creature.current_ac = creature.ac = change.ac;
                 }
                 if (change.temp) {
                     let baseline = 0;
@@ -181,13 +192,12 @@ function createTracker() {
                             creature.temp,
                             baseline + change.temp
                         );
-                    }
-                    else {
+                    } else {
                         creature.temp = Math.max(
                             0,
                             creature.temp + change.temp
                         );
-                    };
+                    }
                 }
                 if (change.marker) {
                     creature.marker = change.marker;
@@ -293,6 +303,7 @@ function createTracker() {
         },
 
         updating,
+        updateTarget,
         updateCreatures,
 
         setUpdate: (creature: Creature, evt: MouseEvent) =>
@@ -308,7 +319,7 @@ function createTracker() {
                 }
                 return creatures;
             }),
-        doUpdate: (toAddString: string, statuses: Condition[]) =>
+        doUpdate: (toAddString: string, statuses: Condition[], ac: string) =>
             updating.update((updatingCreatures) => {
                 const messages: UpdateLogMessage[] = [];
                 const updates: CreatureUpdates[] = [];
@@ -331,7 +342,9 @@ function createTracker() {
                         max: false,
                         status: null,
                         saved: false,
-                        unc: false
+                        unc: false,
+                        ac: null,
+                        ac_add: false
                     };
 
                     if (toAddString.charAt(0) == "t") {
@@ -364,6 +377,24 @@ function createTracker() {
                         } else {
                             message.saved = true;
                         }
+                    }
+                    if (ac != null) {
+                        if (ac.charAt(0) == "+" || ac.charAt(0) == "-") {
+                            const current_ac = parseInt(
+                                String(creature.current_ac)
+                            );
+                            if (isNaN(current_ac)) {
+                                creature.current_ac = creature.current_ac + ac;
+                            } else {
+                                creature.current_ac = current_ac + parseInt(ac);
+                            }
+                            message.ac_add = true;
+                        } else {
+                            creature.current_ac = ac.slice(
+                                Number(ac.charAt(0) == "\\")
+                            );
+                        }
+                        message.ac = ac;
                     }
                     messages.push(message);
                     updates.push({ creature, change });
@@ -500,7 +531,10 @@ function createTracker() {
                         let roller = plugin.getRoller(
                             creature.hit_dice
                         ) as StackRoller;
-                        creature.hp = creature.max = creature.current_max = roller.rollSync();
+                        creature.hp =
+                            creature.max =
+                            creature.current_max =
+                                roller.rollSync();
                     }
                 }
                 creatures.push(...items);
@@ -545,7 +579,7 @@ function createTracker() {
                 $state.set(state?.state ?? false);
                 $name.set(state?.name ?? null);
                 creatures = state?.creatures
-                    ? state.creatures.map((c) => Creature.from(c))
+                    ? state.creatures.map((c) => Creature.fromJSON(c))
                     : creatures.filter((c) => c.player);
                 if (!state || state?.roll) {
                     for (let creature of creatures) {
@@ -565,7 +599,10 @@ function createTracker() {
                             let roller = plugin.getRoller(
                                 creature.hit_dice
                             ) as StackRoller;
-                            creature.hp = creature.max = creature.current_max = roller.rollSync();
+                            creature.hp =
+                                creature.max =
+                                creature.current_max =
+                                    roller.rollSync();
                         }
                     }
                 }
@@ -584,6 +621,7 @@ function createTracker() {
         reset: () =>
             updateAndSave((creatures) => {
                 for (let creature of creatures) {
+                    creature.current_ac = creature.ac;
                     creature.hp = creature.current_max = creature.max;
                     creature.enabled = true;
                     creature.hidden = false;
@@ -606,44 +644,38 @@ function createTracker() {
                                 message.name
                             } gained ${message.hp.toString()} temporary HP`
                         );
-                    } else if (!message.max) {
-                        if (message.hp < 0) {
-                            perCreature.push(
-                                `${message.name} took ${(
-                                    -1 * message.hp
-                                ).toString()} damage${
-                                    message.unc
-                                        ? " and was knocked unconscious"
-                                        : ""
-                                }`
-                            );
-                        } else if (message.hp > 0) {
-                            perCreature.push(
-                                `${
-                                    message.name
-                                } was healed for ${message.hp.toString()} HP`
-                            );
-                        }
-                    }
-                     else if (message.max) {
+                    } else if (message.max) {
                         if (message.hp < 0) {
                             perCreature.push(
                                 `${message.name} took ${(
                                     -1 * message.hp
                                 ).toString()} max HP damage${
-                                    message.unc
-                                        ? " and died"
-                                        : ""
+                                    message.unc ? " and died" : ""
                                 }`
                             );
-                        }
-                        else {
+                        } else {
                             perCreature.push(
                                 `${message.name} gained ${(
                                     -1 * message.hp
                                 ).toString()} max HP`
                             );
                         }
+                    } else if (message.hp < 0) {
+                        perCreature.push(
+                            `${message.name} took ${(
+                                -1 * message.hp
+                            ).toString()} damage${
+                                message.unc
+                                    ? " and was knocked unconscious"
+                                    : ""
+                            }`
+                        );
+                    } else if (message.hp > 0) {
+                        perCreature.push(
+                            `${
+                                message.name
+                            } was healed for ${message.hp.toString()} HP`
+                        );
                     }
                 }
                 if (message.status) {
