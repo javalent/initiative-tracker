@@ -87,7 +87,7 @@
         modal = null;
 
         $updateTarget = null;
-        
+
         return;
     };
 </script>
@@ -100,7 +100,7 @@
                 <div class="hp-status">
                     {#if plugin.data.beginnerTips}
                         <small class="label">
-                            Apply damage, healing(-) or temp HP(t)
+                            Apply damage, healing(-), temp HP(t), or max HP(m)
                         </small>
                     {/if}
                     <div class="input">
@@ -121,8 +121,8 @@
                                     return;
                                 }
                                 if (
-                                    !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
-                                        this.value + evt.key
+                                    !/^(t?m?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
+                                        evt.key
                                     )
                                 ) {
                                     evt.preventDefault();
