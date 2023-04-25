@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.8.1](https://github.com/javalent/initiative-tracker/compare/9.8.0...9.8.1) (2023-04-25)
+
+
+### Bug Fixes
+
+* ac updatable (oops) ([#148](https://github.com/javalent/initiative-tracker/issues/148)) ([ebd2b5e](https://github.com/javalent/initiative-tracker/commit/ebd2b5ecefa7d0e9ba78265089fd15fabe6e1aea))
+* fix max HP cannot be entered ([#148](https://github.com/javalent/initiative-tracker/issues/148)) ([fb09d9d](https://github.com/javalent/initiative-tracker/commit/fb09d9d9233db1749747487cd16807555e97736c))
+* fixes max hp logging ([5996907](https://github.com/javalent/initiative-tracker/commit/5996907b3666f4d71fff8ca4106c78325ddf8191))
+* re-add value to hp guard ([60b6949](https://github.com/javalent/initiative-tracker/commit/60b69492085f793978dbf6092c9bc83c2efb06b1))
+
 ## [9.8.0](https://github.com/javalent/initiative-tracker/compare/9.7.1...9.8.0) (2023-04-25)
 
 
