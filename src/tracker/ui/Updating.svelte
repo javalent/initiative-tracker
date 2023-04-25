@@ -5,6 +5,7 @@
     import { AC, HP, REMOVE, TAG } from "src/utils";
     import { ConditionSuggestionModal } from "src/utils/suggester";
     import { getContext } from "svelte";
+    import { getId } from "src/utils/creature";
 
     import { tracker } from "../stores/tracker";
     const { updating, updateTarget } = tracker;
@@ -45,7 +46,11 @@
             $statuses = [
                 ...$statuses,
                 {
-                    ...plugin.data.statuses.find((s) => s.name == status)
+                    ...(plugin.data.statuses.find((s) => s.name == status) ?? {
+                        name: status,
+                        id: getId(),
+                        desc: ""
+                    })
                 }
             ];
             status = null;
