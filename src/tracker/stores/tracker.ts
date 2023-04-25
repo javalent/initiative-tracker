@@ -180,7 +180,7 @@ function createTracker() {
                     }
                 }
                 if (change.ac) {
-                    creature.current_ac = creature.ac = change.ac;
+                    creature.current_ac = change.ac;
                 }
                 if (change.temp) {
                     let baseline = 0;
@@ -223,16 +223,14 @@ function createTracker() {
                 if ("hidden" in change) {
                     creature.hidden = change.hidden!;
                     _logger.log(
-                        `${creature.getName()} ${
-                            creature.hidden ? "hidden" : "revealed"
+                        `${creature.getName()} ${creature.hidden ? "hidden" : "revealed"
                         }`
                     );
                 }
                 if ("enabled" in change) {
                     creature.enabled = change.enabled!;
                     _logger.log(
-                        `${creature.getName()} ${
-                            creature.enabled ? "enabled" : "disabled"
+                        `${creature.getName()} ${creature.enabled ? "enabled" : "disabled"
                         }`
                     );
                 }
@@ -534,7 +532,7 @@ function createTracker() {
                         creature.hp =
                             creature.max =
                             creature.current_max =
-                                roller.rollSync();
+                            roller.rollSync();
                     }
                 }
                 creatures.push(...items);
@@ -602,7 +600,7 @@ function createTracker() {
                             creature.hp =
                                 creature.max =
                                 creature.current_max =
-                                    roller.rollSync();
+                                roller.rollSync();
                         }
                     }
                 }
@@ -640,8 +638,7 @@ function createTracker() {
                 if (message.hp) {
                     if (message.temp) {
                         perCreature.push(
-                            `${
-                                message.name
+                            `${message.name
                             } gained ${message.hp.toString()} temporary HP`
                         );
                     } else if (message.max) {
@@ -649,8 +646,7 @@ function createTracker() {
                             perCreature.push(
                                 `${message.name} took ${(
                                     -1 * message.hp
-                                ).toString()} max HP damage${
-                                    message.unc ? " and died" : ""
+                                ).toString()} max HP damage${message.unc ? " and died" : ""
                                 }`
                             );
                         } else {
@@ -664,16 +660,14 @@ function createTracker() {
                         perCreature.push(
                             `${message.name} took ${(
                                 -1 * message.hp
-                            ).toString()} damage${
-                                message.unc
-                                    ? " and was knocked unconscious"
-                                    : ""
+                            ).toString()} damage${message.unc
+                                ? " and was knocked unconscious"
+                                : ""
                             }`
                         );
                     } else if (message.hp > 0) {
                         perCreature.push(
-                            `${
-                                message.name
+                            `${message.name
                             } was healed for ${message.hp.toString()} HP`
                         );
                     }

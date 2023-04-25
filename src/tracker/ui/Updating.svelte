@@ -45,8 +45,8 @@
             $statuses = [
                 ...$statuses,
                 {
-                    ...plugin.data.statuses.find((s) => s.name == status)
-                }
+                    ...plugin.data.statuses.find((s) => s.name == status),
+                },
             ];
             status = null;
         }
@@ -76,7 +76,7 @@
     }
     const performUpdate = (perform: boolean) => {
         if (perform) {
-            tracker.doUpdate(damage ?? "", $statuses);
+            tracker.doUpdate(damage ?? "", $statuses, ac);
         } else {
             tracker.clearUpdate();
         }
@@ -87,7 +87,7 @@
         modal = null;
 
         $updateTarget = null;
-        
+
         return;
     };
 </script>
@@ -121,7 +121,7 @@
                                     return;
                                 }
                                 if (
-                                    !/^(t?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
+                                    !/^((t|m)?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
                                         this.value + evt.key
                                     )
                                 ) {
