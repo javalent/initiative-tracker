@@ -28,6 +28,7 @@ export class Creature {
     enabled: boolean = true;
     hidden: boolean = false;
     max: number;
+    current_max: number;
     level: number;
     player: boolean;
     status: Set<Condition> = new Set();
@@ -62,7 +63,7 @@ export class Creature {
                 : Number(initiative ?? 0);
         this.modifier = Number(creature.modifier ?? 0);
 
-        this.max = creature.hp ? Number(creature.hp) : undefined;
+        this.max = this.current_max = creature.hp ? Number(creature.hp) : 0;
         this.ac = creature.ac ?? undefined;
         this.note = creature.note;
         this.level = creature.level;
@@ -96,14 +97,14 @@ export class Creature {
         }
     }
     get hpDisplay() {
-        if (this.max) {
+        if (this.current_max) {
             const tempMods =
                 this.temp > 0
                     ? `aria-label="Temp HP: ${this.temp}" style="font-weight:bold"`
                     : "";
             return `
                 <span ${tempMods}>${this.hp + this.temp}</span><span>/${
-                this.max
+                this.current_max
             }</span>
             `;
         }
@@ -181,7 +182,7 @@ export class Creature {
         this.name = creature.name;
         this.modifier = Number(creature.modifier ?? 0);
 
-        this.max = creature.hp ? Number(creature.hp) : undefined;
+        this.current_max = this.max = creature.hp ? Number(creature.hp) : 0;
 
         if (this.hp > this.max) this.hp = this.max;
 
@@ -206,6 +207,7 @@ export class Creature {
             initiative: this.initiative - this.modifier,
             modifier: this.modifier,
             hp: this.max,
+            currentMaxHP: this.current_max,
             ac: this.ac,
             note: this.note,
             id: this.id,
@@ -230,6 +232,7 @@ export class Creature {
         creature.enabled = state.enabled;
 
         creature.temp = state.tempHP ? state.tempHP : 0;
+        creature.current_max = state.currentMaxHP;
         creature.hp = state.currentHP;
         let statuses: Condition[] = [];
         for (const status of state.status) {
