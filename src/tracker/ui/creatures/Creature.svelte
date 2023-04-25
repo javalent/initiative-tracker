@@ -9,6 +9,7 @@
     import { createEventDispatcher } from "svelte";
 
     const dispatch = createEventDispatcher();
+    const { updateTarget } = tracker;
 
     export let creature: Creature;
     $: statuses = creature.status;
@@ -60,7 +61,7 @@
         on:initiative={(e) => {
             tracker.updateCreatures({
                 creature,
-                change: { initiative: Number(e.detail) },
+                change: { initiative: Number(e.detail) }
             });
         }}
     />
@@ -96,7 +97,7 @@
                     on:remove={() => {
                         tracker.updateCreatures({
                             creature,
-                            change: { status: [status] },
+                            change: { status: [status] }
                         });
                     }}
                 />
@@ -108,7 +109,9 @@
 <td
     class="center hp-container creature-adder"
     on:click|stopPropagation={(evt) => {
-        tracker.updateTarget.set("hp");
+        const prev = $updateTarget;
+        $updateTarget = "hp";
+        if (prev == "ac") return;
         tracker.setUpdate(creature, evt);
     }}
 >
@@ -120,7 +123,9 @@
 <td
     class="center ac-container creature-adder"
     on:click|stopPropagation={(evt) => {
-        tracker.updateTarget.set("ac");
+        const prev = $updateTarget;
+        $updateTarget = "ac";
+        if (prev == "hp") return;
         tracker.setUpdate(creature, evt);
     }}
 >

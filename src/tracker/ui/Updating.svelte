@@ -85,6 +85,9 @@
         ac = null;
         $statuses = [];
         modal = null;
+
+        $updateTarget = null;
+        
         return;
     };
 </script>
