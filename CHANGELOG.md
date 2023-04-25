@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.8.0](https://github.com/javalent/initiative-tracker/compare/9.7.1...9.8.0) (2023-04-25)
+
+
+### Features
+
+* add functionality for max HP damage ([38ebd91](https://github.com/javalent/initiative-tracker/commit/38ebd91e72725c9fd5f7c0129b4113a14410b303))
+* Temporarily change AC on the fly ([#118](https://github.com/javalent/initiative-tracker/issues/118)) ([ac03929](https://github.com/javalent/initiative-tracker/commit/ac03929daee48baeaa4767f6ec81ae164ca61e32))
+
+
+### Bug Fixes
+
+* status amount set if not ([6189dda](https://github.com/javalent/initiative-tracker/commit/6189dda67d156e82889df73810d51c058262f47e))
+
 ## [9.7.1](https://github.com/javalent/initiative-tracker/compare/9.7.0...9.7.1) (2023-04-24)
 
 
