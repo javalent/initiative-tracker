@@ -76,7 +76,7 @@
     }
     const performUpdate = (perform: boolean) => {
         if (perform) {
-            tracker.doUpdate(damage ?? "", $statuses);
+            tracker.doUpdate(damage ?? "", $statuses, ac);
         } else {
             tracker.clearUpdate();
         }
