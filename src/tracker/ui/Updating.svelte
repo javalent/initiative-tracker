@@ -122,7 +122,7 @@
                                 }
                                 if (
                                     !/^(t?m?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
-                                        evt.key
+                                        this.value + evt.key
                                     )
                                 ) {
                                     evt.preventDefault();
