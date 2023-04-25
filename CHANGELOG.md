@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.8.2](https://github.com/javalent/initiative-tracker/compare/9.8.1...9.8.2) (2023-04-25)
+
+
+### Bug Fixes
+
+* improvised statuses work again (close [#148](https://github.com/javalent/initiative-tracker/issues/148)) ([53dcaa2](https://github.com/javalent/initiative-tracker/commit/53dcaa20708f570d40e1edf34a8656d060061d76))
+
 ## [9.8.1](https://github.com/javalent/initiative-tracker/compare/9.8.0...9.8.1) (2023-04-25)
 
 
