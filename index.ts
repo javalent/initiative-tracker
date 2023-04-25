@@ -140,6 +140,7 @@ export interface CreatureState extends HomebrewCreature {
     currentMaxHP: number;
     currentHP: number;
     tempHP: number;
+    currentAC: number | string;
     initiative: number;
     player: boolean;
     xp: number;
@@ -206,6 +207,8 @@ export interface UpdateLogMessage {
     max: boolean;
     saved: boolean;
     unc: boolean;
+    ac: string;
+    ac_add: boolean;
 }
 
 export interface BuilderPartyPlayer {

@@ -197,6 +197,7 @@
             <label for="add-ac">AC</label>
             <input
                 bind:value={creature.ac}
+                on:change={() => creature.dirty_ac=true}
                 id="add-ac"
                 name="ac"
                 type="text"
