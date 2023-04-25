@@ -137,6 +137,7 @@ export interface InitiativeViewState {
 export interface CreatureState extends HomebrewCreature {
     status: string[];
     enabled: boolean;
+    currentMaxHP: number;
     currentHP: number;
     tempHP: number;
     currentAC: number | string;
@@ -203,6 +204,7 @@ export interface UpdateLogMessage {
     hp: number | null;
     temp: boolean;
     status: string[] | null;
+    max: boolean;
     saved: boolean;
     unc: boolean;
     ac: string;

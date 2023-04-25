@@ -82,7 +82,7 @@
                     class:friendly={creature.friendly}
                     animate:flip={{ duration: flipDurationMs }}
                     data-hp={creature.hp}
-                    data-hp-max={creature.max}
+                    data-hp-max={creature.current_max}
                     data-hp-percent={Math.round(
                         ((creature.hp ?? 0) / creature.max) * 100 ?? 0
                     )}

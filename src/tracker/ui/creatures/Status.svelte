@@ -6,6 +6,9 @@
     import type { Condition } from "index";
 
     export let status: Condition;
+    if (isNaN(status.amount) || status.amount < 0) {
+        status.amount = status.startingAmount;
+    }
     const deleteIcon = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("cross-in-box");
     };

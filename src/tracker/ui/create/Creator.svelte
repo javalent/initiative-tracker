@@ -35,7 +35,7 @@
                 if (!$adding.length && !isEditing) return;
                 if (isEditing) {
                     if ($editing.hp != creature.max) {
-                        creature.max = $editing.hp;
+                        creature.max = creature.current_max = $editing.hp;
                     }
                     if (creature.dirty_ac) {
                         creature.current_ac = $editing.ac;

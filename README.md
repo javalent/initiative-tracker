@@ -294,7 +294,8 @@ Once all of the creatures in a given combat have been added, initiatives can be 
 
 ### HP
 
-Creatures can take damage, be healed or gain temporary HP by clicking on their HP.
+Creatures can take damage, be healed, gain temporary HP or take max HP damage by clicking on their HP.
+The temp HP and max HP modifiers also support the "-" symbol to remove temp HP and restore/gain max HP.
 
 #### Rolling HP
 

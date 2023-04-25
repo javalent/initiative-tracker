@@ -177,7 +177,7 @@ export default class Logger {
                 if (message.status.length > 1) {
                     status = [
                         message.status
-                            .slice(0, Math.max(message.status.length - 1, 1))
+                            .slice(0, message.status.length - 1)
                             .join(", ")
                     ];
                     status.push(message.status[message.status.length - 1]);
