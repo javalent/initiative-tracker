@@ -38,8 +38,7 @@
 {/if}
 
 <style>
-    .creature-name,
-    .creatures-header {
+    .creature-name {
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;

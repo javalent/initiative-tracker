@@ -6,6 +6,7 @@
     import { ConditionSuggestionModal } from "src/utils/suggester";
     import { getContext } from "svelte";
     import { getId } from "src/utils/creature";
+    import Status from "src/tracker/ui/creatures/Status.svelte";
 
     import { tracker } from "../stores/tracker";
     const { updating, updateTarget } = tracker;
@@ -49,9 +50,9 @@
                     ...(plugin.data.statuses.find((s) => s.name == status) ?? {
                         name: status,
                         id: getId(),
-                        desc: ""
-                    })
-                }
+                        desc: "",
+                    }),
+                },
             ];
             status = null;
         }
@@ -160,7 +161,19 @@
                                 }}
                                 on:keydown={function (evt) {
                                     if (["Enter", "Escape"].includes(evt.key)) {
-                                        performUpdate(evt.key == "Enter");
+                                        if (evt.key == "Enter" && status) {
+                                            applyStatus();
+                                            modal.items = plugin.data.statuses
+                                                .filter(
+                                                    (s) =>
+                                                        !$statuses.find(
+                                                            (a) => a.id == s.id
+                                                        )
+                                                )
+                                                .map((s) => s.name);
+                                        } else {
+                                            performUpdate(evt.key == "Enter");
+                                        }
                                     }
                                 }}
                             />
@@ -169,8 +182,32 @@
                             use:applyStatusIcon
                             aria-label="Add Status"
                             on:click={applyStatus}
+                            style="margin: 0rem 0.2rem 0rem 0rem"
                         />
                     </div>
+                    {#if $statuses.length}
+                        <div class="status-list">
+                            <div
+                                use:removeIcon
+                                aria-label="Clear status list"
+                                style="margin:0.2rem 0.2rem 0rem 0.7rem;cursor:pointer;"
+                                on:click={function (evt) {
+                                    $statuses = [];
+                                }}
+                            />
+                            <div class="status-list-entries">
+                                {#each $statuses as status}
+                                    <Status
+                                        {status}
+                                        on:remove={function (evt) {
+                                            $statuses.remove(status);
+                                            $statuses = $statuses;
+                                        }}
+                                    />
+                                {/each}
+                            </div>
+                        </div>
+                    {/if}
                 </div>
             </div>
         {:else}
@@ -187,6 +224,10 @@
                     <input
                         type="text"
                         bind:value={ac}
+                        on:focus={function () {
+                            // Resolves bug caused by condition select modal not closing
+                            modal = null;
+                        }}
                         on:keydown={function (evt) {
                             if (evt.key == "Tab") {
                                 return true;
@@ -202,46 +243,6 @@
             </div>
         {/if}
     </div>
-    {#if $updateTarget == "hp"}
-        <div class="statuses">
-            <table class="updating-creature-table">
-                <thead class="updating-creature-table-header">
-                    <th style="width:100%" class="left">Status</th>
-                    <th
-                        style="cursor:pointer"
-                        class="left"
-                        use:removeIcon
-                        on:click={() => performUpdate(false)}
-                    />
-                </thead>
-                <tbody>
-                    {#each $statuses as status}
-                        <tr class="updating-creature-table-row">
-                            <td>
-                                <span>
-                                    {status.name}
-                                </span>
-                            </td>
-
-                            <td
-                                use:removeIcon
-                                on:click={function (evt) {
-                                    $statuses.remove(status);
-                                    $statuses = $statuses;
-                                }}
-                                style="cursor:pointer"
-                            />
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
-        </div>
-    {/if}
-    {#if plugin.data.beginnerTips}
-        <div>
-            <small>Multiple creatures can be selected at a time.</small>
-        </div>
-    {/if}
     <div style="margin: 0.5rem">
         <table class="updating-creature-table">
             <thead class="updating-creature-table-header">
@@ -250,12 +251,7 @@
                     <th style="padding:0 0.2rem" class="center">Saved</th>
                     <th style="padding:0 0.2rem" class="center">Resist</th>
                     <th style="padding:0 0.2rem" class="center">Modifier</th>
-                    <th
-                        style="cursor:pointer"
-                        class="left"
-                        use:removeIcon
-                        on:click={() => performUpdate(false)}
-                    />
+                    <th />
                 {/if}
             </thead>
             <tbody>
@@ -333,6 +329,8 @@
             aria-label="Cancel"
         />
     </div>
+{:else}
+    <div on:load={performUpdate(false)} />
 {/if}
 
 <style scoped>
@@ -354,6 +352,16 @@
     th:has(> svg) {
         display: flex;
         align-items: center;
+    }
+    .status-list {
+        display: flex;
+        margin: 0.5rem 0 0.1rem 0;
+    }
+    .status-list-entries {
+        display: flex;
+        flex-flow: row wrap;
+        column-gap: 0.25rem;
+        margin: 0 2rem 0 0.5rem;
     }
     .left {
         text-align: left;
@@ -379,7 +387,7 @@
         display: flex;
         justify-content: flex-end;
         gap: 1rem;
-        margin-right: 1.2rem;
+        margin-right: 0.7rem;
     }
     td > input {
         margin: 0;
