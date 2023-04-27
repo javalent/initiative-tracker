@@ -49,9 +49,9 @@
                     ...(plugin.data.statuses.find((s) => s.name == status) ?? {
                         name: status,
                         id: getId(),
-                        desc: ""
-                    })
-                }
+                        desc: "",
+                    }),
+                },
             ];
             status = null;
         }
@@ -105,13 +105,13 @@
                 <div class="hp-status">
                     {#if plugin.data.beginnerTips}
                         <small class="label">
-                            Apply damage, healing(-), temp HP(t), or max HP(m)
+                            Apply damage, (-)healing, (t)temp HP, or (m)max HP
                         </small>
                     {/if}
                     <div class="input">
                         <tag
                             use:hpIcon
-                            aria-label="Apply damage, healing(-) or temp HP(t)"
+                            aria-label="Apply damage, (-)healing, (t)temp HP, or (m)max HP"
                             style="margin: 0 0.2rem 0 0.7rem"
                         />
                         <input
