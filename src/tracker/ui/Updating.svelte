@@ -126,7 +126,7 @@
                                     return;
                                 }
                                 if (
-                                    !/^(t?m?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
+                                    !/^((t|m)?-?\d*\.?\d*(Backspace|Delete|Arrow\w+)?)$/.test(
                                         this.value + evt.key
                                     )
                                 ) {
