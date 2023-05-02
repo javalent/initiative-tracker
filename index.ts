@@ -63,7 +63,7 @@ export type Condition = {
     resetOnRound?: boolean;
     hasAmount?: boolean;
     startingAmount?: number;
-    amount?:number;
+    amount?: number;
 } & (
     | {
           hasAmount: true;
@@ -251,7 +251,6 @@ export declare class Creature {
     player: boolean;
     status: Set<Condition>;
     marker: string;
-    private _initiative;
     source: string | string[];
     id: string;
     xp: number;
