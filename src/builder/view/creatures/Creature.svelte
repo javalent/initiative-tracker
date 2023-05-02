@@ -1,11 +1,14 @@
 <script lang="ts">
     import type { SRDMonster } from "index";
-    import { ExtraButtonComponent, HoverPopover } from "obsidian";
-    import { DEFAULT_UNDEFINED } from "src/utils";
+    import { ExtraButtonComponent, HoverPopover, setIcon } from "obsidian";
     import { getContext } from "svelte";
     import { encounter } from "../../stores/encounter";
     import Nullable from "../Nullable.svelte";
+    import { convertFraction, DEFAULT_UNDEFINED, XP_PER_CR } from "src/utils";
     import { Creature as CreatureCreator } from "src/utils/creature";
+
+    const { players } = encounter;
+    const { average } = players;
 
     const plugin = getContext("plugin");
     export let creature: SRDMonster;
@@ -52,10 +55,30 @@
         if (!Array.isArray(source)) return "";
         return stringify(source, 0, ", ", false);
     }
+    const convertedCR = (cr: string | number) => {
+        if (cr == undefined) return DEFAULT_UNDEFINED;
+        if (cr == "1/8") {
+            return "⅛";
+        }
+        if (cr == "1/4") {
+            return "¼";
+        }
+        if (cr == "1/2") {
+            return "½";
+        }
+        return cr;
+    };
+
+    const insignificant = convertFraction(creature.cr) < $average - 3;
+
+    const baby = (node: HTMLElement) => setIcon(node, "baby");
+    const challenge = convertFraction(creature.cr) > $average + 3;
+
+    const skull = (node: HTMLElement) => setIcon(node, "skull");
 </script>
 
 <tr class="creature">
-    <td class="creature-name creature-40">
+    <td class="creature-40">
         <div class="creature-name-container">
             <div use:add on:click={() => encounter.add(creature)} />
             <!-- svelte-ignore a11y-mouse-events-have-key-events -->
@@ -65,6 +88,20 @@
                     plugin.openCombatant(CreatureCreator.from(creature))}
             >
                 {creature.name}
+                {#if insignificant}
+                    <div
+                        class="contains-icon"
+                        use:baby
+                        aria-label={"This creature is significantly under the average party level and might not contribute much to the fight."}
+                    />
+                {/if}
+                {#if challenge}
+                    <div
+                        class="contains-icon"
+                        use:skull
+                        aria-label={"This creature is significantly over the average party level and might prove a challenge."}
+                    />
+                {/if}
             </div>
             <div class="setting-item-description">
                 {#if creature.source?.length}
@@ -105,6 +142,8 @@
     }
     .creature-name {
         cursor: pointer;
+        display: flex;
+        justify-content: space-between;
     }
     .setting-item-description {
         grid-area: desc;
