@@ -130,6 +130,7 @@ interface BuilderState {
     sidebarIcon: boolean;
     showXP: boolean;
     showParty: boolean;
+    headers?: TableHeaderState[];
 }
 
 export interface InitiativeViewState {
@@ -185,6 +186,8 @@ export interface SRDMonster {
     source?: string | string[];
     friendly?: boolean;
     hidden?: boolean;
+
+    [key: string]: any;
 }
 
 export interface HomebrewCreature {
@@ -284,3 +287,16 @@ export declare class Creature {
     toJSON(): CreatureState;
     static fromJSON(state: CreatureState): Creature;
 }
+
+//Builder
+export enum SortFunctions {
+    LOCAL_COMPARE,
+    CONVERT_FRACTION,
+    CUSTOM
+}
+export type TableHeaderState = {
+    text: string;
+    field: string;
+    type: SortFunctions;
+    func?: string;
+};

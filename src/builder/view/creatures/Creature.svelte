@@ -6,11 +6,15 @@
     import Nullable from "../Nullable.svelte";
     import { convertFraction, DEFAULT_UNDEFINED, XP_PER_CR } from "src/utils";
     import { Creature as CreatureCreator } from "src/utils/creature";
+    import type { createTable } from "src/builder/stores/table";
+    import type InitiativeTracker from "src/main";
 
     const { players } = encounter;
     const { average } = players;
 
-    const plugin = getContext("plugin");
+    const plugin = getContext<InitiativeTracker>("plugin");
+    const table = getContext<ReturnType<typeof createTable>>("table");
+
     export let creature: SRDMonster;
     const add = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("plus-with-circle");
@@ -55,19 +59,6 @@
         if (!Array.isArray(source)) return "";
         return stringify(source, 0, ", ", false);
     }
-    const convertedCR = (cr: string | number) => {
-        if (cr == undefined) return DEFAULT_UNDEFINED;
-        if (cr == "1/8") {
-            return "⅛";
-        }
-        if (cr == "1/4") {
-            return "¼";
-        }
-        if (cr == "1/2") {
-            return "½";
-        }
-        return cr;
-    };
 
     const insignificant = convertFraction(creature.cr) < $average - 3;
 
@@ -78,7 +69,7 @@
 </script>
 
 <tr class="creature">
-    <td class="creature-40">
+    <td>
         <div class="creature-name-container">
             <div use:add on:click={() => encounter.add(creature)} />
             <!-- svelte-ignore a11y-mouse-events-have-key-events -->
@@ -115,16 +106,14 @@
             <!-- svelte-ignore a11y-mouse-events-have-key-events -->
         </div>
     </td>
-    <td class="creature-cr creature-15"><Nullable str={creature.cr ?? 0} /></td>
-    <td class="creature-type creature-15"
-        ><Nullable str={creature.type ?? DEFAULT_UNDEFINED} /></td
-    >
-    <td class="creature-size creature-15"
-        ><Nullable str={creature.size ?? DEFAULT_UNDEFINED} /></td
-    >
-    <td class="creature-alignment creature-15">
-        <Nullable str={creature.alignment ?? DEFAULT_UNDEFINED} />
-    </td>
+    {#each $table as header}
+        <td><Nullable str={creature[header.field] ?? DEFAULT_UNDEFINED} /></td>
+        <!-- <td><Nullable str={creature.type ?? DEFAULT_UNDEFINED} /></td>
+        <td><Nullable str={creature.size ?? DEFAULT_UNDEFINED} /></td>
+        <td>
+            <Nullable str={creature.alignment ?? DEFAULT_UNDEFINED} />
+        </td> -->
+    {/each}
 </tr>
 
 <style scoped>
@@ -152,10 +141,4 @@
         display: flex;
         align-items: center;
     } */
-    .creature-40 {
-        width: 40%;
-    }
-    .creature-15 {
-        width: 15%;
-    }
 </style>

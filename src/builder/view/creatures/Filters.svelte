@@ -6,7 +6,7 @@
         Modal,
         TextComponent
     } from "obsidian";
-    import { getContext } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
     import { slide } from "svelte/transition";
     import { linear } from "svelte/easing";
     import Slider from "./Slider.svelte";
@@ -26,6 +26,7 @@
     } from "../../stores/filter";
 
     let open = false;
+    const dispatch = createEventDispatcher();
 
     const plugin = getContext("plugin");
     const original = plugin.bestiary as SRDMonster[];
@@ -72,6 +73,9 @@
     const filter = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("filter");
     };
+    const settingsIcon = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon("settings");
+    };
     const sourcesButton = (node: HTMLElement) => {
         new ButtonComponent(node)
             .setButtonText("Manage Sources")
@@ -100,6 +104,7 @@
             <div class="filter-number">{active}</div>
         </div>
         <div use:resetIcon on:click={() => reset()} />
+        <div use:settingsIcon on:click={() => dispatch("settings")} />
     </div>
     {#if open}
         <div class="filters" transition:slide={{ easing: linear }}>
