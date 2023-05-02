@@ -307,6 +307,10 @@ function createTracker() {
         updateTarget,
         updateCreatures,
 
+        players: derived(ordered, (creatures) =>
+            creatures.filter((c) => c.player)
+        ),
+
         setUpdate: (creature: Creature, evt: MouseEvent) =>
             updating.update((creatures) => {
                 if (creatures.has(creature)) {

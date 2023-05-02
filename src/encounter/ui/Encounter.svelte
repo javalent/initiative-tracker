@@ -121,6 +121,11 @@
                 );
             })
             .flat();
+        for (const player of players) {
+            if (!$tracker.find((creature) => creature.name === player)) {
+                creatures.push(plugin.getPlayerByName(player));
+            }
+        }
         tracker.add(plugin, rollHP, ...creatures);
     };
 
