@@ -564,6 +564,7 @@ function createTracker() {
             });
         },
         update: () => update((c) => c),
+        updateAndSave: () => updateAndSave((c) => c),
         roll: (plugin: InitiativeTracker) =>
             updateAndSave((creatures) => {
                 for (let creature of creatures) {
