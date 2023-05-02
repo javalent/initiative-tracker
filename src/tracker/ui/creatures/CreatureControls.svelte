@@ -7,7 +7,7 @@
         HP,
         MAPMARKER,
         REMOVE,
-        TAG,
+        TAG
     } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/tracker/view";
@@ -42,7 +42,7 @@
                         .setTitle("Reset AC")
                         .onClick((e: MouseEvent) => {
                             creature.current_ac = creature.ac;
-                            tracker.update();
+                            tracker.updateAndSave();
                         });
                 });
             }
@@ -60,7 +60,7 @@
                         .onClick(() => {
                             tracker.updateCreatures({
                                 creature,
-                                change: { hidden: false },
+                                change: { hidden: false }
                             });
                         });
                 });
@@ -71,7 +71,7 @@
                         .onClick(() => {
                             tracker.updateCreatures({
                                 creature,
-                                change: { hidden: true },
+                                change: { hidden: true }
                             });
                         });
                 });
@@ -83,7 +83,7 @@
                         .onClick(() => {
                             tracker.updateCreatures({
                                 creature,
-                                change: { enabled: false },
+                                change: { enabled: false }
                             });
                         });
                 });
@@ -94,7 +94,7 @@
                         .onClick(() => {
                             tracker.updateCreatures({
                                 creature,
-                                change: { enabled: true },
+                                change: { enabled: true }
                             });
                         });
                 });
@@ -112,7 +112,7 @@
                                     item.onClick(() => {
                                         tracker.updateCreatures({
                                             creature,
-                                            change: { marker: marker.type },
+                                            change: { marker: marker.type }
                                         });
                                     });
                                 });

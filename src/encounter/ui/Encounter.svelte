@@ -14,8 +14,11 @@
     import { tracker } from "src/tracker/stores/tracker";
     import type { CreatureState } from "index";
     import CreatureComponent from "./Creature.svelte";
+    import { setContext } from "svelte/internal";
 
     export let plugin: InitiativeTracker;
+
+    setContext("plugin", plugin);
 
     export let name: string = "Encounter";
     export let creatures: Map<Creature, number | string>;
@@ -118,6 +121,11 @@
                 );
             })
             .flat();
+        for (const player of players) {
+            if (!$tracker.find((creature) => creature.name === player)) {
+                creatures.push(plugin.getPlayerByName(player));
+            }
+        }
         tracker.add(plugin, rollHP, ...creatures);
     };
 

@@ -221,10 +221,13 @@ export class EncounterParser {
                 hidden = true;
                 monster = monster.replace(/,\s*hidden/, "");
             }
-            if (monster.match(/,\s+friend/) || monster.match(/,\s+ally/)) {
+            if (
+                monster.match(/,\s+friend(?:ly)?/) ||
+                monster.match(/,\s+ally/)
+            ) {
                 friendly = true;
                 monster = monster
-                    .replace(/,\s*friend/, "")
+                    .replace(/,\s*friend(?:ly)?/, "")
                     .replace(/,\s*ally/, "");
             }
             name = monster.split(/,\s?/)[0];
@@ -246,12 +249,15 @@ export class EncounterParser {
             hidden = monster.slice(1).find((v) => v == "hidden") != undefined;
 
             friendly =
-                monster.slice(1).find((v) => v == "friend" || v == "ally") !=
-                undefined;
+                monster
+                    .slice(1)
+                    .find(
+                        (v) => v == "friend" || v == "friendly" || v == "ally"
+                    ) != undefined;
 
             [hp, ac, mod, xp] = monster
                 .slice(1)
-                .filter((v) => v != "hidden" && v != "friend" && v != "ally")
+                .filter((v) => v != "hidden" && v != "friend" && v != "friendly" && v != "ally")
                 .map((v) => (isNaN(Number(v)) ? null : Number(v)));
         } else if (typeof monster == "object") {
             ({ creature: name, name: display, hp, ac, mod, xp } = monster);

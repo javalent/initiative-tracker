@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.9.0](https://github.com/javalent/initiative-tracker/compare/9.8.2...9.9.0) (2023-05-02)
+
+
+### Features
+
+* encounter creatures can be clicked to open combatant view ([6fea212](https://github.com/javalent/initiative-tracker/commit/6fea2126d68857847d4e7a837371ecf3c979a7e0))
+
+
+### Bug Fixes
+
+* `friendly` can be used for allies (close [#157](https://github.com/javalent/initiative-tracker/issues/157)) ([114896f](https://github.com/javalent/initiative-tracker/commit/114896f91250338dea4036e0696e6fe799abc3f8))
+* Add to Encounter will add players that aren't already in the encounter (close [#160](https://github.com/javalent/initiative-tracker/issues/160)) ([37a6520](https://github.com/javalent/initiative-tracker/commit/37a6520bc10d4b06022371a176ee200ce8656df9))
+* display hidden & friendly icons in encounter ([b46545f](https://github.com/javalent/initiative-tracker/commit/b46545fbf7faea19775a5f0b70def400045c00e5))
+* hp state for rollable creatures now persists ([b8fb407](https://github.com/javalent/initiative-tracker/commit/b8fb407b46614e218821b2d48d79a48ed73c92aa))
+* save initiative state when resetting ac ([f362df1](https://github.com/javalent/initiative-tracker/commit/f362df1a5c8f7903665458d79d5bcee8acbf7873))
+
 ## [9.8.2](https://github.com/javalent/initiative-tracker/compare/9.8.1...9.8.2) (2023-04-25)
 
 
