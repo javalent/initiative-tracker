@@ -5,6 +5,7 @@
     import { getContext } from "svelte";
     import { encounter } from "../../stores/encounter";
     import Nullable from "../Nullable.svelte";
+    import { Creature as CreatureCreator } from "src/utils/creature";
 
     const plugin = getContext("plugin");
     export let creature: SRDMonster;
@@ -51,17 +52,6 @@
         if (!Array.isArray(source)) return "";
         return stringify(source, 0, ", ", false);
     }
-
-    function show(node: HTMLElement) {
-        if (plugin.canUseStatBlocks && plugin.statblockVersion?.major >= 2) {
-            const statblockNode = createDiv();
-            const statblock = plugin.statblocks.render(creature, statblockNode);
-            if (statblock) {
-                const popover = new HoverPopover({ hoverPopover: null }, node);
-                popover.hoverEl.appendChild(statblockNode);
-            }
-        }
-    }
 </script>
 
 <tr class="creature">
@@ -70,8 +60,9 @@
             <div use:add on:click={() => encounter.add(creature)} />
             <!-- svelte-ignore a11y-mouse-events-have-key-events -->
             <div
-                class="setting-item-name"
-                on:mouseover={(evt) => show(evt.currentTarget)}
+                class="setting-item-name creature-name"
+                on:click={(evt) =>
+                    plugin.openCombatant(CreatureCreator.from(creature))}
             >
                 {creature.name}
             </div>
@@ -111,6 +102,9 @@
         justify-content: flex-start;
         align-items: center;
         grid-template-columns: auto 1fr;
+    }
+    .creature-name {
+        cursor: pointer;
     }
     .setting-item-description {
         grid-area: desc;

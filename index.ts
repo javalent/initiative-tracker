@@ -95,6 +95,7 @@ export interface InitiativeTrackerData {
         status: boolean;
         plugin: boolean;
         player: boolean;
+        builder: boolean;
     };
     players: HomebrewCreature[];
     parties: Party[];
@@ -122,6 +123,13 @@ export interface InitiativeTrackerData {
     integrateSRD: boolean;
     diplayPlayerHPValues: boolean;
     rollHP: boolean;
+    builder: BuilderState;
+}
+
+interface BuilderState {
+    sidebarIcon: boolean;
+    showXP: boolean;
+    showParty: boolean;
 }
 
 export interface InitiativeViewState {
@@ -175,6 +183,8 @@ export interface SRDMonster {
     reactions?: Trait[];
     monster?: string;
     source?: string | string[];
+    friendly?: boolean;
+    hidden?: boolean;
 }
 
 export interface HomebrewCreature {
