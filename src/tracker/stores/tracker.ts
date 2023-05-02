@@ -249,7 +249,8 @@ function createTracker() {
             state: get($state),
             name: get($name)!,
             round: get($round),
-            logFile: _logger?.getLogFile() ?? null
+            logFile: _logger?.getLogFile() ?? null,
+            rollHP: false
         };
     };
 
