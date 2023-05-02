@@ -1,7 +1,7 @@
 <script lang="ts">
     import { setIcon } from "obsidian";
     import type InitiativeTracker from "src/main";
-    import { RANDOM_HP } from "src/utils";
+    import { FRIENDLY, HIDDEN, RANDOM_HP } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import { getContext } from "svelte/internal";
 
@@ -15,33 +15,50 @@
     const rollEl = (node: HTMLElement) => {
         setIcon(node, RANDOM_HP);
     };
+    const friendly = (node: HTMLElement) => {
+        setIcon(node, FRIENDLY);
+    };
+    const hidden = (node: HTMLElement) => {
+        setIcon(node, HIDDEN);
+    };
 </script>
 
 <slot />
-<span class="creature-name" on:click={() => plugin.openCombatant(creature)}>
-    {#if creature.display && creature.display != creature.name}
-        &nbsp;{creature.display}{count == 1 ? "" : "s"} ({creature.name})
-    {:else}
-        &nbsp;{creature.name}{count == 1 ? "" : "s"}
+<div class="creature-container">
+    {#if creature.friendly}
+        <span class="has-icon" use:friendly />
     {/if}
-    {#if shouldShowRoll && creature.hit_dice?.length}
-        <span class="has-icon" aria-label="Rolling for HP" use:rollEl />
+    {#if creature.hidden}
+        <span class="has-icon" use:hidden />
     {/if}
-</span>
-{#if xp}
-    <span class="xp-parent">
-        <span class="paren left">(</span>
-        <span class="xp-container">
-            <span class="xp number">
-                {xp}
-            </span>
-            <span class="xp text">XP</span>
-        </span>
-        <span class="paren right">)</span>
+    <span class="creature-name" on:click={() => plugin.openCombatant(creature)}>
+        {#if creature.display && creature.display != creature.name}
+            &nbsp;{creature.display}{count == 1 ? "" : "s"} ({creature.name})
+        {:else}
+            &nbsp;{creature.name}{count == 1 ? "" : "s"}
+        {/if}
+        {#if shouldShowRoll && creature.hit_dice?.length}
+            <span class="has-icon" aria-label="Rolling for HP" use:rollEl />
+        {/if}
     </span>
-{/if}
+    {#if xp}
+        <span class="xp-parent">
+            <span class="paren left">&nbsp;(</span>
+            <span class="xp-container">
+                <span class="xp number">{xp}</span>
+                <span class="xp text">XP</span>
+            </span>
+            <span class="paren right">)</span>
+        </span>
+    {/if}
+</div>
 
 <style>
+    .has-icon,
+    .creature-container {
+        display: inline-flex;
+        align-items: center;
+    }
     .creature-name {
         cursor: pointer;
     }
