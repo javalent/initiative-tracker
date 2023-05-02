@@ -3,9 +3,12 @@
 
     import type { ParsedParams } from "..";
     import EncounterRow from "./EncounterRow.svelte";
+    import { setContext } from "svelte";
 
     export let encounters: ParsedParams[];
     export let plugin: InitiativeTracker;
+
+    setContext("plugin", plugin);
 
     const headers: string[] = [];
     if (

@@ -1,7 +1,11 @@
 <script lang="ts">
     import { setIcon } from "obsidian";
+    import type InitiativeTracker from "src/main";
     import { RANDOM_HP } from "src/utils";
     import type { Creature } from "src/utils/creature";
+    import { getContext } from "svelte/internal";
+
+    const plugin = getContext<InitiativeTracker>("plugin");
 
     export let creature: Creature;
     export let count: string | number;
@@ -14,7 +18,7 @@
 </script>
 
 <slot />
-<span class="creature-name">
+<span class="creature-name" on:click={() => plugin.openCombatant(creature)}>
     {#if creature.display && creature.display != creature.name}
         &nbsp;{creature.display}{count == 1 ? "" : "s"} ({creature.name})
     {:else}
@@ -38,6 +42,9 @@
 {/if}
 
 <style>
+    .creature-name {
+        cursor: pointer;
+    }
     .creature-name,
     .creatures-header {
         display: inline-flex;

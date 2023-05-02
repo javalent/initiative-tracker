@@ -13,6 +13,7 @@
     } from "src/utils/encounter-difficulty";
 
     import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
+    import { setContext } from "svelte";
 
     export let name: string = "Encounter";
     export let creatures: Map<Creature, number | string>;
@@ -21,6 +22,8 @@
     export let hide: string[] = [];
     export let playerLevels: number[];
     export let plugin: InitiativeTracker;
+
+    setContext("plugin", plugin);
     export let headers: string[];
     export let rollHP: boolean = plugin.data.rollHP;
 
