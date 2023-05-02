@@ -6,10 +6,19 @@
 
     import { players } from "../../stores/players";
     import Experience from "./Experience.svelte";
+    import Collapsible from "./Collapsible.svelte";
 
     const { party, generics } = players;
 
     const plugin = getContext("plugin");
+    if (!plugin.data.builder) {
+        plugin.data.builder = {
+            sidebarIcon: true,
+            showParty: true,
+            showXP: true
+        };
+    }
+    const open = plugin.data.builder.showParty;
 
     const defaultParty = plugin.data.defaultParty;
     const parties = plugin.data.parties;
@@ -81,90 +90,104 @@
 </script>
 
 <div class="players-container">
-    <h5 class="player-header">Players</h5>
-    <div class="party">
-        {#if parties.length}
-            <div use:partyDropdown />
-        {/if}
-    </div>
+    <Collapsible
+        {open}
+        on:toggle={() =>
+            (plugin.data.builder.showParty = !plugin.data.builder.showParty)}
+    >
+        <h5 class="player-header" slot="title">Players</h5>
+        <div slot="content">
+            <div class="party">
+                {#if parties.length}
+                    <div use:partyDropdown />
+                {/if}
+            </div>
 
-    <div class="players">
-        {#each $party as player (player.name)}
-            <div class="player" class:disabled={!player.enabled}>
-                <span class="player-name">{player.name}</span>
-                <div class="player-right">
-                    <span>{player.level}</span>
+            <div class="players">
+                {#each $party as player (player.name)}
+                    <div class="player" class:disabled={!player.enabled}>
+                        <span class="player-name">{player.name}</span>
+                        <div class="player-right">
+                            <span>{player.level}</span>
+                            <div
+                                class="clickable-icon setting-editor-extra-setting-button"
+                                aria-label={player.enabled
+                                    ? "Disable"
+                                    : "Enable"}
+                                on:click={() => players.toggleEnabled(player)}
+                            >
+                                {#if player.enabled}
+                                    <div use:disable />
+                                {:else}
+                                    <div use:enable />
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                {/each}
+                {#each $generics as player, index}
+                    <div class="player" class:disabled={!player.enabled}>
+                        <input
+                            type="number"
+                            value={player.count}
+                            on:input={(evt) =>
+                                players.set(
+                                    player,
+                                    Number(evt.currentTarget.value)
+                                )}
+                            min="1"
+                        />
+                        <span>Player(s)</span>
+                        <div use:crossIcon />
+
+                        <span>Level</span>
+                        <input
+                            type="number"
+                            value={player.level}
+                            on:input={(evt) =>
+                                players.setLevel(
+                                    player,
+                                    Number(evt.currentTarget.value)
+                                )}
+                            min="1"
+                        />
+                        <div class="player-right">
+                            <div
+                                class="clickable-icon setting-editor-extra-setting-button"
+                                aria-label={player.enabled
+                                    ? "Disable"
+                                    : "Enable"}
+                                on:click={() => players.toggleEnabled(player)}
+                            >
+                                {#if player.enabled}
+                                    <div use:disable />
+                                {:else}
+                                    <div use:enable />
+                                {/if}
+                            </div>
+
+                            <div
+                                class="clickable-icon setting-editor-extra-setting-button"
+                                on:click={() => players.remove(player)}
+                            >
+                                <div use:removeIcon />
+                            </div>
+                        </div>
+                    </div>
+                {/each}
+                <div class="add-player">
                     <div
                         class="clickable-icon setting-editor-extra-setting-button"
-                        aria-label={player.enabled ? "Disable" : "Enable"}
-                        on:click={() => players.toggleEnabled(player)}
-                    >
-                        {#if player.enabled}
-                            <div use:disable />
-                        {:else}
-                            <div use:enable />
-                        {/if}
-                    </div>
+                        on:click={add}
+                        use:addIcon
+                    />
                 </div>
             </div>
-        {/each}
-        {#each $generics as player, index}
-            <div class="player" class:disabled={!player.enabled}>
-                <input
-                    type="number"
-                    value={player.count}
-                    on:input={(evt) =>
-                        players.set(player, Number(evt.currentTarget.value))}
-                    min="1"
-                />
-                <span>Player(s)</span>
-                <div use:crossIcon />
-
-                <span>Level</span>
-                <input
-                    type="number"
-                    value={player.level}
-                    on:input={(evt) =>
-                        players.setLevel(
-                            player,
-                            Number(evt.currentTarget.value)
-                        )}
-                    min="1"
-                />
-                <div class="player-right">
-                    <div
-                        class="clickable-icon setting-editor-extra-setting-button"
-                        aria-label={player.enabled ? "Disable" : "Enable"}
-                        on:click={() => players.toggleEnabled(player)}
-                    >
-                        {#if player.enabled}
-                            <div use:disable />
-                        {:else}
-                            <div use:enable />
-                        {/if}
-                    </div>
-
-                    <div
-                        class="clickable-icon setting-editor-extra-setting-button"
-                        on:click={() => players.remove(player)}
-                    >
-                        <div use:removeIcon />
-                    </div>
-                </div>
-            </div>
-        {/each}
-        <div class="add-player">
-            <div
-                class="clickable-icon setting-editor-extra-setting-button"
-                on:click={add}
-                use:addIcon
-            />
         </div>
-    </div>
+    </Collapsible>
 </div>
 
 <style scoped>
-    
     .players {
         display: flex;
         flex-flow: column;
