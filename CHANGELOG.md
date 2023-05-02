@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.10.0](https://github.com/javalent/initiative-tracker/compare/9.9.0...9.10.0) (2023-05-02)
+
+
+### Features
+
+* You can now create custom encounter builder headers ([2c42744](https://github.com/javalent/initiative-tracker/commit/2c42744b3ec0b20059d5ff68cdc6ec037415effa))
+
+
+### Bug Fixes
+
+* can disable encounter builder ribbon icon ([d6d2bee](https://github.com/javalent/initiative-tracker/commit/d6d2bee38d423ac1512ec81b5704f3a540839b17))
+* can now open combatant view for creatures in encounter builder ([d6d2bee](https://github.com/javalent/initiative-tracker/commit/d6d2bee38d423ac1512ec81b5704f3a540839b17))
+* creatures in table display difficulty ([921034a](https://github.com/javalent/initiative-tracker/commit/921034a695a04312ffa09768329e9fdc791b8e04))
+* encounter builder name is editable ([d6d2bee](https://github.com/javalent/initiative-tracker/commit/d6d2bee38d423ac1512ec81b5704f3a540839b17))
+* launching encounter from builder works again ([d6d2bee](https://github.com/javalent/initiative-tracker/commit/d6d2bee38d423ac1512ec81b5704f3a540839b17))
+* new encounter builder ribbon icon ([d6d2bee](https://github.com/javalent/initiative-tracker/commit/d6d2bee38d423ac1512ec81b5704f3a540839b17))
+* player & xp sections of builder are collapsible ([8505873](https://github.com/javalent/initiative-tracker/commit/85058739e04b9947fe08dc93e732bf3095dbf5b1))
+
 ## [9.9.0](https://github.com/javalent/initiative-tracker/compare/9.8.2...9.9.0) (2023-05-02)
 
 
