@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.11.0](https://github.com/javalent/initiative-tracker/compare/9.10.0...9.11.0) (2023-05-03)
+
+
+### Features
+
+* Support for more complicated initiatives ([f0b698a](https://github.com/javalent/initiative-tracker/commit/f0b698a54c2769cd117af2307d09921868f3b4ca))
+
+
+### Bug Fixes
+
+* Add statuses with enter key ([70be5ad](https://github.com/javalent/initiative-tracker/commit/70be5ad2ee323838769f9ef72c73214e11beeb45))
+* Improves creature HP/Status editing UI ([70be5ad](https://github.com/javalent/initiative-tracker/commit/70be5ad2ee323838769f9ef72c73214e11beeb45))
+
 ## [9.10.0](https://github.com/javalent/initiative-tracker/compare/9.9.0...9.10.0) (2023-05-02)
 
 
