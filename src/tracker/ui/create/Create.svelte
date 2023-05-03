@@ -75,6 +75,7 @@
                 if (!creature.modifier) {
                     creature.modifier = 0;
                 }
+                creature.modifier = JSON.parse(`${creature.modifier}`);
                 if (
                     creature.initiative <= 0 ||
                     creature.initiative == null ||
@@ -184,12 +185,12 @@
             />
         </div>
         <div>
-            <label for="add-hp">Hit Dice</label>
+            <label for="hit-dice">Hit Dice</label>
             <input
                 bind:value={creature.hit_dice}
-                id="add-hp"
+                id="hit-dice"
                 type="text"
-                name="hp"
+                name="hitdice"
                 tabindex="0"
             />
         </div>
@@ -197,7 +198,7 @@
             <label for="add-ac">AC</label>
             <input
                 bind:value={creature.ac}
-                on:change={() => creature.dirty_ac=true}
+                on:change={() => (creature.dirty_ac = true)}
                 id="add-ac"
                 name="ac"
                 type="text"
@@ -209,8 +210,8 @@
             <input
                 bind:value={creature.modifier}
                 id="add-mod"
-                type="number"
-                name="ac"
+                type="text"
+                name="add-mod"
                 tabindex="0"
             />
         </div>

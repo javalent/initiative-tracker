@@ -26,7 +26,7 @@ import type {
     SRDMonster
 } from "../index";
 
-import type { Plugins } from "obsidian-overload";
+import type { Plugins, StackRoller } from "obsidian-overload";
 
 import InitiativeTrackerSettings from "./settings/settings";
 import { EncounterBlock, EncounterParser } from "./encounter";
@@ -70,7 +70,7 @@ export default class InitiativeTracker extends Plugin {
         const roller = this.app.plugins
             .getPlugin("obsidian-dice-roller")
             .getRollerSync(str, "statblock");
-        return roller;
+        return roller as StackRoller;
     }
     get canUseDiceRoller() {
         if (this.app.plugins.getPlugin("obsidian-dice-roller") != null) {
@@ -88,17 +88,24 @@ export default class InitiativeTracker extends Plugin {
         return false;
     }
 
-    getInitiativeValue(modifier: number = 0): number {
-        let initiative = Math.floor(Math.random() * 19 + 1) + modifier;
-        if (this.canUseDiceRoller) {
-            const roller = this.getRoller(
-                this.data.initiative.replace(/%mod%/g, `(${modifier})`)
-            );
-            if (roller) {
-                roller.roll();
-                if (!isNaN(roller.result)) initiative = roller.result;
+    getInitiativeValue(modifier: number | number[] = 0): number {
+        const defaultIfNoResult =
+            Math.floor(Math.random() * 19 + 1) +
+            [modifier].flat().reduce((a, b) => a + b, 0);
+        if (!this.canUseDiceRoller) {
+            return defaultIfNoResult;
+        }
+        let dice = this.data.initiative;
+        if (typeof modifier == "number") {
+            dice = dice.replace(/%mod\d?%/g, `(${modifier})`);
+        } else {
+            for (let i = 0; i < modifier.length; i++) {
+                dice = dice.replace(`%mod${i + 1}%`, `${modifier[i]}`);
             }
         }
+        const roller = this.getRoller(dice);
+        const initiative = roller.rollSync();
+        if (isNaN(initiative)) return defaultIfNoResult;
         return initiative;
     }
 

@@ -198,7 +198,7 @@ export interface HomebrewCreature {
     stats?: number[];
     source?: string | string[];
     cr?: number | string;
-    modifier?: number;
+    modifier?: number | number[];
     note?: string;
     path?: string;
     level?: number;

@@ -19,7 +19,7 @@ export function getId() {
 export class Creature {
     active: boolean;
     name: string;
-    modifier: number;
+    modifier: number | number[];
     hp: number;
     hit_dice?: string;
     temp: number;
@@ -35,7 +35,7 @@ export class Creature {
     player: boolean;
     status: Set<Condition> = new Set();
     marker: string;
-    private _initiative: number;
+    initiative: number;
     source: string | string[];
     id: string;
     xp: number;
@@ -59,7 +59,7 @@ export class Creature {
     constructor(public creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;
         this.display = creature.display;
-        this._initiative =
+        this.initiative =
             "initiative" in creature
                 ? (creature as Creature).initiative
                 : Number(initiative ?? 0);
@@ -114,13 +114,6 @@ export class Creature {
         return DEFAULT_UNDEFINED;
     }
 
-    get initiative() {
-        return this._initiative + this.modifier;
-    }
-    set initiative(x: number) {
-        this._initiative = Number(x) - this.modifier;
-    }
-
     getName() {
         let name = [this.display ?? this.name];
         /* if (this.display) {
@@ -161,7 +154,7 @@ export class Creature {
                 ...creature,
                 id: getId()
             },
-            creature._initiative
+            creature.initiative
         );
     }
 
@@ -208,7 +201,7 @@ export class Creature {
         return {
             name: this.name,
             display: this.display,
-            initiative: this.initiative - this.modifier,
+            initiative: this.initiative,
             modifier: this.modifier,
             hp: this.max,
             currentMaxHP: this.current_max,
