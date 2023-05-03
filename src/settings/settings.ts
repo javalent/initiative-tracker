@@ -47,7 +47,8 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     player: true,
                     party: true,
                     plugin: true,
-                    status: true
+                    status: true,
+                    builder: true
                 };
             }
             this._displayBattle(
@@ -75,6 +76,16 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     cls: "initiative-tracker-additional-container",
                     attr: {
                         ...(this.plugin.data.openState.party
+                            ? { open: true }
+                            : {})
+                    }
+                })
+            );
+            this._displayBuilder(
+                containerEl.createEl("details", {
+                    cls: "initiative-tracker-additional-container",
+                    attr: {
+                        ...(this.plugin.data.openState.builder
                             ? { open: true }
                             : {})
                     }
@@ -458,6 +469,36 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     });
             }
         }
+    }
+    private _displayBuilder(additionalContainer: HTMLDetailsElement) {
+        additionalContainer.empty();
+        additionalContainer.ontoggle = () => {
+            this.plugin.data.openState.player = additionalContainer.open;
+        };
+        const summary = additionalContainer.createEl("summary");
+        new Setting(summary).setHeading().setName("Encounter Builder");
+        summary.createDiv("collapser").createDiv("handle");
+        const explanation = additionalContainer.createDiv(
+            "initiative-tracker-explanation"
+        );
+        explanation.createEl("span", {
+            text: "The encounter builder allows you to quickly create encounters that can be saved for later use or immediately launched into a battle."
+        });
+        explanation.createEl("br");
+        explanation.createEl("br");
+        explanation.createEl("span", {
+            text: "It can be opened using the sidebar shortcut (if enabled) or by using the Open Encounter Builder command."
+        });
+        new Setting(additionalContainer)
+            .setName("Add Sidebar Shortcut")
+            .setDesc(
+                "A sidebar shortcut will be added to open the Encounter Builder."
+            ).addToggle(t => {
+                t.setValue(this.plugin.data.builder.sidebarIcon).onChange(v => {
+                    this.plugin.data.builder.sidebarIcon = v;
+                    this.plugin.setBuilderIcon();
+                })
+            });
     }
     private _displayParties(additionalContainer: HTMLDetailsElement) {
         additionalContainer.empty();
@@ -1460,7 +1501,8 @@ class StatusModal extends Modal {
                         (t
                             .setValue(`${this.status.startingAmount}`)
                             .onChange((v) => {
-                                this.status.amount = this.status.startingAmount = Number(v);
+                                this.status.amount =
+                                    this.status.startingAmount = Number(v);
                             }).inputEl.type = "number")
                 );
         }

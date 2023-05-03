@@ -6,10 +6,19 @@
 
     import { players } from "../../stores/players";
     import Experience from "./Experience.svelte";
+    import Collapsible from "./Collapsible.svelte";
 
     const { party, generics } = players;
 
     const plugin = getContext("plugin");
+    if (!plugin.data.builder) {
+        plugin.data.builder = {
+            sidebarIcon: true,
+            showParty: true,
+            showXP: true
+        };
+    }
+    const open = plugin.data.builder.showParty;
 
     const defaultParty = plugin.data.defaultParty;
     const parties = plugin.data.parties;
@@ -80,10 +89,14 @@
     };
 </script>
 
-<div class="player-component-container">
-    <div class="players-xp">
-        <div class="players-container">
-            <h5 class="player-header">Players</h5>
+<div class="players-container">
+    <Collapsible
+        {open}
+        on:toggle={() =>
+            (plugin.data.builder.showParty = !plugin.data.builder.showParty)}
+    >
+        <h5 class="player-header" slot="title">Players</h5>
+        <div slot="content">
             <div class="party">
                 {#if parties.length}
                     <div use:partyDropdown />
@@ -171,15 +184,10 @@
                 </div>
             </div>
         </div>
-        <Experience />
-    </div>
+    </Collapsible>
 </div>
 
 <style scoped>
-    .players-xp {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
     .players {
         display: flex;
         flex-flow: column;

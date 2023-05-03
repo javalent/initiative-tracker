@@ -1,12 +1,20 @@
 <script lang="ts">
     import type { SRDMonster } from "index";
-    import { ExtraButtonComponent, HoverPopover } from "obsidian";
-    import { DEFAULT_UNDEFINED } from "src/utils";
+    import { ExtraButtonComponent, HoverPopover, setIcon } from "obsidian";
     import { getContext } from "svelte";
     import { encounter } from "../../stores/encounter";
     import Nullable from "../Nullable.svelte";
+    import { convertFraction, DEFAULT_UNDEFINED, XP_PER_CR } from "src/utils";
+    import { Creature as CreatureCreator } from "src/utils/creature";
+    import type { createTable } from "src/builder/stores/table";
+    import type InitiativeTracker from "src/main";
 
-    const plugin = getContext("plugin");
+    const { players } = encounter;
+    const { average } = players;
+
+    const plugin = getContext<InitiativeTracker>("plugin");
+    const table = getContext<ReturnType<typeof createTable>>("table");
+
     export let creature: SRDMonster;
     const add = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("plus-with-circle");
@@ -52,28 +60,39 @@
         return stringify(source, 0, ", ", false);
     }
 
-    function show(node: HTMLElement) {
-        if (plugin.canUseStatBlocks && plugin.statblockVersion?.major >= 2) {
-            const statblockNode = createDiv();
-            const statblock = plugin.statblocks.render(creature, statblockNode);
-            if (statblock) {
-                const popover = new HoverPopover({ hoverPopover: null }, node);
-                popover.hoverEl.appendChild(statblockNode);
-            }
-        }
-    }
+    const insignificant = convertFraction(creature.cr) < $average - 3;
+
+    const baby = (node: HTMLElement) => setIcon(node, "baby");
+    const challenge = convertFraction(creature.cr) > $average + 3;
+
+    const skull = (node: HTMLElement) => setIcon(node, "skull");
 </script>
 
 <tr class="creature">
-    <td class="creature-name creature-40">
+    <td>
         <div class="creature-name-container">
             <div use:add on:click={() => encounter.add(creature)} />
             <!-- svelte-ignore a11y-mouse-events-have-key-events -->
             <div
-                class="setting-item-name"
-                on:mouseover={(evt) => show(evt.currentTarget)}
+                class="setting-item-name creature-name"
+                on:click={(evt) =>
+                    plugin.openCombatant(CreatureCreator.from(creature))}
             >
                 {creature.name}
+                {#if insignificant}
+                    <div
+                        class="contains-icon"
+                        use:baby
+                        aria-label={"This creature is significantly under the average party level and might not contribute much to the fight."}
+                    />
+                {/if}
+                {#if challenge}
+                    <div
+                        class="contains-icon"
+                        use:skull
+                        aria-label={"This creature is significantly over the average party level and might prove a challenge."}
+                    />
+                {/if}
             </div>
             <div class="setting-item-description">
                 {#if creature.source?.length}
@@ -87,16 +106,14 @@
             <!-- svelte-ignore a11y-mouse-events-have-key-events -->
         </div>
     </td>
-    <td class="creature-cr creature-15"><Nullable str={creature.cr ?? 0} /></td>
-    <td class="creature-type creature-15"
-        ><Nullable str={creature.type ?? DEFAULT_UNDEFINED} /></td
-    >
-    <td class="creature-size creature-15"
-        ><Nullable str={creature.size ?? DEFAULT_UNDEFINED} /></td
-    >
-    <td class="creature-alignment creature-15">
-        <Nullable str={creature.alignment ?? DEFAULT_UNDEFINED} />
-    </td>
+    {#each $table as header}
+        <td><Nullable str={creature[header.field] ?? DEFAULT_UNDEFINED} /></td>
+        <!-- <td><Nullable str={creature.type ?? DEFAULT_UNDEFINED} /></td>
+        <td><Nullable str={creature.size ?? DEFAULT_UNDEFINED} /></td>
+        <td>
+            <Nullable str={creature.alignment ?? DEFAULT_UNDEFINED} />
+        </td> -->
+    {/each}
 </tr>
 
 <style scoped>
@@ -112,6 +129,11 @@
         align-items: center;
         grid-template-columns: auto 1fr;
     }
+    .creature-name {
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+    }
     .setting-item-description {
         grid-area: desc;
     }
@@ -119,10 +141,4 @@
         display: flex;
         align-items: center;
     } */
-    .creature-40 {
-        width: 40%;
-    }
-    .creature-15 {
-        width: 15%;
-    }
 </style>

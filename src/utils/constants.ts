@@ -47,7 +47,8 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
         party: true,
         status: true,
         plugin: true,
-        player: true
+        player: true,
+        builder: true
     },
     hpOverflow: "ignore",
     additiveTemp: false,
@@ -56,7 +57,12 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     useLegacy: false,
     integrateSRD: true,
     diplayPlayerHPValues: true,
-    rollHP: false
+    rollHP: false,
+    builder: {
+        showParty: true,
+        showXP: true,
+        sidebarIcon: true
+    }
 };
 
 export const XP_PER_CR: Record<string, number> = {

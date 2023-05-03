@@ -1,22 +1,22 @@
-> 🥇  Our documentation has moved *[here](https://plugins.javalent.com/initiative-tracker)*.
+> 🥇 Our documentation has moved *[here](https://plugins.javalent.com/initiative-tracker)*.
 >
 > <a href='https://www.buymeacoffee.com/valentine195' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 ---
 
-The Initiative Tracker plugin for [Obsidian](https://obsidian.md) allows you to keep track of initiative and turn order during combat encounters in tabletop role playing games.
+The Initiative Tracker plugin for [Obsidian](https://obsidian.md) allows you to keep track of initiative and turn order during combat encounters in tabletop role-playing games.
 
 With this plugin, you can easily add creatures and NPCs to the initiative tracker, and track their health, armor class, and other stats. The plugin also calculates experience points for creatures, and supports both custom and SRD creatures from the [Fantasy Statblocks](https://github.com/javalent/fantasy-statblocks) plugin.
 
 ## Features
-- Easily add and remove creatures to the encounter
+- Add and remove creatures from the encounter
 - Input creature name, HP, AC and initiative
 - Calculate creature XP based on challenge rating
 - Group identical creatures together to simplify the encounter
 - Set creature display names to differentiate identical creatures
-- Supports dice rolls to add random amounts of creatures
-- Keep track of creature HP, AC, and status
+- Supports dice rolls to add random amount creatures
+- Keep track of creature HP, AC and status
 - Sort creatures by initiative automatically
-- Add arbitrary number of encounters in one block
+- Add several encounters in one code block
 - Automatically save and load encounters
 - And much, much more...
 

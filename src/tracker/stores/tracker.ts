@@ -247,7 +247,8 @@ function createTracker() {
             state: get($state),
             name: get($name)!,
             round: get($round),
-            logFile: _logger?.getLogFile() ?? null
+            logFile: _logger?.getLogFile() ?? null,
+            rollHP: false
         };
     };
 
@@ -303,6 +304,10 @@ function createTracker() {
         updating,
         updateTarget,
         updateCreatures,
+
+        players: derived(ordered, (creatures) =>
+            creatures.filter((c) => c.player)
+        ),
 
         setUpdate: (creature: Creature, evt: MouseEvent) =>
             updating.update((creatures) => {
@@ -563,6 +568,7 @@ function createTracker() {
             });
         },
         update: () => update((c) => c),
+        updateAndSave: () => updateAndSave((c) => c),
         roll: (plugin: InitiativeTracker) =>
             updateAndSave((creatures) => {
                 for (let creature of creatures) {

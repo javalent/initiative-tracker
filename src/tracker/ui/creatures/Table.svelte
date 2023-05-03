@@ -73,6 +73,7 @@
             on:consider={handleDndConsider}
             on:finalize={handleDndFinalize}
         >
+        
             {#each items as { creature, id } (id)}
                 <tr
                     class="draggable initiative-tracker-creature"

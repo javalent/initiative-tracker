@@ -199,6 +199,8 @@ export default class InitiativeTracker extends Plugin {
 
         await this.loadSettings();
 
+        this.setBuilderIcon();
+
         this.addSettingTab(new InitiativeTrackerSettings(this));
 
         this.registerView(
@@ -673,5 +675,20 @@ export default class InitiativeTracker extends Plugin {
         }
 
         await this.combatant.render(creature);
+        this.app.workspace.revealLeaf(this.combatant.leaf);
+    }
+    private _builderIcon: HTMLElement;
+    setBuilderIcon() {
+        if (this.data.builder.sidebarIcon) {
+            this._builderIcon = this.addRibbonIcon(
+                BUILDER_VIEW,
+                "Intiative Tracker Encounter Builder",
+                () => {
+                    this.addBuilderView();
+                }
+            );
+        } else {
+            this._builderIcon.detach();
+        }
     }
 }

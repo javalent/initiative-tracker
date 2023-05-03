@@ -63,7 +63,7 @@ export type Condition = {
     resetOnRound?: boolean;
     hasAmount?: boolean;
     startingAmount?: number;
-    amount?:number;
+    amount?: number;
 } & (
     | {
           hasAmount: true;
@@ -95,6 +95,7 @@ export interface InitiativeTrackerData {
         status: boolean;
         plugin: boolean;
         player: boolean;
+        builder: boolean;
     };
     players: HomebrewCreature[];
     parties: Party[];
@@ -122,6 +123,14 @@ export interface InitiativeTrackerData {
     integrateSRD: boolean;
     diplayPlayerHPValues: boolean;
     rollHP: boolean;
+    builder: BuilderState;
+}
+
+interface BuilderState {
+    sidebarIcon: boolean;
+    showXP: boolean;
+    showParty: boolean;
+    headers?: TableHeaderState[];
 }
 
 export interface InitiativeViewState {
@@ -175,6 +184,10 @@ export interface SRDMonster {
     reactions?: Trait[];
     monster?: string;
     source?: string | string[];
+    friendly?: boolean;
+    hidden?: boolean;
+
+    [key: string]: any;
 }
 
 export interface HomebrewCreature {
@@ -251,7 +264,6 @@ export declare class Creature {
     player: boolean;
     status: Set<Condition>;
     marker: string;
-    private _initiative;
     source: string | string[];
     id: string;
     xp: number;
@@ -275,3 +287,16 @@ export declare class Creature {
     toJSON(): CreatureState;
     static fromJSON(state: CreatureState): Creature;
 }
+
+//Builder
+export enum SortFunctions {
+    LOCAL_COMPARE,
+    CONVERT_FRACTION,
+    CUSTOM
+}
+export type TableHeaderState = {
+    text: string;
+    field: string;
+    type: SortFunctions;
+    func?: string;
+};

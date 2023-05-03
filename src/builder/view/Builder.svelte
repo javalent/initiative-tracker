@@ -5,7 +5,7 @@
 
     import Creatures from "./creatures/Creatures.svelte";
     import Encounter from "./encounter/Encounter.svelte";
-    import Party from "./party/Party.svelte";
+    import PartyExperience from "./party/PartyExperience.svelte";
 
     export let plugin: InitiativeTracker;
 
@@ -17,7 +17,7 @@
 </script>
 
 <div class="initiative-tracker encounter-builder markdown-rendered">
-    <Party />
+    <PartyExperience />
     <Encounter />
     <Creatures />
 </div>

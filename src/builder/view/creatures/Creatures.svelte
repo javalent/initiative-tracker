@@ -3,107 +3,63 @@
     import { getContext } from "svelte";
     import Filters from "./Filters.svelte";
     import type { SRDMonster } from "index";
-    import { prepareFuzzySearch, prepareSimpleSearch, setIcon } from "obsidian";
+    import { prepareSimpleSearch, setIcon } from "obsidian";
     import Pagination from "./Pagination.svelte";
-    import {
-        cr,
-        alignment,
-        size,
-        type,
-        sources,
-        name
-    } from "../../stores/filter";
+    import { cr, size, type, sources, name } from "../../stores/filter";
     import { convertFraction } from "src/utils";
     import { get } from "svelte/store";
 
-    interface TableHeader {
-        text: string;
-        active: boolean;
-        sortAsc: (a: SRDMonster, b: SRDMonster) => number;
-        sortDesc: (a: SRDMonster, b: SRDMonster) => number;
-    }
-
+    import { createTable, SettingsModal } from "../../stores/table";
+    import { setContext } from "svelte/internal";
     const plugin = getContext("plugin");
+    let original = plugin.bestiary as SRDMonster[];
+    const table = createTable(plugin, [...original]);
+
+    setContext<ReturnType<typeof createTable>>("table", table);
+    const { creatures, sortDir, allHeaders } = table;
 
     let slice = 50;
 
-    let sortDir = true; //true == asc, false == des
-    const sort = (field: TableHeader) => {
-        if (field.active) {
-            sortDir = !sortDir;
-        } else {
-            headers = headers.map((h) => {
-                h.active = false;
-                return h;
-            });
-            field.active = true;
-            sortDir = true;
-        }
-
-        creatures.sort(sortDir ? field.sortAsc : field.sortDesc);
-        creatures = creatures;
+    const sortUp = (node: HTMLElement) => {
+        setIcon(node, "chevron-up");
     };
-    const sortIcon = (node: HTMLElement) => {
-        setIcon(node, sortDir ? "chevron-up" : "chevron-down");
+    const sortDown = (node: HTMLElement) => {
+        setIcon(node, "chevron-down");
     };
-    let headers: TableHeader[] = [
-        {
-            text: "Name",
-            active: true,
-            sortAsc: (a, b) => a.name.localeCompare(b.name),
-            sortDesc: (a, b) => b.name.localeCompare(a.name)
-        },
-        {
-            text: "CR",
-            active: false,
-            sortAsc: (a, b) =>
-                convertFraction(a.cr ?? 0) - convertFraction(b.cr ?? 0),
-            sortDesc: (a, b) =>
-                convertFraction(b.cr ?? 0) - convertFraction(a.cr ?? 0)
-        },
-        {
-            text: "Type",
-            active: false,
-            sortAsc: (a, b) => a.type?.localeCompare(b.type),
-            sortDesc: (a, b) => b.type?.localeCompare(a.type)
-        },
-        {
-            text: "Size",
-            active: false,
-            sortAsc: (a, b) => a.size?.localeCompare(b.size),
-            sortDesc: (a, b) => b.size?.localeCompare(a.size)
-        },
-        {
-            text: "Alignment",
-            active: false,
-            sortAsc: (a, b) => a.alignment?.localeCompare(b.alignment),
-            sortDesc: (a, b) => b.alignment?.localeCompare(a.alignment)
-        }
-    ];
-
-    let original = plugin.bestiary as SRDMonster[];
-
-    let creatures = [...original];
 
     name.subscribe((n) => {
+        if (!$table.length) return;
         if (!n || !n.length) {
-            const header = headers.find((h) => h.active) ?? headers[0];
+            const header = $table.find((h) => h.active) ?? $table[0];
             if (!header.active) header.active = true;
-            const active = sortDir ? header.sortAsc : header.sortDesc;
-            creatures = [...original].sort(active);
+            $creatures = [...original];
         } else {
             const search = prepareSimpleSearch(n);
             const results: SRDMonster[] = [];
+            console.log("🚀 ~ file: Creatures.svelte:40 ~ original:", original);
             for (const monster of original) {
                 if (search(monster.name)) {
                     results.push(monster);
                 }
             }
-            creatures = results;
+            $creatures = results;
         }
     });
 
-    $: filtered = creatures
+    const openSettingsModal = () => {
+        const modal = new SettingsModal($table.map((t) => t.toState()));
+        modal.open();
+        modal.onClose = () => {
+            if (modal.canceled) return;
+            if (modal.reset) {
+                table.resetToDefault();
+                return;
+            }
+            table.setHeadersFromState(modal.headers);
+        };
+    };
+
+    $: filtered = $creatures
         .filter(
             (c) =>
                 get(cr.isDefault) ||
@@ -112,7 +68,6 @@
         )
         .filter(
             (c) =>
-            
                 !$size.length ||
                 $size
                     .map((s) => s?.toLowerCase())
@@ -135,28 +90,38 @@
 </script>
 
 <div class="filters">
-    <Filters />
+    <Filters on:settings={() => openSettingsModal()} />
 </div>
 
-<table>
-    <thead>
-        {#each headers as header (header.text)}
-            <th on:click={() => sort(header)}>
-                <div class="table-header">
-                    <span class="table-header-content">{header.text}</span>
-                    {#key sortDir}
-                        <div use:sortIcon class:invisible={!header.active} />
-                    {/key}
-                </div>
-            </th>
-        {/each}
-    </thead>
-    <tbody>
-        {#each filtered.slice((page - 1) * slice, page * slice) as creature}
-            <Creature {creature} />
-        {/each}
-    </tbody>
-</table>
+{#if $allHeaders.length}
+    <table>
+        <thead>
+            {#each $allHeaders as header (header.text)}
+                <th
+                    on:click={() => {
+                        table.sort(header);
+                    }}
+                >
+                    <div class="table-header">
+                        <span class="table-header-content">{header.text}</span>
+                        {#if header.active}
+                            {#if $sortDir}
+                                <div class="has-icon" use:sortUp />
+                            {:else}
+                                <div class="has-icon" use:sortDown />
+                            {/if}
+                        {/if}
+                    </div>
+                </th>
+            {/each}
+        </thead>
+        <tbody>
+            {#each filtered.slice($name?.length ? 0 : (page - 1) * slice, page * slice) as creature}
+                <Creature {creature} />
+            {/each}
+        </tbody>
+    </table>
+{/if}
 
 <Pagination
     {slice}
@@ -177,8 +142,9 @@
         gap: 0.25rem;
     }
 
-    .invisible {
-        color: transparent;
+    .has-icon {
+        display: flex;
+        align-items: center;
     }
 
     table {
