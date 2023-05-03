@@ -581,7 +581,6 @@ export class ConditionSuggestionModal extends SuggestionModal<string> {
         );
     }
     selectSuggestion({ item }: FuzzyMatch<string>) {
-        console.dir(item)
         if (this.condition !== null) {
             this.inputEl.value = item;
             this.condition = item;
