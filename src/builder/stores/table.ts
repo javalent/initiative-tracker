@@ -45,11 +45,9 @@ export class TableHeader {
     }
 
     public sortAsc(a: SRDMonster, b: SRDMonster) {
-        console.log(this._func(a, b));
         return this._func(a, b);
     }
     public sortDesc(a: SRDMonster, b: SRDMonster) {
-        console.log(this._func(b, a));
         return this._func(b, a);
     }
 
@@ -194,7 +192,6 @@ export class SettingsModal extends Modal {
             }
         });
         app.$on("update", (evt) => {
-            console.log("🚀 ~ file: table.ts:169 ~ evt:", evt);
             this.headers = copy(evt.detail);
         });
         app.$on("cancel", () => {

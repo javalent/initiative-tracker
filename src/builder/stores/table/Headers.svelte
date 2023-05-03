@@ -112,7 +112,6 @@
                         (state.type != SortFunctions.CUSTOM ||
                             state?.func?.length)
                     ) {
-                        console.log(items.findIndex((i) => i.id == id));
                         items.splice(
                             items.findIndex((i) => i.id == id),
                             1,

@@ -36,7 +36,6 @@
         } else {
             const search = prepareSimpleSearch(n);
             const results: SRDMonster[] = [];
-            console.log("🚀 ~ file: Creatures.svelte:40 ~ original:", original);
             for (const monster of original) {
                 if (search(monster.name)) {
                     results.push(monster);
