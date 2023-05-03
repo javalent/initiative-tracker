@@ -28,6 +28,8 @@
         creature = c;
     });
 
+    let modifier = JSON.stringify(creature.modifier ?? 0);
+
     const saveButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Add Creature")
@@ -75,7 +77,6 @@
                 if (!creature.modifier) {
                     creature.modifier = 0;
                 }
-                creature.modifier = JSON.parse(`${creature.modifier}`);
                 if (
                     creature.initiative <= 0 ||
                     creature.initiative == null ||
@@ -146,6 +147,12 @@
             .setValue(creature.friendly)
             .onChange((v) => (creature.friendly = v));
     };
+
+    $: {
+        try {
+            creature.modifier = JSON.parse(`${modifier}`);
+        } catch (e) {}
+    }
 </script>
 
 <div class="initiative-tracker-editor">
@@ -208,7 +215,7 @@
         <div>
             <label for="add-mod">Modifier</label>
             <input
-                bind:value={creature.modifier}
+                bind:value={modifier}
                 id="add-mod"
                 type="text"
                 name="add-mod"

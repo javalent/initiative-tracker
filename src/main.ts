@@ -97,7 +97,7 @@ export default class InitiativeTracker extends Plugin {
         }
         let dice = this.data.initiative;
         if (typeof modifier == "number") {
-            dice = dice.replace(/%mod\d?%/g, `(${modifier})`);
+            dice = dice.replace(/%mod\d?%/g, `${modifier}`);
         } else {
             for (let i = 0; i < modifier.length; i++) {
                 dice = dice.replace(`%mod${i + 1}%`, `${modifier[i]}`);

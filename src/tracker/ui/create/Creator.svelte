@@ -42,8 +42,6 @@
                         creature.dirty_ac = false;
                     }
 
-                    creature.modifier = JSON.parse(`${creature.modifier}`);
-
                     tracker.replace(creature, $editing);
                 } else {
                     const creatures = $adding.flatMap(([creature, amount]) =>
