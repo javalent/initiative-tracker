@@ -123,9 +123,9 @@
                 );
             });
     };
-    let nameInput: HTMLInputElement;
+    let nameInput: HTMLInputElement, displayNameInput: HTMLInputElement;
     let modal: SRDMonsterSuggestionModal;
-    onMount(() => {
+    const createModal = () => {
         modal = new SRDMonsterSuggestionModal(plugin, nameInput);
         modal.onClose = async () => {
             if (modal.creature) {
@@ -136,6 +136,16 @@
                 );
             }
         };
+    };
+    onMount(() => {
+        if (isEditing) {
+            setImmediate(() => {
+                displayNameInput.focus();
+                createModal();
+            });
+        } else {
+            createModal();
+        }
     });
     const hideToggle = (div: HTMLDivElement) => {
         new ToggleComponent(div)
@@ -163,7 +173,7 @@
                 bind:this={nameInput}
                 bind:value={creature.name}
                 on:focus={function () {
-                    modal.open();
+                    if (modal) modal.open();
                 }}
                 id="add-name"
                 type="text"
@@ -175,6 +185,7 @@
             <label for="add-display">Display Name</label>
             <input
                 bind:value={creature.display}
+                bind:this={displayNameInput}
                 id="add-display"
                 type="text"
                 name="display"
