@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.11.1](https://github.com/javalent/initiative-tracker/compare/9.11.0...9.11.1) (2023-05-03)
+
+
+### Bug Fixes
+
+* better handling for multiple modifiers ([6a866f6](https://github.com/javalent/initiative-tracker/commit/6a866f67bcb8d8128bf4cfd69bcf889cedfea44a))
+
 ## [9.11.0](https://github.com/javalent/initiative-tracker/compare/9.10.0...9.11.0) (2023-05-03)
 
 
