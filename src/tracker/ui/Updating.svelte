@@ -307,6 +307,10 @@
                             use:removeIcon
                             on:click={function (evt) {
                                 tracker.setUpdate(creature, evt);
+                                if (!$updating.size) {
+                                    $statuses = [];
+                                    modal = null;
+                                }
                             }}
                             style="cursor:pointer"
                         />
