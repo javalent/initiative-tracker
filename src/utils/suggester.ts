@@ -555,19 +555,21 @@ export class ConditionSuggestionModal extends SuggestionModal<string> {
         const inputStr = this.modifyInput(this.inputEl.value);
         const suggestions = this.getSuggestions(inputStr);
 
-        if (suggestions.length > 0) {
-            this.suggester.setSuggestions(suggestions.slice(0, this.limit));
-        } else {
-            // Only solution found to allow improvised statuses in status list when applying through enter click
-            // Fairly ugly, but works
-            const fake_results: FuzzyMatch<string>[] = [{
-                item: this.inputEl.value,
+        if (inputStr) {
+            const improvCondition: FuzzyMatch<string> = {
                 match: {
-                    score: 0,
-                    matches: [[0, this.inputEl.value.length]]
-                }
-            }]
-            this.suggester.setSuggestions(fake_results);
+                    matches: [[1, this.inputEl.value.length + 1]],
+                    score: 1
+                },
+                item: this.inputEl.value
+            }
+            this.suggester.setSuggestions([...suggestions.slice(0, this.limit - 1), improvCondition]);
+        }
+        else if (suggestions.length > 0) {
+            this.suggester.setSuggestions(suggestions.slice(0, this.limit));
+        }
+        else {
+            this.onNoSuggestion();
         }
         this.open();
     }
@@ -579,6 +581,7 @@ export class ConditionSuggestionModal extends SuggestionModal<string> {
         );
     }
     selectSuggestion({ item }: FuzzyMatch<string>) {
+        console.dir(item)
         if (this.condition !== null) {
             this.inputEl.value = item;
             this.condition = item;
@@ -605,6 +608,10 @@ export class ConditionSuggestionModal extends SuggestionModal<string> {
         });
         for (let i = 0; i < item.length; i++) {
             let match = matches.matches.find((m) => m[0] === i);
+            if (matches.score == 1) {
+                content.nameEl.appendText(`"${item}"`);
+                break;
+            }
             if (match) {
                 let element = matchElements[matches.matches.indexOf(match)];
                 content.nameEl.appendChild(element);

@@ -23,7 +23,7 @@
         setIcon(node, TAG);
     };
     let statusBtn: ExtraButtonComponent;
-    const applyStatusIcon = (node: HTMLElement) => {
+    const addStatusIcon = (node: HTMLElement) => {
         statusBtn = new ExtraButtonComponent(node).setIcon("plus-circle");
     };
     const removeIcon = (node: HTMLElement) => {
@@ -42,7 +42,7 @@
         if (statusBtn) statusBtn.setDisabled(!status);
     }
     const statuses = writable<Condition[]>([]);
-    const applyStatus = () => {
+    const addStatus = () => {
         if (status) {
             $statuses = [
                 ...$statuses,
@@ -50,7 +50,7 @@
                     ...(plugin.data.statuses.find((s) => s.name == status) ?? {
                         name: status,
                         id: getId(),
-                        desc: "",
+                        description: "",
                     }),
                 },
             ];
@@ -162,7 +162,7 @@
                                 on:keydown={function (evt) {
                                     if (["Enter", "Escape"].includes(evt.key)) {
                                         if (evt.key == "Enter" && status) {
-                                            applyStatus();
+                                            addStatus();
                                             modal.items = plugin.data.statuses
                                                 .filter(
                                                     (s) =>
@@ -179,9 +179,9 @@
                             />
                         </div>
                         <div
-                            use:applyStatusIcon
+                            use:addStatusIcon
                             aria-label="Add Status"
-                            on:click={applyStatus}
+                            on:click={addStatus}
                             style="margin: 0rem 0.2rem 0rem 0rem"
                         />
                     </div>
@@ -330,7 +330,7 @@
         />
     </div>
 {:else}
-    <div on:load={performUpdate(false)} />
+    <div on:load={() => performUpdate(false)} />
 {/if}
 
 <style scoped>
