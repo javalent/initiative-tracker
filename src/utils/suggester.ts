@@ -3,6 +3,7 @@ import {
     CachedMetadata,
     FuzzyMatch,
     FuzzySuggestModal,
+    prepareFuzzySearch,
     Scope,
     Setting,
     SuggestModal,
@@ -253,7 +254,7 @@ export class FileSuggestionModal extends SuggestionModal<TFile> {
 
         this.inputEl.addEventListener("input", this.getItem.bind(this));
     }
-    createPrompts() {}
+    createPrompts() { }
     getItem() {
         const v = this.inputEl.value,
             file = this.items.find((file) => file.name === v.trim());
@@ -439,7 +440,7 @@ abstract class ElementSuggestionModal<T> extends FuzzySuggestModal<T> {
         this.onInputChanged();
         this.open();
     }
-    onInputChanged(): void {}
+    onInputChanged(): void { }
     onNoSuggestion() {
         this.empty();
         this.renderSuggestion(
@@ -447,9 +448,9 @@ abstract class ElementSuggestionModal<T> extends FuzzySuggestModal<T> {
             this.contentEl.createDiv(/* "suggestion-item" */)
         );
     }
-    open(): void {}
+    open(): void { }
 
-    close(): void {}
+    close(): void { }
     createPrompt(prompts: HTMLSpanElement[]) {
         if (!this.promptEl)
             this.promptEl = this.suggestEl.createDiv("prompt-instructions");
@@ -529,8 +530,8 @@ export class HomebrewMonsterSuggestionModal extends ElementSuggestionModal<Homeb
                 .onClick(() => this.onRemoveItem(item));
         });
     }
-    onEditItem(item: HomebrewCreature) {}
-    onRemoveItem(item: HomebrewCreature) {}
+    onEditItem(item: HomebrewCreature) { }
+    onRemoveItem(item: HomebrewCreature) { }
 }
 
 export class ConditionSuggestionModal extends SuggestionModal<string> {
@@ -550,13 +551,34 @@ export class ConditionSuggestionModal extends SuggestionModal<string> {
         this.inputEl.value = item;
         this.condition = item;
     }
+    onInputChanged(): void {
+        const inputStr = this.modifyInput(this.inputEl.value);
+        const suggestions = this.getSuggestions(inputStr);
+
+        if (inputStr) {
+            const improvCondition: FuzzyMatch<string> = {
+                match: {
+                    matches: [[1, this.inputEl.value.length + 1]],
+                    score: 1
+                },
+                item: this.inputEl.value
+            }
+            this.suggester.setSuggestions([...suggestions.slice(0, this.limit - 1), improvCondition]);
+        }
+        else if (suggestions.length > 0) {
+            this.suggester.setSuggestions(suggestions.slice(0, this.limit));
+        }
+        else {
+            this.onNoSuggestion();
+        }
+        this.open();
+    }
     onNoSuggestion() {
         this.empty();
         this.renderSuggestion(
             null,
             this.contentEl.createDiv("suggestion-item")
         );
-        this.condition = null;
     }
     selectSuggestion({ item }: FuzzyMatch<string>) {
         if (this.condition !== null) {
@@ -585,6 +607,10 @@ export class ConditionSuggestionModal extends SuggestionModal<string> {
         });
         for (let i = 0; i < item.length; i++) {
             let match = matches.matches.find((m) => m[0] === i);
+            if (matches.score == 1) {
+                content.nameEl.appendText(`"${item}"`);
+                break;
+            }
             if (match) {
                 let element = matchElements[matches.matches.indexOf(match)];
                 content.nameEl.appendChild(element);
@@ -616,7 +642,7 @@ export class PlayerSuggestionModal extends SuggestionModal<HomebrewCreature> {
         this.inputEl.addEventListener("input", this.getItem.bind(this));
         this.inputEl.addEventListener("focus", this.onInputChanged.bind(this));
     }
-    createPrompts() {}
+    createPrompts() { }
     getItem() {
         const v = this.inputEl.value,
             file = this.items.find((file) => file.name === v.trim());
