@@ -101,6 +101,7 @@ export const NAME_HEADER = TableHeader.fromState({
     type: SortFunctions.LOCAL_COMPARE
 });
 
+export type BuiltTableStore = ReturnType<typeof createTable>;
 export function createTable(plugin: InitiativeTracker, monsters: SRDMonster[]) {
     if (!plugin.data.builder) {
         plugin.data.builder = {
@@ -118,7 +119,7 @@ export function createTable(plugin: InitiativeTracker, monsters: SRDMonster[]) {
         plugin.data.builder.headers.map((h) => TableHeader.fromState(h))
     );
     const { subscribe, set, update } = store;
-    const creatures = writable<SRDMonster[]>(monsters);
+    const creatures = writable<SRDMonster[]>(copy(monsters));
 
     let sortDir = writable(true); //true == asc, false == des
     const allHeaders = derived(store, (headers) => {
@@ -157,6 +158,10 @@ export function createTable(plugin: InitiativeTracker, monsters: SRDMonster[]) {
         sort,
         sortDir,
         creatures,
+        reset: () =>
+            creatures.update(() => {
+                return copy(monsters);
+            }),
         setHeadersFromState: (headers: TableHeaderState[]) =>
             updateAndSave((_) => {
                 plugin.data.builder.headers = headers;

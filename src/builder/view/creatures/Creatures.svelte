@@ -5,18 +5,14 @@
     import type { SRDMonster } from "index";
     import { prepareSimpleSearch, setIcon } from "obsidian";
     import Pagination from "./Pagination.svelte";
-    import { cr, size, type, sources, name } from "../../stores/filter";
-    import { convertFraction } from "src/utils";
-    import { get } from "svelte/store";
+    import { BuiltFilterStore, name } from "../../stores/filter";
 
-    import { createTable, SettingsModal } from "../../stores/table";
-    import { setContext } from "svelte/internal";
-    const plugin = getContext("plugin");
-    let original = plugin.bestiary as SRDMonster[];
-    const table = createTable(plugin, [...original]);
+    import { BuiltTableStore, SettingsModal } from "../../stores/table";
 
-    setContext<ReturnType<typeof createTable>>("table", table);
+    const table = getContext<BuiltTableStore>("table");
     const { creatures, sortDir, allHeaders } = table;
+    const filters = getContext<BuiltFilterStore>("filters");
+    const { filtered } = filters;
 
     let slice = 50;
 
@@ -32,11 +28,11 @@
         if (!n || !n.length) {
             const header = $table.find((h) => h.active) ?? $table[0];
             if (!header.active) header.active = true;
-            $creatures = [...original];
+            table.reset();
         } else {
             const search = prepareSimpleSearch(n);
             const results: SRDMonster[] = [];
-            for (const monster of original) {
+            for (const monster of $creatures) {
                 if (search(monster.name)) {
                     results.push(monster);
                 }
@@ -58,34 +54,8 @@
         };
     };
 
-    $: filtered = $creatures
-        .filter(
-            (c) =>
-                get(cr.isDefault) ||
-                (convertFraction(c.cr) >= $cr[0] &&
-                    convertFraction(c.cr) <= $cr[1])
-        )
-        .filter(
-            (c) =>
-                !$size.length ||
-                $size
-                    .map((s) => s?.toLowerCase())
-                    .includes(c.size?.toLowerCase())
-        )
-        .filter(
-            (c) =>
-                !$type.length ||
-                $type
-                    .map((s) => s?.toLowerCase())
-                    .includes(c.type?.toLowerCase())
-        )
-        .filter((c) =>
-            !$sources.length || typeof c.source == "string"
-                ? !$sources.includes(c.source as string)
-                : !c.source?.find((s) => $sources.includes(s))
-        );
     let page = 1;
-    $: pages = Math.ceil(filtered.length / slice);
+    $: pages = Math.ceil($filtered.length / slice);
 </script>
 
 <div class="filters">
@@ -115,7 +85,7 @@
             {/each}
         </thead>
         <tbody>
-            {#each filtered.slice($name?.length ? 0 : (page - 1) * slice, page * slice) as creature}
+            {#each $filtered.slice($name?.length ? 0 : (page - 1) * slice, page * slice) as creature}
                 <Creature {creature} />
             {/each}
         </tbody>

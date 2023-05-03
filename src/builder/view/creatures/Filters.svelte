@@ -16,20 +16,16 @@
 
     import type { SRDMonster } from "index";
 
-    import {
-        cr,
-        alignment,
-        size,
-        type,
-        sources,
-        name
-    } from "../../stores/filter";
+    import { BuiltFilterStore, name } from "../../stores/filter";
 
     let open = false;
     const dispatch = createEventDispatcher();
 
     const plugin = getContext("plugin");
     const original = plugin.bestiary as SRDMonster[];
+
+    const filters = getContext<BuiltFilterStore>("filters");
+    const { active } = filters;
 
     const sizes = [
         "Tiny",
@@ -62,14 +58,6 @@
     const resetIcon = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("reset");
     };
-    const reset = () => {
-        cr.reset();
-        alignment.reset();
-        type.reset();
-        size.reset();
-        sources.reset();
-        name.set("");
-    };
     const filter = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("filter");
     };
@@ -85,15 +73,6 @@
                 modal.open();
             });
     };
-
-    $: active =
-        (!$name || !$name.length ? 0 : 1) +
-        ($cr[0] == 0 ? 0 : 1) +
-        ($cr[1] == 30 ? 0 : 1) +
-        (!$sources.length ? 0 : 1) +
-        (!$size.length ? 0 : 1) +
-        (!$type.length ? 0 : 1) +
-        (!$alignment.length ? 0 : 1);
 </script>
 
 <div class="filters-container">
@@ -101,9 +80,9 @@
         <div class="search" use:search />
         <div class="filter-button">
             <div use:filter on:click={() => (open = !open)} />
-            <div class="filter-number">{active}</div>
+            <div class="filter-number">{$active}</div>
         </div>
-        <div use:resetIcon on:click={() => reset()} />
+        <div use:resetIcon on:click={() => filters.reset()} />
         <div use:settingsIcon on:click={() => dispatch("settings")} />
     </div>
     {#if open}
@@ -136,7 +115,6 @@
                 bind:value={$cr[0]}
             />
             <Slider bind:value={$cr} range order min={0} max={30} />
-
             <input
                 type="number"
                 placeholder="Max CR"

@@ -28,7 +28,7 @@ interface StringFilter extends BaseFilter {
 }
 type Filter = RangeFilter | OptionsFilter | StringFilter;
 
-const DEFAULT_FILTERS: Filter[] = [
+export const DEFAULT_FILTERS: Filter[] = [
     {
         type: FilterType.Range,
         text: "CR",
@@ -42,6 +42,7 @@ const DEFAULT_CR: [number, number] = [0, 30];
 
 interface FilterStore<T> extends Writable<T> {
     isDefault: Readable<boolean>;
+    getDefault: () => boolean;
     reset: () => void;
     comparer: (value: T) => Readable<boolean>;
     field: any;
@@ -60,6 +61,7 @@ function createRangeFilter(filter: RangeFilter): FilterStore<[number, number]> {
     });
     return {
         isDefault,
+        getDefault: () => get(isDefault),
 
         update,
         set,
@@ -86,6 +88,7 @@ function createOptionsFilter(filter: OptionsFilter): FilterStore<string[]> {
     });
     return {
         isDefault,
+        getDefault: () => get(isDefault),
         subscribe,
         set,
         reset: () => set([...DEFAULT_STRING_ARRAY]),
@@ -110,6 +113,7 @@ function createStringFilter(filter: StringFilter): FilterStore<string> {
     });
     return {
         isDefault,
+        getDefault: () => get(isDefault),
         subscribe,
         set,
         reset: () => set(DEFAULT_STRING),
@@ -135,14 +139,23 @@ function getFilterStore<T extends Filter>(
             return createStringFilter(filter);
     }
 }
+export type BuiltFilterStore = ReturnType<typeof createFilterStore>;
 
 export function createFilterStore(
     creatures: Writable<SRDMonster[]>,
     filters: Filter[]
 ) {
-    const filters$ = writable(
-        new Map(filters.map((f) => [f.id, getFilterStore(f)]))
-    );
+    const map = new Map();
+    const subscriptions = new Map();
+    for (const filter of filters) {
+        const store = getFilterStore(filter);
+        map.set(filter.id, store);
+        subscriptions.set(
+            filter.id,
+            store.subscribe((_) => filters$.update((f) => f))
+        );
+    }
+    const filters$ = writable(map);
     const filtered = derived([creatures, filters$], ([creatures, filters$]) => {
         const filtered: SRDMonster[] = [];
         const filters = Array.from(filters$.values());
@@ -158,15 +171,33 @@ export function createFilterStore(
         }
         return filtered;
     });
+
+    const active = derived(filters$, (filters$) => {
+        let active = 0;
+        for (const filter of filters$.values()) {
+            if (!filter.getDefault()) {
+                active++;
+            }
+        }
+        return active;
+    });
+
     return {
         add: (filter: Filter) =>
             filters$.update((filters) => {
-                filters.set(filter.id, getFilterStore(filter));
+                const store = getFilterStore(filter);
+                filters.set(filter.id, store);
+                subscriptions.set(
+                    filter.id,
+                    store.subscribe((_) => filters$.update((f) => f))
+                );
                 return filters;
             }),
         remove: (filter: Filter) =>
             filters$.update((filters) => {
                 filters.delete(filter.id);
+                subscriptions.get(filter.id)();
+                subscriptions.delete(filter.id);
                 return filters;
             }),
         reset: () =>
@@ -176,11 +207,10 @@ export function createFilterStore(
                 }
                 return filters;
             }),
-
+        active,
         filtered
     };
 }
-
 
 function createCR() {
     const store = writable<[number, number]>([...DEFAULT_CR]);
