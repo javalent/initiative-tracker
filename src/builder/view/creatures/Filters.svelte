@@ -113,7 +113,7 @@
                 <Multiselect
                     options={sizes}
                     bind:selected={$size}
-                    outerDivClass="dropdown"
+                    outerDivClass="multiselect-dropdown"
                     placeholder="Sizes"
                 />
             </div>
@@ -121,7 +121,7 @@
                 <Multiselect
                     options={types}
                     bind:selected={$type}
-                    outerDivClass="dropdown"
+                    outerDivClass="multiselect-dropdown"
                     placeholder="Types"
                 />
             </div>
@@ -204,7 +204,10 @@
     .multiselect-container {
         width: 100%;
     }
-
+    :global(.multiselect-dropdown) {
+        height: auto;
+        min-height: var(--input-height, 30px);
+    }
     /** Normalize multiselect */
     :global(div.multiselect) {
         --sms-border: none;
