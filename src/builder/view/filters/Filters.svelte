@@ -9,14 +9,16 @@
     import { createEventDispatcher, getContext } from "svelte";
     import { slide } from "svelte/transition";
     import { linear } from "svelte/easing";
-    import Slider from "./Slider.svelte";
+    import Slider from "./customs/Slider.svelte";
     import Multiselect from "svelte-multiselect";
 
     import FilterModal from "./FilterModal.svelte";
 
     import type { SRDMonster } from "index";
 
-    import { BuiltFilterStore, name } from "../../stores/filter";
+    import { BuiltFilterStore, FilterType, name } from "../../stores/filter";
+    import Range from "./customs/Range.svelte";
+    import { each } from "svelte/internal";
 
     let open = false;
     const dispatch = createEventDispatcher();
@@ -24,8 +26,8 @@
     const plugin = getContext("plugin");
     const original = plugin.bestiary as SRDMonster[];
 
-    const filters = getContext<BuiltFilterStore>("filters");
-    const { active } = filters;
+    const filterStore = getContext<BuiltFilterStore>("filters");
+    const { active, filters } = filterStore;
 
     const sizes = [
         "Tiny",
@@ -82,13 +84,13 @@
             <div use:filter on:click={() => (open = !open)} />
             <div class="filter-number">{$active}</div>
         </div>
-        <div use:resetIcon on:click={() => filters.reset()} />
+        <div use:resetIcon on:click={() => filterStore.reset()} />
         <div use:settingsIcon on:click={() => dispatch("settings")} />
     </div>
     {#if open}
         <div class="filters" transition:slide={{ easing: linear }}>
             <div use:sourcesButton />
-            <div class="multiselect-container">
+            <!-- <div class="multiselect-container">
                 <Multiselect
                     options={sizes}
                     bind:selected={$size}
@@ -103,27 +105,13 @@
                     outerDivClass="multiselect-dropdown"
                     placeholder="Types"
                 />
-            </div>
+            </div> -->
         </div>
-        <div class="cr-container">
-            <span>Min CR</span>
-            <input
-                type="number"
-                placeholder="Min CR"
-                min="0"
-                max="30"
-                bind:value={$cr[0]}
-            />
-            <Slider bind:value={$cr} range order min={0} max={30} />
-            <input
-                type="number"
-                placeholder="Max CR"
-                min="0"
-                max="30"
-                bind:value={$cr[1]}
-            />
-            <span>Max CR</span>
-        </div>
+        {#each [...$filters.values()] as filter}
+            {#if filter.type == FilterType.Range}
+                <Range {filter} />
+            {/if}
+        {/each}
     {/if}
 </div>
 
@@ -167,13 +155,7 @@
         gap: 1rem;
         width: 100%;
     }
-    .cr-container {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        width: 100%;
-        white-space: nowrap;
-    }
+    
 
     input {
         text-align: center;

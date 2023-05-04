@@ -2,7 +2,7 @@ import type { SRDMonster } from "index";
 import { getId } from "src/utils/creature";
 import { derived, get, Readable, Writable, writable } from "svelte/store";
 
-enum FilterType {
+export enum FilterType {
     Range,
     String,
     Options
@@ -28,27 +28,29 @@ interface StringFilter extends BaseFilter {
 }
 type Filter = RangeFilter | OptionsFilter | StringFilter;
 
-export const DEFAULT_FILTERS: Filter[] = [
-    {
-        type: FilterType.Range,
-        text: "CR",
-        field: "cr",
-        options: [0, 30],
-        id: getId()
-    }
-];
-
-const DEFAULT_CR: [number, number] = [0, 30];
-
-interface FilterStore<T> extends Writable<T> {
+interface BaseFilterStore<T extends Filter> extends Writable<T["options"]> {
     isDefault: Readable<boolean>;
     getDefault: () => boolean;
     reset: () => void;
-    comparer: (value: T) => Readable<boolean>;
-    field: any;
+    comparer: (value: T["options"]) => Readable<boolean>;
+    filter: Filter;
+    type: T["type"];
+}
+export interface RangeFilterStore extends BaseFilterStore<RangeFilter> {
+    type: FilterType.Range;
+}
+export interface OptionsFilterStore extends BaseFilterStore<OptionsFilter> {
+    type: FilterType.Options;
+}
+export interface StringFilterStore extends BaseFilterStore<StringFilter> {
+    type: FilterType.String;
 }
 
-function createRangeFilter(filter: RangeFilter): FilterStore<[number, number]> {
+type FilterStore = RangeFilterStore | OptionsFilterStore | StringFilterStore;
+
+type FilterFactory<T extends Filter> = (filter: T) => FilterStore;
+
+const createRangeFilter: FilterFactory<RangeFilter> = (filter) => {
     const store = writable<[number, number]>([...filter.options]);
     const { update, set, subscribe } = store;
     const isDefault = derived(store, (existing) => {
@@ -74,11 +76,12 @@ function createRangeFilter(filter: RangeFilter): FilterStore<[number, number]> {
                 if (get(isDefault)) return true;
                 return value[0] >= values[0] && value[1] <= values[1];
             }),
-
-        field: filter.field
+        filter,
+        type: filter.type
     };
-}
-function createOptionsFilter(filter: OptionsFilter): FilterStore<string[]> {
+};
+
+const createOptionsFilter: FilterFactory<OptionsFilter> = (filter) => {
     let DEFAULT_STRING_ARRAY: string[] = [];
     const store = writable<string[]>([...DEFAULT_STRING_ARRAY]);
     const { subscribe, set, update } = store;
@@ -99,11 +102,12 @@ function createOptionsFilter(filter: OptionsFilter): FilterStore<string[]> {
                 );
             }),
         update,
-
-        field: filter.field
+        filter,
+        type: filter.type
     };
-}
-function createStringFilter(filter: StringFilter): FilterStore<string> {
+};
+
+const createStringFilter: FilterFactory<StringFilter> = (filter) => {
     let DEFAULT_STRING: string = "";
     const store = writable<string>(DEFAULT_STRING);
     const { subscribe, set, update } = store;
@@ -122,14 +126,12 @@ function createStringFilter(filter: StringFilter): FilterStore<string> {
                 return get(isDefault) || value === val;
             }),
         update,
-
-        field: filter.field
+        filter,
+        type: filter.type
     };
-}
+};
 
-function getFilterStore<T extends Filter>(
-    filter: Filter
-): FilterStore<T["options"]> {
+function getFilterStore(filter: Filter) {
     switch (filter.type) {
         case FilterType.Options:
             return createOptionsFilter(filter);
@@ -145,7 +147,8 @@ export function createFilterStore(
     creatures: Writable<SRDMonster[]>,
     filters: Filter[]
 ) {
-    const map = new Map();
+    const map = new Map<string, FilterStore>();
+    const filters$ = writable(map);
     const subscriptions = new Map();
     for (const filter of filters) {
         const store = getFilterStore(filter);
@@ -155,15 +158,14 @@ export function createFilterStore(
             store.subscribe((_) => filters$.update((f) => f))
         );
     }
-    const filters$ = writable(map);
     const filtered = derived([creatures, filters$], ([creatures, filters$]) => {
         const filtered: SRDMonster[] = [];
         const filters = Array.from(filters$.values());
         for (const creature of creatures) {
             if (
                 filters.every((filter) => {
-                    if (!(filter.field in creature)) return false;
-                    return filter.comparer(creature[filter.field]);
+                    if (!(filter.filter.field in creature)) return false;
+                    return filter.comparer(creature[filter.filter.field]);
                 })
             ) {
                 filtered.push(creature);
@@ -208,48 +210,10 @@ export function createFilterStore(
                 return filters;
             }),
         active,
-        filtered
+        filtered,
+        filters: filters$
     };
 }
-
-function createCR() {
-    const store = writable<[number, number]>([...DEFAULT_CR]);
-    const { subscribe, set, update } = store;
-    const isDefault = derived(store, (existing) => {
-        if (DEFAULT_CR[0] == existing[0] && DEFAULT_CR[1] == existing[1])
-            return true;
-        return false;
-    });
-    return {
-        isDefault,
-        subscribe,
-        set: (value: [number, number]) => {
-            const current = get(store);
-            let setMin = true,
-                setMax = true;
-            if (value[0] == current[0] || value[0] < 0) {
-                setMin = false;
-            }
-
-            if (value[1] == current[1] || value[0] > 30) {
-                setMax = false;
-            }
-            if (!setMin && !setMax) return;
-            update((cr) => {
-                cr = [...value];
-                return cr;
-            });
-        },
-        reset: () => set([...DEFAULT_CR]),
-        update,
-        comparer: (value: [number, number]) =>
-            derived(store, (values) => {
-                if (get(isDefault)) return true;
-                return value[0] >= values[0] && value[1] <= values[1];
-            })
-    };
-}
-
 function createStringArrayStore() {
     let DEFAULT_STRING_ARRAY: string[] = [];
     const store = writable<string[]>([...DEFAULT_STRING_ARRAY]);
@@ -271,9 +235,15 @@ function createStringArrayStore() {
     };
 }
 
-export const cr = createCR();
-export const alignment = createStringArrayStore();
-export const type = createStringArrayStore();
-export const size = createStringArrayStore();
 export const sources = createStringArrayStore();
 export const name = writable<string>();
+
+export const DEFAULT_FILTERS: Filter[] = [
+    {
+        type: FilterType.Range,
+        text: "CR",
+        field: "cr",
+        options: [0, 30],
+        id: getId()
+    }
+];

@@ -1,7 +1,7 @@
 <script lang="ts">
     import Creature from "./Creature.svelte";
     import { getContext } from "svelte";
-    import Filters from "./Filters.svelte";
+    import Filters from "../filters/Filters.svelte";
     import type { SRDMonster } from "index";
     import { prepareSimpleSearch, setIcon } from "obsidian";
     import Pagination from "./Pagination.svelte";
