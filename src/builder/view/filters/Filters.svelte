@@ -12,12 +12,12 @@
 
     import FilterModal from "./FilterModal.svelte";
 
-    import { BuiltFilterStore, FilterType, name } from "../../stores/filter";
+    import { BuiltFilterStore, FilterType, name } from "../../stores/filter/filter";
     import Range from "./customs/Range.svelte";
     import Options from "./customs/Options.svelte";
 
     let open = false;
-    const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher<{ settings: MouseEvent }>();
 
     const plugin = getContext("plugin");
 
@@ -60,7 +60,7 @@
             <div class="filter-number">{$active}</div>
         </div>
         <div use:resetIcon on:click={() => filterStore.reset()} />
-        <div use:settingsIcon on:click={() => dispatch("settings")} />
+        <div use:settingsIcon on:click={(evt) => dispatch("settings", evt)} />
     </div>
     {#if open}
         <div class="filters" transition:slide={{ easing: linear }}>
@@ -117,9 +117,5 @@
         align-items: center;
         gap: 1rem;
         width: 100%;
-    }
-
-    input {
-        text-align: center;
     }
 </style>

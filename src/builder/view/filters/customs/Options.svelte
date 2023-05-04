@@ -1,6 +1,6 @@
 <script lang="ts">
     import Multiselect from "svelte-multiselect";
-    import type { OptionsFilterStore } from "src/builder/stores/filter";
+    import type { OptionsFilterStore } from "src/builder/stores/filter/filter";
 
     export let filter: OptionsFilterStore;
 </script>

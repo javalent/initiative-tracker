@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { RangeFilterStore } from "src/builder/stores/filter";
+    import type { RangeFilterStore } from "src/builder/stores/filter/filter";
     import Slider from "./Slider.svelte";
 
     export let filter: RangeFilterStore;

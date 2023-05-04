@@ -3,13 +3,12 @@ import {
     type SRDMonster,
     SortFunctions,
     type TableHeaderState
-} from "../../../index";
-import { convertFraction } from "../../utils";
-import type InitiativeTracker from "../../main";
+} from "../../../../index";
+import { convertFraction } from "../../../utils";
+import type InitiativeTracker from "../../../main";
 import { Modal } from "obsidian";
 import copy from "fast-copy";
-import Headers from "./table/Headers.svelte";
-import { getId } from "src/utils/creature";
+import { getId } from "../../../utils/creature";
 
 export const playerCount = writable(0);
 
@@ -36,7 +35,7 @@ export class TableHeader {
                     convertFraction(b[this.field] ?? 0);
             }
             case SortFunctions.CUSTOM: {
-                return new Function("a", "b", this.func) as (
+                return new Function("a", "b", this.func!) as (
                     a: SRDMonster,
                     b: SRDMonster
                 ) => number;
@@ -182,30 +181,3 @@ export function createTable(plugin: InitiativeTracker, monsters: SRDMonster[]) {
     };
 }
 
-export class SettingsModal extends Modal {
-    canceled: boolean = false;
-    reset = false;
-    constructor(public headers: TableHeaderState[]) {
-        super(app);
-    }
-    onOpen() {
-        this.titleEl.setText("Edit Headers");
-        const app = new Headers({
-            target: this.contentEl,
-            props: {
-                headers: copy(this.headers)
-            }
-        });
-        app.$on("update", (evt) => {
-            this.headers = copy(evt.detail);
-        });
-        app.$on("cancel", () => {
-            this.canceled = true;
-            this.close();
-        });
-        app.$on("reset", () => {
-            this.reset = true;
-            this.close();
-        });
-    }
-}

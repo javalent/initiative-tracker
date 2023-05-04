@@ -3,11 +3,12 @@
     import { getContext } from "svelte";
     import Filters from "../filters/Filters.svelte";
     import type { SRDMonster } from "index";
-    import { prepareSimpleSearch, setIcon } from "obsidian";
+    import { Menu, prepareSimpleSearch, setIcon } from "obsidian";
     import Pagination from "./Pagination.svelte";
-    import { BuiltFilterStore, name } from "../../stores/filter";
+    import { BuiltFilterStore, name } from "../../stores/filter/filter";
 
-    import { BuiltTableStore, SettingsModal } from "../../stores/table";
+    import type { BuiltTableStore } from "../../stores/table/table";
+    import { HeadersModal } from "src/builder/stores/table/headers-modal";
 
     const table = getContext<BuiltTableStore>("table");
     const { creatures, sortDir, allHeaders } = table;
@@ -41,8 +42,22 @@
         }
     });
 
-    const openSettingsModal = () => {
-        const modal = new SettingsModal($table.map((t) => t.toState()));
+    const settingsMenu = (evt: CustomEvent<MouseEvent>) => {
+        const menu = new Menu();
+        menu.addItem((item) => {
+            item.setTitle("Edit Headers").onClick(() => {
+                openHeadersModal();
+            });
+        }).addItem((item) => {
+            item.setTitle("Edit Filters").onClick(() => {
+                openFiltersModal();
+            });
+        });
+        menu.showAtMouseEvent(evt.detail);
+    };
+    const openFiltersModal = () => {};
+    const openHeadersModal = () => {
+        const modal = new HeadersModal($table.map((t) => t.toState()));
         modal.open();
         modal.onClose = () => {
             if (modal.canceled) return;
@@ -59,7 +74,7 @@
 </script>
 
 <div class="filters">
-    <Filters on:settings={() => openSettingsModal()} />
+    <Filters on:settings={(evt) => settingsMenu(evt)} />
 </div>
 
 {#if $allHeaders.length}

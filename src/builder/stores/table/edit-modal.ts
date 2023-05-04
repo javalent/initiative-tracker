@@ -1,36 +1,7 @@
-import { EditorState, type Extension } from "@codemirror/state";
-import { EditorView } from "@codemirror/view";
-
-import { basicSetup } from "./editor/extensions";
-import { materialPalenight } from "./editor/theme-dark";
-import { basicLightTheme } from "./editor/theme-light";
-import { type TableHeaderState, SortFunctions } from "index";
+import { type TableHeaderState, SortFunctions } from "../../../../index";
 import { Modal, Setting, TextAreaComponent } from "obsidian";
-export function editorFromTextArea(
-    textarea: HTMLTextAreaElement,
-    facet?: Extension
-) {
-    if (document.body.hasClass("theme-dark")) {
-        basicSetup.push(materialPalenight);
-    } else {
-        basicSetup.push(basicLightTheme);
-    }
-    const extensions = [...basicSetup];
-    if (facet) extensions.push(facet);
-    let view = new EditorView({
-        state: EditorState.create({
-            doc: textarea.value,
-            extensions
-        })
-    });
-    textarea.parentNode!.appendChild(view.dom);
-    textarea.style.display = "none";
-    if (textarea.form)
-        textarea.form.addEventListener("submit", () => {
-            textarea.value = view.state.doc.toString();
-        });
-    return view;
-}
+import { EditorView } from "@codemirror/view";
+import { editorFromTextArea } from "../../../utils/editor/index";
 
 export class EditModal extends Modal {
     public header: TableHeaderState;
@@ -97,7 +68,7 @@ export class EditModal extends Modal {
                     })
                 );
             const component = new TextAreaComponent(this.contentEl).setValue(
-                this.header.func
+                this.header.func!
             );
             component.inputEl.addClass("initiative-tracker-textarea");
             this.editor = editorFromTextArea(

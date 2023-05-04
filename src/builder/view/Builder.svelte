@@ -10,8 +10,8 @@
         BuiltFilterStore,
         DEFAULT_FILTERS,
         createFilterStore
-    } from "../stores/filter";
-    import { BuiltTableStore, createTable } from "../stores/table";
+    } from "../stores/filter/filter";
+    import { BuiltTableStore, createTable } from "../stores/table/table";
     import type { SRDMonster } from "index";
 
     export let plugin: InitiativeTracker;

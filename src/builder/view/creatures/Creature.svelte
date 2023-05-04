@@ -1,12 +1,12 @@
 <script lang="ts">
     import type { SRDMonster } from "index";
-    import { ExtraButtonComponent, HoverPopover, setIcon } from "obsidian";
+    import { ExtraButtonComponent, setIcon } from "obsidian";
     import { getContext } from "svelte";
     import { encounter } from "../../stores/encounter";
     import Nullable from "../Nullable.svelte";
-    import { convertFraction, DEFAULT_UNDEFINED, XP_PER_CR } from "src/utils";
+    import { convertFraction, DEFAULT_UNDEFINED } from "src/utils";
     import { Creature as CreatureCreator } from "src/utils/creature";
-    import type { createTable } from "src/builder/stores/table";
+    import type { createTable } from "src/builder/stores/table/table";
     import type InitiativeTracker from "src/main";
 
     const { players } = encounter;
@@ -60,11 +60,10 @@
         return stringify(source, 0, ", ", false);
     }
 
-    const insignificant = convertFraction(creature.cr) < $average - 3;
+    $: insignificant = convertFraction(creature.cr) < $average - 3;
+    $: challenge = convertFraction(creature.cr) > $average + 3;
 
     const baby = (node: HTMLElement) => setIcon(node, "baby");
-    const challenge = convertFraction(creature.cr) > $average + 3;
-
     const skull = (node: HTMLElement) => setIcon(node, "skull");
 </script>
 
@@ -108,11 +107,6 @@
     </td>
     {#each $table as header}
         <td><Nullable str={creature[header.field] ?? DEFAULT_UNDEFINED} /></td>
-        <!-- <td><Nullable str={creature.type ?? DEFAULT_UNDEFINED} /></td>
-        <td><Nullable str={creature.size ?? DEFAULT_UNDEFINED} /></td>
-        <td>
-            <Nullable str={creature.alignment ?? DEFAULT_UNDEFINED} />
-        </td> -->
     {/each}
 </tr>
 
