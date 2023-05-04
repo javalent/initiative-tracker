@@ -17,7 +17,6 @@ import {
 } from "./utils";
 
 import { PLAYER_VIEW_VIEW } from "./utils/constants";
-
 import type {
     EventsOnArgs,
     HomebrewCreature,
@@ -25,26 +24,16 @@ import type {
     InitiativeViewState,
     SRDMonster
 } from "../index";
-
 import type { Plugins, StackRoller } from "obsidian-overload";
-
 import InitiativeTrackerSettings from "./settings/settings";
 import { EncounterBlock, EncounterParser } from "./encounter";
 import EncounterLine from "./encounter/ui/EncounterLine.svelte";
-
 import { Creature, getId } from "./utils/creature";
-
 import TrackerView, { CreatureView } from "./tracker/view";
 import BuilderView from "./builder/view";
-
 import PlayerView from "./tracker/player-view";
 import { tracker } from "./tracker/stores/tracker";
 declare module "obsidian" {
-    /* interface Plugins {
-        "obsidian-dice-roller": DiceRollerAPI;
-        "obsidian-5e-statblocks": StatblockAPI;
-        "obsidian-leaflet-plugin": LeafletAPI;
-    } */
     interface App {
         plugins: {
             getPlugin<T extends keyof Plugins>(plugin: T): Plugins[T];
