@@ -254,7 +254,7 @@ export class FileSuggestionModal extends SuggestionModal<TFile> {
 
         this.inputEl.addEventListener("input", this.getItem.bind(this));
     }
-    createPrompts() { }
+    createPrompts() {}
     getItem() {
         const v = this.inputEl.value,
             file = this.items.find((file) => file.name === v.trim());
@@ -440,7 +440,7 @@ abstract class ElementSuggestionModal<T> extends FuzzySuggestModal<T> {
         this.onInputChanged();
         this.open();
     }
-    onInputChanged(): void { }
+    onInputChanged(): void {}
     onNoSuggestion() {
         this.empty();
         this.renderSuggestion(
@@ -448,9 +448,9 @@ abstract class ElementSuggestionModal<T> extends FuzzySuggestModal<T> {
             this.contentEl.createDiv(/* "suggestion-item" */)
         );
     }
-    open(): void { }
+    open(): void {}
 
-    close(): void { }
+    close(): void {}
     createPrompt(prompts: HTMLSpanElement[]) {
         if (!this.promptEl)
             this.promptEl = this.suggestEl.createDiv("prompt-instructions");
@@ -462,76 +462,6 @@ abstract class ElementSuggestionModal<T> extends FuzzySuggestModal<T> {
     abstract onChooseItem(item: T, evt: MouseEvent | KeyboardEvent): void;
     abstract getItemText(arg: T): string;
     abstract getItems(): T[];
-}
-
-export class HomebrewMonsterSuggestionModal extends ElementSuggestionModal<HomebrewCreature> {
-    creature: HomebrewCreature;
-    homebrew: HomebrewCreature[];
-    constructor(
-        public plugin: InitiativeTracker,
-        inputEl: HTMLInputElement,
-        el: HTMLDivElement
-    ) {
-        super(plugin.app, inputEl, el);
-        this.homebrew = this.plugin.homebrew;
-        this._onInputChanged();
-    }
-    getItems() {
-        return this.homebrew;
-    }
-    getItemText(item: HomebrewCreature) {
-        return item.name;
-    }
-
-    onChooseItem(item: HomebrewCreature) {
-        this.inputEl.value = item.name;
-        this.creature = item;
-    }
-    selectSuggestion({ item }: FuzzyMatch<HomebrewCreature>) {
-        return;
-    }
-    renderSuggestion(result: FuzzyMatch<HomebrewCreature>, el: HTMLElement) {
-        let { item, match: matches } = result || {};
-        let content = new Setting(el); /* el.createDiv({
-            cls: "suggestion-content"
-        }); */
-        if (!item) {
-            content.nameEl.setText(this.emptyStateText);
-            /* content.parentElement.addClass("is-selected"); */
-            return;
-        }
-
-        const matchElements = matches.matches.map((m) => {
-            return createSpan("suggestion-highlight");
-        });
-        for (let i = 0; i < item.name.length; i++) {
-            let match = matches.matches.find((m) => m[0] === i);
-            if (match) {
-                let element = matchElements[matches.matches.indexOf(match)];
-                content.nameEl.appendChild(element);
-                element.appendText(item.name.substring(match[0], match[1]));
-
-                i += match[1] - match[0] - 1;
-                continue;
-            }
-
-            content.nameEl.appendText(item.name[i]);
-        }
-
-        content.setDesc([item.source ?? ""].flat().join(", "));
-        content.addExtraButton((b) => {
-            b.setIcon("pencil")
-                .setTooltip("Edit")
-                .onClick(() => this.onEditItem(item));
-        });
-        content.addExtraButton((b) => {
-            b.setIcon("trash")
-                .setTooltip("Delete")
-                .onClick(() => this.onRemoveItem(item));
-        });
-    }
-    onEditItem(item: HomebrewCreature) { }
-    onRemoveItem(item: HomebrewCreature) { }
 }
 
 export class ConditionSuggestionModal extends SuggestionModal<string> {
@@ -562,13 +492,14 @@ export class ConditionSuggestionModal extends SuggestionModal<string> {
                     score: 1
                 },
                 item: this.inputEl.value
-            }
-            this.suggester.setSuggestions([...suggestions.slice(0, this.limit - 1), improvCondition]);
-        }
-        else if (suggestions.length > 0) {
+            };
+            this.suggester.setSuggestions([
+                ...suggestions.slice(0, this.limit - 1),
+                improvCondition
+            ]);
+        } else if (suggestions.length > 0) {
             this.suggester.setSuggestions(suggestions.slice(0, this.limit));
-        }
-        else {
+        } else {
             this.onNoSuggestion();
         }
         this.open();
@@ -642,7 +573,7 @@ export class PlayerSuggestionModal extends SuggestionModal<HomebrewCreature> {
         this.inputEl.addEventListener("input", this.getItem.bind(this));
         this.inputEl.addEventListener("focus", this.onInputChanged.bind(this));
     }
-    createPrompts() { }
+    createPrompts() {}
     getItem() {
         const v = this.inputEl.value,
             file = this.items.find((file) => file.name === v.trim());

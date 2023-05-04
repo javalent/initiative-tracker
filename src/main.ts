@@ -34,8 +34,6 @@ import EncounterLine from "./encounter/ui/EncounterLine.svelte";
 
 import { Creature, getId } from "./utils/creature";
 
-import { BESTIARY } from "./utils/srd-bestiary";
-
 import TrackerView, { CreatureView } from "./tracker/view";
 import BuilderView from "./builder/view";
 
@@ -158,12 +156,8 @@ export default class InitiativeTracker extends Plugin {
         ] as SRDMonster[];
     }
 
-    get homebrew() {
-        return [...this.statblock_creatures, ...this.data.homebrew];
-    }
-
     get bestiary() {
-        return [...(this.data.integrateSRD ? BESTIARY : []), ...this.homebrew];
+        return [...this.statblock_creatures];
     }
 
     get view() {
@@ -188,13 +182,13 @@ export default class InitiativeTracker extends Plugin {
     }
 
     getBaseCreatureFromBestiary(name: string) {
-        /** Check statblocks first. */
+        /** Check statblocks */
         try {
             if (this.canUseStatBlocks && this.statblocks.hasCreature(name)) {
                 return this.statblocks.getCreatureFromBestiary(name);
             }
         } catch (e) {}
-        return this.bestiary.find((n) => name == n);
+        return null;
     }
     getCreatureFromBestiary(name: string) {
         let creature = this.getBaseCreatureFromBestiary(name);
@@ -538,21 +532,6 @@ export default class InitiativeTracker extends Plugin {
         });
         this.app.workspace.revealLeaf(this.builder.leaf);
     }
-
-    async saveMonsters(importedMonsters: HomebrewCreature[]) {
-        this.data.homebrew.push(...importedMonsters);
-
-        for (let monster of importedMonsters) {
-            this.homebrewCreatures.set(monster.name, Creature.from(monster));
-        }
-
-        await this.saveSettings();
-    }
-    async saveMonster(monster: HomebrewCreature) {
-        this.data.homebrew.push(monster);
-        this.homebrewCreatures.set(monster.name, Creature.from(monster));
-        await this.saveSettings();
-    }
     async updatePlayer(existing: HomebrewCreature, player: HomebrewCreature) {
         if (!this.playerCreatures.has(existing.name)) {
             await this.savePlayer(player);
@@ -575,37 +554,6 @@ export default class InitiativeTracker extends Plugin {
         if (view) {
             tracker.updateState();
         }
-
-        await this.saveSettings();
-    }
-    async updateMonster(existing: HomebrewCreature, monster: HomebrewCreature) {
-        if (!this.homebrewCreatures.has(existing.name)) {
-            await this.saveMonster(monster);
-            return;
-        }
-
-        const creature = this.homebrewCreatures.get(existing.name);
-        creature.update(monster);
-
-        this.data.homebrew.splice(
-            this.data.homebrew.indexOf(existing),
-            1,
-            monster
-        );
-
-        this.homebrewCreatures.set(monster.name, creature);
-        this.homebrewCreatures.delete(existing.name);
-
-        const view = this.view;
-        if (view) {
-            tracker.updateState();
-        }
-
-        await this.saveSettings();
-    }
-    async deleteMonster(monster: HomebrewCreature) {
-        this.data.homebrew = this.data.homebrew.filter((m) => m != monster);
-        this.homebrewCreatures.delete(monster.name);
 
         await this.saveSettings();
     }

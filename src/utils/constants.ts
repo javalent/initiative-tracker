@@ -16,7 +16,6 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     players: [],
     parties: [],
     defaultParty: null,
-    homebrew: [],
     statuses: [...Conditions],
     unconsciousId: "Unconscious",
     version: null,
@@ -55,7 +54,6 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     logging: false,
     logFolder: "/",
     useLegacy: false,
-    integrateSRD: true,
     diplayPlayerHPValues: true,
     rollHP: false,
     builder: {
