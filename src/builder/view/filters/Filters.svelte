@@ -39,12 +39,6 @@
         <div class="filters" transition:slide={{ easing: linear }}>
             {#each $layout as layout}
                 <FilterContainer {layout} />
-                <!-- {#if filter.type == FilterType.Range}
-                    <Range {filter} />
-                {/if}
-                {#if filter.type == FilterType.Options}
-                    <Options {filter} />
-                {/if} -->
             {/each}
         </div>
     {/if}
