@@ -1,25 +1,25 @@
 import { Modal } from "obsidian";
 
-import Headers from "./Headers.svelte";
-import type { TableHeaderState } from "../../../..";
 import copy from "fast-copy";
+import Filters from "./Filters.svelte";
+import { type Filter } from "./filter";
 
 export class HeadersModal extends Modal {
     canceled: boolean = false;
     reset = false;
-    constructor(public headers: TableHeaderState[]) {
+    constructor(public filters: Filter[]) {
         super(app);
     }
     onOpen() {
         this.titleEl.setText("Edit Headers");
-        const app = new Headers({
+        const app = new Filters({
             target: this.contentEl,
             props: {
-                headers: copy(this.headers)
+                filters: copy(this.filters)
             }
         });
         app.$on("update", (evt) => {
-            this.headers = copy(evt.detail);
+            this.filters = copy(evt.detail);
         });
         app.$on("cancel", () => {
             this.canceled = true;

@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
     import { ButtonComponent } from "obsidian";
     import type InitiativeTracker from "src/main";
     import { sources } from "../../stores/filter/filter";
@@ -56,3 +56,4 @@
         gap: 1rem;
     }
 </style>
+ -->

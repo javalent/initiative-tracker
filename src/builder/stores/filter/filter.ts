@@ -1,4 +1,5 @@
 import type { SRDMonster } from "index";
+import { prepareSimpleSearch, SearchResult } from "obsidian";
 import { convertFraction } from "src/utils";
 import { getId } from "src/utils/creature";
 import { derived, get, Readable, Writable, writable } from "svelte/store";
@@ -28,7 +29,7 @@ interface StringFilter extends BaseFilter {
     type: FilterType.String;
     options: string;
 }
-type Filter = RangeFilter | OptionsFilter | StringFilter;
+export type Filter = RangeFilter | OptionsFilter | StringFilter;
 
 interface BaseFilterStore<T extends Filter, S> extends Writable<T["options"]> {
     isDefault: Readable<boolean>;
@@ -123,6 +124,8 @@ const createStringFilter: FilterFactory<StringFilter> = (filter) => {
     const isDefault = derived(store, (existing) => {
         return !existing.length;
     });
+    let search = prepareSimpleSearch("");
+    store.subscribe((value) => (search = prepareSimpleSearch(value)));
     return {
         isDefault,
         getIsDefault: () => get(isDefault),
@@ -131,8 +134,7 @@ const createStringFilter: FilterFactory<StringFilter> = (filter) => {
         reset: () => set(DEFAULT_STRING),
         compare: (value: string) => {
             if (get(isDefault)) return true;
-            const values = get(store);
-            return get(isDefault) || value === values;
+            return get(isDefault) || search(value) != null;
         },
         update,
         filter,
@@ -209,6 +211,18 @@ export function createFilterStore(
     creatures: Writable<SRDMonster[]>,
     filters: Filter[]
 ) {
+    const buildAndSubscribe = (filter: Filter) => {
+        const store = getFilterStore(filter);
+        map.set(filter.id, store);
+        subscriptions.set(
+            filter.id,
+            store.subscribe((_) => {
+                filters$.update((f) => f);
+            })
+        );
+        return store;
+    };
+
     const map = new Map<string, FilterStore>();
     const filters$ = writable(map);
     const subscriptions = new Map();
@@ -220,14 +234,7 @@ export function createFilterStore(
         }
     }
     for (const filter of filters) {
-        const store = getFilterStore(filter);
-        map.set(filter.id, store);
-        subscriptions.set(
-            filter.id,
-            store.subscribe((_) => {
-                filters$.update((f) => f);
-            })
-        );
+        buildAndSubscribe(filter);
     }
     const filtered = derived([creatures, filters$], ([creatures, filters$]) => {
         const filtered: SRDMonster[] = [];
@@ -248,6 +255,8 @@ export function createFilterStore(
         return filtered;
     });
 
+    const layout = writable(DEFAULT_LAYOUT);
+
     const active = derived(filters$, (filters$) => {
         let active = 0;
         for (const filter of filters$.values()) {
@@ -257,6 +266,10 @@ export function createFilterStore(
         }
         return active;
     });
+
+    const name: StringFilterStore = buildAndSubscribe(
+        NAME_FILTER
+    ) as StringFilterStore;
 
     return {
         add: (filter: Filter) =>
@@ -285,32 +298,22 @@ export function createFilterStore(
             }),
         active,
         filtered,
-        filters: filters$
-    };
-}
-function createStringArrayStore() {
-    let DEFAULT_STRING_ARRAY: string[] = [];
-    const store = writable<string[]>([...DEFAULT_STRING_ARRAY]);
-    const { subscribe, set, update } = store;
-
-    const isDefault = derived(store, (existing) => {
-        return !existing.length;
-    });
-    return {
-        isDefault,
-        subscribe,
-        set,
-        reset: () => set([...DEFAULT_STRING_ARRAY]),
-        comparer: (value: string) =>
-            derived(store, (values) => {
-                return get(isDefault) || values.includes(value);
-            }),
-        update
+        filters: filters$,
+        layout,
+        name
     };
 }
 
-export const sources = createStringArrayStore();
 export const name = writable<string>();
+
+const NAME_FILTER: StringFilter = {
+    type: FilterType.String,
+    text: "Name",
+    fields: ["name"],
+    options: "",
+    id: "ID_DEFAULT_NAME_FILTER",
+    derive: false
+};
 
 export const DEFAULT_FILTERS: Filter[] = [
     {
@@ -318,7 +321,7 @@ export const DEFAULT_FILTERS: Filter[] = [
         text: "CR",
         fields: ["cr"],
         options: [0, 30],
-        id: getId(),
+        id: "ID_DEFAULT_CR_FILTER",
         derive: true
     },
     {
@@ -326,7 +329,7 @@ export const DEFAULT_FILTERS: Filter[] = [
         text: "Size",
         fields: ["size"],
         options: [],
-        id: getId(),
+        id: "ID_DEFAULT_SIZE_FILTER",
         derive: true
     },
     {
@@ -334,15 +337,35 @@ export const DEFAULT_FILTERS: Filter[] = [
         text: "Type",
         fields: ["type"],
         options: [],
-        id: getId(),
+        id: "ID_DEFAULT_TYPE_FILTER",
         derive: true
     },
     {
-        type: FilterType.Options,
+        type: FilterType.String,
         text: "Alignment",
         fields: ["alignment"],
-        options: [],
-        id: getId(),
+        options: "",
+        id: "ID_DEFAULT_ALIGNMENT_FILTER",
         derive: true
     }
 ];
+
+export const DEFAULT_LAYOUT: FilterLayout = [
+    { filter: "ID_DEFAULT_CR_FILTER" },
+    {
+        nested: [
+            { filter: "ID_DEFAULT_SIZE_FILTER" },
+            { filter: "ID_DEFAULT_TYPE_FILTER" },
+            { filter: "ID_DEFAULT_ALIGNMENT_FILTER" }
+        ]
+    }
+];
+
+export type FilterLayoutItem =
+    | {
+          filter: string; //filter id
+      }
+    | {
+          nested: FilterLayout;
+      };
+export type FilterLayout = FilterLayoutItem[];
