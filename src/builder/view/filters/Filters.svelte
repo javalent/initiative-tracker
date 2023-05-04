@@ -9,45 +9,20 @@
     import { createEventDispatcher, getContext } from "svelte";
     import { slide } from "svelte/transition";
     import { linear } from "svelte/easing";
-    import Slider from "./customs/Slider.svelte";
-    import Multiselect from "svelte-multiselect";
 
     import FilterModal from "./FilterModal.svelte";
 
-    import type { SRDMonster } from "index";
-
     import { BuiltFilterStore, FilterType, name } from "../../stores/filter";
     import Range from "./customs/Range.svelte";
-    import { each } from "svelte/internal";
+    import Options from "./customs/Options.svelte";
 
     let open = false;
     const dispatch = createEventDispatcher();
 
     const plugin = getContext("plugin");
-    const original = plugin.bestiary as SRDMonster[];
 
     const filterStore = getContext<BuiltFilterStore>("filters");
     const { active, filters } = filterStore;
-
-    const sizes = [
-        "Tiny",
-        "Small",
-        "Medium",
-        "Large",
-        "Huge",
-        "Gargantuan",
-        "Varies"
-    ];
-
-    $: types = [
-        ...new Set(
-            original
-                .map((c) => {
-                    return typeof c.type == "string" ? c.type : null;
-                })
-                .filter((c) => c)
-        )
-    ].sort();
 
     const search = (node: HTMLElement) => {
         new TextComponent(node).setPlaceholder("Name").onChange(
@@ -80,8 +55,8 @@
 <div class="filters-container">
     <div class="controls">
         <div class="search" use:search />
-        <div class="filter-button">
-            <div use:filter on:click={() => (open = !open)} />
+        <div class="filter-button" on:click={() => (open = !open)}>
+            <div use:filter />
             <div class="filter-number">{$active}</div>
         </div>
         <div use:resetIcon on:click={() => filterStore.reset()} />
@@ -90,26 +65,13 @@
     {#if open}
         <div class="filters" transition:slide={{ easing: linear }}>
             <div use:sourcesButton />
-            <!-- <div class="multiselect-container">
-                <Multiselect
-                    options={sizes}
-                    bind:selected={$size}
-                    outerDivClass="multiselect-dropdown"
-                    placeholder="Sizes"
-                />
-            </div>
-            <div class="multiselect-container">
-                <Multiselect
-                    options={types}
-                    bind:selected={$type}
-                    outerDivClass="multiselect-dropdown"
-                    placeholder="Types"
-                />
-            </div> -->
         </div>
         {#each [...$filters.values()] as filter}
             {#if filter.type == FilterType.Range}
                 <Range {filter} />
+            {/if}
+            {#if filter.type == FilterType.Options}
+                <Options {filter} />
             {/if}
         {/each}
     {/if}
@@ -147,6 +109,7 @@
         align-items: center;
         justify-content: center;
         font-size: var(--font-smallest);
+        pointer-events: none;
     }
 
     .filters {
@@ -155,41 +118,8 @@
         gap: 1rem;
         width: 100%;
     }
-    
 
     input {
         text-align: center;
-    }
-
-    .multiselect-container {
-        width: 100%;
-    }
-    :global(.multiselect-dropdown) {
-        height: auto;
-        min-height: var(--input-height, 30px);
-    }
-    /** Normalize multiselect */
-    :global(div.multiselect) {
-        --sms-border: none;
-        --sms-bg: var(--interactive-normal);
-        --sms-options-bg: var(--interactive-normal);
-        --sms-border-radius: var(--radius);
-    }
-    :global(div.multiselect ul) {
-        padding-left: 0;
-        border-radius: var(--radius);
-    }
-    :global(div.multiselect button) {
-        height: 0;
-    }
-    :global(div.multiselect input) {
-        width: 0;
-        font-size: var(--font-ui-small);
-    }
-    :global(div.multiselect li) {
-        border-left: none;
-    }
-    :global(div.multiselect li::before) {
-        content: none;
     }
 </style>

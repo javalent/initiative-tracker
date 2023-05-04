@@ -19,6 +19,7 @@
     const table = createTable(plugin, [...original]);
 
     setContext<BuiltTableStore>("table", table);
+
     const filterStore = createFilterStore(table.creatures, DEFAULT_FILTERS);
     setContext<BuiltFilterStore>("filters", filterStore);
 

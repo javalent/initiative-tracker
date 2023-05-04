@@ -4,6 +4,7 @@ export * from "./conditions";
 
 export const convertFraction = (s: string | number): number => {
     if (typeof s == "number") return s;
+    if (typeof s != "string") return null;
     if (!s || s == "undefined" || !s.length) return 0;
 
     let split = s.split("/");
