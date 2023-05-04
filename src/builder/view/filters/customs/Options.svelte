@@ -18,32 +18,32 @@
     .multiselect-container {
         width: 100%;
     }
-    :global(.multiselect-dropdown) {
+    .multiselect-container :global(.multiselect-dropdown) {
         height: auto;
         min-height: var(--input-height, 30px);
     }
     /** Normalize multiselect */
-    :global(div.multiselect) {
+    .multiselect-container :global(div.multiselect) {
         --sms-border: none;
         --sms-bg: var(--interactive-normal);
         --sms-options-bg: var(--interactive-normal);
         --sms-border-radius: var(--radius);
     }
-    :global(div.multiselect ul) {
+    .multiselect-container :global(div.multiselect ul) {
         padding-left: 0;
         border-radius: var(--radius);
     }
-    :global(div.multiselect button) {
+    .multiselect-container :global(div.multiselect button) {
         height: 0;
     }
-    :global(div.multiselect input) {
+    .multiselect-container :global(div.multiselect input) {
         width: 0;
         font-size: var(--font-ui-small);
     }
-    :global(div.multiselect li) {
+    .multiselect-container :global(div.multiselect li) {
         border-left: none;
     }
-    :global(div.multiselect li::before) {
+    .multiselect-container :global(div.multiselect li::before) {
         content: none;
     }
 </style>
