@@ -134,13 +134,12 @@ export default class InitiativeTracker extends Plugin {
     }
 
     get statblock_creatures() {
-        if (!this.data.sync) return [];
         if (!this.app.plugins.getPlugin("obsidian-5e-statblocks")) return [];
         return [
             ...Array.from(
                 this.app.plugins
                     .getPlugin("obsidian-5e-statblocks")
-                    .data?.values() ?? []
+                    .bestiary?.values() ?? []
             )
         ] as SRDMonster[];
     }
