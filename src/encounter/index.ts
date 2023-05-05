@@ -27,7 +27,7 @@ interface CreatureStats {
     name: string;
     ac: number | string;
     hp: number;
-    modifier: number;
+    modifier: number | number[];
     xp: number;
     display?: string;
     hidden: boolean;
@@ -42,12 +42,29 @@ export const equivalent = (
         creature.name == existing.name &&
         creature.display == existing.display &&
         creature.ac == existing.ac &&
-        creature.modifier == existing.modifier &&
+        equivalentModifiers(creature.modifier, existing.modifier) &&
         creature.xp == existing.xp &&
         creature.hidden == existing.hidden &&
         creature.friendly == existing.friendly
     );
 };
+
+function equivalentModifiers(
+    modifier: number | number[],
+    existing: number | number[]
+): boolean {
+    if (typeof modifier != typeof existing) return false;
+    if (typeof modifier == "number") {
+        return modifier == existing;
+    }
+    if (Array.isArray(modifier) && Array.isArray(existing)) {
+        for (let i = 0; i < modifier.length; i++) {
+            if (modifier[i] != existing[i]) return false;
+        }
+        return true;
+    }
+    return false;
+}
 
 export interface ParsedParams {
     name: string;
@@ -257,7 +274,13 @@ export class EncounterParser {
 
             [hp, ac, mod, xp] = monster
                 .slice(1)
-                .filter((v) => v != "hidden" && v != "friend" && v != "friendly" && v != "ally")
+                .filter(
+                    (v) =>
+                        v != "hidden" &&
+                        v != "friend" &&
+                        v != "friendly" &&
+                        v != "ally"
+                )
                 .map((v) => (isNaN(Number(v)) ? null : Number(v)));
         } else if (typeof monster == "object") {
             ({ creature: name, name: display, hp, ac, mod, xp } = monster);

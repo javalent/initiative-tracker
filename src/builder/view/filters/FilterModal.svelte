@@ -1,7 +1,7 @@
-<script lang="ts">
+<!-- <script lang="ts">
     import { ButtonComponent } from "obsidian";
     import type InitiativeTracker from "src/main";
-    import { sources } from "../../stores/filter";
+    import { sources } from "../../stores/filter/filter";
 
     export let plugin: InitiativeTracker;
     const allSources = [...new Set(plugin.bestiary.map((c) => c.source).flat())]
@@ -56,3 +56,4 @@
         gap: 1rem;
     }
 </style>
+ -->

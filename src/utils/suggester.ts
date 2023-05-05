@@ -3,6 +3,7 @@ import {
     CachedMetadata,
     FuzzyMatch,
     FuzzySuggestModal,
+    prepareFuzzySearch,
     Scope,
     Setting,
     SuggestModal,
@@ -463,76 +464,6 @@ abstract class ElementSuggestionModal<T> extends FuzzySuggestModal<T> {
     abstract getItems(): T[];
 }
 
-export class HomebrewMonsterSuggestionModal extends ElementSuggestionModal<HomebrewCreature> {
-    creature: HomebrewCreature;
-    homebrew: HomebrewCreature[];
-    constructor(
-        public plugin: InitiativeTracker,
-        inputEl: HTMLInputElement,
-        el: HTMLDivElement
-    ) {
-        super(plugin.app, inputEl, el);
-        this.homebrew = this.plugin.homebrew;
-        this._onInputChanged();
-    }
-    getItems() {
-        return this.homebrew;
-    }
-    getItemText(item: HomebrewCreature) {
-        return item.name;
-    }
-
-    onChooseItem(item: HomebrewCreature) {
-        this.inputEl.value = item.name;
-        this.creature = item;
-    }
-    selectSuggestion({ item }: FuzzyMatch<HomebrewCreature>) {
-        return;
-    }
-    renderSuggestion(result: FuzzyMatch<HomebrewCreature>, el: HTMLElement) {
-        let { item, match: matches } = result || {};
-        let content = new Setting(el); /* el.createDiv({
-            cls: "suggestion-content"
-        }); */
-        if (!item) {
-            content.nameEl.setText(this.emptyStateText);
-            /* content.parentElement.addClass("is-selected"); */
-            return;
-        }
-
-        const matchElements = matches.matches.map((m) => {
-            return createSpan("suggestion-highlight");
-        });
-        for (let i = 0; i < item.name.length; i++) {
-            let match = matches.matches.find((m) => m[0] === i);
-            if (match) {
-                let element = matchElements[matches.matches.indexOf(match)];
-                content.nameEl.appendChild(element);
-                element.appendText(item.name.substring(match[0], match[1]));
-
-                i += match[1] - match[0] - 1;
-                continue;
-            }
-
-            content.nameEl.appendText(item.name[i]);
-        }
-
-        content.setDesc([item.source ?? ""].flat().join(", "));
-        content.addExtraButton((b) => {
-            b.setIcon("pencil")
-                .setTooltip("Edit")
-                .onClick(() => this.onEditItem(item));
-        });
-        content.addExtraButton((b) => {
-            b.setIcon("trash")
-                .setTooltip("Delete")
-                .onClick(() => this.onRemoveItem(item));
-        });
-    }
-    onEditItem(item: HomebrewCreature) {}
-    onRemoveItem(item: HomebrewCreature) {}
-}
-
 export class ConditionSuggestionModal extends SuggestionModal<string> {
     condition: string;
     constructor(public items: string[], inputEl: HTMLInputElement) {
@@ -550,13 +481,35 @@ export class ConditionSuggestionModal extends SuggestionModal<string> {
         this.inputEl.value = item;
         this.condition = item;
     }
+    onInputChanged(): void {
+        const inputStr = this.modifyInput(this.inputEl.value);
+        const suggestions = this.getSuggestions(inputStr);
+
+        if (inputStr) {
+            const improvCondition: FuzzyMatch<string> = {
+                match: {
+                    matches: [[1, this.inputEl.value.length + 1]],
+                    score: 1
+                },
+                item: this.inputEl.value
+            };
+            this.suggester.setSuggestions([
+                ...suggestions.slice(0, this.limit - 1),
+                improvCondition
+            ]);
+        } else if (suggestions.length > 0) {
+            this.suggester.setSuggestions(suggestions.slice(0, this.limit));
+        } else {
+            this.onNoSuggestion();
+        }
+        this.open();
+    }
     onNoSuggestion() {
         this.empty();
         this.renderSuggestion(
             null,
             this.contentEl.createDiv("suggestion-item")
         );
-        this.condition = null;
     }
     selectSuggestion({ item }: FuzzyMatch<string>) {
         if (this.condition !== null) {
@@ -585,6 +538,10 @@ export class ConditionSuggestionModal extends SuggestionModal<string> {
         });
         for (let i = 0; i < item.length; i++) {
             let match = matches.matches.find((m) => m[0] === i);
+            if (matches.score == 1) {
+                content.nameEl.appendText(`"${item}"`);
+                break;
+            }
             if (match) {
                 let element = matchElements[matches.matches.indexOf(match)];
                 content.nameEl.appendChild(element);

@@ -41,6 +41,7 @@
                         creature.current_ac = $editing.ac;
                         creature.dirty_ac = false;
                     }
+
                     tracker.replace(creature, $editing);
                 } else {
                     const creatures = $adding.flatMap(([creature, amount]) =>

@@ -28,6 +28,8 @@
         creature = c;
     });
 
+    let modifier = JSON.stringify(creature.modifier ?? 0);
+
     const saveButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Add Creature")
@@ -121,9 +123,9 @@
                 );
             });
     };
-    let nameInput: HTMLInputElement;
+    let nameInput: HTMLInputElement, displayNameInput: HTMLInputElement;
     let modal: SRDMonsterSuggestionModal;
-    onMount(() => {
+    const createModal = () => {
         modal = new SRDMonsterSuggestionModal(plugin, nameInput);
         modal.onClose = async () => {
             if (modal.creature) {
@@ -134,6 +136,16 @@
                 );
             }
         };
+    };
+    onMount(() => {
+        if (isEditing) {
+            setImmediate(() => {
+                displayNameInput.focus();
+                createModal();
+            });
+        } else {
+            createModal();
+        }
     });
     const hideToggle = (div: HTMLDivElement) => {
         new ToggleComponent(div)
@@ -145,6 +157,12 @@
             .setValue(creature.friendly)
             .onChange((v) => (creature.friendly = v));
     };
+
+    $: {
+        try {
+            creature.modifier = JSON.parse(`${modifier}`);
+        } catch (e) {}
+    }
 </script>
 
 <div class="initiative-tracker-editor">
@@ -155,7 +173,7 @@
                 bind:this={nameInput}
                 bind:value={creature.name}
                 on:focus={function () {
-                    modal.open();
+                    if (modal) modal.open();
                 }}
                 id="add-name"
                 type="text"
@@ -167,6 +185,7 @@
             <label for="add-display">Display Name</label>
             <input
                 bind:value={creature.display}
+                bind:this={displayNameInput}
                 id="add-display"
                 type="text"
                 name="display"
@@ -184,12 +203,12 @@
             />
         </div>
         <div>
-            <label for="add-hp">Hit Dice</label>
+            <label for="hit-dice">Hit Dice</label>
             <input
                 bind:value={creature.hit_dice}
-                id="add-hp"
+                id="hit-dice"
                 type="text"
-                name="hp"
+                name="hitdice"
                 tabindex="0"
             />
         </div>
@@ -197,7 +216,7 @@
             <label for="add-ac">AC</label>
             <input
                 bind:value={creature.ac}
-                on:change={() => creature.dirty_ac=true}
+                on:change={() => (creature.dirty_ac = true)}
                 id="add-ac"
                 name="ac"
                 type="text"
@@ -207,10 +226,10 @@
         <div>
             <label for="add-mod">Modifier</label>
             <input
-                bind:value={creature.modifier}
+                bind:value={modifier}
                 id="add-mod"
-                type="number"
-                name="ac"
+                type="text"
+                name="add-mod"
                 tabindex="0"
             />
         </div>

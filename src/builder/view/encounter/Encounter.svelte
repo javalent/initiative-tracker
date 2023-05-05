@@ -7,10 +7,28 @@
     import { encounter } from "../../stores/encounter";
     import { START_ENCOUNTER } from "src/utils";
     import { getContext } from "svelte";
+    import { tracker } from "src/tracker/stores/tracker";
+    import type { CreatureState } from "index";
+    import { writable } from "svelte/store";
 
     const { players } = encounter;
 
     const plugin = getContext("plugin");
+    let name = writable("Encounter");
+    let tempName = writable("");
+    let updatingName = writable(false);
+
+    const setName = () => {
+        $updatingName = false;
+        $name = $tempName.length ? $tempName : $name;
+        $tempName = "";
+    };
+    const cancelName = () => {
+        $updatingName = false;
+        $tempName = "";
+    };
+
+    let rollHP = plugin.data.rollHP;
 
     $: items = [...$encounter.entries()];
 
@@ -18,18 +36,46 @@
     const start = (node: HTMLElement) => {
         startIcon = new ExtraButtonComponent(node)
             .setIcon(START_ENCOUNTER)
-            .onClick(() => {
-                plugin.view.newEncounter({
-                    creatures: [...$encounter.entries()]
-                        .map((c) =>
-                            [...Array(c[1]).keys()].map(() =>
-                                CreatureCreator.from(c[0])
-                            )
+            .onClick(async () => {
+                if (!plugin.view) {
+                    await plugin.addTrackerView();
+                }
+
+                const view = plugin.view;
+                const creatures: CreatureCreator[] = [];
+                const transformedCreatures: CreatureState[] = [];
+                for (const [srd, count] of items) {
+                    const creature = CreatureCreator.from(srd);
+                    const amount = Math.max(
+                        isNaN(Number(count)) ? 1 : Number(count),
+                        1
+                    );
+                    creatures.push(
+                        ...[...Array(amount).keys()].map((v) =>
+                            CreatureCreator.new(creature)
                         )
-                        .flat(),
-                    players: [...$players].map((p) => p.name)
+                    );
+                }
+                for (const creature of [
+                    ...$players.map(
+                        (p) =>
+                            plugin.getPlayerByName(p.name) ??
+                            CreatureCreator.from(p)
+                    ),
+                    ...creatures
+                ]) {
+                    transformedCreatures.push(creature.toJSON());
+                }
+                tracker.new(plugin, {
+                    creatures: transformedCreatures,
+                    name: $name,
+                    round: 1,
+                    state: false,
+                    logFile: null,
+                    roll: true,
+                    rollHP
                 });
-                app.workspace.revealLeaf(plugin.view.leaf);
+                plugin.app.workspace.revealLeaf(view.leaf);
             });
     };
 
@@ -44,67 +90,55 @@
             }
         }
     }
-    let saveIcon: ExtraButtonComponent;
-    const save = (node: HTMLElement) => {
-        saveIcon = new ExtraButtonComponent(node)
-            .setIcon("save")
-            .onClick(() => {
-                const modal = new Modal(app);
-                modal.contentEl.createEl("h4", { text: "Save Encounter" });
-                let name: string = `Encounter ${
-                    Object.keys(plugin.data.encounters).length
-                }`;
-                new Setting(modal.contentEl)
-                    .setName("Encounter Name")
-                    .addText((t) => {
-                        t.setPlaceholder(name).onChange((v) => (name = v));
-                    });
-                new Setting(modal.contentEl).addButton((b) =>
-                    b.setButtonText("Save").onClick(() => {
-                        if (name in plugin.data.encounters) {
-                            new Notice(
-                                "An encounter by that name already exists."
-                            );
-                            return;
-                        }
-                        const creatures = [
-                            ...[...$players].map((p) =>
-                                CreatureCreator.from(p)
-                            ),
-                            ...[...$encounter.entries()]
-                                .map((c) =>
-                                    [...Array(c[1]).keys()].map(() =>
-                                        CreatureCreator.from(c[0])
-                                    )
-                                )
-                                .flat()
-                        ];
-                        plugin.data.encounters[name] = {
-                            creatures: [...creatures.map((c) => c.toJSON())],
-                            state: false,
-                            name,
-                            round: 1,
-                            logFile: null
-                        };
-                        modal.close();
-                    })
-                );
-                modal.open();
-            });
+    const editIcon = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon("pencil");
     };
 
-    $: {
-        if (saveIcon) {
-            if (!items.length) {
-                saveIcon.setDisabled(true);
-                saveIcon.setTooltip("");
-            } else {
-                saveIcon.setDisabled(false);
-                saveIcon.setTooltip("Save Encounter");
-            }
-        }
-    }
+    const saveIcon = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon("save");
+    };
+    const save = () => {
+        const modal = new Modal(app);
+        modal.contentEl.createEl("h4", { text: "Save Encounter" });
+        let encName: string =
+            $name != "Encounter"
+                ? $name
+                : `Encounter ${Object.keys(plugin.data.encounters).length}`;
+        new Setting(modal.contentEl).setName("Encounter Name").addText((t) => {
+            t.setPlaceholder(encName).onChange((v) => (encName = v));
+        });
+        new Setting(modal.contentEl).addButton((b) =>
+            b.setButtonText("Save").onClick(() => {
+                if (encName in plugin.data.encounters) {
+                    new Notice("An encounter by that name already exists.");
+                    return;
+                }
+                const creatures = [
+                    ...[...$players].map((p) => CreatureCreator.from(p)),
+                    ...[...$encounter.entries()]
+                        .map((c) =>
+                            [...Array(c[1]).keys()].map(() =>
+                                CreatureCreator.from(c[0])
+                            )
+                        )
+                        .flat()
+                ];
+                plugin.data.encounters[encName] = {
+                    creatures: [...creatures.map((c) => c.toJSON())],
+                    state: false,
+                    name: encName,
+                    round: 1,
+                    logFile: null
+                };
+                modal.close();
+            })
+        );
+        modal.open();
+    };
 
+    const cancelIcon = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon("cross-in-box");
+    };
     let exportIcon: ExtraButtonComponent;
     const exp = (node: HTMLElement) => {
         exportIcon = new ExtraButtonComponent(node).setIcon("code");
@@ -135,14 +169,29 @@
 </script>
 
 <div class="encounter-header">
-    <h5 class="built-encounter">Encounter</h5>
+    <div class="encounter-name">
+        {#if $updatingName}
+            <input type="text" bind:value={$tempName} placeholder={$name} />
+            <div use:saveIcon on:click={setName} />
+            <div use:cancelIcon on:click={cancelName} />
+        {:else}
+            <h5 class="built-encounter">{$name}</h5>
+            <div use:editIcon on:click={() => ($updatingName = true)} />
+        {/if}
+    </div>
     <div class="encounter-controls">
         <div use:start />
-        <div use:save />
+        <div use:saveIcon on:click={save} />
         <!-- <div use:exp /> -->
         <!-- <div use:load /> -->
 
-        <div use:clear on:click={() => encounter.empty()} />
+        <div
+            use:clear
+            on:click={() => {
+                encounter.empty();
+                $name = "Encounter";
+            }}
+        />
     </div>
 </div>
 {#if !items.length}
@@ -156,6 +205,10 @@
 {/if}
 
 <style scoped>
+    .encounter-name {
+        display: flex;
+        align-items: center;
+    }
     .encounter-header {
         display: flex;
         align-items: center;

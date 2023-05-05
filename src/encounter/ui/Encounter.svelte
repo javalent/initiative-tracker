@@ -304,8 +304,7 @@
     .icons > div:first-child :global(.clickable-icon) {
         margin-right: 0;
     }
-    .creature-name,
-    .creatures-header {
+    .creature-name {
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;

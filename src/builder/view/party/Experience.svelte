@@ -4,7 +4,12 @@
     import { players } from "../../stores/players";
     import { MODIFIERS_BY_COUNT, MODIFIER_THRESHOLDS } from "../../constants";
     import { DEFAULT_UNDEFINED, XP_PER_CR } from "src/utils";
+    import { getContext } from "svelte";
+    import Collapsible from "./Collapsible.svelte";
 
+    const plugin = getContext("plugin");
+    
+    const open = plugin.data.builder.showXP;
     const { thresholds, modifier: playerModifier } = players;
 
     $: count = ([...$encounter.values()] ?? []).reduce((a, b) => {
@@ -47,48 +52,58 @@
 </script>
 
 <div class="xp-container">
-    <h5>Experience</h5>
-    <div class="xp">
-        <div class="encounter-difficulty">
-            <div class="difficulty container">
-                <strong class="header">Difficulty</strong>
-                <span>
-                    {difficulty}
-                </span>
-            </div>
-            <div class="total container">
-                <strong class="header">XP</strong>
-                <span>
-                    {xp ? xp.toLocaleString() : DEFAULT_UNDEFINED}
-                </span>
-            </div>
-            <div class="adjusted container">
-                <strong class="header">Adjusted</strong>
-                <span>
-                    {adjXP ? adjXP.toLocaleString() : DEFAULT_UNDEFINED}
-                </span>
-            </div>
-        </div>
-        <div class="thresholds">
-            {#each EXPERIENCE_THRESHOLDS as level}
-                <div
-                    class="experience-threshold {level.toLowerCase()} container"
-                >
-                    <strong class="experience-name header">{level}</strong>
-                    <span class="experience-amount">
-                        {$thresholds[level].toLocaleString()} XP
-                    </span>
+    <Collapsible
+        {open}
+        on:toggle={() =>
+            (plugin.data.builder.showXP = !plugin.data.builder.showXP)}
+    >
+        <h5 slot="title">Experience</h5>
+        <div slot="content">
+            <div class="xp">
+                <div class="encounter-difficulty">
+                    <div class="difficulty container">
+                        <strong class="header">Difficulty</strong>
+                        <span>
+                            {difficulty}
+                        </span>
+                    </div>
+                    <div class="total container">
+                        <strong class="header">XP</strong>
+                        <span>
+                            {xp ? xp.toLocaleString() : DEFAULT_UNDEFINED}
+                        </span>
+                    </div>
+                    <div class="adjusted container">
+                        <strong class="header">Adjusted</strong>
+                        <span>
+                            {adjXP ? adjXP.toLocaleString() : DEFAULT_UNDEFINED}
+                        </span>
+                    </div>
                 </div>
-            {/each}
+                <div class="thresholds">
+                    {#each EXPERIENCE_THRESHOLDS as level}
+                        <div
+                            class="experience-threshold {level.toLowerCase()} container"
+                        >
+                            <strong class="experience-name header"
+                                >{level}</strong
+                            >
+                            <span class="experience-amount">
+                                {$thresholds[level].toLocaleString()} XP
+                            </span>
+                        </div>
+                    {/each}
+                </div>
+                <br />
+            </div>
+            <div class="budget">
+                <h5 class="experience-name">Daily budget</h5>
+                <span class="experience-amount">
+                    {$thresholds.Daily.toLocaleString()} XP
+                </span>
+            </div>
         </div>
-        <br />
-    </div>
-    <div class="budget">
-        <h5 class="experience-name">Daily budget</h5>
-        <span class="experience-amount">
-            {$thresholds.Daily.toLocaleString()} XP
-        </span>
-    </div>
+    </Collapsible>
 </div>
 
 <style scoped>

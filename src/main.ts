@@ -17,7 +17,6 @@ import {
 } from "./utils";
 
 import { PLAYER_VIEW_VIEW } from "./utils/constants";
-
 import type {
     EventsOnArgs,
     HomebrewCreature,
@@ -25,28 +24,16 @@ import type {
     InitiativeViewState,
     SRDMonster
 } from "../index";
-
-import type { Plugins } from "obsidian-overload";
-
+import type { Plugins, StackRoller } from "obsidian-overload";
 import InitiativeTrackerSettings from "./settings/settings";
 import { EncounterBlock, EncounterParser } from "./encounter";
 import EncounterLine from "./encounter/ui/EncounterLine.svelte";
-
 import { Creature, getId } from "./utils/creature";
-
-import { BESTIARY } from "./utils/srd-bestiary";
-
 import TrackerView, { CreatureView } from "./tracker/view";
 import BuilderView from "./builder/view";
-
 import PlayerView from "./tracker/player-view";
 import { tracker } from "./tracker/stores/tracker";
 declare module "obsidian" {
-    /* interface Plugins {
-        "obsidian-dice-roller": DiceRollerAPI;
-        "obsidian-5e-statblocks": StatblockAPI;
-        "obsidian-leaflet-plugin": LeafletAPI;
-    } */
     interface App {
         plugins: {
             getPlugin<T extends keyof Plugins>(plugin: T): Plugins[T];
@@ -70,7 +57,7 @@ export default class InitiativeTracker extends Plugin {
         const roller = this.app.plugins
             .getPlugin("obsidian-dice-roller")
             .getRollerSync(str, "statblock");
-        return roller;
+        return roller as StackRoller;
     }
     get canUseDiceRoller() {
         if (this.app.plugins.getPlugin("obsidian-dice-roller") != null) {
@@ -88,17 +75,24 @@ export default class InitiativeTracker extends Plugin {
         return false;
     }
 
-    getInitiativeValue(modifier: number = 0): number {
-        let initiative = Math.floor(Math.random() * 19 + 1) + modifier;
-        if (this.canUseDiceRoller) {
-            const roller = this.getRoller(
-                this.data.initiative.replace(/%mod%/g, `(${modifier})`)
-            );
-            if (roller) {
-                roller.roll();
-                if (!isNaN(roller.result)) initiative = roller.result;
+    getInitiativeValue(modifier: number | number[] = 0): number {
+        const defaultIfNoResult =
+            Math.floor(Math.random() * 19 + 1) +
+            [modifier].flat().reduce((a, b) => a + b, 0);
+        if (!this.canUseDiceRoller) {
+            return defaultIfNoResult;
+        }
+        let dice = this.data.initiative;
+        if (typeof modifier == "number") {
+            dice = dice.replace(/%mod\d?%/g, `${modifier}`);
+        } else {
+            for (let i = 0; i < modifier.length; i++) {
+                dice = dice.replace(`%mod${i + 1}%`, `${modifier[i]}`);
             }
         }
+        const roller = this.getRoller(dice);
+        const initiative = roller.rollSync();
+        if (isNaN(initiative)) return defaultIfNoResult;
         return initiative;
     }
 
@@ -140,23 +134,18 @@ export default class InitiativeTracker extends Plugin {
     }
 
     get statblock_creatures() {
-        if (!this.data.sync) return [];
         if (!this.app.plugins.getPlugin("obsidian-5e-statblocks")) return [];
         return [
             ...Array.from(
                 this.app.plugins
                     .getPlugin("obsidian-5e-statblocks")
-                    .data?.values() ?? []
+                    .bestiary?.values() ?? []
             )
         ] as SRDMonster[];
     }
 
-    get homebrew() {
-        return [...this.statblock_creatures, ...this.data.homebrew];
-    }
-
     get bestiary() {
-        return [...(this.data.integrateSRD ? BESTIARY : []), ...this.homebrew];
+        return [...this.statblock_creatures];
     }
 
     get view() {
@@ -181,13 +170,13 @@ export default class InitiativeTracker extends Plugin {
     }
 
     getBaseCreatureFromBestiary(name: string) {
-        /** Check statblocks first. */
+        /** Check statblocks */
         try {
             if (this.canUseStatBlocks && this.statblocks.hasCreature(name)) {
                 return this.statblocks.getCreatureFromBestiary(name);
             }
         } catch (e) {}
-        return this.bestiary.find((n) => name == n);
+        return null;
     }
     getCreatureFromBestiary(name: string) {
         let creature = this.getBaseCreatureFromBestiary(name);
@@ -198,6 +187,8 @@ export default class InitiativeTracker extends Plugin {
         registerIcons();
 
         await this.loadSettings();
+
+        this.setBuilderIcon();
 
         this.addSettingTab(new InitiativeTrackerSettings(this));
 
@@ -529,21 +520,6 @@ export default class InitiativeTracker extends Plugin {
         });
         this.app.workspace.revealLeaf(this.builder.leaf);
     }
-
-    async saveMonsters(importedMonsters: HomebrewCreature[]) {
-        this.data.homebrew.push(...importedMonsters);
-
-        for (let monster of importedMonsters) {
-            this.homebrewCreatures.set(monster.name, Creature.from(monster));
-        }
-
-        await this.saveSettings();
-    }
-    async saveMonster(monster: HomebrewCreature) {
-        this.data.homebrew.push(monster);
-        this.homebrewCreatures.set(monster.name, Creature.from(monster));
-        await this.saveSettings();
-    }
     async updatePlayer(existing: HomebrewCreature, player: HomebrewCreature) {
         if (!this.playerCreatures.has(existing.name)) {
             await this.savePlayer(player);
@@ -566,37 +542,6 @@ export default class InitiativeTracker extends Plugin {
         if (view) {
             tracker.updateState();
         }
-
-        await this.saveSettings();
-    }
-    async updateMonster(existing: HomebrewCreature, monster: HomebrewCreature) {
-        if (!this.homebrewCreatures.has(existing.name)) {
-            await this.saveMonster(monster);
-            return;
-        }
-
-        const creature = this.homebrewCreatures.get(existing.name);
-        creature.update(monster);
-
-        this.data.homebrew.splice(
-            this.data.homebrew.indexOf(existing),
-            1,
-            monster
-        );
-
-        this.homebrewCreatures.set(monster.name, creature);
-        this.homebrewCreatures.delete(existing.name);
-
-        const view = this.view;
-        if (view) {
-            tracker.updateState();
-        }
-
-        await this.saveSettings();
-    }
-    async deleteMonster(monster: HomebrewCreature) {
-        this.data.homebrew = this.data.homebrew.filter((m) => m != monster);
-        this.homebrewCreatures.delete(monster.name);
 
         await this.saveSettings();
     }
@@ -646,6 +591,66 @@ export default class InitiativeTracker extends Plugin {
             }
             await this.saveSettings();
         }
+
+        console.log(
+            "🚀 ~ file: main.ts:597 ~ this.data.version?.[0] < 10:",
+            this.data.version
+        );
+        if (this.data.version?.[0] < 10 && false) {
+            if (
+                !this.canUseStatBlocks ||
+                !this.statblocks.settings.disableSRD
+            ) {
+                new Notice(
+                    createFragment((e) => {
+                        e.createEl("h4", { text: "Initiative Tracker Notice" });
+                        e.createSpan({
+                            text: "The 5e SRD has been removed from the plugin."
+                        });
+                        e.createEl("br");
+                        const p = e.createEl("p");
+
+                        if (this.canUseStatBlocks) {
+                            if (!this.statblocks.settings.disableSRD) {
+                                p.createSpan({
+                                    text: "It will still be available thanks to the "
+                                });
+                                p.createEl("a", {
+                                    text: "Fantasy Statblocks",
+                                    href: "obsidian://show-plugin?id=obsidian-5e-statblocks"
+                                });
+                                p.createSpan({
+                                    text: " plugin."
+                                });
+                            }
+                        } else {
+                            p.createSpan({
+                                text: "Please install and use the "
+                            });
+                            p.createEl("a", {
+                                text: "Fantasy Statblocks",
+                                href: "obsidian://show-plugin?id=obsidian-5e-statblocks"
+                            });
+                            p.createSpan({
+                                text: " to re-integrate the SRD, if desired."
+                            });
+                        }
+                        const docs = e.createEl("p");
+                        docs.createSpan({ text: "See more at " });
+                        docs.createEl("a", {
+                            text: "https://plugins.javalent.com",
+                            href: "https://plugins.javalent.com"
+                        });
+                        docs.createSpan({ text: "." });
+                    }),
+                    0
+                );
+            }
+        }
+
+        this.data.version = this.manifest.version
+            .split(".")
+            .map((n) => Number(n));
     }
 
     async saveSettings() {
@@ -673,5 +678,20 @@ export default class InitiativeTracker extends Plugin {
         }
 
         await this.combatant.render(creature);
+        this.app.workspace.revealLeaf(this.combatant.leaf);
+    }
+    private _builderIcon: HTMLElement;
+    setBuilderIcon() {
+        if (this.data.builder.sidebarIcon) {
+            this._builderIcon = this.addRibbonIcon(
+                BUILDER_VIEW,
+                "Intiative Tracker Encounter Builder",
+                () => {
+                    this.addBuilderView();
+                }
+            );
+        } else {
+            this._builderIcon.detach();
+        }
     }
 }

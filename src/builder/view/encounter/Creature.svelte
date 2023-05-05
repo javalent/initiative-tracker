@@ -4,10 +4,13 @@
     import { convertFraction, DEFAULT_UNDEFINED, XP_PER_CR } from "src/utils";
     import { encounter } from "../../stores/encounter";
     import Nullable from "../Nullable.svelte";
+    import { getContext } from "svelte";
+    import { Creature as CreatureCreator } from "src/utils/creature";
 
     const { players } = encounter;
     const { average } = players;
 
+    const plugin = getContext("plugin");
     const remove = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("minus-circle");
     };
@@ -17,6 +20,8 @@
     const del = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("trash-2");
     };
+
+    
 
     export let count: number;
     export let creature: SRDMonster;
@@ -40,6 +45,10 @@
     const challenge = convertFraction(creature.cr) > $average + 3;
 
     const skull = (node: HTMLElement) => setIcon(node, "skull");
+
+    const open = () => {
+        plugin.openCombatant(CreatureCreator.from(creature));
+    };
 </script>
 
 <div class="encounter-creature-container">
@@ -55,7 +64,7 @@
         <div use:add on:click={() => encounter.add(creature)} />
     </div>
     <div class="encounter-creature">
-        <strong class="encounter-creature-name">
+        <strong class="encounter-creature-name" on:click={open}>
             {creature.name}
         </strong>
         {#if insignificant}

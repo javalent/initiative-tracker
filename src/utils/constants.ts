@@ -16,10 +16,9 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     players: [],
     parties: [],
     defaultParty: null,
-    homebrew: [],
     statuses: [...Conditions],
     unconsciousId: "Unconscious",
-    version: null,
+    version: [],
     canUseDiceRoll: false,
     preferStatblockLink: false,
     initiative: "1d20 + %mod%",
@@ -47,16 +46,21 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
         party: true,
         status: true,
         plugin: true,
-        player: true
+        player: true,
+        builder: true
     },
     hpOverflow: "ignore",
     additiveTemp: false,
     logging: false,
     logFolder: "/",
     useLegacy: false,
-    integrateSRD: true,
     diplayPlayerHPValues: true,
-    rollHP: false
+    rollHP: false,
+    builder: {
+        showParty: true,
+        showXP: true,
+        sidebarIcon: true
+    }
 };
 
 export const XP_PER_CR: Record<string, number> = {

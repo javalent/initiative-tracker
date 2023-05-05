@@ -1,162 +1,171 @@
 <script lang="ts">
     import Creature from "./Creature.svelte";
     import { getContext } from "svelte";
-    import Filters from "./Filters.svelte";
-    import type { SRDMonster } from "index";
-    import { prepareFuzzySearch, prepareSimpleSearch, setIcon } from "obsidian";
+    import Filters from "../filters/Filters.svelte";
+    import { Menu, Notice, setIcon } from "obsidian";
     import Pagination from "./Pagination.svelte";
-    import {
-        cr,
-        alignment,
-        size,
-        type,
-        sources,
-        name
-    } from "../../stores/filter";
-    import { convertFraction } from "src/utils";
-    import { get } from "svelte/store";
+    import type { BuiltFilterStore } from "../../stores/filter/filter";
 
-    interface TableHeader {
-        text: string;
-        active: boolean;
-        sortAsc: (a: SRDMonster, b: SRDMonster) => number;
-        sortDesc: (a: SRDMonster, b: SRDMonster) => number;
-    }
+    import type { BuiltTableStore } from "../../stores/table/table";
+    import { HeadersModal } from "src/builder/stores/table/headers-modal";
+    import { FiltersModal } from "src/builder/stores/filter/filters-modal";
+    import type InitiativeTracker from "src/main";
+    import Ajv from "ajv";
+    import schema from "../../stores/filter/filter-schema.json";
 
-    const plugin = getContext("plugin");
+    const table = getContext<BuiltTableStore>("table");
+    const { sortDir, allHeaders } = table;
+    const filterStore = getContext<BuiltFilterStore>("filters");
+    const { filtered, layout } = filterStore;
+    const plugin = getContext<InitiativeTracker>("plugin");
 
     let slice = 50;
 
-    let sortDir = true; //true == asc, false == des
-    const sort = (field: TableHeader) => {
-        if (field.active) {
-            sortDir = !sortDir;
-        } else {
-            headers = headers.map((h) => {
-                h.active = false;
-                return h;
+    const sortUp = (node: HTMLElement) => {
+        setIcon(node, "chevron-up");
+    };
+    const sortDown = (node: HTMLElement) => {
+        setIcon(node, "chevron-down");
+    };
+
+    const settingsMenu = (evt: CustomEvent<MouseEvent>) => {
+        const menu = new Menu();
+        menu.addItem((item) => {
+            item.setTitle("Edit Headers").onClick(() => {
+                openHeadersModal();
             });
-            field.active = true;
-            sortDir = true;
-        }
+        })
+            .addItem((item) => {
+                item.setTitle("Edit Filters").onClick(() => {
+                    openFiltersModal();
+                });
+            })
+            .addSeparator()
+            .addItem((item) => {
+                item.setTitle("Export").onClick(() => {
+                    const link = createEl("a");
+                    const file = new Blob(
+                        [JSON.stringify(plugin.data.builder)],
+                        {
+                            type: "json"
+                        }
+                    );
+                    const url = URL.createObjectURL(file);
+                    link.href = url;
+                    link.download = `initiative-tracker-encounter-builder.json`;
+                    link.click();
+                });
+            })
+            .addItem((item) => {
+                item.setTitle("Import").onClick(() => {
+                    //validate;
+                    const ajv = new Ajv();
 
-        creatures.sort(sortDir ? field.sortAsc : field.sortDesc);
-        creatures = creatures;
+                    // validate is a type guard for MyData - type is inferred from schema type
+                    const validate = ajv.compile(schema);
+                    const input = createEl("input", {
+                        attr: {
+                            type: "file",
+                            name: "builder_state",
+                            accept: ".json"
+                        }
+                    });
+                    input.onchange = async () => {
+                        const { files } = input;
+                        if (!files.length) return;
+
+                        const reader = new FileReader();
+                        reader.onload = async (
+                            event: ProgressEvent<FileReader>
+                        ) => {
+                            if (typeof event.target.result == "string") {
+                                let json: any;
+                                try {
+                                    json = JSON.parse(event.target.result);
+                                } catch (e) {
+                                    new Notice(
+                                        "There was an issue parsing the file as JSON."
+                                    );
+                                }
+                                if (validate(json)) {
+                                    plugin.data.builder = { ...json };
+                                    await plugin.saveSettings();
+                                    filterStore.resetLayout();
+                                } else {
+                                    console.log(
+                                        ...validate.errors.map((e) => e.message)
+                                    );
+                                    new Notice(
+                                        "This file does not match the builder state schema."
+                                    );
+                                }
+                            }
+                        };
+                        reader.readAsText(files[0]);
+                    };
+                    input.click();
+                });
+            });
+        menu.showAtMouseEvent(evt.detail);
     };
-    const sortIcon = (node: HTMLElement) => {
-        setIcon(node, sortDir ? "chevron-up" : "chevron-down");
+    const openFiltersModal = () => {
+        const modal = new FiltersModal($layout, filterStore);
+        modal.open();
+        modal.onClose = () => {
+            if (modal.canceled) return;
+            $layout = modal.layout;
+        };
     };
-    let headers: TableHeader[] = [
-        {
-            text: "Name",
-            active: true,
-            sortAsc: (a, b) => a.name.localeCompare(b.name),
-            sortDesc: (a, b) => b.name.localeCompare(a.name)
-        },
-        {
-            text: "CR",
-            active: false,
-            sortAsc: (a, b) =>
-                convertFraction(a.cr ?? 0) - convertFraction(b.cr ?? 0),
-            sortDesc: (a, b) =>
-                convertFraction(b.cr ?? 0) - convertFraction(a.cr ?? 0)
-        },
-        {
-            text: "Type",
-            active: false,
-            sortAsc: (a, b) => a.type?.localeCompare(b.type),
-            sortDesc: (a, b) => b.type?.localeCompare(a.type)
-        },
-        {
-            text: "Size",
-            active: false,
-            sortAsc: (a, b) => a.size?.localeCompare(b.size),
-            sortDesc: (a, b) => b.size?.localeCompare(a.size)
-        },
-        {
-            text: "Alignment",
-            active: false,
-            sortAsc: (a, b) => a.alignment?.localeCompare(b.alignment),
-            sortDesc: (a, b) => b.alignment?.localeCompare(a.alignment)
-        }
-    ];
-
-    let original = plugin.bestiary as SRDMonster[];
-
-    let creatures = [...original];
-
-    name.subscribe((n) => {
-        if (!n || !n.length) {
-            const header = headers.find((h) => h.active) ?? headers[0];
-            if (!header.active) header.active = true;
-            const active = sortDir ? header.sortAsc : header.sortDesc;
-            creatures = [...original].sort(active);
-        } else {
-            const search = prepareSimpleSearch(n);
-            const results: SRDMonster[] = [];
-            for (const monster of original) {
-                if (search(monster.name)) {
-                    results.push(monster);
-                }
+    const openHeadersModal = () => {
+        const modal = new HeadersModal($table.map((t) => t.toState()));
+        modal.open();
+        modal.onClose = () => {
+            if (modal.canceled) return;
+            if (modal.reset) {
+                table.resetToDefault();
+                return;
             }
-            creatures = results;
-        }
-    });
+            table.setHeadersFromState(modal.headers);
+        };
+    };
 
-    $: filtered = creatures
-        .filter(
-            (c) =>
-                get(cr.isDefault) ||
-                (convertFraction(c.cr) >= $cr[0] &&
-                    convertFraction(c.cr) <= $cr[1])
-        )
-        .filter(
-            (c) =>
-            
-                !$size.length ||
-                $size
-                    .map((s) => s?.toLowerCase())
-                    .includes(c.size?.toLowerCase())
-        )
-        .filter(
-            (c) =>
-                !$type.length ||
-                $type
-                    .map((s) => s?.toLowerCase())
-                    .includes(c.type?.toLowerCase())
-        )
-        .filter((c) =>
-            !$sources.length || typeof c.source == "string"
-                ? !$sources.includes(c.source as string)
-                : !c.source?.find((s) => $sources.includes(s))
-        );
     let page = 1;
-    $: pages = Math.ceil(filtered.length / slice);
+    $: pages = Math.ceil($filtered.length / slice);
 </script>
 
 <div class="filters">
-    <Filters />
+    <Filters on:settings={(evt) => settingsMenu(evt)} />
 </div>
 
-<table>
-    <thead>
-        {#each headers as header (header.text)}
-            <th on:click={() => sort(header)}>
-                <div class="table-header">
-                    <span class="table-header-content">{header.text}</span>
-                    {#key sortDir}
-                        <div use:sortIcon class:invisible={!header.active} />
-                    {/key}
-                </div>
-            </th>
-        {/each}
-    </thead>
-    <tbody>
-        {#each filtered.slice((page - 1) * slice, page * slice) as creature}
-            <Creature {creature} />
-        {/each}
-    </tbody>
-</table>
+{#if $allHeaders.length}
+    <table>
+        <thead>
+            {#each $allHeaders as header (header.text)}
+                <th
+                    on:click={() => {
+                        table.sort(header);
+                    }}
+                >
+                    <div class="table-header">
+                        <span class="table-header-content">{header.text}</span>
+                        {#if header.active}
+                            {#if $sortDir}
+                                <div class="has-icon" use:sortUp />
+                            {:else}
+                                <div class="has-icon" use:sortDown />
+                            {/if}
+                        {/if}
+                    </div>
+                </th>
+            {/each}
+        </thead>
+        <tbody>
+            {#each $filtered.slice((page - 1) * slice, page * slice) as creature}
+                <Creature {creature} />
+            {/each}
+        </tbody>
+    </table>
+{/if}
 
 <Pagination
     {slice}
@@ -177,8 +186,9 @@
         gap: 0.25rem;
     }
 
-    .invisible {
-        color: transparent;
+    .has-icon {
+        display: flex;
+        align-items: center;
     }
 
     table {

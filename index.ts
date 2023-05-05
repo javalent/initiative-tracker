@@ -1,5 +1,6 @@
 import "obsidian";
 import type { Spell, Trait, ability } from "obsidian-overload";
+import type { Filter, FilterLayout } from "src/builder/stores/filter/filter";
 
 //      CUSTOM EVENTS
 // ------------------------
@@ -63,7 +64,7 @@ export type Condition = {
     resetOnRound?: boolean;
     hasAmount?: boolean;
     startingAmount?: number;
-    amount?:number;
+    amount?: number;
 } & (
     | {
           hasAmount: true;
@@ -95,12 +96,12 @@ export interface InitiativeTrackerData {
         status: boolean;
         plugin: boolean;
         player: boolean;
+        builder: boolean;
     };
     players: HomebrewCreature[];
     parties: Party[];
     defaultParty: string;
-    homebrew: HomebrewCreature[];
-    version: string;
+
     canUseDiceRoll: boolean;
     initiative: string;
     modifier: string;
@@ -119,9 +120,22 @@ export interface InitiativeTrackerData {
     logging: boolean;
     logFolder: string;
     useLegacy: boolean;
-    integrateSRD: boolean;
     diplayPlayerHPValues: boolean;
     rollHP: boolean;
+    builder: BuilderState;
+
+    version: number[];
+}
+
+export interface BuilderState {
+    sidebarIcon: boolean;
+    showXP: boolean;
+    showParty: boolean;
+    headers?: TableHeaderState[];
+    filters?: {
+        layout: FilterLayout;
+        filters: Filter[];
+    };
 }
 
 export interface InitiativeViewState {
@@ -175,6 +189,10 @@ export interface SRDMonster {
     reactions?: Trait[];
     monster?: string;
     source?: string | string[];
+    friendly?: boolean;
+    hidden?: boolean;
+
+    [key: string]: any;
 }
 
 export interface HomebrewCreature {
@@ -185,7 +203,7 @@ export interface HomebrewCreature {
     stats?: number[];
     source?: string | string[];
     cr?: number | string;
-    modifier?: number;
+    modifier?: number | number[];
     note?: string;
     path?: string;
     level?: number;
@@ -251,7 +269,6 @@ export declare class Creature {
     player: boolean;
     status: Set<Condition>;
     marker: string;
-    private _initiative;
     source: string | string[];
     id: string;
     xp: number;
@@ -275,3 +292,16 @@ export declare class Creature {
     toJSON(): CreatureState;
     static fromJSON(state: CreatureState): Creature;
 }
+
+//Builder
+export enum SortFunctions {
+    LOCAL_COMPARE,
+    CONVERT_FRACTION,
+    CUSTOM
+}
+export type TableHeaderState = {
+    text: string;
+    field: string;
+    type: SortFunctions;
+    func?: string;
+};

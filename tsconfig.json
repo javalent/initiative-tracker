@@ -9,6 +9,7 @@
         "noImplicitAny": true,
         "moduleResolution": "node",
         "importHelpers": true,
+        "resolveJsonModule": true,
         "types": ["node", "svelte", "jest"],
         "lib": ["dom", "esnext", "scripthost"],
         "experimentalDecorators": true
