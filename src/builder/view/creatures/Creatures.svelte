@@ -12,8 +12,6 @@
     import type InitiativeTracker from "src/main";
     import Ajv from "ajv";
     import schema from "../../stores/filter/filter-schema.json";
-    import type { Writable } from "svelte/store";
-    import type { BuilderState } from "index";
 
     const table = getContext<BuiltTableStore>("table");
     const { sortDir, allHeaders } = table;

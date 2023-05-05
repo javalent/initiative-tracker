@@ -309,11 +309,11 @@ export function createFilterStore(
         plugin.data.builder.filters.layout = newLayout;
         plugin.saveSettings();
     };
-    const resetLayout = () => {
-        setLayout(getDefaultLayout());
+    const resetLayout = (def?: boolean) => {
+        setLayout(def ? ORIGINAL_DEFAULT_LAYOUT : getDefaultLayout());
         updateAndSave((f) => {
             f.clear();
-            const filters = getDefaultFilters();
+            const filters = def ? DEFAULT_FILTERS : getDefaultFilters();
             for (const filter of filters) {
                 buildAndSubscribe(filter);
             }

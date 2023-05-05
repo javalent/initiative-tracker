@@ -32,7 +32,7 @@
             .setName("Restore Default Layout")
             .addExtraButton((b) => {
                 b.setIcon("reset").onClick(() => {
-                    filterStore.resetLayout();
+                    filterStore.resetLayout(true);
                 });
             });
     };
