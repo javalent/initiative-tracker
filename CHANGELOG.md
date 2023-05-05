@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.0.1](https://github.com/javalent/initiative-tracker/compare/10.0.0...10.0.1) (2023-05-05)
+
+
+### Bug Fixes
+
+* Fixes reset filters to default ([de9a394](https://github.com/javalent/initiative-tracker/commit/de9a3942f67611bb2111829d013fb82670c6ad98))
+
 ## [10.0.0](https://github.com/javalent/initiative-tracker/compare/9.11.1...10.0.0) (2023-05-05)
 
 
