@@ -100,7 +100,7 @@ export interface InitiativeTrackerData {
     players: HomebrewCreature[];
     parties: Party[];
     defaultParty: string;
-    version: string;
+
     canUseDiceRoll: boolean;
     initiative: string;
     modifier: string;
@@ -122,6 +122,8 @@ export interface InitiativeTrackerData {
     diplayPlayerHPValues: boolean;
     rollHP: boolean;
     builder: BuilderState;
+
+    version: number[];
 }
 
 interface BuilderState {

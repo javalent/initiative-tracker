@@ -18,7 +18,7 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     defaultParty: null,
     statuses: [...Conditions],
     unconsciousId: "Unconscious",
-    version: null,
+    version: [],
     canUseDiceRoll: false,
     preferStatblockLink: false,
     initiative: "1d20 + %mod%",
