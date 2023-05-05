@@ -2,18 +2,24 @@
     import Creature from "./Creature.svelte";
     import { getContext } from "svelte";
     import Filters from "../filters/Filters.svelte";
-    import type { SRDMonster } from "index";
-    import { Menu, prepareSimpleSearch, setIcon } from "obsidian";
+    import { Menu, Notice, setIcon } from "obsidian";
     import Pagination from "./Pagination.svelte";
-    import { BuiltFilterStore, name } from "../../stores/filter/filter";
+    import type { BuiltFilterStore } from "../../stores/filter/filter";
 
     import type { BuiltTableStore } from "../../stores/table/table";
     import { HeadersModal } from "src/builder/stores/table/headers-modal";
+    import { FiltersModal } from "src/builder/stores/filter/filters-modal";
+    import type InitiativeTracker from "src/main";
+    import Ajv from "ajv";
+    import schema from "../../stores/filter/filter-schema.json";
+    import type { Writable } from "svelte/store";
+    import type { BuilderState } from "index";
 
     const table = getContext<BuiltTableStore>("table");
-    const { creatures, sortDir, allHeaders } = table;
-    const filters = getContext<BuiltFilterStore>("filters");
-    const { filtered } = filters;
+    const { sortDir, allHeaders } = table;
+    const filterStore = getContext<BuiltFilterStore>("filters");
+    const { filtered, layout } = filterStore;
+    const plugin = getContext<InitiativeTracker>("plugin");
 
     let slice = 50;
 
@@ -24,38 +30,94 @@
         setIcon(node, "chevron-down");
     };
 
-    name.subscribe((n) => {
-        if (!$table.length) return;
-        if (!n || !n.length) {
-            const header = $table.find((h) => h.active) ?? $table[0];
-            if (!header.active) header.active = true;
-            table.reset();
-        } else {
-            const search = prepareSimpleSearch(n);
-            const results: SRDMonster[] = [];
-            for (const monster of $creatures) {
-                if (search(monster.name)) {
-                    results.push(monster);
-                }
-            }
-            $creatures = results;
-        }
-    });
-
     const settingsMenu = (evt: CustomEvent<MouseEvent>) => {
         const menu = new Menu();
         menu.addItem((item) => {
             item.setTitle("Edit Headers").onClick(() => {
                 openHeadersModal();
             });
-        }).addItem((item) => {
-            item.setTitle("Edit Filters").onClick(() => {
-                openFiltersModal();
+        })
+            .addItem((item) => {
+                item.setTitle("Edit Filters").onClick(() => {
+                    openFiltersModal();
+                });
+            })
+            .addSeparator()
+            .addItem((item) => {
+                item.setTitle("Export").onClick(() => {
+                    const link = createEl("a");
+                    const file = new Blob(
+                        [JSON.stringify(plugin.data.builder)],
+                        {
+                            type: "json"
+                        }
+                    );
+                    const url = URL.createObjectURL(file);
+                    link.href = url;
+                    link.download = `initiative-tracker-encounter-builder.json`;
+                    link.click();
+                });
+            })
+            .addItem((item) => {
+                item.setTitle("Import").onClick(() => {
+                    //validate;
+                    const ajv = new Ajv();
+
+                    // validate is a type guard for MyData - type is inferred from schema type
+                    const validate = ajv.compile(schema);
+                    const input = createEl("input", {
+                        attr: {
+                            type: "file",
+                            name: "builder_state",
+                            accept: ".json"
+                        }
+                    });
+                    input.onchange = async () => {
+                        const { files } = input;
+                        if (!files.length) return;
+
+                        const reader = new FileReader();
+                        reader.onload = async (
+                            event: ProgressEvent<FileReader>
+                        ) => {
+                            if (typeof event.target.result == "string") {
+                                let json: any;
+                                try {
+                                    json = JSON.parse(event.target.result);
+                                } catch (e) {
+                                    new Notice(
+                                        "There was an issue parsing the file as JSON."
+                                    );
+                                }
+                                if (validate(json)) {
+                                    plugin.data.builder = { ...json };
+                                    await plugin.saveSettings();
+                                    filterStore.resetLayout();
+                                } else {
+                                    console.log(
+                                        ...validate.errors.map((e) => e.message)
+                                    );
+                                    new Notice(
+                                        "This file does not match the builder state schema."
+                                    );
+                                }
+                            }
+                        };
+                        reader.readAsText(files[0]);
+                    };
+                    input.click();
+                });
             });
-        });
         menu.showAtMouseEvent(evt.detail);
     };
-    const openFiltersModal = () => {};
+    const openFiltersModal = () => {
+        const modal = new FiltersModal($layout, filterStore);
+        modal.open();
+        modal.onClose = () => {
+            if (modal.canceled) return;
+            $layout = modal.layout;
+        };
+    };
     const openHeadersModal = () => {
         const modal = new HeadersModal($table.map((t) => t.toState()));
         modal.open();
@@ -100,7 +162,7 @@
             {/each}
         </thead>
         <tbody>
-            {#each $filtered.slice($name?.length ? 0 : (page - 1) * slice, page * slice) as creature}
+            {#each $filtered.slice((page - 1) * slice, page * slice) as creature}
                 <Creature {creature} />
             {/each}
         </tbody>

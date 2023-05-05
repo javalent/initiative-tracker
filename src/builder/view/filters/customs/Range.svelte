@@ -13,16 +13,22 @@
     <input
         type="number"
         placeholder={min}
-        min="0"
-        max="30"
+        min={filter.options[0]}
+        max={filter.options[1]}
         bind:value={$filter[0]}
     />
-    <Slider bind:value={$filter} range order min={0} max={30} />
+    <Slider
+        bind:value={$filter}
+        range
+        order
+        min={filter.options[0]}
+        max={filter.options[1]}
+    />
     <input
         type="number"
         placeholder={max}
-        min="0"
-        max="30"
+        min={filter.options[0]}
+        max={filter.options[1]}
         bind:value={$filter[1]}
     />
     <span>{max}</span>

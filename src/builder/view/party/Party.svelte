@@ -11,13 +11,7 @@
     const { party, generics } = players;
 
     const plugin = getContext("plugin");
-    if (!plugin.data.builder) {
-        plugin.data.builder = {
-            sidebarIcon: true,
-            showParty: true,
-            showXP: true
-        };
-    }
+    
     const open = plugin.data.builder.showParty;
 
     const defaultParty = plugin.data.defaultParty;

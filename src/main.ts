@@ -596,7 +596,7 @@ export default class InitiativeTracker extends Plugin {
             "🚀 ~ file: main.ts:597 ~ this.data.version?.[0] < 10:",
             this.data.version
         );
-        if (this.data.version?.[0] < 10) {
+        if (this.data.version?.[0] < 10 && false) {
             if (
                 !this.canUseStatBlocks ||
                 !this.statblocks.settings.disableSRD

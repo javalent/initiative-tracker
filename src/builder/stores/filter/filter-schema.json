@@ -1,0 +1,142 @@
+{
+    "$ref": "#/definitions/BuilderState",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "BuilderState": {
+            "additionalProperties": false,
+            "properties": {
+                "filters": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "filters": {
+                            "items": {
+                                "$ref": "#/definitions/Filter"
+                            },
+                            "type": "array"
+                        },
+                        "layout": {
+                            "$ref": "#/definitions/FilterLayout"
+                        }
+                    },
+                    "required": ["layout", "filters"],
+                    "type": "object"
+                },
+                "headers": {
+                    "items": {
+                        "$ref": "#/definitions/TableHeaderState"
+                    },
+                    "type": "array"
+                },
+                "showParty": {
+                    "type": "boolean"
+                },
+                "showXP": {
+                    "type": "boolean"
+                },
+                "sidebarIcon": {
+                    "type": "boolean"
+                }
+            },
+            "required": ["sidebarIcon", "showXP", "showParty"],
+            "type": "object"
+        },
+        "Filter": {
+            "additionalProperties": false,
+            "properties": {
+                "derive": {
+                    "type": "boolean"
+                },
+                "fields": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "options": {
+                    "type": [
+                        "string",
+                        "number",
+                        "boolean",
+                        "integer",
+                        "object",
+                        "array"
+                    ]
+                },
+                "text": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "number"
+                }
+            },
+            "required": ["derive", "fields", "id", "options", "text", "type"],
+            "type": "object"
+        },
+        "FilterLayout": {
+            "items": {
+                "$ref": "#/definitions/NestedFilterLayoutItem"
+            },
+            "type": "array"
+        },
+        "FilterLayoutItem": {
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "const": "filter",
+                    "type": "string"
+                }
+            },
+            "required": ["id", "type"],
+            "type": "object"
+        },
+        "NestedFilterLayoutItem": {
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "nested": {
+                    "items": {
+                        "$ref": "#/definitions/FilterLayoutItem"
+                    },
+                    "type": "array"
+                },
+                "type": {
+                    "const": "nested",
+                    "type": "string"
+                }
+            },
+            "required": ["id", "nested", "type"],
+            "type": "object"
+        },
+        "SortFunctions": {
+            "enum": [0, 1, 2],
+            "type": "number"
+        },
+        "TableHeaderState": {
+            "additionalProperties": false,
+            "properties": {
+                "field": {
+                    "type": "string"
+                },
+                "func": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/SortFunctions"
+                }
+            },
+            "required": ["text", "field", "type"],
+            "type": "object"
+        }
+    }
+}

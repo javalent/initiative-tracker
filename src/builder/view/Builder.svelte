@@ -12,7 +12,8 @@
         createFilterStore
     } from "../stores/filter/filter";
     import { BuiltTableStore, createTable } from "../stores/table/table";
-    import type { SRDMonster } from "index";
+    import type { BuilderState, SRDMonster } from "index";
+    import { writable } from "svelte/store";
 
     export let plugin: InitiativeTracker;
     let original = plugin.bestiary as SRDMonster[];
@@ -20,9 +21,16 @@
 
     setContext<BuiltTableStore>("table", table);
 
-    const filterStore = createFilterStore(table.creatures, DEFAULT_FILTERS);
+    const filterStore = createFilterStore(table.creatures, plugin);
     setContext<BuiltFilterStore>("filters", filterStore);
 
+    if (!plugin.data.builder) {
+        plugin.data.builder = {
+            sidebarIcon: true,
+            showParty: true,
+            showXP: true
+        };
+    }
     setContext("plugin", plugin);
 
     onDestroy(() => {

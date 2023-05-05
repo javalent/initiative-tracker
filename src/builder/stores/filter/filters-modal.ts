@@ -1,32 +1,58 @@
-import { Modal } from "obsidian";
+import { Modal, Setting } from "obsidian";
 
 import copy from "fast-copy";
-import Filters from "./Filters.svelte";
-import { type Filter } from "./filter";
+import Filters from "./Container.svelte";
+import EditFilter from "./EditFilter.svelte";
+import type { BuiltFilterStore, Filter, FilterLayout } from "./filter";
 
-export class HeadersModal extends Modal {
+export class FiltersModal extends Modal {
     canceled: boolean = false;
     reset = false;
-    constructor(public filters: Filter[]) {
+    layout: FilterLayout;
+    constructor(layout: FilterLayout, public filterStore: BuiltFilterStore) {
         super(app);
+        this.layout = copy(layout);
     }
     onOpen() {
-        this.titleEl.setText("Edit Headers");
+        this.titleEl.setText("Edit Filters");
         const app = new Filters({
             target: this.contentEl,
             props: {
-                filters: copy(this.filters)
+                filterStore: this.filterStore
             }
         });
         app.$on("update", (evt) => {
-            this.filters = copy(evt.detail);
+            this.layout = copy(evt.detail);
         });
         app.$on("cancel", () => {
             this.canceled = true;
             this.close();
         });
-        app.$on("reset", () => {
-            this.reset = true;
+    }
+}
+
+export class EditFilterModal extends Modal {
+    canceled = false;
+    filter: Filter;
+    constructor(public original: Filter) {
+        super(app);
+        this.filter = copy(original);
+    }
+    onOpen(): void {
+        this.titleEl.setText("Edit Filter");
+        const app = new EditFilter({
+            target: this.contentEl,
+            props: {
+                filter: this.filter,
+                original: this.original
+            }
+        });
+
+        app.$on("update", (evt) => {
+            this.filter = evt.detail;
+        });
+        app.$on("cancel", (evt) => {
+            this.canceled = true;
             this.close();
         });
     }

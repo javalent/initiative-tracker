@@ -1,5 +1,6 @@
 import "obsidian";
 import type { Spell, Trait, ability } from "obsidian-overload";
+import type { Filter, FilterLayout } from "src/builder/stores/filter/filter";
 
 //      CUSTOM EVENTS
 // ------------------------
@@ -126,11 +127,15 @@ export interface InitiativeTrackerData {
     version: number[];
 }
 
-interface BuilderState {
+export interface BuilderState {
     sidebarIcon: boolean;
     showXP: boolean;
     showParty: boolean;
     headers?: TableHeaderState[];
+    filters?: {
+        layout: FilterLayout;
+        filters: Filter[];
+    };
 }
 
 export interface InitiativeViewState {

@@ -3,6 +3,7 @@
         BuiltFilterStore,
         FilterLayoutItem,
         FilterType,
+        LayoutItem,
         OptionsFilterStore,
         RangeFilterStore,
         StringFilterStore
@@ -10,16 +11,16 @@
     import { getContext } from "svelte";
     import Range from "./Range.svelte";
     import Options from "./Options.svelte";
-    import String from "./String.svelte";
+    import Search from "./Search.svelte";
 
     const filterStore = getContext<BuiltFilterStore>("filters");
     const { filters } = filterStore;
-    export let layout: FilterLayoutItem;
+    export let layout: LayoutItem;
 
     let filter: RangeFilterStore | OptionsFilterStore | StringFilterStore;
     $: {
-        if ("filter" in layout) {
-            filter = $filters.get(layout.filter);
+        if (!("nested" in layout)) {
+            filter = $filters.get(layout.id);
         }
     }
 </script>
@@ -38,14 +39,14 @@
         {#if filter.type == FilterType.Options}
             <Options {filter} />
         {/if}
-        {#if filter.type == FilterType.String}
-            <String {filter} />
+        {#if filter.type == FilterType.Search}
+            <Search {filter} />
         {/if}
     </div>
 {/if}
 
 <style scoped>
-    .nested-filter-container {
+    :global(.nested-filter-container) {
         display: flex;
         flex-flow: row wrap;
         gap: 0.5rem;

@@ -6,7 +6,7 @@
 
     import type { BuiltFilterStore } from "../../stores/filter/filter";
     import FilterContainer from "./customs/FilterContainer.svelte";
-    import String from "./customs/String.svelte";
+    import String from "./customs/Search.svelte";
 
     let open = false;
     const dispatch = createEventDispatcher<{ settings: MouseEvent }>();

@@ -1,7 +1,6 @@
-
 declare type DndEventInfo = import("svelte-dnd-action").DndEventInfo;
 declare interface GenericDndEvent<T extends Record<string, any>> {
-    items: T[];
+    items: T;
     info: DndEventInfo;
 }
 declare namespace svelte.JSX {

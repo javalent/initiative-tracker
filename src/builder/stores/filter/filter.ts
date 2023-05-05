@@ -1,12 +1,21 @@
+import copy from "fast-copy";
 import type { SRDMonster } from "index";
 import { prepareSimpleSearch, SearchResult } from "obsidian";
+import type InitiativeTracker from "src/main";
 import { convertFraction } from "src/utils";
 import { getId } from "src/utils/creature";
-import { derived, get, Readable, Writable, writable } from "svelte/store";
+import {
+    derived,
+    get,
+    Readable,
+    Updater,
+    Writable,
+    writable
+} from "svelte/store";
 
 export enum FilterType {
     Range,
-    String,
+    Search,
     Options
 }
 
@@ -26,10 +35,18 @@ interface OptionsFilter extends BaseFilter {
     options: string[];
 }
 interface StringFilter extends BaseFilter {
-    type: FilterType.String;
+    type: FilterType.Search;
     options: string;
 }
 export type Filter = RangeFilter | OptionsFilter | StringFilter;
+export const DEFAULT_NEW_FILTER: Filter = {
+    type: FilterType.Search,
+    fields: [],
+    text: "New Filter",
+    options: "",
+    id: getId(),
+    derive: false
+};
 
 interface BaseFilterStore<T extends Filter, S> extends Writable<T["options"]> {
     isDefault: Readable<boolean>;
@@ -51,7 +68,7 @@ export interface OptionsFilterStore
 }
 export interface StringFilterStore
     extends BaseFilterStore<StringFilter, number | string> {
-    type: FilterType.String;
+    type: FilterType.Search;
 }
 
 type FilterStore = RangeFilterStore | OptionsFilterStore | StringFilterStore;
@@ -148,7 +165,7 @@ function getFilterStore(filter: Filter) {
             return createOptionsFilter(filter);
         case FilterType.Range:
             return createRangeFilter(filter);
-        case FilterType.String:
+        case FilterType.Search:
             return createStringFilter(filter);
     }
 }
@@ -195,7 +212,7 @@ function getDerivedFilterOptions(
                             options.get(filter).add(creature[field]);
                             break;
                         }
-                        case FilterType.String: {
+                        case FilterType.Search: {
                             continue;
                         }
                     }
@@ -209,7 +226,7 @@ function getDerivedFilterOptions(
 
 export function createFilterStore(
     creatures: Writable<SRDMonster[]>,
-    filters: Filter[]
+    plugin: InitiativeTracker
 ) {
     const buildAndSubscribe = (filter: Filter) => {
         const store = getFilterStore(filter);
@@ -225,7 +242,37 @@ export function createFilterStore(
 
     const map = new Map<string, FilterStore>();
     const filters$ = writable(map);
+    const filterMap: Map<string, Filter> = new Map();
+    filters$.subscribe((f) => {
+        for (const [id, filter] of f) {
+            filterMap.set(id, filter.filter);
+        }
+    });
+
     const subscriptions = new Map();
+    if (!plugin.data.builder) {
+        plugin.data.builder = {
+            sidebarIcon: true,
+            showParty: true,
+            showXP: true
+        };
+    }
+    const getDefaultLayout = () => {
+        return copy(
+            plugin.data.builder?.filters?.layout ?? ORIGINAL_DEFAULT_LAYOUT
+        );
+    };
+    const getDefaultFilters = () => {
+        return copy(plugin.data.builder?.filters?.filters ?? DEFAULT_FILTERS);
+    };
+    if (!plugin.data.builder.filters) {
+        plugin.data.builder.filters = {
+            filters: getDefaultFilters(),
+            layout: getDefaultLayout()
+        };
+    }
+    const filters = plugin.data.builder?.filters?.filters ?? DEFAULT_FILTERS;
+    const layouts = plugin.data.builder?.filters?.layout ?? getDefaultLayout();
     const needToDerive = filters.filter((f) => f.derive);
     if (needToDerive.length) {
         const options = getDerivedFilterOptions(get(creatures), filters);
@@ -242,11 +289,12 @@ export function createFilterStore(
         for (const creature of creatures) {
             if (
                 filters.every((filter) => {
+                    if (!filter.filter.fields.length) return true;
                     for (const field of filter.filter.fields) {
                         if (!(field in creature)) continue;
                         return filter.compare(creature[field]);
                     }
-                    return false;
+                    return true;
                 })
             ) {
                 filtered.push(creature);
@@ -255,8 +303,33 @@ export function createFilterStore(
         return filtered;
     });
 
-    const layout = writable(DEFAULT_LAYOUT);
-
+    const layout = writable(layouts ?? getDefaultLayout());
+    const setLayout = (newLayout: FilterLayout) => {
+        layout.set(newLayout);
+        plugin.data.builder.filters.layout = newLayout;
+        plugin.saveSettings();
+    };
+    const resetLayout = () => {
+        setLayout(getDefaultLayout());
+        updateAndSave((f) => {
+            f.clear();
+            const filters = getDefaultFilters();
+            for (const filter of filters) {
+                buildAndSubscribe(filter);
+            }
+            return f;
+        });
+    };
+    function updateAndSave(updater: Updater<Map<string, FilterStore>>) {
+        filters$.update((filters) => {
+            const updated = updater(filters);
+            plugin.data.builder.filters.filters = [...updated.values()].map(
+                (f) => f.filter
+            );
+            plugin.saveSettings();
+            return updated;
+        });
+    }
     const active = derived(filters$, (filters$) => {
         let active = 0;
         for (const filter of filters$.values()) {
@@ -271,26 +344,41 @@ export function createFilterStore(
         NAME_FILTER
     ) as StringFilterStore;
 
+    const add = (filter: Filter, filters: Map<string, FilterStore>) => {
+        if (filter.derive) {
+            const options = getDerivedFilterOptions(get(creatures), [filter]);
+            for (const [filter, set] of options) {
+                filter.options = Array.from(set) as any[];
+            }
+        }
+        const store = getFilterStore(filter);
+        filters.set(filter.id, store);
+        subscriptions.set(
+            filter.id,
+            store.subscribe((_) => filters$.update((f) => f))
+        );
+        return filters;
+    };
+    const remove = (filter: string, filters: Map<string, FilterStore>) => {
+        filters.delete(filter);
+        if (subscriptions.has(filter)) {
+            subscriptions.get(filter)();
+            subscriptions.delete(filter);
+        }
+        return filters;
+    };
     return {
         add: (filter: Filter) =>
-            filters$.update((filters) => {
-                const store = getFilterStore(filter);
-                filters.set(filter.id, store);
-                subscriptions.set(
-                    filter.id,
-                    store.subscribe((_) => filters$.update((f) => f))
-                );
-                return filters;
+            updateAndSave((filters) => add(filter, filters)),
+        update: (id: string, newFilter: Filter) =>
+            updateAndSave((filters) => {
+                remove(id, filters);
+                return add(newFilter, filters);
             }),
         remove: (filter: Filter) =>
-            filters$.update((filters) => {
-                filters.delete(filter.id);
-                subscriptions.get(filter.id)();
-                subscriptions.delete(filter.id);
-                return filters;
-            }),
+            updateAndSave((filters) => remove(filter.id, filters)),
         reset: () =>
-            filters$.update((filters) => {
+            updateAndSave((filters) => {
                 for (const filter of filters.values()) {
                     filter.reset();
                 }
@@ -299,7 +387,17 @@ export function createFilterStore(
         active,
         filtered,
         filters: filters$,
-        layout,
+        filterMap,
+
+        layout: {
+            subscribe: layout.subscribe,
+            set: setLayout
+        },
+        resetLayout,
+        getOrDefault(id: string): Filter {
+            return filterMap?.get(id) ?? copy(DEFAULT_NEW_FILTER);
+        },
+
         name
     };
 }
@@ -307,7 +405,7 @@ export function createFilterStore(
 export const name = writable<string>();
 
 const NAME_FILTER: StringFilter = {
-    type: FilterType.String,
+    type: FilterType.Search,
     text: "Name",
     fields: ["name"],
     options: "",
@@ -341,31 +439,44 @@ export const DEFAULT_FILTERS: Filter[] = [
         derive: true
     },
     {
-        type: FilterType.String,
+        type: FilterType.Options,
         text: "Alignment",
         fields: ["alignment"],
-        options: "",
+        options: [],
         id: "ID_DEFAULT_ALIGNMENT_FILTER",
         derive: true
     }
 ];
 
-export const DEFAULT_LAYOUT: FilterLayout = [
-    { filter: "ID_DEFAULT_CR_FILTER" },
+const ORIGINAL_DEFAULT_LAYOUT: FilterLayout = [
     {
+        nested: [{ id: "ID_DEFAULT_CR_FILTER", type: "filter" }],
+        id: "ID_DEFAULT_NESTED_CR",
+        type: "nested"
+    },
+    {
+        id: "ID_DEFAULT_NESTED_LAYOUT",
+        type: "nested",
         nested: [
-            { filter: "ID_DEFAULT_SIZE_FILTER" },
-            { filter: "ID_DEFAULT_TYPE_FILTER" },
-            { filter: "ID_DEFAULT_ALIGNMENT_FILTER" }
+            { id: "ID_DEFAULT_SIZE_FILTER", type: "filter" },
+            { id: "ID_DEFAULT_TYPE_FILTER", type: "filter" },
+            { id: "ID_DEFAULT_ALIGNMENT_FILTER", type: "filter" }
         ]
     }
 ];
 
-export type FilterLayoutItem =
-    | {
-          filter: string; //filter id
-      }
-    | {
-          nested: FilterLayout;
-      };
-export type FilterLayout = FilterLayoutItem[];
+export type BaseLayoutItem = {
+    id: string; //filter id
+    type: "filter" | "nested";
+};
+export type FilterLayoutItem = {
+    id: string; //filter id
+    type: "filter";
+};
+export type NestedFilterLayoutItem = BaseLayoutItem & {
+    nested: FilterLayoutItem[];
+    type: "nested";
+};
+export type LayoutItem = NestedFilterLayoutItem | FilterLayoutItem;
+
+export type FilterLayout = NestedFilterLayoutItem[];
