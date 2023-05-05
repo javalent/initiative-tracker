@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.0.0](https://github.com/javalent/initiative-tracker/compare/9.11.1...10.0.0) (2023-05-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* Removed 5e SRD from Initiative Tracker
+
+### Features
+
+* Encounter Builder Custom Filters ([0146f8a](https://github.com/javalent/initiative-tracker/commit/0146f8af80343379aaf1cf5a15f77cfccdf8c31d))
+* Removed 5e SRD from Initiative Tracker ([260abfc](https://github.com/javalent/initiative-tracker/commit/260abfcc81b28fae1232a8600496c1f3c624056a))
+
+
+### Bug Fixes
+
+* do not open creature suggester immediately when editing a creature ([4340370](https://github.com/javalent/initiative-tracker/commit/434037050a43a003827998ae2f45071ccaffa94d))
+* removes logs ([ca9b95f](https://github.com/javalent/initiative-tracker/commit/ca9b95f3392482fa142a9a60f6b20e5ea12780db))
+
 ## [9.11.1](https://github.com/javalent/initiative-tracker/compare/9.11.0...9.11.1) (2023-05-03)
 
 
