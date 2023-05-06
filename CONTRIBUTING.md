@@ -40,7 +40,7 @@ Your PR helps us help you. 🎉.
 
 ## Code of Conduct
 
-The Fantasy Statblocks Code of Conduct **[governs these project and everyone participating in it](https://github.com/javalent/fantasy-statblocks/CODE_OF_CONDUCT.md)**.
+The Code of Conduct **[governs these project and everyone participating in it](https://github.com/javalent/fantasy-statblocks/CODE_OF_CONDUCT.md)**.
 By participating, the assumption is that you are agreeing to uphold this code.
 
 ## I've a Question
