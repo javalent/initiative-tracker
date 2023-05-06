@@ -16,11 +16,11 @@ Your PR helps us help you. 🎉.
 > - Mention the project in your own projects readme
 > - Continue using the project and give us feedback
 
-## Important Links for Initiative Tracker
+## Important Links for Fantasy Statblocks
 
 - **[Documentation](https://plugins.javalent.com/initiative-tracker)**
-- **[Submit an Issue](https://github.com/javalent/initiative-tracker/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc)**
-- **[Bug Tracker](https://github.com/javalent/initiative-tracker/issues?q=is%3Aopen+label%3Abug+sort%3Aupdated-desc)**
+- **[Submit an Issue](https://github.com/javalent/fantasy-statblocks/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc)**
+- **[Bug Tracker](https://github.com/javalent/fantasy-statblocks/issues?q=is%3Aopen+label%3Abug+sort%3Aupdated-desc)**
 - **[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)**.
 
 <!-- omit in toc -->
@@ -40,7 +40,7 @@ Your PR helps us help you. 🎉.
 
 ## Code of Conduct
 
-The Fantasy Statblocks Code of Conduct **[governs these project and everyone participating in it](https://github.com/javalent/fantasy-statblocks/CODE_OF_CONDUCT.md)**.
+The Code of Conduct **[governs these project and everyone participating in it](CODE_OF_CONDUCT.md)**.
 By participating, the assumption is that you are agreeing to uphold this code.
 
 ## I've a Question
