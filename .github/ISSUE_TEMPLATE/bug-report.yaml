@@ -86,7 +86,7 @@ body:
     id: plugin-version
     attributes:
       label: Plugin Version
-      description: Which Fantasy Statblocks version are you using?
+      description: Which plugin version are you using?
       placeholder: 3.6.3
     validations:
       required: true
