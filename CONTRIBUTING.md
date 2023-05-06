@@ -21,7 +21,7 @@ Your PR helps us help you. 🎉.
 - **[Documentation](https://plugins.javalent.com/initiative-tracker)**
 - **[Submit an Issue](https://github.com/javalent/initiative-tracker/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc)**
 - **[Bug Tracker](https://github.com/javalent/initiative-tracker/issues?q=is%3Aopen+label%3Abug+sort%3Aupdated-desc)**
-- **[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)**.
+- **[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)**
 
 <!-- omit in toc -->
 ## Table of Contents
