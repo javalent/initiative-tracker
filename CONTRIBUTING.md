@@ -16,11 +16,11 @@ Your PR helps us help you. 🎉.
 > - Mention the project in your own projects readme
 > - Continue using the project and give us feedback
 
-## Important Links for Fantasy Statblocks
+## Important Links for Initiative Tracker
 
 - **[Documentation](https://plugins.javalent.com/initiative-tracker)**
-- **[Submit an Issue](https://github.com/javalent/fantasy-statblocks/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc)**
-- **[Bug Tracker](https://github.com/javalent/fantasy-statblocks/issues?q=is%3Aopen+label%3Abug+sort%3Aupdated-desc)**
+- **[Submit an Issue](https://github.com/javalent/initiative-tracker/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc)**
+- **[Bug Tracker](https://github.com/javalent/initiative-tracker/issues?q=is%3Aopen+label%3Abug+sort%3Aupdated-desc))**
 - **[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)**.
 
 <!-- omit in toc -->
