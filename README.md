@@ -47,6 +47,6 @@ If you encounter any issues, want to give back and help out, or have suggestions
 
 If you're using Obsidian to run/plan a TTRPG, you may find my other plugins useful:
 
-- [Obsidian Leaflet](https://github.com/valentine195/obsidian-leaflet-plugin) Adds interactive maps to Obsidian notes
-- [Dice Roller](https://github.com/valentine195/obsidian-dice-roller) Inline dice rolling for Obsidian
-- [Fantasy Statblocks](https://github.com/valentine195/obsidian-5e-statblocks) Format Statblocks inside Obsidian
+- **[Obsidian Leaflet](https://github.com/valentine195/obsidian-leaflet-plugin)** Adds interactive maps to Obsidian notes
+- **[Dice Roller](https://github.com/valentine195/obsidian-dice-roller)** Inline dice rolling for Obsidian
+- **[Fantasy Statblocks](https://github.com/valentine195/obsidian-5e-statblocks)** Format Statblocks inside Obsidian
