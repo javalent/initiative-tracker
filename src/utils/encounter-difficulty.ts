@@ -52,19 +52,19 @@ const tresholds: BudgetDict = {
 
 function xpBudget(characterLevels: number[]): XpBudget {
     const easy = characterLevels.reduce(
-        (acc, lvl) => acc + tresholds[lvl].easy,
+        (acc, lvl) => acc + (tresholds[lvl]?.easy ?? 0),
         0
     );
     const medium = characterLevels.reduce(
-        (acc, lvl) => acc + tresholds[lvl].medium,
+        (acc, lvl) => acc + (tresholds[lvl]?.medium ?? 0),
         0
     );
     const hard = characterLevels.reduce(
-        (acc, lvl) => acc + tresholds[lvl].hard,
+        (acc, lvl) => acc + (tresholds[lvl]?.hard ?? 0),
         0
     );
     const deadly = characterLevels.reduce(
-        (acc, lvl) => acc + tresholds[lvl].deadly,
+        (acc, lvl) => acc + (tresholds[lvl]?.deadly ?? 0),
         0
     );
     return { easy: easy, medium: medium, hard: hard, deadly: deadly };
