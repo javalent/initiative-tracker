@@ -535,8 +535,8 @@ export default class InitiativeTracker extends Plugin {
             player
         );
 
-        this.playerCreatures.set(player.name, creature);
         this.playerCreatures.delete(existing.name);
+        this.playerCreatures.set(player.name, creature);
 
         const view = this.view;
         if (view) {
