@@ -97,6 +97,7 @@ export default class InitiativeTracker extends Plugin {
     }
 
     getPlayerByName(name: string) {
+        if (!this.playerCreatures.has(name)) return new Creature({ name });
         return Creature.from(this.playerCreatures.get(name));
     }
     getPlayersForParty(party: string) {
