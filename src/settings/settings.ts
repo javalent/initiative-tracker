@@ -392,16 +392,38 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             );
 
             headers.createDiv({ text: "Name" });
-            new ExtraButtonComponent(headers.createDiv())
-                .setIcon(HP)
-                .setTooltip("Max HP");
-            new ExtraButtonComponent(headers.createDiv())
-                .setIcon(AC)
-                .setTooltip("Armor Class");
-            new ExtraButtonComponent(headers.createDiv())
-                .setIcon(INITIATIVE)
-                .setTooltip("Initiative Modifier");
-
+            setIcon(
+                headers.createDiv({
+                    attr: {
+                        "aria-label": "Level"
+                    }
+                }),
+                "swords"
+            );
+            setIcon(
+                headers.createDiv({
+                    attr: {
+                        "aria-label": "Max HP"
+                    }
+                }),
+                HP
+            );
+            setIcon(
+                headers.createDiv({
+                    attr: {
+                        "aria-label": "Armor Class"
+                    }
+                }),
+                AC
+            );
+            setIcon(
+                headers.createDiv({
+                    attr: {
+                        "aria-label": "Initiative Modifier"
+                    }
+                }),
+                INITIATIVE
+            );
             headers.createDiv();
 
             for (let player of this.plugin.data.players) {
@@ -409,6 +431,9 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     "initiative-tracker-player"
                 );
                 playerDiv.createDiv({ text: player.name });
+                playerDiv.createDiv({
+                    text: `${player.level ?? DEFAULT_UNDEFINED}`
+                });
                 playerDiv.createDiv({
                     text: `${player.hp ?? DEFAULT_UNDEFINED}`
                 });
