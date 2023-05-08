@@ -93,7 +93,7 @@ export class EncounterParser {
         const playerLevels = players
             .map((p) => this.plugin.getPlayerByName(p))
             .map((p) => p.level)
-            .filter((p) => p);
+            .filter((p) => p && !isNaN(Number(p)));
 
         return {
             name,
