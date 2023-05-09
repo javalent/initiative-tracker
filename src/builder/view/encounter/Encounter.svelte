@@ -137,6 +137,7 @@
                     rollHP: plugin.data.rollHP,
                     logFile: null
                 };
+                plugin.saveSettings();
                 new Notice(`Encounter "${encName}" saved.`);
                 modal.close();
             } catch (e) {
