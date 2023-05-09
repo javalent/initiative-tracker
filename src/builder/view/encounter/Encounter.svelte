@@ -107,7 +107,7 @@
     $: saveButton?.setDisabled($encounter.size == 0);
     const save = () => {
         const modal = new Modal(app);
-        modal.contentEl.createEl("h4", { text: "Save Encounter" });
+        modal.titleEl.setText("Save Encounter");
         let encName: string =
             $name != "Encounter"
                 ? $name
@@ -115,37 +115,58 @@
         new Setting(modal.contentEl).setName("Encounter Name").addText((t) => {
             t.setPlaceholder(encName).onChange((v) => (encName = v));
         });
+
+        const saveEncounter = () => {
+            try {
+                const creatures = [
+                    ...[...$players].map((p) => CreatureCreator.from(p)),
+                    ...[...$encounter.entries()]
+                        .map((c) =>
+                            [...Array(c[1]).keys()].map(() =>
+                                CreatureCreator.from(c[0])
+                            )
+                        )
+                        .flat()
+                ];
+                plugin.data.encounters[encName] = {
+                    creatures: [...creatures.map((c) => c.toJSON())],
+                    state: false,
+                    name: encName,
+                    round: 1,
+                    roll: true,
+                    rollHP: plugin.data.rollHP,
+                    logFile: null
+                };
+                new Notice(`Encounter "${encName}" saved.`);
+                modal.close();
+            } catch (e) {
+                new Notice("There was an issue saving the encounter.");
+            }
+        };
         new Setting(modal.contentEl).addButton((b) =>
             b.setButtonText("Save").onClick(() => {
                 if (encName in plugin.data.encounters) {
-                    new Notice("An encounter by that name already exists.");
-                    return;
+                    const confirm = new Modal(app);
+                    confirm.titleEl.setText("Are you sure?");
+                    confirm.contentEl.createEl("p", {
+                        text: "This will overwrite an existing encounter. Are you sure?"
+                    });
+                    new Setting(confirm.contentEl)
+                        .addButton((b) =>
+                            b.setButtonText("Overwrite").onClick(() => {
+                                confirm.close();
+                                saveEncounter();
+                            })
+                        )
+                        .addExtraButton((b) =>
+                            b.setIcon("cross").onClick(() => {
+                                confirm.close();
+                            })
+                        );
+                    confirm.open();
+                } else {
+                    saveEncounter();
                 }
-                try {
-                    const creatures = [
-                        ...[...$players].map((p) => CreatureCreator.from(p)),
-                        ...[...$encounter.entries()]
-                            .map((c) =>
-                                [...Array(c[1]).keys()].map(() =>
-                                    CreatureCreator.from(c[0])
-                                )
-                            )
-                            .flat()
-                    ];
-                    plugin.data.encounters[encName] = {
-                        creatures: [...creatures.map((c) => c.toJSON())],
-                        state: false,
-                        name: encName,
-                        round: 1,
-                        roll: true,
-                        rollHP: plugin.data.rollHP,
-                        logFile: null
-                    };
-                    new Notice(`Encounter "${encName}" saved.`);
-                } catch (e) {
-                    new Notice("There was an issue saving the encounter.");
-                }
-                modal.close();
             })
         );
         modal.open();
@@ -197,7 +218,10 @@
                             );
                         }
                     }
-                    console.log("🚀 ~ file: Encounter.svelte:198 ~ encounter:", $encounter);
+                    console.log(
+                        "🚀 ~ file: Encounter.svelte:198 ~ encounter:",
+                        $encounter
+                    );
                 });
             });
         }
