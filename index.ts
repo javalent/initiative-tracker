@@ -146,6 +146,7 @@ export interface InitiativeViewState {
     logFile: string;
     roll?: boolean;
     rollHP?: boolean;
+    timestamp?: number;
 }
 
 export interface CreatureState extends HomebrewCreature {

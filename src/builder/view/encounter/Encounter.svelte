@@ -135,7 +135,8 @@
                     round: 1,
                     roll: true,
                     rollHP: plugin.data.rollHP,
-                    logFile: null
+                    logFile: null,
+                    timestamp: Date.now()
                 };
                 plugin.saveSettings();
                 new Notice(`Encounter "${encName}" saved.`);

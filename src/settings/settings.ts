@@ -510,7 +510,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             this.plugin.data.openState.player = additionalContainer.open;
         };
         const summary = additionalContainer.createEl("summary");
-        new Setting(summary).setHeading().setName("Encounter Builder");
+        new Setting(summary).setHeading().setName("Encounters");
         summary.createDiv("collapser").createDiv("handle");
         const explanation = additionalContainer.createDiv(
             "initiative-tracker-explanation"
@@ -536,6 +536,68 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     }
                 );
             });
+
+        const additional = additionalContainer.createDiv("additional");
+        new Setting(additional).setHeading().setName("Saved Encounters");
+        if (!Object.keys(this.plugin.data.encounters).length) {
+            additional
+                .createDiv({
+                    attr: {
+                        style: "display: flex; justify-content: center; padding-bottom: 18px;"
+                    }
+                })
+                .createSpan({
+                    text: "No saved encounters! Create one to see it here."
+                });
+        } else {
+            for (const [name, encounter] of Object.entries(
+                this.plugin.data.encounters
+            )) {
+                new Setting(additional)
+                    .setName(name)
+                    .setDesc(
+                        createFragment((e) => {
+                            const players = [],
+                                creatures = [];
+                            for (const creature of encounter.creatures) {
+                                if (creature.player) {
+                                    players.push(creature.name);
+                                } else {
+                                    creatures.push(creature.name);
+                                }
+                            }
+
+                            if (players.length) {
+                                e.createSpan({
+                                    text: `Players: ${players.join(", ")}`
+                                });
+                                e.createEl("br");
+                            }
+                            if (creatures.length) {
+                                e.createSpan({
+                                    text: `Creatures: ${creatures.join(", ")}`
+                                });
+                                e.createEl("br");
+                            }
+
+                            if (encounter.timestamp) {
+                                e.createSpan({
+                                    text: `${new Date(
+                                        encounter.timestamp
+                                    ).toLocaleString()}`
+                                });
+                            }
+                        })
+                    )
+                    .addExtraButton((b) => {
+                        b.setIcon("trash").onClick(async () => {
+                            delete this.plugin.data.encounters[name];
+                            await this.plugin.saveSettings();
+                            this._displayParties(additionalContainer);
+                        });
+                    });
+            }
+        }
     }
     private _displayParties(additionalContainer: HTMLDetailsElement) {
         additionalContainer.empty();
