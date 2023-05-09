@@ -36,7 +36,8 @@
                 } else {
                     plugin.data.encounters[encounterName] = {
                         ...tracker.getEncounterState(),
-                        name: encounterName
+                        name: encounterName,
+                        rollHP: plugin.data.rollHP
                     };
                     await plugin.saveSettings();
                     dispatch("cancel");
