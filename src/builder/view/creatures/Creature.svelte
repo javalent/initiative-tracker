@@ -60,8 +60,14 @@
         return stringify(source, 0, ", ", false);
     }
 
-    $: insignificant = convertFraction(creature.cr) < $average - 3;
-    $: challenge = convertFraction(creature.cr) > $average + 3;
+    $: insignificant =
+        "cr" in creature &&
+        creature.cr &&
+        convertFraction(creature.cr) < $average - 3;
+    $: challenge =
+        "cr" in creature &&
+        creature.cr &&
+        convertFraction(creature.cr) > $average + 3;
 
     const baby = (node: HTMLElement) => setIcon(node, "baby");
     const skull = (node: HTMLElement) => setIcon(node, "skull");

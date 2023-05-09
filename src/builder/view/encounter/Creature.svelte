@@ -21,8 +21,6 @@
         new ExtraButtonComponent(node).setIcon("trash-2");
     };
 
-    
-
     export let count: number;
     export let creature: SRDMonster;
     const convertedCR = (cr: string | number) => {
@@ -38,11 +36,16 @@
         }
         return cr;
     };
-
-    const insignificant = convertFraction(creature.cr) < $average - 3;
+    $: insignificant =
+        "cr" in creature &&
+        creature.cr &&
+        convertFraction(creature.cr) < $average - 3;
+    $: challenge =
+        "cr" in creature &&
+        creature.cr &&
+        convertFraction(creature.cr) > $average + 3;
 
     const baby = (node: HTMLElement) => setIcon(node, "baby");
-    const challenge = convertFraction(creature.cr) > $average + 3;
 
     const skull = (node: HTMLElement) => setIcon(node, "skull");
 
