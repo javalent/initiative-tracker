@@ -45,7 +45,7 @@
                 <em>There are no saved encounters.</em>
             </span>
         {/if}
-        {#each Object.keys(encounters) as encounter}
+        {#each Object.keys(encounters) as encounter (encounter)}
             <div class="encounter">
                 <span>{encounter}</span>
                 <div class="encounter-controls">
