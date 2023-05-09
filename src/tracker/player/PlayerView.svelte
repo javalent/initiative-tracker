@@ -3,7 +3,7 @@
     import { fade } from "svelte/transition";
     import { SyncLoader } from "svelte-loading-spinners";
 
-    import { AC, HP, INITIATIVE } from "src/utils";
+    import { AC, FRIENDLY, HP, INITIATIVE } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import { createEventDispatcher } from "svelte";
 
@@ -44,6 +44,9 @@
     $: activeAndVisible = $ordered.filter((c) => c.enabled && !c.hidden);
 
     const name = (creature: Creature) => creature.getName();
+    const friendIcon = (node: HTMLElement) => {
+        setIcon(node, FRIENDLY);
+    };
 </script>
 
 <table class="initiative-tracker-table" transition:fade>
@@ -58,7 +61,14 @@
         {#each activeAndVisible as creature (creature.id)}
             <tr class:active={amIActive(creature) && $state}>
                 <td class="center">{creature.initiative}</td>
-                <td>
+                <td class='name'>
+                    {#if creature.friendly}
+                        <div
+                            class="contains-icon"
+                            use:friendIcon
+                            aria-label={`This creature is an ally.`}
+                        />
+                    {/if}
                     {name(creature)}
                 </td>
                 <td
@@ -106,6 +116,11 @@
     }
     .left {
         text-align: left;
+    }
+    .name, .name > :global(svg) {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
     .center {
         text-align: center;
