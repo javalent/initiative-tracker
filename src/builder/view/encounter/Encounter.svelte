@@ -113,23 +113,30 @@
                     new Notice("An encounter by that name already exists.");
                     return;
                 }
-                const creatures = [
-                    ...[...$players].map((p) => CreatureCreator.from(p)),
-                    ...[...$encounter.entries()]
-                        .map((c) =>
-                            [...Array(c[1]).keys()].map(() =>
-                                CreatureCreator.from(c[0])
+                try {
+                    const creatures = [
+                        ...[...$players].map((p) => CreatureCreator.from(p)),
+                        ...[...$encounter.entries()]
+                            .map((c) =>
+                                [...Array(c[1]).keys()].map(() =>
+                                    CreatureCreator.from(c[0])
+                                )
                             )
-                        )
-                        .flat()
-                ];
-                plugin.data.encounters[encName] = {
-                    creatures: [...creatures.map((c) => c.toJSON())],
-                    state: false,
-                    name: encName,
-                    round: 1,
-                    logFile: null
-                };
+                            .flat()
+                    ];
+                    plugin.data.encounters[encName] = {
+                        creatures: [...creatures.map((c) => c.toJSON())],
+                        state: false,
+                        name: encName,
+                        round: 1,
+                        roll: true,
+                        rollHP: plugin.data.rollHP,
+                        logFile: null
+                    };
+                    new Notice(`Encounter "${encName}" saved.`);
+                } catch (e) {
+                    new Notice("There was an issue saving the encounter.");
+                }
                 modal.close();
             })
         );
