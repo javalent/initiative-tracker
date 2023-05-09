@@ -152,6 +152,11 @@
             .setValue(creature.hidden)
             .onChange((v) => (creature.hidden = v));
     };
+    const staticToggle = (div: HTMLDivElement) => {
+        new ToggleComponent(div)
+            .setValue(creature.static)
+            .onChange((v) => (creature.static = v));
+    };
     const friendToggle = (div: HTMLDivElement) => {
         new ToggleComponent(div)
             .setValue(creature.friendly)
@@ -247,6 +252,10 @@
         </div>
 
         {#key creature}
+            <div>
+                <label for="add-mod">Static Initiative</label>
+                <div use:staticToggle />
+            </div>
             <div>
                 <label for="add-mod">Hidden</label>
                 <div use:hideToggle />

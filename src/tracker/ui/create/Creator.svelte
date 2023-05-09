@@ -52,8 +52,7 @@
 
                     tracker.add(plugin, rollHP, ...creatures);
                 }
-                console.log(creature.player && creature.note);
-                if (creature.player && creature.path) {
+                if (creature?.player && creature?.path) {
                     const file = await plugin.app.vault.getAbstractFileByPath(
                         creature.path
                     );

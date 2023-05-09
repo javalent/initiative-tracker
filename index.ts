@@ -157,6 +157,7 @@ export interface CreatureState extends HomebrewCreature {
     tempHP: number;
     currentAC: number | string;
     initiative: number;
+    static: boolean;
     player: boolean;
     xp: number;
     active: boolean;
@@ -215,6 +216,7 @@ export interface HomebrewCreature {
     hidden?: boolean;
     friendly?: boolean;
     active?: boolean;
+    static?: boolean;
     "statblock-link"?: string;
 }
 

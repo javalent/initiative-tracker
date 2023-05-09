@@ -32,6 +32,7 @@ interface CreatureStats {
     display?: string;
     hidden: boolean;
     friendly?: boolean;
+    static?: boolean;
 }
 
 export const equivalent = (
@@ -45,7 +46,8 @@ export const equivalent = (
         equivalentModifiers(creature.modifier, existing.modifier) &&
         creature.xp == existing.xp &&
         creature.hidden == existing.hidden &&
-        creature.friendly == existing.friendly
+        creature.friendly == existing.friendly &&
+        creature.static == existing.static
     );
 };
 

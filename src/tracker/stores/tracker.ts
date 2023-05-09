@@ -87,6 +87,7 @@ function createTracker() {
             values.forEach((creature, _, arr) => {
                 const equiv = arr.filter((c) => equivalent(c, creature));
                 equiv.forEach((eq) => {
+                    if (eq.static) return;
                     eq.initiative = Math.max(...equiv.map((i) => i.initiative));
                 });
             });
@@ -572,6 +573,7 @@ function createTracker() {
         roll: (plugin: InitiativeTracker) =>
             updateAndSave((creatures) => {
                 for (let creature of creatures) {
+                    if (creature.static) continue;
                     creature.initiative = plugin.getInitiativeValue(
                         creature.modifier
                     );
@@ -589,6 +591,7 @@ function createTracker() {
                     : creatures.filter((c) => c.player);
                 if (!state || state?.roll) {
                     for (let creature of creatures) {
+                        if (creature.static && creature.initiative) continue;
                         creature.initiative = plugin.getInitiativeValue(
                             creature.modifier
                         );

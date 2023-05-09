@@ -36,6 +36,7 @@ export class Creature {
     status: Set<Condition> = new Set();
     marker: string;
     initiative: number;
+    static: boolean = false;
     source: string | string[];
     id: string;
     xp: number;
@@ -65,6 +66,7 @@ export class Creature {
             "initiative" in creature
                 ? (creature as Creature).initiative
                 : Number(initiative ?? 0);
+        this.static = creature.static ?? false;
         this.modifier = Number(creature.modifier ?? 0);
 
         this.current_ac = this.ac = creature.ac ?? undefined;
@@ -142,6 +144,7 @@ export class Creature {
     *[Symbol.iterator]() {
         yield this.name;
         yield this.initiative;
+        yield this.static;
         yield this.modifier;
         yield this.max;
         yield this.ac;
@@ -209,6 +212,7 @@ export class Creature {
             name: this.name,
             display: this.display,
             initiative: this.initiative,
+            static: this.static,
             modifier: this.modifier,
             hp: this.max,
             currentMaxHP: this.current_max,
@@ -240,7 +244,7 @@ export class Creature {
             creature =
                 plugin.getPlayerByName(state.name) ??
                 new Creature(state, state.initiative);
-                creature.initiative = state.initiative;
+            creature.initiative = state.initiative;
         } else {
             creature = new Creature(state, state.initiative);
         }
