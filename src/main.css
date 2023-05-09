@@ -21,7 +21,7 @@ body {
 
 .initiative-tracker-additional-container .initiative-tracker-players {
     display: grid;
-    grid-template-columns: 3fr 1fr 1fr 1fr auto;
+    grid-template-columns: 3fr 1fr 1fr 1fr 1fr auto;
     gap: 0.5rem;
 }
 
