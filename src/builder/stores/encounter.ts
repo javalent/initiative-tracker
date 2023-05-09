@@ -34,6 +34,12 @@ function createEncounter() {
                 monsters.set(item, count);
                 return monsters;
             }),
+        setMultiple: (creatures: [item: SRDMonster, count: number][]) => update((monsters) => {
+                for (const [item, count] of creatures) {
+                    monsters.set(item, count);
+                }
+                return monsters;
+            }),
         empty: () => set(new Map())
     };
 }
