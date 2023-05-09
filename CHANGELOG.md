@@ -2,6 +2,49 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.0.0](https://github.com/javalent/initiative-tracker/compare/v10.0.1...11.0.0) (2023-05-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* Removed 5e SRD from Initiative Tracker
+
+### Features
+
+* Can now specify initiative as static (close [#74](https://github.com/javalent/initiative-tracker/issues/74)) ([b602f5c](https://github.com/javalent/initiative-tracker/commit/b602f5c790df097fcd4f2482d52ce36d7b28ab77))
+* Creatures set as a player from Fantasy Statblocks now treated as players ([cda408b](https://github.com/javalent/initiative-tracker/commit/cda408b74b46dcd04b263bf389bc916e362cf184))
+* Encounter Builder Custom Filters ([0146f8a](https://github.com/javalent/initiative-tracker/commit/0146f8af80343379aaf1cf5a15f77cfccdf8c31d))
+* Load saved encounters into builder ([de7181c](https://github.com/javalent/initiative-tracker/commit/de7181cdfab548179a5848a065dad9a31c6c22a0))
+* Removed 5e SRD from Initiative Tracker ([260abfc](https://github.com/javalent/initiative-tracker/commit/260abfcc81b28fae1232a8600496c1f3c624056a))
+
+
+### Bug Fixes
+
+* Changes to players sync back to linked notes (close [#176](https://github.com/javalent/initiative-tracker/issues/176)) ([40da2d3](https://github.com/javalent/initiative-tracker/commit/40da2d3492f9b7745130cb5b415eaeb23afeddfe))
+* Confirm to overwrite saved encounters ([be070ee](https://github.com/javalent/initiative-tracker/commit/be070eeed6a6ff872c3c20c2ab40c61e69edbe67))
+* Creature difficulty now won't display if CR is not present ([a1079c4](https://github.com/javalent/initiative-tracker/commit/a1079c4c3ff57c91bfd75e8a062ec42ff3a76bb8))
+* Creature hidden state no longer reset with HP / Status ([e88b468](https://github.com/javalent/initiative-tracker/commit/e88b468cd7c7276b7d6f8d2e832a862c03c1abf3))
+* Display friendly state in Player View ([c3ff665](https://github.com/javalent/initiative-tracker/commit/c3ff6652e4ba92f4b9c956ebf2b99b522b7076e9))
+* Display saved encounters in settings ([bcb9e14](https://github.com/javalent/initiative-tracker/commit/bcb9e14c6a2ecc415dfea5adafecaded9d354e63))
+* do not open creature suggester immediately when editing a creature ([4340370](https://github.com/javalent/initiative-tracker/commit/434037050a43a003827998ae2f45071ccaffa94d))
+* Encounter Builder encounters will save between reloads ([dca66ab](https://github.com/javalent/initiative-tracker/commit/dca66abb23c302d84a00c9f6e72d2c9db35ec8bd))
+* Encounter builder supports hidden and friendly creatures ([20d2ee7](https://github.com/javalent/initiative-tracker/commit/20d2ee77a2283d03217ca421b26ef62c7d81e087))
+* Encounters saved from builder now roll initiatives correctly ([50e9281](https://github.com/javalent/initiative-tracker/commit/50e9281abafa2a53b003230abecbc8dc16771aec))
+* fixes issue where levels other than 1-20 caused encounter calculation errors ([4599fc6](https://github.com/javalent/initiative-tracker/commit/4599fc64c8b543dd13e99b2f60d6f653382e7e55))
+* Fixes issue with deleting saved encounters ([75c8664](https://github.com/javalent/initiative-tracker/commit/75c8664bb68baea64a89d90e738ba1e17b713ad8))
+* Fixes player display in settings ([5336fef](https://github.com/javalent/initiative-tracker/commit/5336fef4102b9f500be63d503f9fee59387e3388))
+* Fixes reset filters to default ([de9a394](https://github.com/javalent/initiative-tracker/commit/de9a3942f67611bb2111829d013fb82670c6ad98))
+* fixes saving players sometimes duplicating ([c8c2a9b](https://github.com/javalent/initiative-tracker/commit/c8c2a9bf91e09fac4c75126ebc9df49eab8da936))
+* getting a player by name now returns a creature if no player exists ([0549522](https://github.com/javalent/initiative-tracker/commit/054952278eb92fda243eea498ac598ed0c44d5d1))
+* **issues:** Typo Fix ([d2dc915](https://github.com/javalent/initiative-tracker/commit/d2dc9153111b02f8ca7e2763f9a0b6568b32802f))
+* **issues:** Typo Fix ([7347187](https://github.com/javalent/initiative-tracker/commit/734718755e938f500be916f8a7c27c077297c609))
+* Load encounters disabled when no encounters exist ([06b1a45](https://github.com/javalent/initiative-tracker/commit/06b1a452651fba6d995f12c69498af02a9f19eeb))
+* only include player levels in encounter if they are a number ([3fb298f](https://github.com/javalent/initiative-tracker/commit/3fb298f81bd3c2a1e0a450d4f76a3919d22a89d8))
+* Plugin will now properly save encounters immediately from the builder ([daa8ce2](https://github.com/javalent/initiative-tracker/commit/daa8ce2f33b85e7f06734948f9cb3777657ada42))
+* removes logs ([ca9b95f](https://github.com/javalent/initiative-tracker/commit/ca9b95f3392482fa142a9a60f6b20e5ea12780db))
+* Saved encounters now respect the roll HP setting ([554a430](https://github.com/javalent/initiative-tracker/commit/554a430569fc93b1955c08b43474b6a1e535a1f3))
+* show player level in settings ([e739698](https://github.com/javalent/initiative-tracker/commit/e739698cef1a7ac9d79cc53308b32bc47b7d2fbf))
+
 ## [10.0.1](https://github.com/javalent/initiative-tracker/compare/10.0.0...10.0.1) (2023-05-05)
 
 
