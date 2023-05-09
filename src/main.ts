@@ -50,7 +50,6 @@ declare module "obsidian" {
 export default class InitiativeTracker extends Plugin {
     public data: InitiativeTrackerData;
     playerCreatures: Map<string, Creature> = new Map();
-    homebrewCreatures: Map<string, Creature> = new Map();
     watchers: Map<TFile, HomebrewCreature> = new Map();
     getRoller(str: string) {
         if (!this.canUseDiceRoller) return;
@@ -134,7 +133,7 @@ export default class InitiativeTracker extends Plugin {
         }
     }
 
-    get statblock_creatures() {
+    get bestiary() {
         if (!this.app.plugins.getPlugin("obsidian-5e-statblocks")) return [];
         return [
             ...Array.from(
@@ -143,10 +142,6 @@ export default class InitiativeTracker extends Plugin {
                     .bestiary?.values() ?? []
             )
         ] as SRDMonster[];
-    }
-
-    get bestiary() {
-        return [...this.statblock_creatures];
     }
 
     get view() {
@@ -261,9 +256,6 @@ export default class InitiativeTracker extends Plugin {
 
         this.playerCreatures = new Map(
             this.data.players.map((p) => [p.name, Creature.from(p)])
-        );
-        this.homebrewCreatures = new Map(
-            this.bestiary.map((p) => [p.name, Creature.from(p)])
         );
 
         this.app.workspace.onLayoutReady(async () => {

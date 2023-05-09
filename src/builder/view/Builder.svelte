@@ -8,19 +8,16 @@
     import PartyExperience from "./party/PartyExperience.svelte";
     import {
         BuiltFilterStore,
-        DEFAULT_FILTERS,
         createFilterStore
     } from "../stores/filter/filter";
     import { BuiltTableStore, createTable } from "../stores/table/table";
-    import type { BuilderState, SRDMonster } from "index";
-    import { writable } from "svelte/store";
+    import type { SRDMonster } from "index";
 
     export let plugin: InitiativeTracker;
     let original = plugin.bestiary as SRDMonster[];
     const table = createTable(plugin, [...original]);
 
     setContext<BuiltTableStore>("table", table);
-
     const filterStore = createFilterStore(table.creatures, plugin);
     setContext<BuiltFilterStore>("filters", filterStore);
 
