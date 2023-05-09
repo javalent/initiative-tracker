@@ -50,6 +50,16 @@ body {
 .initiative-tracker-settings
     .initiative-tracker-additional-container
     .initiative-tracker-players
+    .initiative-tracker-player
+    .initiative-tracker-player-icon.imported {
+    display: flex;
+    justify-content: center;
+    width: auto;
+    color: var(--text-success);
+}
+.initiative-tracker-settings
+    .initiative-tracker-additional-container
+    .initiative-tracker-players
     .initiative-tracker-player.headers {
     font-weight: bolder;
 }
@@ -235,4 +245,10 @@ body {
 .initiative-tracker-textarea + .cm-editor {
     height: 200px;
     margin-bottom: 1rem;
+}
+
+.initiative-tracker.suggestion-item, .initiative-tracker.suggestion-item > svg {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }

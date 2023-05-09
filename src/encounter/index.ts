@@ -136,14 +136,14 @@ export class EncounterParser {
             playersToReturn.splice(0, playersToReturn.length);
         } else if (players == true) {
             playersToReturn.push(
-                ...this.plugin.data.players.map((p) => p.name)
+                ...[...this.plugin.players.values()].map((p) => p.name)
             );
         } else if (!players && !params.party) {
         } else if (typeof players == "string") {
             playersToReturn.push(players);
         } else if (Array.isArray(players)) {
             playersToReturn.push(
-                ...(this.plugin.data.players ?? [])
+                ...([...this.plugin.players.values()] ?? [])
                     .map((p) => p.name)
                     .filter((p) =>
                         (players as string[])

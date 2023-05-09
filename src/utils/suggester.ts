@@ -5,6 +5,7 @@ import {
     FuzzySuggestModal,
     prepareFuzzySearch,
     Scope,
+    setIcon,
     Setting,
     SuggestModal,
     TextComponent,
@@ -327,7 +328,10 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
     creatures: (HomebrewCreature | SRDMonster)[];
     constructor(public plugin: InitiativeTracker, inputEl: HTMLInputElement) {
         super(plugin.app, inputEl);
-        this.creatures = [...this.plugin.data.players, ...this.plugin.bestiary];
+        this.creatures = [
+            ...[...this.plugin.players.values()],
+            ...this.plugin.bestiary
+        ];
         /* this.onInputChanged(); */
     }
     getItems() {
@@ -353,9 +357,12 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
         el: HTMLElement
     ) {
         let { item, match: matches } = result || {};
-
+        el.addClass("initiative-tracker");
+        if (item.player) {
+            setIcon(el, "user");
+        }
         let content = el.createDiv({
-            cls: "suggestion-content icon"
+            cls: "suggestion-content icon initiative-tracker"
         });
         if (!item) {
             this.suggester.selectedItem = null;
@@ -565,7 +572,7 @@ export class PlayerSuggestionModal extends SuggestionModal<HomebrewCreature> {
         public party: Party
     ) {
         super(plugin.app, input.inputEl);
-        this.items = this.plugin.data.players;
+        this.items = [...this.plugin.players.values()];
         this.text = input;
 
         this.createPrompts();

@@ -376,7 +376,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             });
         const additional = additionalContainer.createDiv("additional");
         const playerView = additional.createDiv("initiative-tracker-players");
-        if (!this.plugin.data.players.length) {
+        if (!this.plugin.players.size) {
             additional
                 .createDiv({
                     attr: {
@@ -476,6 +476,31 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         await this.plugin.saveSettings();
                         this._displayPlayers(additionalContainer);
                     });
+            }
+            for (let [name, player] of this.plugin.statblock_players) {
+                const playerDiv = playerView.createDiv(
+                    "initiative-tracker-player"
+                );
+                playerDiv.createDiv({ text: name });
+                playerDiv.createDiv({
+                    text: `${player.level ?? DEFAULT_UNDEFINED}`
+                });
+                playerDiv.createDiv({
+                    text: `${player.hp ?? DEFAULT_UNDEFINED}`
+                });
+                playerDiv.createDiv({
+                    text: `${player.ac ?? DEFAULT_UNDEFINED}`
+                });
+                playerDiv.createDiv({
+                    text: `${player.modifier ?? DEFAULT_UNDEFINED}`
+                });
+                const icons = playerDiv.createDiv({
+                    cls: "initiative-tracker-player-icon imported",
+                    attr: {
+                        "aria-label": "Imported from Fantasy Statblocks"
+                    }
+                });
+                setIcon(icons, "heart-handshake");
             }
         }
     }
@@ -849,7 +874,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             .setDesc(
                 createFragment((e) => {
                     e.createSpan({
-                        text: "Homebrew creatures saved to the TTRPG Statblocks plugin will be available in the quick-add."
+                        text: "Homebrew creatures saved to the TTRPG Statblocks plugin will be available to use."
                     });
                     if (!this.plugin.canUseStatBlocks) {
                         e.createEl("br");
@@ -879,7 +904,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             });
         if (this.plugin.data.sync) {
             const synced = new Setting(containerEl).setDesc(
-                `${this.plugin.statblock_creatures.length} creatures synced.`
+                `${this.plugin.bestiary.length} creatures synced.`
             );
             synced.settingEl.addClass("initiative-synced");
             setIcon(synced.nameEl, "check-in-circle");
@@ -1110,9 +1135,7 @@ class NewPlayerModal extends Modal {
                         let error = false;
                         if (
                             (!i.value.length && !load) ||
-                            (this.plugin.data.players.find(
-                                (p) => p.name === i.value
-                            ) &&
+                            (this.plugin.players.has(i.value) &&
                                 this.player.name != this.original.name)
                         ) {
                             i.addClass("has-error");
@@ -1517,11 +1540,7 @@ class PartyModal extends Modal {
                         new Notice("That player is already in this party!");
                         return;
                     }
-                    if (
-                        !this.plugin.data.players.find(
-                            (p) => p.name == playerText.getValue()
-                        )
-                    ) {
+                    if (!this.plugin.players.has(playerText.getValue())) {
                         new Notice(
                             "That player doesn't exist! You should make them first."
                         );

@@ -133,7 +133,7 @@ export default class InitiativeTracker extends Plugin {
         }
     }
 
-    get bestiary() {
+    get statblock_creatures() {
         if (!this.app.plugins.getPlugin("obsidian-5e-statblocks")) return [];
         return [
             ...Array.from(
@@ -143,7 +143,9 @@ export default class InitiativeTracker extends Plugin {
             )
         ] as SRDMonster[];
     }
-
+    get bestiary() {
+        return this.statblock_creatures.filter((p) => !p.player);
+    }
     get view() {
         const leaves = this.app.workspace.getLeavesOfType(
             INTIATIVE_TRACKER_VIEW
@@ -177,6 +179,17 @@ export default class InitiativeTracker extends Plugin {
     getCreatureFromBestiary(name: string) {
         let creature = this.getBaseCreatureFromBestiary(name);
         if (creature) return Creature.from(creature);
+    }
+    get statblock_players() {
+        return this.statblock_creatures
+            .filter((p) => p.player)
+            .map((p) => [p.name, Creature.from(p)] as [string, Creature]);
+    }
+    get players() {
+        return new Map([
+            ...this.playerCreatures.entries(),
+            ...this.statblock_players
+        ]);
     }
 
     async onload() {
