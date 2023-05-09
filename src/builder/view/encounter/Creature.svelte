@@ -1,7 +1,13 @@
 <script lang="ts">
     import type { SRDMonster } from "index";
     import { ExtraButtonComponent, setIcon } from "obsidian";
-    import { convertFraction, DEFAULT_UNDEFINED, XP_PER_CR } from "src/utils";
+    import {
+        convertFraction,
+        DEFAULT_UNDEFINED,
+        FRIENDLY,
+        HIDDEN,
+        XP_PER_CR
+    } from "src/utils";
     import { encounter } from "../../stores/encounter";
     import Nullable from "../Nullable.svelte";
     import { getContext } from "svelte";
@@ -19,6 +25,18 @@
     };
     const del = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("trash-2");
+    };
+    const hide = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon(HIDDEN);
+    };
+    const hideIcon = (node: HTMLElement) => {
+        setIcon(node, HIDDEN);
+    };
+    const friend = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon(FRIENDLY);
+    };
+    const friendIcon = (node: HTMLElement) => {
+        setIcon(node, FRIENDLY);
     };
 
     export let count: number;
@@ -67,6 +85,20 @@
         <div use:add on:click={() => encounter.add(creature)} />
     </div>
     <div class="encounter-creature">
+        {#if creature.hidden}
+            <div
+                class="contains-icon"
+                use:hideIcon
+                aria-label={`This creature is hidden.`}
+            />
+        {/if}
+        {#if creature.friendly}
+            <div
+                class="contains-icon"
+                use:friendIcon
+                aria-label={`This creature is an ally.`}
+            />
+        {/if}
         <strong class="encounter-creature-name" on:click={open}>
             {creature.name}
         </strong>
@@ -105,6 +137,11 @@
         </span>
     </div>
     <div class="encounter-creature-controls">
+        <div use:hide on:click={() => (creature.hidden = !creature.hidden)} />
+        <div
+            use:friend
+            on:click={() => (creature.friendly = !creature.friendly)}
+        />
         <div use:del on:click={() => encounter.delete(creature)} />
     </div>
 </div>
@@ -114,7 +151,7 @@
         display: grid;
         align-items: center;
         justify-content: center;
-        grid-template-columns: min-content 1fr 10% 10% auto;
+        grid-template-columns: min-content 1fr 10% 10% auto auto auto;
         gap: 0.5rem;
     }
     .encounter-creature {
