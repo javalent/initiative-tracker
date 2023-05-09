@@ -14,7 +14,7 @@
             "jsonpath": "$.version"
         }
     ],
-    "last-release-sha": "a4e89a1ce4c581e8afb1e39d1b5f45a524803cd8",
+    "last-release-sha": "6c1e73f36b3e1255f49ab6a6825fdd3ebb08a843",
 
     "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
 }
