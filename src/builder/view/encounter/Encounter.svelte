@@ -215,7 +215,7 @@
                         } else {
                             encounter.add(
                                 CreatureCreator.fromJSON(
-                                    creature
+                                    creature, plugin
                                 ) as any as SRDMonster
                             );
                         }

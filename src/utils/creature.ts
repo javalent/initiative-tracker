@@ -45,6 +45,7 @@ export class Creature {
     friendly: boolean = false;
     "statblock-link": string;
     cr: string | number;
+    path: string;
 
     getXP(plugin: InitiativeTracker) {
         if (this.xp) return this.xp;
@@ -84,6 +85,9 @@ export class Creature {
         this.active = creature.active;
 
         this.hidden = creature.hidden ?? false;
+
+        this.note = creature.note;
+        this.path = creature.path;
 
         if ("xp" in creature) {
             this.xp = creature.xp;
@@ -142,6 +146,7 @@ export class Creature {
         yield this.max;
         yield this.ac;
         yield this.note;
+        yield this.path;
         yield this.id;
         yield this.marker;
         yield this.xp;
@@ -211,6 +216,7 @@ export class Creature {
             ac: this.ac,
             currentAC: this.current_ac,
             note: this.note,
+            path: this.path,
             id: this.id,
             marker: this.marker,
             currentHP: this.hp,
@@ -228,8 +234,16 @@ export class Creature {
         };
     }
 
-    static fromJSON(state: CreatureState) {
-        const creature = new Creature(state, state.initiative);
+    static fromJSON(state: CreatureState, plugin: InitiativeTracker) {
+        let creature: Creature;
+        if (state.player) {
+            creature =
+                plugin.getPlayerByName(state.name) ??
+                new Creature(state, state.initiative);
+                creature.initiative = state.initiative;
+        } else {
+            creature = new Creature(state, state.initiative);
+        }
         creature.enabled = state.enabled;
 
         creature.temp = state.tempHP ? state.tempHP : 0;

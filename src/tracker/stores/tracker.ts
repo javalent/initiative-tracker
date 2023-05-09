@@ -585,7 +585,7 @@ function createTracker() {
                 $state.set(state?.state ?? false);
                 $name.set(state?.name ?? null);
                 creatures = state?.creatures
-                    ? state.creatures.map((c) => Creature.fromJSON(c))
+                    ? state.creatures.map((c) => Creature.fromJSON(c, plugin))
                     : creatures.filter((c) => c.player);
                 if (!state || state?.roll) {
                     for (let creature of creatures) {

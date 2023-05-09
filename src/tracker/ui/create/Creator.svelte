@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ButtonComponent, Platform } from "obsidian";
+    import { ButtonComponent, Platform, TFile } from "obsidian";
     import type InitiativeTracker from "src/main";
     import { tracker } from "src/tracker/stores/tracker";
     import { Creature } from "src/utils/creature";
@@ -31,7 +31,7 @@
     const add = (node: HTMLElement) => {
         new ButtonComponent(node)
             .setButtonText(isEditing ? "Save" : "Add to Encounter")
-            .onClick(() => {
+            .onClick(async () => {
                 if (!$adding.length && !isEditing) return;
                 if (isEditing) {
                     if ($editing.hp != creature.max) {
@@ -51,6 +51,19 @@
                     );
 
                     tracker.add(plugin, rollHP, ...creatures);
+                }
+                console.log(creature.player && creature.note);
+                if (creature.player && creature.path) {
+                    const file = await plugin.app.vault.getAbstractFileByPath(
+                        creature.path
+                    );
+                    if (file && file instanceof TFile)
+                        plugin.app.fileManager.processFrontMatter(file, (f) => {
+                            f.ac = creature.ac;
+                            f.hp = creature.max;
+                            f.level = creature.level;
+                            f.modifier = creature.modifier;
+                        });
                 }
                 dispatch("close");
             });

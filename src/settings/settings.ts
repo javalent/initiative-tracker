@@ -1133,7 +1133,7 @@ class NewPlayerModal extends Modal {
     saved: boolean;
     constructor(
         private plugin: InitiativeTracker,
-        private original?: HomebrewCreature
+        private original: HomebrewCreature = {}
     ) {
         super(plugin.app);
         this.player = { ...(original ?? {}) };
@@ -1159,7 +1159,6 @@ class NewPlayerModal extends Modal {
                 const modal = new FileSuggestionModal(this.app, t);
                 modal.onClose = async () => {
                     if (!modal.file) return;
-
                     const metaData = this.app.metadataCache.getFileCache(
                         modal.file
                     );
@@ -1167,6 +1166,7 @@ class NewPlayerModal extends Modal {
                     this.player.note = modal.file.basename;
                     this.player.path = modal.file.path;
                     this.player.name = modal.file.basename;
+                    console.log("🚀 ~ file: settings.ts:1169 ~ this.player:", this.player);
 
                     if (!metaData || !metaData.frontmatter) return;
                     const { ac, hp, modifier, level, name } =
