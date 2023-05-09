@@ -68,7 +68,7 @@
         });
         menu.addItem((item) => {
             item.setIcon(REDO)
-                .setTitle("Reset HP & Status")
+                .setTitle("Reset HP / Status")
                 .onClick(() => tracker.reset());
         });
         menu.addItem((item) => {
