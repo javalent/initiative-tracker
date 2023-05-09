@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ExtraButtonComponent, Platform } from "obsidian";
+    import { ExtraButtonComponent, type MenuItem, Platform } from "obsidian";
 
     import {
         BACKWARD,
@@ -121,12 +121,15 @@
                     dispatch("save");
                 });
         });
+        let load: MenuItem;
         menu.addItem((item) => {
-            item.setIcon("open-elsewhere-glyph")
+            load = item
+                .setIcon("open-elsewhere-glyph")
                 .setTitle("Load Encounter")
                 .onClick(() => {
                     dispatch("load");
-                });
+                })
+                .setDisabled(Object.keys(plugin.data.encounters).length == 0);
         });
         if ($data.leafletIntegration) {
             menu.addSeparator();
