@@ -1,5 +1,11 @@
 <script lang="ts">
-    import { ExtraButtonComponent, Modal, Notice, Setting } from "obsidian";
+    import {
+        ExtraButtonComponent,
+        Menu,
+        Modal,
+        Notice,
+        Setting
+    } from "obsidian";
 
     import Creature from "./Creature.svelte";
     import { Creature as CreatureCreator } from "../../../utils/creature";
@@ -10,6 +16,7 @@
     import { tracker } from "src/tracker/stores/tracker";
     import type { CreatureState } from "index";
     import { writable } from "svelte/store";
+    import type { SRDMonster } from "obsidian-overload";
 
     const { players } = encounter;
 
@@ -93,10 +100,11 @@
     const editIcon = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("pencil");
     };
-
+    let saveButton: ExtraButtonComponent;
     const saveIcon = (node: HTMLElement) => {
-        new ExtraButtonComponent(node).setIcon("save");
+        saveButton = new ExtraButtonComponent(node).setIcon("save");
     };
+    $: saveButton?.setDisabled($encounter.size == 0);
     const save = () => {
         const modal = new Modal(app);
         modal.contentEl.createEl("h4", { text: "Save Encounter" });
@@ -162,11 +170,38 @@
         }
     }
 
-    const load = (node: HTMLElement) => {
-        new ExtraButtonComponent(node)
-            .setIcon("import")
-            .setTooltip("Load Encounter")
-            .onClick(() => {});
+    let loadButton: ExtraButtonComponent;
+    const loadIcon = (node: HTMLElement) => {
+        loadButton = new ExtraButtonComponent(node)
+            .setIcon("upload")
+            .setTooltip("Load Encounter");
+    };
+    $: loadButton?.setDisabled(Object.keys(plugin.data.encounters).length == 0);
+    const load = (evt: MouseEvent) => {
+        const menu = new Menu();
+        for (const enc of Object.values(plugin.data.encounters)) {
+            menu.addItem((item) => {
+                item.setTitle(enc.name).onClick(() => {
+                    console.log(enc);
+                    $name = enc.name;
+                    encounter.empty();
+                    players.empty();
+                    for (const creature of enc.creatures) {
+                        if (creature.player) {
+                            players.addFromState(creature);
+                        } else {
+                            encounter.add(
+                                CreatureCreator.fromJSON(
+                                    creature
+                                ) as any as SRDMonster
+                            );
+                        }
+                    }
+                    console.log("🚀 ~ file: Encounter.svelte:198 ~ encounter:", $encounter);
+                });
+            });
+        }
+        menu.showAtMouseEvent(evt);
     };
     const clear = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -189,6 +224,7 @@
     <div class="encounter-controls">
         <div use:start />
         <div use:saveIcon on:click={save} />
+        <div use:loadIcon on:click={load} />
         <!-- <div use:exp /> -->
         <!-- <div use:load /> -->
 

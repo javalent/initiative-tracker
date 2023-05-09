@@ -44,6 +44,7 @@ export class Creature {
     display: string;
     friendly: boolean = false;
     "statblock-link": string;
+    cr: string | number;
 
     getXP(plugin: InitiativeTracker) {
         if (this.xp) return this.xp;
@@ -89,6 +90,7 @@ export class Creature {
         } else if ("cr" in creature) {
             this.xp = XP_PER_CR[`${creature.cr}`];
         }
+        this.cr = creature.cr;
         this.id = creature.id ?? getId();
         if ("statblock-link" in creature) {
             this["statblock-link"] = (creature as any)[
@@ -205,6 +207,7 @@ export class Creature {
             modifier: this.modifier,
             hp: this.max,
             currentMaxHP: this.current_max,
+            cr: this.cr,
             ac: this.ac,
             currentAC: this.current_ac,
             note: this.note,

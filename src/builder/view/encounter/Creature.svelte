@@ -130,6 +130,7 @@
         <span>
             <Nullable
                 str={`${
+                    creature.xp ??
                     XP_PER_CR[creature.cr]?.toLocaleString() ??
                     DEFAULT_UNDEFINED
                 } XP`}

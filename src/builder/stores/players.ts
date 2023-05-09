@@ -4,7 +4,7 @@ import { EXPERIENCE_PER_LEVEL } from "../constants";
 
 export const playerCount = writable(0);
 
-interface Player extends Partial<CreatureState> {
+export interface Player extends Partial<CreatureState> {
     level: number;
     name: string;
     isPlayer: true;
@@ -74,6 +74,16 @@ function createPlayers() {
         }),
         add: (item: CombinedPlayer) =>
             update((players) => {
+                if (!item.count || item.count <= 0) {
+                    item.count = 1;
+                }
+                players.push(item);
+                return players;
+            }),
+        addFromState: (state: CreatureState) =>
+            update((players) => {
+                const item = state as Player;
+                item.isPlayer = true;
                 if (!item.count || item.count <= 0) {
                     item.count = 1;
                 }

@@ -1,4 +1,4 @@
-import type { SRDMonster } from "../../../index";
+import type { InitiativeViewState, SRDMonster } from "../../../index";
 import { writable } from "svelte/store";
 import { players } from "./players";
 function createEncounter() {
@@ -34,7 +34,8 @@ function createEncounter() {
                 monsters.set(item, count);
                 return monsters;
             }),
-        setMultiple: (creatures: [item: SRDMonster, count: number][]) => update((monsters) => {
+        setMultiple: (creatures: [item: SRDMonster, count: number][]) =>
+            update((monsters) => {
                 for (const [item, count] of creatures) {
                     monsters.set(item, count);
                 }
