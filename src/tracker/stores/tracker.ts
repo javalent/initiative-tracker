@@ -111,137 +111,135 @@ function createTracker() {
         );
     };
 
-    const updateCreatures = (...updates: CreatureUpdates[]) =>
-        updateAndSave((creatures) => {
-            for (const { creature, change } of updates) {
-                if (change.initiative) {
-                    creature.initiative = Number(change.initiative);
-                    logNewInitiative(creature);
+    const performCreatureUpdate = (
+        creatures: Creature[],
+        ...updates: CreatureUpdates[]
+    ) => {
+        for (const { creature, change } of updates) {
+            if (change.initiative) {
+                creature.initiative = Number(change.initiative);
+                logNewInitiative(creature);
+            }
+            if (change.name) {
+                creature.name = change.name;
+                creature.number = 0;
+            }
+            if (change.hp) {
+                // Reduce temp HP first
+                change.hp = Number(change.hp);
+                if (change.hp < 0 && creature.temp > 0) {
+                    const remaining = creature.temp + change.hp;
+                    creature.temp = Math.max(0, remaining);
+                    change.hp = Math.min(0, remaining);
                 }
-                if (change.name) {
-                    creature.name = change.name;
-                    creature.number = 0;
+                // Clamp HP at 0 if clamp is enabled in settings
+                if (_settings.clamp && creature.hp + change.hp < 0) {
+                    change.hp = -creature.hp;
                 }
-                if (change.hp) {
-                    // Reduce temp HP first
-                    change.hp = Number(change.hp);
-                    if (change.hp < 0 && creature.temp > 0) {
-                        const remaining = creature.temp + change.hp;
-                        creature.temp = Math.max(0, remaining);
-                        change.hp = Math.min(0, remaining);
-                    }
-                    // Clamp HP at 0 if clamp is enabled in settings
-                    if (_settings.clamp && creature.hp + change.hp < 0) {
-                        change.hp = -creature.hp;
-                    }
-                    // Handle overflow healing according to settings
-                    if (
-                        change.hp > 0 &&
-                        change.hp + creature.hp > creature.current_max
-                    ) {
-                        switch (_settings.hpOverflow) {
-                            case OVERFLOW_TYPE.ignore:
-                                change.hp = Math.max(
-                                    creature.current_max - creature.hp,
-                                    0
-                                );
-                                break;
-                            case OVERFLOW_TYPE.temp:
-                                // Gives temp a value, such that it will be set later
-                                change.temp =
-                                    change.hp -
-                                    Math.min(
-                                        creature.current_max - creature.hp,
-                                        0
-                                    );
-                                change.hp -= change.temp;
-                                break;
-                            case OVERFLOW_TYPE.current:
-                                break;
-                        }
-                    }
-                    creature.hp += change.hp;
-                    if (_settings.autoStatus && creature.hp <= 0) {
-                        const unc = _settings.statuses.find(
-                            (s) => s.id == _settings.unconsciousId
-                        );
-                        if (unc) creature.status.add(unc);
-                    }
-                }
-                if (change.max) {
-                    creature.current_max = Math.max(
-                        0,
-                        creature.current_max + change.max
-                    );
-                    if (
-                        creature.hp >= creature.current_max &&
-                        _settings.hpOverflow !== OVERFLOW_TYPE.current
-                    ) {
-                        creature.hp = creature.current_max;
-                    }
-                }
-                if (change.ac) {
-                    creature.current_ac = creature.ac = change.ac;
-                }
-                if (change.temp) {
-                    let baseline = 0;
-                    if (_settings.additiveTemp) {
-                        baseline = creature.temp;
-                    }
-                    if (change.temp > 0) {
-                        creature.temp = Math.max(
-                            creature.temp,
-                            baseline + change.temp
-                        );
-                    } else {
-                        creature.temp = Math.max(
-                            0,
-                            creature.temp + change.temp
-                        );
-                    }
-                }
-                if (change.marker) {
-                    creature.marker = change.marker;
-                }
-                if (change.status?.length) {
-                    for (const status of change.status) {
-                        if (
-                            [...creature.status].find((s) => s.id == status.id)
-                        ) {
-                            creature.status = new Set(
-                                [...creature.status].filter(
-                                    (s) => s.id != status.id
-                                )
+                // Handle overflow healing according to settings
+                if (
+                    change.hp > 0 &&
+                    change.hp + creature.hp > creature.current_max
+                ) {
+                    switch (_settings.hpOverflow) {
+                        case OVERFLOW_TYPE.ignore:
+                            change.hp = Math.max(
+                                creature.current_max - creature.hp,
+                                0
                             );
-                            _logger?.log(
-                                `${creature.name} relieved of status ${status.name}`
-                            );
-                        } else {
-                            creature.status.add(status);
-                        }
+                            break;
+                        case OVERFLOW_TYPE.temp:
+                            // Gives temp a value, such that it will be set later
+                            change.temp =
+                                change.hp -
+                                Math.min(creature.current_max - creature.hp, 0);
+                            change.hp -= change.temp;
+                            break;
+                        case OVERFLOW_TYPE.current:
+                            break;
                     }
                 }
-                if ("hidden" in change) {
-                    creature.hidden = change.hidden!;
-                    _logger.log(
-                        `${creature.getName()} ${
-                            creature.hidden ? "hidden" : "revealed"
-                        }`
+                creature.hp += change.hp;
+                if (_settings.autoStatus && creature.hp <= 0) {
+                    const unc = _settings.statuses.find(
+                        (s) => s.id == _settings.unconsciousId
                     );
-                }
-                if ("enabled" in change) {
-                    creature.enabled = change.enabled!;
-                    _logger.log(
-                        `${creature.getName()} ${
-                            creature.enabled ? "enabled" : "disabled"
-                        }`
-                    );
-                }
-                if (!creatures.includes(creature)) {
-                    creatures.push(creature);
+                    if (unc) creature.status.add(unc);
                 }
             }
-            return creatures;
+            if (change.max) {
+                creature.current_max = Math.max(
+                    0,
+                    creature.current_max + change.max
+                );
+                if (
+                    creature.hp >= creature.current_max &&
+                    _settings.hpOverflow !== OVERFLOW_TYPE.current
+                ) {
+                    creature.hp = creature.current_max;
+                }
+            }
+            if (change.ac) {
+                creature.current_ac = creature.ac = change.ac;
+            }
+            if (change.temp) {
+                let baseline = 0;
+                if (_settings.additiveTemp) {
+                    baseline = creature.temp;
+                }
+                if (change.temp > 0) {
+                    creature.temp = Math.max(
+                        creature.temp,
+                        baseline + change.temp
+                    );
+                } else {
+                    creature.temp = Math.max(0, creature.temp + change.temp);
+                }
+            }
+            if (change.marker) {
+                creature.marker = change.marker;
+            }
+            if (change.status?.length) {
+                for (const status of change.status) {
+                    if ([...creature.status].find((s) => s.id == status.id)) {
+                        creature.status = new Set(
+                            [...creature.status].filter(
+                                (s) => s.id != status.id
+                            )
+                        );
+                        _logger?.log(
+                            `${creature.name} relieved of status ${status.name}`
+                        );
+                    } else {
+                        creature.status.add(status);
+                    }
+                }
+            }
+            if ("hidden" in change) {
+                creature.hidden = change.hidden!;
+                _logger.log(
+                    `${creature.getName()} ${
+                        creature.hidden ? "hidden" : "revealed"
+                    }`
+                );
+            }
+            if ("enabled" in change) {
+                creature.enabled = change.enabled!;
+                _logger.log(
+                    `${creature.getName()} ${
+                        creature.enabled ? "enabled" : "disabled"
+                    }`
+                );
+            }
+            if (!creatures.includes(creature)) {
+                creatures.push(creature);
+            }
+        }
+        return creatures;
+    };
+    const updateCreatures = (...updates: CreatureUpdates[]) =>
+        updateAndSave((creatures) => {
+            return performCreatureUpdate(creatures, ...updates);
         });
 
     const getEncounterState = (): InitiativeViewState => {
@@ -307,14 +305,76 @@ function createTracker() {
         updating,
         updateTarget,
         updateCreatures,
-        updateCreatureByName: (name: string, change: CreatureUpdate) => 
-          update((creatures) => {
-            const creature = creatures.find(c => c.name == name);
-            if (creature) {
-                return updateCreatures({ creature, change });
-            }
-            return creatures;
-          }),
+        updateCreatureByName: (name: string, change: CreatureUpdate) =>
+            update((creatures) => {
+                const creature = creatures.find((c) => c.name == name);
+                if (creature) {
+                    if (!isNaN(Number(change.hp))) {
+                        creature.hp =
+                            creature.max =
+                            creature.current_max =
+                                change.hp;
+                    }
+                    if (change.max) {
+                        creature.current_max = Math.max(
+                            0,
+                            creature.current_max + change.max
+                        );
+                        if (
+                            creature.hp >= creature.current_max &&
+                            _settings.hpOverflow !== OVERFLOW_TYPE.current
+                        ) {
+                            creature.hp = creature.current_max;
+                        }
+                    }
+                    if (change.temp) {
+                        let baseline = 0;
+                        if (_settings.additiveTemp) {
+                            baseline = creature.temp;
+                        }
+                        if (change.temp > 0) {
+                            creature.temp = Math.max(
+                                creature.temp,
+                                baseline + change.temp
+                            );
+                        } else {
+                            creature.temp = Math.max(
+                                0,
+                                creature.temp + change.temp
+                            );
+                        }
+                    }
+                    if (change.marker) {
+                        creature.marker = change.marker;
+                    }
+                    if (
+                        typeof change.ac == "string" ||
+                        !isNaN(Number(change.ac))
+                    ) {
+                        creature.ac = creature.current_ac = change.ac;
+                    }
+                    if (
+                        typeof change.current_ac == "string" ||
+                        !isNaN(Number(change.current_ac))
+                    ) {
+                        creature.current_ac = change.ac;
+                    }
+                    if (!isNaN(Number(change.initiative))) {
+                        creature.initiative = change.initiative;
+                    }
+                    if (typeof change.name == "string") {
+                        creature.name = change.name;
+                    }
+                    if ("hidden" in change) {
+                        creature.hidden = change.hidden;
+                    }
+                    if ("enabled" in change) {
+                        creature.enabled = change.enabled;
+                    }
+                }
+
+                return creatures;
+            }),
 
         players: derived(ordered, (creatures) =>
             creatures.filter((c) => c.player)

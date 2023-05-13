@@ -205,7 +205,6 @@
         for (const enc of Object.values(plugin.data.encounters)) {
             menu.addItem((item) => {
                 item.setTitle(enc.name).onClick(() => {
-                    console.log(enc);
                     $name = enc.name;
                     encounter.empty();
                     players.empty();
@@ -215,15 +214,12 @@
                         } else {
                             encounter.add(
                                 CreatureCreator.fromJSON(
-                                    creature, plugin
+                                    creature,
+                                    plugin
                                 ) as any as SRDMonster
                             );
                         }
                     }
-                    console.log(
-                        "🚀 ~ file: Encounter.svelte:198 ~ encounter:",
-                        $encounter
-                    );
                 });
             });
         }

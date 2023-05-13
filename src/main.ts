@@ -599,62 +599,6 @@ export default class InitiativeTracker extends Plugin {
             await this.saveSettings();
         }
 
-        console.log(
-            "🚀 ~ file: main.ts:597 ~ this.data.version?.[0] < 10:",
-            this.data.version
-        );
-        if (this.data.version?.[0] < 10 && false) {
-            if (
-                !this.canUseStatBlocks ||
-                !this.statblocks.settings.disableSRD
-            ) {
-                new Notice(
-                    createFragment((e) => {
-                        e.createEl("h4", { text: "Initiative Tracker Notice" });
-                        e.createSpan({
-                            text: "The 5e SRD has been removed from the plugin."
-                        });
-                        e.createEl("br");
-                        const p = e.createEl("p");
-
-                        if (this.canUseStatBlocks) {
-                            if (!this.statblocks.settings.disableSRD) {
-                                p.createSpan({
-                                    text: "It will still be available thanks to the "
-                                });
-                                p.createEl("a", {
-                                    text: "Fantasy Statblocks",
-                                    href: "obsidian://show-plugin?id=obsidian-5e-statblocks"
-                                });
-                                p.createSpan({
-                                    text: " plugin."
-                                });
-                            }
-                        } else {
-                            p.createSpan({
-                                text: "Please install and use the "
-                            });
-                            p.createEl("a", {
-                                text: "Fantasy Statblocks",
-                                href: "obsidian://show-plugin?id=obsidian-5e-statblocks"
-                            });
-                            p.createSpan({
-                                text: " to re-integrate the SRD, if desired."
-                            });
-                        }
-                        const docs = e.createEl("p");
-                        docs.createSpan({ text: "See more at " });
-                        docs.createEl("a", {
-                            text: "https://plugins.javalent.com",
-                            href: "https://plugins.javalent.com"
-                        });
-                        docs.createSpan({ text: "." });
-                    }),
-                    0
-                );
-            }
-        }
-
         this.data.version = this.manifest.version
             .split(".")
             .map((n) => Number(n));
