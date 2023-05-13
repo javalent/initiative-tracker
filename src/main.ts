@@ -49,6 +49,7 @@ declare module "obsidian" {
 
 export default class InitiativeTracker extends Plugin {
     public data: InitiativeTrackerData;
+    public tracker = tracker;
     playerCreatures: Map<string, Creature> = new Map();
     watchers: Map<TFile, HomebrewCreature> = new Map();
     getRoller(str: string) {
