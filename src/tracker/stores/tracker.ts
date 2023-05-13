@@ -307,6 +307,14 @@ function createTracker() {
         updating,
         updateTarget,
         updateCreatures,
+        updateCreatureByName: (name: string, change: CreatureUpdate) => 
+          update((creatures) => {
+            const creature = creatures.find(c => c.name == name);
+            if (creature) {
+                return updateCreatures({ creature, change });
+            }
+            return creatures;
+          }),
 
         players: derived(ordered, (creatures) =>
             creatures.filter((c) => c.player)
