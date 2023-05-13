@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.1.0](https://github.com/javalent/initiative-tracker/compare/11.0.0...11.1.0) (2023-05-13)
+
+
+### Features
+
+* **publish:** Added Creature as Player Images ([481a221](https://github.com/javalent/initiative-tracker/commit/481a22165679ab084955f1e8dde981d246d436f7))
+* **publish:** Added Creature as Player Images ([c4d09d5](https://github.com/javalent/initiative-tracker/commit/c4d09d5f3080d82afe134300ee86439179063260))
+
+
+### Bug Fixes
+
+* expose tracker as temporary API ([48d7a1c](https://github.com/javalent/initiative-tracker/commit/48d7a1cb96b70144553afe2af138b9ac8e73cb13))
+
 ## [11.0.0](https://github.com/javalent/initiative-tracker/compare/v10.0.1...11.0.0) (2023-05-09)
 
 
