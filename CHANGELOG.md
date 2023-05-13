@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.1.2](https://github.com/javalent/initiative-tracker/compare/11.1.1...11.1.2) (2023-05-13)
+
+
+### Bug Fixes
+
+* `updateCreatureByName` accepts a status array now ([7e8cf1f](https://github.com/javalent/initiative-tracker/commit/7e8cf1fd3c0847e32879cadaa57d88286679e3b4))
+* Fixes `updateCreatureByName` ([4d36f25](https://github.com/javalent/initiative-tracker/commit/4d36f25a3d98aa46fd5eb4472b12d522909061aa))
+
 ## [11.1.1](https://github.com/javalent/initiative-tracker/compare/11.1.0...11.1.1) (2023-05-13)
 
 
