@@ -1,4 +1,4 @@
-import { Creature } from "../../utils/creature";
+import { Creature, getId } from "../../utils/creature";
 import type InitiativeTracker from "../../main";
 import { derived, get, Updater, Writable, writable } from "svelte/store";
 import { equivalent } from "../../encounter";
@@ -306,7 +306,7 @@ function createTracker() {
         updateTarget,
         updateCreatures,
         updateCreatureByName: (name: string, change: CreatureUpdate) =>
-            update((creatures) => {
+            updateAndSave((creatures) => {
                 const creature = creatures.find((c) => c.name == name);
                 if (creature) {
                     if (!isNaN(Number(change.hp))) {
@@ -370,6 +370,25 @@ function createTracker() {
                     }
                     if ("enabled" in change) {
                         creature.enabled = change.enabled;
+                    }
+                    if (Array.isArray(change.status) && change.status?.length) {
+                        for (const status of change.status) {
+                            if (typeof status == "string") {
+                                let cond = _settings.statuses.find(
+                                    (c) => c.name == status
+                                ) ?? {
+                                    name: status,
+                                    description: "",
+                                    id: getId()
+                                };
+                                creature.status.add(cond);
+                            } else if (
+                                typeof status == "object" &&
+                                status.name?.length
+                            ) {
+                                creature.status.add(status as Condition);
+                            }
+                        }
                     }
                 }
 
