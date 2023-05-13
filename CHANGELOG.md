@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.1.1](https://github.com/javalent/initiative-tracker/compare/11.1.0...11.1.1) (2023-05-13)
+
+
+### Bug Fixes
+
+* adds updateCreatureByName tracker method ([94396a2](https://github.com/javalent/initiative-tracker/commit/94396a2f3822e97fd29b277f019ecc3bdea1d333))
+
 ## [11.1.0](https://github.com/javalent/initiative-tracker/compare/11.0.0...11.1.0) (2023-05-13)
 
 
