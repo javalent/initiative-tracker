@@ -54,7 +54,6 @@
         <th style="width:5%"><strong use:iniIcon /></th>
         <th class="left" style="width:30%"><strong>Name</strong></th>
         <th style="width:15%" class="center"><strong use:hpIcon /></th>
-        <th style="width:15%" class="center"><strong use:acIcon /></th>
         <th><strong> Statuses </strong></th>
     </thead>
     <tbody>
@@ -80,12 +79,6 @@
                     {:else}
                         <span>{getHpStatus(creature.hp, creature.max)}</span>
                     {/if}
-                </td>
-                <td
-                    class="ac center"
-                    class:dirty-ac={creature.current_ac != creature.ac}
-                >
-                    <span>{creature.current_ac ?? ""}</span>
                 </td>
                 <td class="center">
                     {[...creature.status].map((s) => s.name).join(", ")}
@@ -142,8 +135,5 @@
     }
     :global(.theme-dark) .active {
         background-color: rgba(255, 255, 255, 0.1);
-    }
-    .dirty-ac {
-        font-weight: var(--font-bold);
     }
 </style>
