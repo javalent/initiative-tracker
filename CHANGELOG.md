@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.1.3](https://github.com/javalent/initiative-tracker/compare/11.1.2...11.1.3) (2023-05-13)
+
+
+### Bug Fixes
+
+* remove AC from player view ([c6ecb19](https://github.com/javalent/initiative-tracker/commit/c6ecb19cfbf0f39fc3e264b3e9bf5c41d480c019))
+
 ## [11.1.2](https://github.com/javalent/initiative-tracker/compare/11.1.1...11.1.2) (2023-05-13)
 
 
