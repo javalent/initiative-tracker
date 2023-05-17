@@ -311,8 +311,6 @@ function createTracker() {
                 if (creature) {
                     if (!isNaN(Number(change.hp))) {
                         creature.hp =
-                            creature.max =
-                            creature.current_max =
                                 change.hp;
                     }
                     if (change.max) {

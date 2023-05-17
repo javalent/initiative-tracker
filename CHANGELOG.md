@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.1.5](https://github.com/javalent/initiative-tracker/compare/11.1.4...11.1.5) (2023-05-14)
+
+
+### Bug Fixes
+
+* actually remove side effects from updateCreatureByName ([cf8bf9f](https://github.com/javalent/initiative-tracker/commit/cf8bf9f806aa0693b3a00551cc9ee53d8ed0d57b))
+
+## [11.1.4](https://github.com/javalent/initiative-tracker/compare/11.1.3...11.1.4) (2023-05-14)
+
+
+### Bug Fixes
+
+* updateCreatureByName no longer has side effects ([a327221](https://github.com/javalent/initiative-tracker/commit/a327221c878f9c26c1cefbe73d98eea33eca080b))
+
+## [11.1.3](https://github.com/javalent/initiative-tracker/compare/11.1.2...11.1.3) (2023-05-13)
+
+
+### Bug Fixes
+
+* remove AC from player view ([c6ecb19](https://github.com/javalent/initiative-tracker/commit/c6ecb19cfbf0f39fc3e264b3e9bf5c41d480c019))
+
 ## [11.1.2](https://github.com/javalent/initiative-tracker/compare/11.1.1...11.1.2) (2023-05-13)
 
 
