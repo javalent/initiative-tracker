@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.1.6](https://github.com/javalent/initiative-tracker/compare/11.1.5...11.1.6) (2023-05-17)
+
+
+### Bug Fixes
+
+* Encounters pull FS creatures correctly ([0db3845](https://github.com/javalent/initiative-tracker/commit/0db3845fdc68344828e80ab45cd53a6977a766de))
+
 ## [11.1.5](https://github.com/javalent/initiative-tracker/compare/11.1.4...11.1.5) (2023-05-14)
 
 
