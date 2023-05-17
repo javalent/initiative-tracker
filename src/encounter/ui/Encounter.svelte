@@ -21,7 +21,7 @@
     setContext("plugin", plugin);
 
     export let name: string = "Encounter";
-    export let creatures: Map<Creature, number | string>;
+    export let creatures: Map<Creature, number | string> = new Map();
     export let players: string[];
     export let party: string = null;
     export let hide: string[] = [];
@@ -63,7 +63,7 @@
             difficulty = encounterDifficulty(
                 playerLevels,
                 totalXP,
-                [...creatureMap.values()].reduce((acc, curr) => acc + curr)
+                [...creatureMap.values()].reduce((acc, curr) => acc + curr, 0)
             );
         }
     }
