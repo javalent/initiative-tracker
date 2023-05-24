@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.1.7](https://github.com/javalent/initiative-tracker/compare/11.1.6...11.1.7) (2023-05-24)
+
+
+### Bug Fixes
+
+* decimal crs now pull xp correctly (close [#190](https://github.com/javalent/initiative-tracker/issues/190)) ([e293e78](https://github.com/javalent/initiative-tracker/commit/e293e78a2329ba3067ad35e00c38c9f37c23da40))
+
 ## [11.1.6](https://github.com/javalent/initiative-tracker/compare/11.1.5...11.1.6) (2023-05-17)
 
 
