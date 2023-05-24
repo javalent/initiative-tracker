@@ -65,8 +65,11 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
 
 export const XP_PER_CR: Record<string, number> = {
     "0": 0,
+    "0.125": 25,
     "1/8": 25,
+    "0.25": 50,
     "1/4": 50,
+    "0.5": 100,
     "1/2": 100,
     "1": 200,
     "2": 450,
