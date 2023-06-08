@@ -3,7 +3,7 @@
     import { DICE, RANDOM_HP, START_ENCOUNTER } from "src/utils";
 
     import { Creature } from "src/utils/creature";
-    import { encounterDifficulty, formatDifficultyReport } from "src/utils/encounter-difficulty";
+    import { encounterDifficulty } from "src/utils/encounter-difficulty";
     import type InitiativeTracker from "src/main";
     import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
     import { tracker } from "src/tracker/stores/tracker";
@@ -45,7 +45,11 @@
     }
 
     $: difficulty = encounterDifficulty(plugin, playerLevels, creatureMap);
-    $: totalXP = difficulty?.adjustedXp ?? 0;
+    $: {
+      if (difficulty) {
+        totalXP = difficulty.xpSystem == "dnd5e" ? difficulty.adjustedXp : difficulty.totalXp;
+      }
+    }
 
     const openButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon(START_ENCOUNTER);
@@ -215,24 +219,22 @@
         </div>
         {#if plugin.data.displayDifficulty}
             <div class="encounter-xp difficulty">
-                {#if totalXP > 0 && difficulty}
+                {#if difficulty}
                     <span
-                        aria-label={formatDifficultyReport(difficulty)}
-                        class={difficulty.difficulty.toLowerCase()}
+                        aria-label={difficulty.formatted}
+                        class={difficulty.difficultyCssClass}
                     >
-                        <strong class="difficulty-label"
-                            >{difficulty.difficulty}</strong
-                        >
-                        <span class="xp-parent difficulty">
-                            <span class="paren left">(</span>
-                            <span class="xp-container">
-                                <span class="xp number">
-                                    {totalXP}
-                                </span>
-                                <span class="xp text">XP</span>
-                            </span>
-                            <span class="paren right">)</span>
-                        </span>
+                      <strong class="difficulty-label">{difficulty.difficulty}</strong>
+                      <span class="xp-parent difficulty">
+                          <span class="paren left">(</span>
+                          <span class="xp-container">
+                              {#if totalXP > 0}
+                                  <span class="xp number">{totalXP}</span>
+                                  <span class="xp text">XP</span>
+                              {/if}
+                          </span>
+                          <span class="paren right">)</span>
+                      </span>
                     </span>
                 {/if}
             </div>

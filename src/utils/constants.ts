@@ -111,5 +111,6 @@ export const OVERFLOW_TYPE: { [key: string]: string } = {
 };
 
 export const AVAILABLE_XP_SYSTEMS: Record<string, string> = {
-  dnd5e: "DnD 5e"
+    dnd5e: "DnD 5e",
+    dnd5eLazyGm: "DnD 5e Lazy GM"
 } as const;

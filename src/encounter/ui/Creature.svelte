@@ -45,8 +45,13 @@
         <span class="xp-parent">
             <span class="paren left">&nbsp;(</span>
             <span class="xp-container">
-                <span class="xp number">{xp}</span>
-                <span class="xp text">XP</span>
+                {#if plugin.data.xpSystem != "dnd5eLazyGm"}
+                  <span class="xp number">{xp}</span>
+                  <span class="xp text">XP</span>
+                {:else}
+                  <span class="xp number">{creature.cr}</span>
+                  <span class="xp text">CR</span>
+                {/if}
             </span>
             <span class="paren right">)</span>
         </span>

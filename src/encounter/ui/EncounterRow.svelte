@@ -6,11 +6,7 @@
     import { RANDOM_HP, START_ENCOUNTER } from "src/utils";
     import { Creature } from "src/utils/creature";
     import CreatureComponent from "./Creature.svelte";
-    import {
-        DifficultyReport,
-        encounterDifficulty,
-        formatDifficultyReport
-    } from "src/utils/encounter-difficulty";
+    import { encounterDifficulty } from "src/utils/encounter-difficulty";
 
     import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
     import { setContext } from "svelte";
@@ -47,7 +43,11 @@
     }
 
     $: difficulty = encounterDifficulty(plugin, playerLevels, creatureMap);
-    $: totalXP = difficulty?.adjustedXp ?? 0;
+    $: {
+      if (difficulty) {
+        totalXP = difficulty.xpSystem == "dnd5e" ? difficulty.adjustedXp : difficulty.totalXp;
+      }
+    }
 
     const open = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -191,10 +191,10 @@
     {#if plugin.data.displayDifficulty}
         <td>
             <div class="encounter-xp difficulty">
-                {#if totalXP > 0 && difficulty}
+                {#if difficulty}
                     <span
-                        aria-label={formatDifficultyReport(difficulty)}
-                        class={difficulty.difficulty.toLowerCase()}
+                        aria-label={difficulty.formatted}
+                        class={difficulty.difficultyCssClass}
                     >
                         <strong class="difficulty-label">
                             {difficulty.difficulty}

@@ -2,7 +2,7 @@
     import { encounter } from "../../stores/encounter";
     import { players } from "../../stores/players";
     import { DEFAULT_UNDEFINED, AVAILABLE_XP_SYSTEMS } from "src/utils";
-    import { encounterDifficulty } from "src/utils/encounter-difficulty";
+    import { encounterDifficulty, isDnd5e, isDnd5eLazyGm } from "src/utils/encounter-difficulty";
     import { getContext } from "svelte";
     import Collapsible from "./Collapsible.svelte";
 
@@ -16,13 +16,28 @@
         $players.filter(player => player.level && player.enabled)
                 .map(player => Math.min(player.level, 20)),
         $encounter);
-    $: xp = difficulty?.totalXp.toLocaleString() ?? DEFAULT_UNDEFINED;
-    $: adjXP = difficulty?.adjustedXp.toLocaleString() ?? DEFAULT_UNDEFINED;
-    $: difficultyName = difficulty?.difficulty ?? DEFAULT_UNDEFINED;
-    $: dailyBudget = difficulty?.budget?.daily.toLocaleString() + " XP" ?? DEFAULT_UNDEFINED;
-    $: thresholds = Object.entries(difficulty?.budget ?? {})
-                          .filter(([name, _]) => name != "daily")
-                          .map(([name, minXP]) => [name, minXP.toLocaleString() + " XP"]);
+
+    let xp: string;
+    $: {
+      if (!difficulty) {
+        xp = DEFAULT_UNDEFINED;
+      } else if (isDnd5e(difficulty)) {
+        xp = difficulty.adjustedXp.toLocaleString();
+      } else {
+        xp = difficulty.totalXp.toLocaleString();
+      }
+    }
+
+    let thresholds: [string, string][] = [];
+    $: {
+        if (isDnd5e(difficulty)) {
+            thresholds = Object.entries(difficulty?.budget ?? {})
+                               .filter(([name]) => name != "daily")
+                               .map(([name, minXP]) => [name, minXP.toLocaleString() + " XP"]);
+        } else if (isDnd5eLazyGm(difficulty)) {
+            thresholds = [["deadly", difficulty.budget.deadly.toLocaleString() + " CR"]];
+        }
+    }
 </script>
 
 <div class="xp-container">
@@ -42,16 +57,31 @@
                 <div class="encounter-difficulty">
                     <div class="difficulty container">
                         <strong class="header">Difficulty</strong>
-                        <span>{difficultyName}</span>
+                        <span>{difficulty?.difficulty ?? DEFAULT_UNDEFINED}</span>
                     </div>
                     <div class="total container">
                         <strong class="header">XP</strong>
                         <span>{xp}</span>
                     </div>
-                    <div class="adjusted container">
-                        <strong class="header">Adjusted</strong>
-                        <span>{adjXP}</span>
-                    </div>
+                    {#if xpSystem == "dnd5e"}
+                        <div class="adjusted container">
+                            <strong class="header">Adjusted</strong>
+                            <span>
+                                {isDnd5e(difficulty)
+                                 ? difficulty.adjustedXp.toLocaleString()
+                                : DEFAULT_UNDEFINED}
+                            </span>
+                        </div>
+                    {:else if xpSystem == "dnd5eLazyGm"}
+                        <div class="adjusted container">
+                            <strong class="header">CR</strong>
+                            <span>
+                                {isDnd5eLazyGm(difficulty)
+                                 ? difficulty.crSum.toLocaleString()
+                                : DEFAULT_UNDEFINED}
+                            </span>
+                        </div>
+                    {/if}
                 </div>
                 <div class="thresholds">
                     {#each thresholds as [name, thresholdText]}
@@ -63,10 +93,16 @@
                 </div>
                 <br />
             </div>
+            {#if xpSystem == "dnd5e"}
             <div class="budget">
                 <h5 class="experience-name">Daily budget</h5>
-                <span class="experience-amount">{dailyBudget}</span>
+                <span class="experience-amount">
+                    {isDnd5e(difficulty)
+                      ? difficulty.budget.daily.toLocaleString()
+                      : DEFAULT_UNDEFINED} XP
+                </span>
             </div>
+            {/if}
         </div>
     </Collapsible>
 </div>

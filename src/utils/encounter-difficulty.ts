@@ -1,20 +1,32 @@
-import { XP_PER_CR } from "./constants";
+import { convertFraction, XP_PER_CR } from "../utils";
 import type InitiativeTracker from "../main";
 import type { Creature } from "./creature";
 
-const xpBudgets = ["easy", "medium", "hard", "deadly", "daily"] as const;
-type XpBudget = {easy: number; medium: number; hard: number; deadly: number; daily: number};
+const dnd5eXpBudgets = ["easy", "medium", "hard", "deadly", "daily"] as const;
+type Dnd5eXpBudget = {easy: number; medium: number; hard: number; deadly: number; daily: number};
 
-export type DifficultyReport = {
+type DifficultyReport = {
+    xpSystem: "dnd5e" | "dnd5eLazyGm";
     difficulty: string;
-    totalXp: number;
-    adjustedXp: number;
+    difficultyCssClass: string;
+    totalXp: number | null;
+    formatted: string;
+    budget: {[key: string]: number};
+}
+
+export type Dnd5eDifficultyReport = DifficultyReport & {
+    xpSystem: "dnd5e";
+    totalXp: number;       // XP prior to adjustment. This is _not_ the final XP value.
+    adjustedXp: number;    // Final XP total after sums an adjustments.
     multiplier: number;
     budget: XpBudget;
 };
 
-interface BudgetDict {
-    [index: number]: XpBudget;
+export type Dnd5eLazyGmDifficultyReport = DifficultyReport & {
+    xpSystem: "dnd5eLazyGm";
+    crSum: number;
+    playerLevelSum: number;
+    budget: { deadly: number };
 }
 
 export const getCreatureXP = (
@@ -29,7 +41,9 @@ export const getCreatureXP = (
     return 0;
 };
 
-const thresholds: BudgetDict = {
+const XP_BUDGETS: {
+    [index: number]: Dnd5eXpBudget;
+} = {
     1: { daily: 300, easy: 25, medium: 50, hard: 75, deadly: 100 },
     2: { daily: 600, easy: 50, medium: 100, hard: 150, deadly: 200 },
     3: { daily: 1200, easy: 75, medium: 150, hard: 225, deadly: 400 },
@@ -54,8 +68,9 @@ const thresholds: BudgetDict = {
 
 function xpBudget(characterLevels: number[]): XpBudget {
     const budget = {};
-    xpBudgets.forEach(name =>
-        budget[name] = characterLevels.reduce((acc, lvl) => acc + (thresholds[lvl][name] ?? 0), 0));
+    dnd5eXpBudgets.forEach(name =>
+        budget[name] = characterLevels.reduce((acc, lvl) =>
+            acc + (XP_BUDGETS[lvl][name] ?? 0), 0));
     return budget
 }
 
@@ -73,11 +88,41 @@ export function formatDifficultyReport(report: DifficultyReport): string {
     ].join("\n")}`;
 }
 
-export function encounterDifficulty(
+function dnd5eLazyGmEncounterDifficulty(
+  plugin: InitiativeTracker,
+  playerLevels: number[],
+  creatures: Map<Creature | SRDMonster, number>
+): Dnd5eLazyGmDifficultyReport | null {
+    let crSum = [...creatures].reduce((acc, [creature, count]) =>
+        acc + (convertFraction(creature.cr) ?? 0) * count, 0);
+    let playerLevelSum = playerLevels.reduce((acc, lv) => acc + lv, 0);
+    if (crSum == 0 || playerLevelSum == 0) return null;
+    let threshold = playerLevelSum / ((playerLevelSum / playerLevels.length) > 4 ? 2 : 4);
+    let rawDifficulty = dnd5eEncounterDifficulty(plugin, playerLevels, creatures);
+    let report = {
+        crSum,
+        playerLevelSum,
+        xpSystem: "dnd5eLazyGm",
+        difficulty: (crSum > threshold) ? "Deadly" : "Not Deadly",
+        difficultyCssClass: (crSum > threshold) ? "deadly" : "easy",
+        totalXp: rawDifficulty?.totalXp,
+        budget: { deadly: threshold }
+    };
+    report.formatted = `Encounter is ${report.difficulty}
+Total XP: ${report.totalXp}
+Sum of CR: ${report.crSum}
+Sum of player levels: ${report.playerLevelSum}
+
+Threshold
+Deadly: ${threshold}`;
+    return report;
+}
+
+function dnd5eEncounterDifficulty(
     plugin: InitiativeTracker,
     playerLevels: number[],
-    creatures: Map<Creature | SRDMonster>
-): DifficultyReport | null {
+    creatures: Map<Creature | SRDMonster, number>
+): Dnd5eDifficultyReport | null {
     let xp = [...creatures].reduce((acc, [creature, count]) =>
         acc + getCreatureXP(plugin, creature) * count, 0);
     let numberOfMonsters = [...creatures.values()].reduce((acc, cur) => acc + cur, 0);
@@ -109,12 +154,47 @@ export function encounterDifficulty(
     } else if (adjustedXp >= budget.easy) {
         difficulty = "Easy";
     }
-    let result = {
+    return {
+        xpSystem: "dnd5e",
         difficulty: difficulty,
+        difficultyCssClass: difficulty.toLowerCase(),
         totalXp: xp,
         adjustedXp: adjustedXp,
         multiplier: numberMultiplier,
-        budget: budget
+        budget: budget,
+        formatted: `Encounter is ${difficulty}
+Total XP: ${xp}
+Adjusted XP: ${adjustedXp} (x${numberMultiplier})
+
+Threshold
+Easy: ${budget.easy}
+Medium: ${budget.medium}
+Hard: ${budget.hard}
+Deadly: ${budget.deadly}`
     };
-    return result;
+}
+
+export function encounterDifficulty(
+    plugin: InitiativeTracker,
+    characterLevels: number[],
+    creatures: Map<Creature | SRDMonster, number>
+): Dnd5eDifficultyReport | Dnd5eLazyGmDifficultyReport | null {
+  switch (plugin.data.xpSystem) {
+    case "dnd5e":
+        return dnd5eEncounterDifficulty(plugin, characterLevels, creatures);
+    case "dnd5eLazyGm":
+        return dnd5eLazyGmEncounterDifficulty(plugin, characterLevels, creatures);
+  }
+}
+
+export function isDnd5e(
+  difficulty: Dnd5eDifficultyReport | Dnd5eLazyGmDifficultyReport | null
+): difficulty is Dnd5eDifficultyReport {
+  return difficulty?.xpSystem == "dnd5e";
+}
+
+export function isDnd5eLazyGm(
+  difficulty: Dnd5eDifficultyReport | Dnd5eLazyGmDifficultyReport | null
+): difficulty is Dnd5eLazyGmDifficultyReport {
+  return difficulty?.xpSystem == "dnd5eLazyGm";
 }

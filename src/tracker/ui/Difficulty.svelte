@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { formatDifficultyReport } from "src/utils/encounter-difficulty";
+    import { isDnd5e, isDnd5eLazyGm } from "src/utils/encounter-difficulty";
     import { tweened } from "svelte/motion";
     import { cubicOut } from "svelte/easing";
     import { getContext } from "svelte";
@@ -19,13 +19,18 @@
 
     let report: string = "";
     $: {
+        if (isDnd5e) {
+          difficultyBar.set(
+            ($dif.adjustedXp / $dif.budget.deadly > 0)
+              ? 1 : $dif.adjustedXp / $dif.budget.deadly);
+          report = difficulty.formatted;
+        } else if ("deadly" in $dif.budget) {
+          difficultyBar.set(
+            ($dif.totalXp / $dif.budget.deadly > 0)
+              ? 1 : $dif.totalXp / $dif.budget.deadly);
+        }
         if ($dif) {
-            let progress =
-                $dif.adjustedXp / $dif.budget.deadly > 1
-                    ? 1
-                    : $dif.adjustedXp / $dif.budget.deadly;
-            difficultyBar.set(progress);
-            report = formatDifficultyReport($dif);
+            report = $dif.formatted;
         }
     }
 </script>
