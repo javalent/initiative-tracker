@@ -5,7 +5,7 @@ import type { SRDMonster } from "index";
 
 type Dnd5eXpBudget = {easy: number; medium: number; hard: number; deadly: number; daily: number};
 
-type DifficultyReport = {
+type BaseDifficultyReport = {
     xpSystem: "dnd5e" | "dnd5eLazyGm";
     difficulty: string;
     difficultyCssClass: string;
@@ -14,7 +14,7 @@ type DifficultyReport = {
     budget: {[key: string]: number};
 }
 
-export type Dnd5eDifficultyReport = DifficultyReport & {
+export type Dnd5eDifficultyReport = BaseDifficultyReport & {
     xpSystem: "dnd5e";
     totalXp: number;       // XP prior to adjustment. This is _not_ the final XP value.
     adjustedXp: number;    // Final XP total after sums an adjustments.
@@ -22,12 +22,14 @@ export type Dnd5eDifficultyReport = DifficultyReport & {
     budget: Dnd5eXpBudget;
 };
 
-export type Dnd5eLazyGmDifficultyReport = DifficultyReport & {
+export type Dnd5eLazyGmDifficultyReport = BaseDifficultyReport & {
     xpSystem: "dnd5eLazyGm";
     crSum: number;
     playerLevelSum: number;
     budget: { deadly: number };
 }
+
+export type DifficultyReport = Dnd5eDifficultyReport | Dnd5eLazyGmDifficultyReport | null;
 
 export const getCreatureXP = (
     plugin: InitiativeTracker,

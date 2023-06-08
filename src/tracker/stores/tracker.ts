@@ -813,7 +813,8 @@ function createTracker() {
                             ac: creature.ac,
                             hp: creature.hp,
                             modifier: creature.modifier,
-                            xp: creature.xp
+                            xp: creature.xp,
+                            hidden: creature.hidden
                         };
                         const existing = [...creatureMap].find(([c]) => equivalent(c, stats));
                         if (!existing) {
