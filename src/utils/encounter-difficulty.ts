@@ -2,7 +2,9 @@ import { XP_PER_CR } from "./constants";
 import type InitiativeTracker from "../main";
 import type { Creature } from "./creature";
 
-type XpBudget = { easy: number; medium: number; hard: number; deadly: number };
+const xpBudgets = ["easy", "medium", "hard", "deadly", "daily"] as const;
+type XpBudget = {easy: number; medium: number; hard: number; deadly: number; daily: number};
+
 export type DifficultyReport = {
     difficulty: string;
     totalXp: number;
@@ -27,47 +29,34 @@ export const getCreatureXP = (
     return 0;
 };
 
-const tresholds: BudgetDict = {
-    1: { easy: 25, medium: 50, hard: 75, deadly: 100 },
-    2: { easy: 50, medium: 100, hard: 150, deadly: 200 },
-    3: { easy: 75, medium: 150, hard: 225, deadly: 400 },
-    4: { easy: 125, medium: 250, hard: 375, deadly: 500 },
-    5: { easy: 250, medium: 500, hard: 750, deadly: 1100 },
-    6: { easy: 300, medium: 600, hard: 900, deadly: 1400 },
-    7: { easy: 350, medium: 750, hard: 1100, deadly: 1700 },
-    8: { easy: 450, medium: 900, hard: 1400, deadly: 2100 },
-    9: { easy: 550, medium: 1100, hard: 1600, deadly: 2400 },
-    10: { easy: 600, medium: 1200, hard: 1900, deadly: 2800 },
-    11: { easy: 800, medium: 1600, hard: 2400, deadly: 3600 },
-    12: { easy: 1000, medium: 2000, hard: 3000, deadly: 4500 },
-    13: { easy: 1100, medium: 2200, hard: 3400, deadly: 5100 },
-    14: { easy: 1250, medium: 2500, hard: 3800, deadly: 5700 },
-    15: { easy: 1400, medium: 2800, hard: 4300, deadly: 6400 },
-    16: { easy: 1600, medium: 3200, hard: 4800, deadly: 7200 },
-    17: { easy: 2000, medium: 3900, hard: 5900, deadly: 8800 },
-    18: { easy: 2100, medium: 4200, hard: 6300, deadly: 9500 },
-    19: { easy: 2400, medium: 4900, hard: 7300, deadly: 10900 },
-    20: { easy: 2800, medium: 5700, hard: 8500, deadly: 12700 }
+const thresholds: BudgetDict = {
+    1: { daily: 300, easy: 25, medium: 50, hard: 75, deadly: 100 },
+    2: { daily: 600, easy: 50, medium: 100, hard: 150, deadly: 200 },
+    3: { daily: 1200, easy: 75, medium: 150, hard: 225, deadly: 400 },
+    4: { daily: 1700, easy: 125, medium: 250, hard: 375, deadly: 500 },
+    5: { daily: 3500, easy: 250, medium: 500, hard: 750, deadly: 1100 },
+    6: { daily: 4000, easy: 300, medium: 600, hard: 900, deadly: 1400 },
+    7: { daily: 5000, easy: 350, medium: 750, hard: 1100, deadly: 1700 },
+    8: { daily: 6000, easy: 450, medium: 900, hard: 1400, deadly: 2100 },
+    9: { daily: 7500, easy: 550, medium: 1100, hard: 1600, deadly: 2400 },
+    10: { daily: 9000, easy: 600, medium: 1200, hard: 1900, deadly: 2800 },
+    11: { daily: 10500, easy: 800, medium: 1600, hard: 2400, deadly: 3600 },
+    12: { daily: 11500, easy: 1000, medium: 2000, hard: 3000, deadly: 4500 },
+    13: { daily: 13500, easy: 1100, medium: 2200, hard: 3400, deadly: 5100 },
+    14: { daily: 15000, easy: 1250, medium: 2500, hard: 3800, deadly: 5700 },
+    15: { daily: 18000, easy: 1400, medium: 2800, hard: 4300, deadly: 6400 },
+    16: { daily: 20000, easy: 1600, medium: 3200, hard: 4800, deadly: 7200 },
+    17: { daily: 25000, easy: 2000, medium: 3900, hard: 5900, deadly: 8800 },
+    18: { daily: 27000, easy: 2100, medium: 4200, hard: 6300, deadly: 9500 },
+    19: { daily: 30000, easy: 2400, medium: 4900, hard: 7300, deadly: 10900 },
+    20: { daily: 40000, easy: 2800, medium: 5700, hard: 8500, deadly: 12700 }
 };
 
 function xpBudget(characterLevels: number[]): XpBudget {
-    const easy = characterLevels.reduce(
-        (acc, lvl) => acc + (tresholds[lvl]?.easy ?? 0),
-        0
-    );
-    const medium = characterLevels.reduce(
-        (acc, lvl) => acc + (tresholds[lvl]?.medium ?? 0),
-        0
-    );
-    const hard = characterLevels.reduce(
-        (acc, lvl) => acc + (tresholds[lvl]?.hard ?? 0),
-        0
-    );
-    const deadly = characterLevels.reduce(
-        (acc, lvl) => acc + (tresholds[lvl]?.deadly ?? 0),
-        0
-    );
-    return { easy: easy, medium: medium, hard: hard, deadly: deadly };
+    const budget = {};
+    xpBudgets.forEach(name =>
+        budget[name] = characterLevels.reduce((acc, lvl) => acc + (thresholds[lvl][name] ?? 0), 0));
+    return budget
 }
 
 export function formatDifficultyReport(report: DifficultyReport): string {
@@ -85,11 +74,14 @@ export function formatDifficultyReport(report: DifficultyReport): string {
 }
 
 export function encounterDifficulty(
-    characterLevels: number[],
-    xp: number,
-    numberOfMonsters: number
+    plugin: InitiativeTracker,
+    playerLevels: number[],
+    creatures: Map<Creature | SRDMonster>
 ): DifficultyReport | null {
-    if (!characterLevels?.length || xp == 0 || numberOfMonsters == 0)
+    let xp = [...creatures].reduce((acc, [creature, count]) =>
+        acc + getCreatureXP(plugin, creature) * count, 0);
+    let numberOfMonsters = [...creatures.values()].reduce((acc, cur) => acc + cur, 0);
+    if (!playerLevels?.length || xp == 0 || numberOfMonsters == 0)
         return null;
     let numberMultiplier: number;
     if (numberOfMonsters === 1) {
@@ -106,14 +98,16 @@ export function encounterDifficulty(
         numberMultiplier = 4.0;
     }
     const adjustedXp = numberMultiplier * xp;
-    const budget = xpBudget(characterLevels);
-    let difficulty = "Easy";
+    const budget = xpBudget(playerLevels);
+    let difficulty = "Trivial";
     if (adjustedXp >= budget.deadly) {
         difficulty = "Deadly";
     } else if (adjustedXp >= budget.hard) {
         difficulty = "Hard";
     } else if (adjustedXp >= budget.medium) {
         difficulty = "Medium";
+    } else if (adjustedXp >= budget.easy) {
+        difficulty = "Easy";
     }
     let result = {
         difficulty: difficulty,

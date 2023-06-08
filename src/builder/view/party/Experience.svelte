@@ -1,54 +1,28 @@
 <script lang="ts">
-    import { EXPERIENCE_THRESHOLDS } from "src/builder/constants";
     import { encounter } from "../../stores/encounter";
     import { players } from "../../stores/players";
-    import { MODIFIERS_BY_COUNT, MODIFIER_THRESHOLDS } from "../../constants";
-    import { DEFAULT_UNDEFINED, XP_PER_CR } from "src/utils";
+    import { DEFAULT_UNDEFINED, AVAILABLE_XP_SYSTEMS } from "src/utils";
+    import { encounterDifficulty } from "src/utils/encounter-difficulty";
     import { getContext } from "svelte";
     import Collapsible from "./Collapsible.svelte";
 
     const plugin = getContext("plugin");
 
     const open = plugin.data.builder.showXP;
-    const { thresholds, modifier: playerModifier } = players;
+    const xpSystem = plugin.data.xpSystem;
 
-    $: count = ([...$encounter.values()] ?? []).reduce((a, b) => {
-        return a + b;
-    }, 0);
-
-    $: index =
-        MODIFIER_THRESHOLDS.lastIndexOf(
-            MODIFIER_THRESHOLDS.filter((t) => t <= count).pop()
-        ) + $playerModifier;
-    $: modifier = MODIFIERS_BY_COUNT[index];
-
-    $: xp = ([...$encounter.entries()] ?? []).reduce((acc, cur) => {
-        const [monster, count] = cur;
-        if (monster.cr && monster.cr in XP_PER_CR) {
-            acc += XP_PER_CR[monster.cr] * count;
-        }
-        return acc;
-    }, 0);
-    $: adjXP = xp * modifier;
-    let difficulty: string;
-    $: {
-        if (!adjXP) difficulty = DEFAULT_UNDEFINED;
-        else {
-            difficulty = "Trivial";
-            if (adjXP > $thresholds.Easy) {
-                difficulty = "Easy";
-            }
-            if (adjXP > $thresholds.Medium) {
-                difficulty = "Medium";
-            }
-            if (adjXP > $thresholds.Hard) {
-                difficulty = "Hard";
-            }
-            if (adjXP > $thresholds.Deadly) {
-                difficulty = "Deadly";
-            }
-        }
-    }
+    $: difficulty = encounterDifficulty(
+        plugin,
+        $players.filter(player => player.level && player.enabled)
+                .map(player => Math.min(player.level, 20)),
+        $encounter);
+    $: xp = difficulty?.totalXp.toLocaleString() ?? DEFAULT_UNDEFINED;
+    $: adjXP = difficulty?.adjustedXp.toLocaleString() ?? DEFAULT_UNDEFINED;
+    $: difficultyName = difficulty?.difficulty ?? DEFAULT_UNDEFINED;
+    $: dailyBudget = difficulty?.budget?.daily.toLocaleString() + " XP" ?? DEFAULT_UNDEFINED;
+    $: thresholds = Object.entries(difficulty?.budget ?? {})
+                          .filter(([name, _]) => name != "daily")
+                          .map(([name, minXP]) => [name, minXP.toLocaleString() + " XP"]);
 </script>
 
 <div class="xp-container">
@@ -57,40 +31,33 @@
         on:toggle={() =>
             (plugin.data.builder.showXP = !plugin.data.builder.showXP)}
     >
-        <h5 slot="title">Experience</h5>
+        <h5 slot="title">
+            Experience
+            {#if xpSystem != "dnd5e"}
+                ({AVAILABLE_XP_SYSTEMS[xpSystem]})
+            {/if}
+        </h5>
         <div slot="content">
             <div class="xp">
                 <div class="encounter-difficulty">
                     <div class="difficulty container">
                         <strong class="header">Difficulty</strong>
-                        <span>
-                            {difficulty}
-                        </span>
+                        <span>{difficultyName}</span>
                     </div>
                     <div class="total container">
                         <strong class="header">XP</strong>
-                        <span>
-                            {xp ? xp.toLocaleString() : DEFAULT_UNDEFINED}
-                        </span>
+                        <span>{xp}</span>
                     </div>
                     <div class="adjusted container">
                         <strong class="header">Adjusted</strong>
-                        <span>
-                            {adjXP ? adjXP.toLocaleString() : DEFAULT_UNDEFINED}
-                        </span>
+                        <span>{adjXP}</span>
                     </div>
                 </div>
                 <div class="thresholds">
-                    {#each EXPERIENCE_THRESHOLDS as level}
-                        <div
-                            class="experience-threshold {level.toLowerCase()} container"
-                        >
-                            <strong class="experience-name header"
-                                >{level}</strong
-                            >
-                            <span class="experience-amount">
-                                {$thresholds[level].toLocaleString()} XP
-                            </span>
+                    {#each thresholds as [name, thresholdText]}
+                        <div class="experience-threshold {name.toLowerCase()} container">
+                            <strong class="experience-name header">{name}</strong>
+                            <span class="experience-amount">{thresholdText}</span>
                         </div>
                     {/each}
                 </div>
@@ -98,9 +65,7 @@
             </div>
             <div class="budget">
                 <h5 class="experience-name">Daily budget</h5>
-                <span class="experience-amount">
-                    {$thresholds.Daily.toLocaleString()} XP
-                </span>
+                <span class="experience-amount">{dailyBudget}</span>
             </div>
         </div>
     </Collapsible>

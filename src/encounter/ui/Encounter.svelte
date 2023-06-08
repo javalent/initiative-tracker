@@ -3,12 +3,7 @@
     import { DICE, RANDOM_HP, START_ENCOUNTER } from "src/utils";
 
     import { Creature } from "src/utils/creature";
-    import {
-        DifficultyReport,
-        encounterDifficulty,
-        formatDifficultyReport,
-        getCreatureXP
-    } from "src/utils/encounter-difficulty";
+    import { encounterDifficulty, formatDifficultyReport } from "src/utils/encounter-difficulty";
     import type InitiativeTracker from "src/main";
     import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
     import { tracker } from "src/tracker/stores/tracker";
@@ -41,10 +36,6 @@
             roller.on("new-result", () => {
                 creatureMap.set(creature, roller.result);
                 creatureMap = creatureMap;
-                totalXP = [...creatureMap].reduce(
-                    (a, c) => a + getCreatureXP(plugin, c[0]) * c[1],
-                    0
-                );
             });
             rollerMap.set(creature, roller);
             roller.roll();
@@ -53,20 +44,8 @@
         }
     }
 
-    totalXP = [...creatureMap].reduce(
-        (a, c) => a + getCreatureXP(plugin, c[0]) * c[1],
-        0
-    );
-    let difficulty: DifficultyReport;
-    $: {
-        if (!isNaN(totalXP)) {
-            difficulty = encounterDifficulty(
-                playerLevels,
-                totalXP,
-                [...creatureMap.values()].reduce((acc, curr) => acc + curr, 0)
-            );
-        }
-    }
+    $: difficulty = encounterDifficulty(plugin, playerLevels, creatureMap);
+    $: totalXP = difficulty?.adjustedXp ?? 0;
 
     const openButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon(START_ENCOUNTER);

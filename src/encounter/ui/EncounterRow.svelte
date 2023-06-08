@@ -38,10 +38,6 @@
             roller.on("new-result", () => {
                 creatureMap.set(creature, roller.result);
                 creatureMap = creatureMap;
-                totalXP = [...creatureMap].reduce(
-                    (a, c) => a + c[0].xp * c[1],
-                    0
-                );
             });
             rollerMap.set(creature, roller);
             roller.roll();
@@ -49,17 +45,9 @@
             creatureMap.set(creature, number);
         }
     }
-    totalXP = [...creatureMap].reduce((a, c) => a + c[0].xp * c[1], 0);
-    let difficulty: DifficultyReport;
-    $: {
-        if (!isNaN(totalXP)) {
-            difficulty = encounterDifficulty(
-                playerLevels,
-                totalXP,
-                [...creatureMap.values()].reduce((acc, curr) => acc + curr)
-            );
-        }
-    }
+
+    $: difficulty = encounterDifficulty(plugin, playerLevels, creatureMap);
+    $: totalXP = difficulty?.adjustedXp ?? 0;
 
     const open = (node: HTMLElement) => {
         new ExtraButtonComponent(node)

@@ -11,7 +11,6 @@ import type { SRDMonster } from "obsidian-overload";
 interface BuilderContext {
     plugin: InitiativeTracker;
     playerCount: number;
-    thresholds: ExperienceThreshold;
 }
 declare module "svelte" {
     function setContext<T extends keyof BuilderContext>(

@@ -1,6 +1,5 @@
 import { derived, get, writable } from "svelte/store";
 import type { CreatureState } from "../../../index";
-import { EXPERIENCE_PER_LEVEL } from "../constants";
 
 export const playerCount = writable(0);
 
@@ -39,29 +38,6 @@ function createPlayers() {
         party,
         generics,
         count,
-        thresholds: derived(store, ($players) => {
-            const threshold = {
-                Easy: 0,
-                Medium: 0,
-                Hard: 0,
-                Deadly: 0,
-                Daily: 0
-            };
-            for (const player of $players) {
-                if (!player.level) continue;
-                if (!player.enabled) continue;
-                const level = player.level > 20 ? 20 : player.level;
-                const thresholds = EXPERIENCE_PER_LEVEL[level];
-                if (!thresholds) continue;
-
-                threshold.Easy += thresholds.easy * player.count;
-                threshold.Medium += thresholds.medium * player.count;
-                threshold.Hard += thresholds.hard * player.count;
-                threshold.Deadly += thresholds.deadly * player.count;
-                threshold.Daily += thresholds.daily * player.count;
-            }
-            return threshold;
-        }),
         modifier: derived(count, ($count) =>
             $count < 3 ? 1 : $count > 5 ? -1 : 0
         ),

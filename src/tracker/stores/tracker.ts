@@ -798,8 +798,7 @@ function createTracker() {
                 creatures,
                 (values) => {
                     const players = [];
-                    let xp = 0;
-                    let amount = 0;
+                    const creatureMap = new Map<Creature, number>();
 
                     for (const creature of values) {
                         if (!creature.enabled) continue;
@@ -808,13 +807,22 @@ function createTracker() {
                             players.push(creature.level);
                             continue;
                         }
-                        const creatureXP = creature.getXP(plugin);
-                        if (creatureXP) {
-                            xp += creatureXP;
-                            amount++;
+                        const stats = {
+                            name: creature.name,
+                            display: creature.display,
+                            ac: creature.ac,
+                            hp: creature.hp,
+                            modifier: creature.modifier,
+                            xp: creature.xp
+                        };
+                        const existing = [...creatureMap].find(([c]) => equivalent(c, stats));
+                        if (!existing) {
+                            creatureMap.set(creature, 1);
+                          continue;
                         }
+                        creatureMap.set(existing[0], existing[1] + 1);
                     }
-                    return encounterDifficulty(players, xp, amount);
+                  return encounterDifficulty(plugin, players, creatureMap);
                 }
             )
     };

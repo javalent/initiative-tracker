@@ -48,17 +48,6 @@ export class Creature {
     cr: string | number;
     path: string;
 
-    getXP(plugin: InitiativeTracker) {
-        if (this.xp) return this.xp;
-        if (this.creature.cr) {
-            return XP_PER_CR[this.creature.cr] ?? 0;
-        }
-        const base = plugin.getBaseCreatureFromBestiary(this.name);
-        if (base && base.cr) {
-            return XP_PER_CR[base.cr] ?? 0;
-        }
-    }
-
     constructor(public creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;
         this.display = creature.display;
