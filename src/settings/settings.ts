@@ -23,7 +23,8 @@ import {
     DEFAULT_UNDEFINED,
     EDIT,
     HP,
-    INITIATIVE
+    INITIATIVE,
+    AVAILABLE_XP_SYSTEMS
 } from "../utils";
 import type { Condition, HomebrewCreature, InputValidate, Party } from "index";
 
@@ -535,6 +536,18 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         this.plugin.setBuilderIcon();
                     }
                 );
+            });
+        new Setting(additionalContainer)
+            .setName("XP System")
+            .setDesc("XP system to use for encounters")
+            .addDropdown((d) => {
+                Object.entries(AVAILABLE_XP_SYSTEMS)
+                    .forEach(([key, displayName]) => d.addOption(key, displayName));
+                d.setValue(this.plugin.data.xpSystem ?? "dnd5e");
+                d.onChange(async (v) => {
+                  this.plugin.data.xpSystem = v;
+                  this.plugin.saveSettings();
+                });
             });
 
         const additional = additionalContainer.createDiv("additional");

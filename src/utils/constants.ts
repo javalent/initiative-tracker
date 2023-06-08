@@ -51,6 +51,7 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     },
     hpOverflow: "ignore",
     additiveTemp: false,
+    xpSystem: "dnd5e",
     logging: false,
     logFolder: "/",
     useLegacy: false,
@@ -108,3 +109,7 @@ export const OVERFLOW_TYPE: { [key: string]: string } = {
     current: "current",
     temp: "temp"
 };
+
+export const AVAILABLE_XP_SYSTEMS: Record<string, string> = {
+  dnd5e: "DnD 5e"
+} as const;

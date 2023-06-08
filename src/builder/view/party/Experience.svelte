@@ -8,7 +8,7 @@
     import Collapsible from "./Collapsible.svelte";
 
     const plugin = getContext("plugin");
-    
+
     const open = plugin.data.builder.showXP;
     const { thresholds, modifier: playerModifier } = players;
 

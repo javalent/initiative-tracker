@@ -102,6 +102,7 @@ export interface InitiativeTrackerData {
     parties: Party[];
     defaultParty: string;
 
+    xpSystem: string;
     canUseDiceRoll: boolean;
     initiative: string;
     modifier: string;
