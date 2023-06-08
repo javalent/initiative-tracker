@@ -1,8 +1,8 @@
 import { convertFraction, XP_PER_CR } from "../utils";
 import type InitiativeTracker from "../main";
 import type { Creature } from "./creature";
+import type { SRDMonster } from "index";
 
-const dnd5eXpBudgets = ["easy", "medium", "hard", "deadly", "daily"] as const;
 type Dnd5eXpBudget = {easy: number; medium: number; hard: number; deadly: number; daily: number};
 
 type DifficultyReport = {
@@ -19,7 +19,7 @@ export type Dnd5eDifficultyReport = DifficultyReport & {
     totalXp: number;       // XP prior to adjustment. This is _not_ the final XP value.
     adjustedXp: number;    // Final XP total after sums an adjustments.
     multiplier: number;
-    budget: XpBudget;
+    budget: Dnd5eXpBudget;
 };
 
 export type Dnd5eLazyGmDifficultyReport = DifficultyReport & {
@@ -31,7 +31,7 @@ export type Dnd5eLazyGmDifficultyReport = DifficultyReport & {
 
 export const getCreatureXP = (
     plugin: InitiativeTracker,
-    creature: Creature
+    creature: Creature | SRDMonster
 ) => {
     if (creature.xp) return creature.xp;
     let existing = plugin.bestiary.find((c) => c.name == creature.name);
@@ -41,7 +41,7 @@ export const getCreatureXP = (
     return 0;
 };
 
-const XP_BUDGETS: {
+const DND5E_XP_BUDGETS: {
     [index: number]: Dnd5eXpBudget;
 } = {
     1: { daily: 300, easy: 25, medium: 50, hard: 75, deadly: 100 },
@@ -66,26 +66,17 @@ const XP_BUDGETS: {
     20: { daily: 40000, easy: 2800, medium: 5700, hard: 8500, deadly: 12700 }
 };
 
-function xpBudget(characterLevels: number[]): XpBudget {
-    const budget = {};
-    dnd5eXpBudgets.forEach(name =>
-        budget[name] = characterLevels.reduce((acc, lvl) =>
-            acc + (XP_BUDGETS[lvl][name] ?? 0), 0));
-    return budget
-}
-
-export function formatDifficultyReport(report: DifficultyReport): string {
-    return `${[
-        `Encounter is ${report.difficulty}`,
-        `Total XP: ${report.totalXp}`,
-        `Adjusted XP: ${report.adjustedXp} (x${report.multiplier})`,
-        ` `,
-        `Threshold`,
-        `Easy: ${report.budget.easy}`,
-        `Medium: ${report.budget.medium}`,
-        `Hard: ${report.budget.hard}`,
-        `Deadly: ${report.budget.deadly}`
-    ].join("\n")}`;
+function dnd5eXpBudget(characterLevels: number[]): Dnd5eXpBudget {
+    const budget = {easy: 0, medium: 0, hard: 0, deadly: 0, daily: 0};
+    characterLevels.forEach(lvl => {
+        lvl = Math.max(1, Math.min(lvl, 20));
+        budget.easy += DND5E_XP_BUDGETS[lvl].easy
+        budget.medium += DND5E_XP_BUDGETS[lvl].medium
+        budget.hard += DND5E_XP_BUDGETS[lvl].hard
+        budget.deadly += DND5E_XP_BUDGETS[lvl].deadly
+        budget.daily += DND5E_XP_BUDGETS[lvl].daily
+    });
+    return budget;
 }
 
 function dnd5eLazyGmEncounterDifficulty(
@@ -99,23 +90,24 @@ function dnd5eLazyGmEncounterDifficulty(
     if (crSum == 0 || playerLevelSum == 0) return null;
     let threshold = playerLevelSum / ((playerLevelSum / playerLevels.length) > 4 ? 2 : 4);
     let rawDifficulty = dnd5eEncounterDifficulty(plugin, playerLevels, creatures);
-    let report = {
+    let difficultyName = (crSum > threshold) ? "Deadly" : "Not Deadly";
+    let totalXp = rawDifficulty?.totalXp;
+    return {
         crSum,
         playerLevelSum,
+        totalXp,
         xpSystem: "dnd5eLazyGm",
-        difficulty: (crSum > threshold) ? "Deadly" : "Not Deadly",
+        difficulty: difficultyName,
         difficultyCssClass: (crSum > threshold) ? "deadly" : "easy",
-        totalXp: rawDifficulty?.totalXp,
-        budget: { deadly: threshold }
-    };
-    report.formatted = `Encounter is ${report.difficulty}
-Total XP: ${report.totalXp}
-Sum of CR: ${report.crSum}
-Sum of player levels: ${report.playerLevelSum}
+        budget: { deadly: threshold },
+        formatted: `Encounter is ${difficultyName}
+Total XP: ${totalXp}
+Sum of CR: ${crSum}
+Sum of player levels: ${playerLevelSum}
 
 Threshold
-Deadly: ${threshold}`;
-    return report;
+Deadly: ${threshold}`
+    };
 }
 
 function dnd5eEncounterDifficulty(
@@ -143,7 +135,7 @@ function dnd5eEncounterDifficulty(
         numberMultiplier = 4.0;
     }
     const adjustedXp = numberMultiplier * xp;
-    const budget = xpBudget(playerLevels);
+    const budget = dnd5eXpBudget(playerLevels);
     let difficulty = "Trivial";
     if (adjustedXp >= budget.deadly) {
         difficulty = "Deadly";
