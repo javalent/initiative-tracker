@@ -1,0 +1,52 @@
+import { DEFAULT_UNDEFINED } from "../constants";
+import type { GenericCreature, DifficultyLevel, DifficultyThreshold } from "./index";
+
+export abstract class RpgSystem {
+  /** The display name of the RPG system, used in the UI. */
+  displayName: string = DEFAULT_UNDEFINED;
+
+  /** The unit that difficulty values are expressed in, eg "XP". Used for formatting values. */
+  valueUnit: string = "XP";
+
+  /** Returns information related to the difficulty of a creature relative to the given players. */
+  getCreatureDifficulty(
+    creature: GenericCreature,
+    playerLevels: number[]
+  ): number {
+    return 0;
+  }
+
+  /** Returns information related to the difficulty of the encounter relative to the given players. */
+  getEncounterDifficulty(
+    creatures: Map<GenericCreature, number>,
+    playerLevels: number[]
+  ) : DifficultyLevel {
+    return {
+      displayName: DEFAULT_UNDEFINED,
+      cssClass: "",
+      value: 0,
+      title: "Total XP",
+      summary: DEFAULT_UNDEFINED,
+      intermediateValues: []
+    };
+  }
+
+  /** Returns an array of difficulty thresholds in ascending order. */
+  getDifficultyThresholds(playerLevels: number[]): DifficultyThreshold[] {
+    return [];
+  }
+
+  /** Returns the given difficulty value formatted with system-appropriate units, eg "800 XP". */
+  formatDifficultyValue(value: number): string {
+    return isNaN(value)
+        ? DEFAULT_UNDEFINED : `${value.toLocaleString()} ${this.valueUnit}`;
+  }
+
+  /**
+   * Returns an array of any additional budgets which should be displayed,
+   * but not taken into account when calculating the difficulty tier.
+   */
+  getAdditionalDifficultyBudgets(playerLevels: number[]): DifficultyThreshold[] {
+    return []
+  }
+}

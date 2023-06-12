@@ -5,8 +5,8 @@
         convertFraction,
         DEFAULT_UNDEFINED,
         FRIENDLY,
-        HIDDEN,
-        XP_PER_CR
+        getRpgSystem,
+        HIDDEN
     } from "src/utils";
     import { encounter } from "../../stores/encounter";
     import Nullable from "../Nullable.svelte";
@@ -17,6 +17,7 @@
     const { average } = players;
 
     const plugin = getContext("plugin");
+    const rpgSystem = getRpgSystem(plugin);
     const remove = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon("minus-circle");
     };
@@ -128,13 +129,7 @@
     </div>
     <div class="encounter-creature-context">
         <span>
-            <Nullable
-                str={`${
-                    creature.xp ??
-                    XP_PER_CR[creature.cr]?.toLocaleString() ??
-                    DEFAULT_UNDEFINED
-                } XP`}
-            />
+            <Nullable str={rpgSystem.formatDifficultyValue(creature.xp)} />
         </span>
     </div>
     <div class="encounter-creature-controls">

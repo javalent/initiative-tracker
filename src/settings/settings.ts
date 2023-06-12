@@ -23,9 +23,9 @@ import {
     DEFAULT_UNDEFINED,
     EDIT,
     HP,
-    INITIATIVE,
-    AVAILABLE_XP_SYSTEMS
+    INITIATIVE
 } from "../utils";
+import { RpgSystemSetting, getRpgSystem } from "../utils/rpg-system";
 import type { Condition, HomebrewCreature, InputValidate, Party } from "index";
 
 export default class InitiativeTrackerSettings extends PluginSettingTab {
@@ -541,11 +541,11 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             .setName("XP System")
             .setDesc("XP system to use for encounters")
             .addDropdown((d) => {
-                Object.entries(AVAILABLE_XP_SYSTEMS)
-                    .forEach(([key, displayName]) => d.addOption(key, displayName));
-                d.setValue(this.plugin.data.xpSystem ?? "dnd5e");
+                Object.values(RpgSystemSetting)
+                  .forEach(system => d.addOption(system, getRpgSystem(this.plugin, system).displayName));
+                d.setValue(this.plugin.data.rpgSystem ?? RpgSystemSetting.Dnd5e);
                 d.onChange(async (v) => {
-                  this.plugin.data.xpSystem = v;
+                  this.plugin.data.rpgSystem = v;
                   this.plugin.saveSettings();
                 });
             });

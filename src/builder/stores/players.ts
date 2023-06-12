@@ -16,7 +16,7 @@ interface GenericPlayer extends Partial<CreatureState> {
     enabled: boolean;
     count: number;
 }
-type CombinedPlayer = Player | GenericPlayer;
+export type CombinedPlayer = Player | GenericPlayer;
 
 function createPlayers() {
     const store = writable<CombinedPlayer[]>([]);

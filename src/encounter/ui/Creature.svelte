@@ -1,11 +1,12 @@
 <script lang="ts">
     import { setIcon } from "obsidian";
     import type InitiativeTracker from "src/main";
-    import { FRIENDLY, HIDDEN, RANDOM_HP } from "src/utils";
+    import { FRIENDLY, HIDDEN, RANDOM_HP, getRpgSystem } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import { getContext } from "svelte/internal";
 
     const plugin = getContext<InitiativeTracker>("plugin");
+    const rpgSystem = getRpgSystem(plugin);
 
     export let creature: Creature;
     export let count: string | number;
@@ -45,13 +46,8 @@
         <span class="xp-parent">
             <span class="paren left">&nbsp;(</span>
             <span class="xp-container">
-                {#if plugin.data.xpSystem != "dnd5eLazyGm"}
-                  <span class="xp number">{xp}</span>
-                  <span class="xp text">XP</span>
-                {:else}
-                  <span class="xp number">{creature.cr}</span>
-                  <span class="xp text">CR</span>
-                {/if}
+                <span class="xp number">{xp}</span>
+                <span class="xp text">{rpgSystem.valueUnit}</span>
             </span>
             <span class="paren right">)</span>
         </span>

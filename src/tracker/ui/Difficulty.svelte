@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { isDnd5e, isDnd5eLazyGm } from "src/utils/encounter-difficulty";
     import { tweened } from "svelte/motion";
     import { cubicOut } from "svelte/easing";
     import { getContext } from "svelte";
@@ -17,25 +16,16 @@
         easing: cubicOut
     });
 
-    let report: string = "";
     $: {
-        if (isDnd5e) {
-          difficultyBar.set(
-            ($dif.adjustedXp / $dif.budget.deadly > 0)
-              ? 1 : $dif.adjustedXp / $dif.budget.deadly);
-          report = difficulty.formatted;
-        } else if ("deadly" in $dif.budget) {
-          difficultyBar.set(
-            ($dif.totalXp / $dif.budget.deadly > 0)
-              ? 1 : $dif.totalXp / $dif.budget.deadly);
-        }
-        if ($dif) {
-            report = $dif.formatted;
+        if ($dif.thresholds.last()) {
+            difficultyBar.set(
+                Math.min($dif.difficulty.value / $dif.thresholds.last().minValue, 1));
         }
     }
+    $: summary = $dif.difficulty.summary;
 </script>
 
-<div class="difficulty-bar-container" aria-label={report}>
+<div class="difficulty-bar-container" aria-label={summary}>
     <span>Easy</span>
     <span
         ><meter

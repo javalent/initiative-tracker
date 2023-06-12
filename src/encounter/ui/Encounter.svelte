@@ -1,9 +1,8 @@
 <script lang="ts">
     import { ExtraButtonComponent, setIcon } from "obsidian";
-    import { DICE, RANDOM_HP, START_ENCOUNTER } from "src/utils";
+    import { getRpgSystem, DICE, RANDOM_HP, START_ENCOUNTER } from "src/utils";
 
     import { Creature } from "src/utils/creature";
-    import { encounterDifficulty } from "src/utils/encounter-difficulty";
     import type InitiativeTracker from "src/main";
     import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
     import { tracker } from "src/tracker/stores/tracker";
@@ -25,9 +24,9 @@
 
     export let playerLevels: number[];
 
-    let totalXP: number;
     let creatureMap: Map<Creature, number> = new Map();
     const rollerMap: Map<Creature, StackRoller> = new Map();
+    const rpgSystem = getRpgSystem(plugin);
 
     for (let [creature, count] of creatures) {
         let number: number = Number(count);
@@ -44,12 +43,7 @@
         }
     }
 
-    $: difficulty = encounterDifficulty(plugin, playerLevels, creatureMap);
-    $: {
-      if (difficulty) {
-        totalXP = difficulty.xpSystem == "dnd5e" ? difficulty.adjustedXp : difficulty.totalXp;
-      }
-    }
+    $: difficulty = rpgSystem.getEncounterDifficulty(creatureMap, playerLevels);
 
     const openButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon(START_ENCOUNTER);
@@ -200,7 +194,7 @@
                             >
                                 <CreatureComponent
                                     {creature}
-                                    xp={creature.xp * creatureMap.get(creature)}
+                                    xp={rpgSystem.getCreatureDifficulty(creature, playerLevels)}
                                     shouldShowRoll={!allRolling && rollHP}
                                     {count}
                                 >
@@ -221,16 +215,16 @@
             <div class="encounter-xp difficulty">
                 {#if difficulty}
                     <span
-                        aria-label={difficulty.formatted}
-                        class={difficulty.difficultyCssClass}
+                        aria-label={difficulty.summary}
+                        class={difficulty.cssClass}
                     >
-                      <strong class="difficulty-label">{difficulty.difficulty}</strong>
+                      <strong class="difficulty-label">{difficulty.displayName}</strong>
                       <span class="xp-parent difficulty">
                           <span class="paren left">(</span>
                           <span class="xp-container">
-                              {#if totalXP > 0}
-                                  <span class="xp number">{totalXP}</span>
-                                  <span class="xp text">XP</span>
+                              {#if difficulty.value > 0}
+                                  <span class="xp number">{difficulty.value}</span>
+                                  <span class="xp text">{rpgSystem.valueUnit}</span>
                               {/if}
                           </span>
                           <span class="paren right">)</span>

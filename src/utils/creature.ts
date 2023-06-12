@@ -4,7 +4,7 @@ import type {
     HomebrewCreature,
     SRDMonster
 } from "index";
-import { Conditions, XP_PER_CR } from ".";
+import { Conditions } from ".";
 import { DEFAULT_UNDEFINED } from "./constants";
 import type InitiativeTracker from "src/main";
 
@@ -80,11 +80,8 @@ export class Creature {
         this.note = creature.note;
         this.path = creature.path;
 
-        if ("xp" in creature) {
-            this.xp = creature.xp;
-        } else if ("cr" in creature) {
-            this.xp = XP_PER_CR[`${creature.cr}`];
-        }
+        this.xp = creature.xp;
+
         this.cr = creature.cr;
         this.id = creature.id ?? getId();
         if ("statblock-link" in creature) {

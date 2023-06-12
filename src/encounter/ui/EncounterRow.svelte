@@ -3,10 +3,9 @@
 
     import type InitiativeTracker from "src/main";
     import { tracker } from "src/tracker/stores/tracker";
-    import { RANDOM_HP, START_ENCOUNTER } from "src/utils";
+    import { DEFAULT_UNDEFINED, getRpgSystem, RANDOM_HP, START_ENCOUNTER } from "src/utils";
     import { Creature } from "src/utils/creature";
     import CreatureComponent from "./Creature.svelte";
-    import { encounterDifficulty } from "src/utils/encounter-difficulty";
 
     import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
     import { setContext } from "svelte";
@@ -23,9 +22,9 @@
     export let headers: string[];
     export let rollHP: boolean = plugin.data.rollHP;
 
-    let totalXP: number;
     let creatureMap: Map<Creature, number> = new Map();
     const rollerMap: Map<Creature, StackRoller> = new Map();
+    const rpgSystem = getRpgSystem(plugin);
 
     for (let [creature, count] of creatures) {
         let number: number = Number(count);
@@ -42,12 +41,7 @@
         }
     }
 
-    $: difficulty = encounterDifficulty(plugin, playerLevels, creatureMap);
-    $: {
-      if (difficulty) {
-        totalXP = difficulty.xpSystem == "dnd5e" ? difficulty.adjustedXp : difficulty.totalXp;
-      }
-    }
+    $: difficulty = rpgSystem.getEncounterDifficulty(creatureMap, playerLevels);
 
     const open = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
@@ -156,7 +150,7 @@
                         <li aria-label={label(creature)}>
                             <CreatureComponent
                                 {creature}
-                                xp={creature.xp * creatureMap.get(creature)}
+                                xp={rpgSystem.getCreatureDifficulty(creature, playerLevels)}
                                 shouldShowRoll={rollHP}
                                 {count}
                             >
@@ -191,17 +185,17 @@
     {#if plugin.data.displayDifficulty}
         <td>
             <div class="encounter-xp difficulty">
-                {#if difficulty}
+                {#if difficulty.value}
                     <span
-                        aria-label={difficulty.formatted}
-                        class={difficulty.difficultyCssClass}
+                        aria-label={difficulty.summary}
+                        class={difficulty.cssClass}
                     >
                         <strong class="difficulty-label">
-                            {difficulty.difficulty}
+                            {difficulty.displayName}
                         </strong>
                     </span>
                 {:else}
-                    -
+                    {DEFAULT_UNDEFINED}
                 {/if}
             </div>
         </td>

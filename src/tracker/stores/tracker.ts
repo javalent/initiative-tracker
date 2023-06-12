@@ -1,4 +1,4 @@
-import { Creature, getId } from "../../utils/creature";
+import { Creature, getId } from "src/utils/creature";
 import type InitiativeTracker from "../../main";
 import { derived, get, Updater, Writable, writable } from "svelte/store";
 import { equivalent } from "../../encounter";
@@ -10,12 +10,9 @@ import type {
     UpdateLogMessage
 } from "../../../index";
 import type { StackRoller } from "obsidian-overload";
-import { OVERFLOW_TYPE } from "../../utils";
+import { OVERFLOW_TYPE, getRpgSystem } from "src/utils";
 import type Logger from "../../logger/logger";
-import {
-    DifficultyReport,
-    encounterDifficulty
-} from "src/utils/encounter-difficulty";
+import type { DifficultyLevel, DifficultyThreshold } from "src/utils/rpg-system";
 
 type HPUpdate = {
     saved: boolean;
@@ -794,11 +791,12 @@ function createTracker() {
         updateState: () => update((c) => c),
 
         difficulty: (plugin: InitiativeTracker) =>
-            derived<Writable<Creature[]>, DifficultyReport>(
+            derived<Writable<Creature[]>, {difficulty: DifficultyLevel, thresholds: DifficultyThreshold[]}>(
                 creatures,
                 (values) => {
-                    const players = [];
+                    const players: number[] = [];
                     const creatureMap = new Map<Creature, number>();
+                    const rpgSystem = getRpgSystem(plugin);
 
                     for (const creature of values) {
                         if (!creature.enabled) continue;
@@ -823,7 +821,10 @@ function createTracker() {
                         }
                         creatureMap.set(existing[0], existing[1] + 1);
                     }
-                  return encounterDifficulty(plugin, players, creatureMap);
+                  return {
+                    difficulty: rpgSystem.getEncounterDifficulty(creatureMap, players),
+                    thresholds: rpgSystem.getDifficultyThresholds(players)
+                  };
                 }
             )
     };

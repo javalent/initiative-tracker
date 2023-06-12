@@ -1,43 +1,17 @@
 <script lang="ts">
     import { encounter } from "../../stores/encounter";
     import { players } from "../../stores/players";
-    import { DEFAULT_UNDEFINED, AVAILABLE_XP_SYSTEMS } from "src/utils";
-    import { encounterDifficulty, isDnd5e, isDnd5eLazyGm } from "src/utils/encounter-difficulty";
+    import { RpgSystemSetting, getRpgSystem } from "src/utils";
     import { getContext } from "svelte";
     import Collapsible from "./Collapsible.svelte";
 
     const plugin = getContext("plugin");
 
     const open = plugin.data.builder.showXP;
-    const xpSystem = plugin.data.xpSystem;
+    const rpgSystem = getRpgSystem(plugin);
 
-    $: difficulty = encounterDifficulty(
-        plugin,
-        $players.filter(player => player.level && player.enabled)
-                .map(player => Math.min(player.level, 20)),
-        $encounter);
-
-    let xp: string;
-    $: {
-      if (!difficulty) {
-        xp = DEFAULT_UNDEFINED;
-      } else if (isDnd5e(difficulty)) {
-        xp = difficulty.adjustedXp.toLocaleString();
-      } else {
-        xp = difficulty.totalXp.toLocaleString();
-      }
-    }
-
-    let thresholds: [string, string][] = [];
-    $: {
-        if (isDnd5e(difficulty)) {
-            thresholds = Object.entries(difficulty?.budget ?? {})
-                               .filter(([name]) => name != "daily")
-                               .map(([name, minXP]) => [name, minXP.toLocaleString() + " XP"]);
-        } else if (isDnd5eLazyGm(difficulty)) {
-            thresholds = [["deadly", difficulty.budget.deadly.toLocaleString() + " CR"]];
-        }
-    }
+    $: playerLevels = $players.filter(p => p.enabled).map(p => p.level)
+    $: difficulty = rpgSystem.getEncounterDifficulty($encounter, playerLevels)
 </script>
 
 <div class="xp-container">
@@ -48,8 +22,8 @@
     >
         <h5 slot="title">
             Experience
-            {#if xpSystem != "dnd5e"}
-                ({AVAILABLE_XP_SYSTEMS[xpSystem]})
+            {#if plugin.data.rpgSystem != RpgSystemSetting.Dnd5e}
+                ({rpgSystem.displayName})
             {/if}
         </h5>
         <div slot="content">
@@ -57,52 +31,41 @@
                 <div class="encounter-difficulty">
                     <div class="difficulty container">
                         <strong class="header">Difficulty</strong>
-                        <span>{difficulty?.difficulty ?? DEFAULT_UNDEFINED}</span>
+                        <span>{difficulty.displayName}</span>
                     </div>
+                    {#each difficulty.intermediateValues as [title, text]}
+                        <div class="adjusted container">
+                            <strong class="header">{title}</strong>
+                            <span>{text}</span>
+                        </div>
+                    {/each}
                     <div class="total container">
-                        <strong class="header">XP</strong>
-                        <span>{xp}</span>
+                        <strong class="header">{difficulty.title}</strong>
+                        <span>{difficulty.value.toLocaleString()}</span>
                     </div>
-                    {#if xpSystem == "dnd5e"}
-                        <div class="adjusted container">
-                            <strong class="header">Adjusted</strong>
-                            <span>
-                                {isDnd5e(difficulty)
-                                 ? difficulty.adjustedXp.toLocaleString()
-                                : DEFAULT_UNDEFINED}
-                            </span>
-                        </div>
-                    {:else if xpSystem == "dnd5eLazyGm"}
-                        <div class="adjusted container">
-                            <strong class="header">CR</strong>
-                            <span>
-                                {isDnd5eLazyGm(difficulty)
-                                 ? difficulty.crSum.toLocaleString()
-                                : DEFAULT_UNDEFINED}
-                            </span>
-                        </div>
-                    {/if}
                 </div>
                 <div class="thresholds">
-                    {#each thresholds as [name, thresholdText]}
-                        <div class="experience-threshold {name.toLowerCase()} container">
-                            <strong class="experience-name header">{name}</strong>
-                            <span class="experience-amount">{thresholdText}</span>
+                    {#each rpgSystem.getDifficultyThresholds(playerLevels) as budget}
+                        <div class="experience-threshold {budget.displayName.toLowerCase()} container">
+                            <strong class="experience-name header">
+                                {budget.displayName}
+                            </strong>
+                            <span class="experience-amount">
+                                {rpgSystem.formatDifficultyValue(budget.minValue)}
+                            </span>
                         </div>
                     {/each}
                 </div>
                 <br />
             </div>
-            {#if xpSystem == "dnd5e"}
             <div class="budget">
-                <h5 class="experience-name">Daily budget</h5>
-                <span class="experience-amount">
-                    {isDnd5e(difficulty)
-                      ? difficulty.budget.daily.toLocaleString()
-                      : DEFAULT_UNDEFINED} XP
-                </span>
+                {#each rpgSystem.getAdditionalDifficultyBudgets(playerLevels) as budget}
+                    <h5 class="experience-name">{budget.displayName}</h5>
+                    <span class="experience-amount">
+                        {rpgSystem.formatDifficultyValue(budget.minValue)}
+                    </span>
+                {/each}
             </div>
-            {/if}
         </div>
     </Collapsible>
 </div>
