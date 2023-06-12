@@ -33,7 +33,8 @@ export class Dnd5eLazyGmRpgSystem extends RpgSystem {
 
   getDifficultyThresholds(playerLevels: number[]): DifficultyThreshold[] {
       const totalLevels = playerLevels.reduce((acc, lv) => acc + lv, 0);
-      const avgLevel = totalLevels / playerLevels.length;
+      const avgLevel = playerLevels.length > 0
+          ? totalLevels / playerLevels.length : 0;
       return [{
           displayName: "Deadly",
           minValue: totalLevels / (avgLevel > 4 ? 2 : 4)
