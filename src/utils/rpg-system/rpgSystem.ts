@@ -40,8 +40,8 @@ export abstract class RpgSystem {
   formatDifficultyValue(value: number, withUnits?: boolean): string {
     if (isNaN(value)) return DEFAULT_UNDEFINED;
     return withUnits
-        ? value.toLocaleString()
-        : `${value.toLocaleString()} ${this.valueUnit}`;
+        ? `${value.toLocaleString()} ${this.valueUnit}`
+        : value.toLocaleString();
   }
 
   /**
