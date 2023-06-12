@@ -129,7 +129,7 @@
     </div>
     <div class="encounter-creature-context">
         <span>
-            <Nullable str={rpgSystem.formatDifficultyValue(creature.xp)} />
+            <Nullable str={rpgSystem.formatDifficultyValue(creature.xp, true)} />
         </span>
     </div>
     <div class="encounter-creature-controls">

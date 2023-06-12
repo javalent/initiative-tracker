@@ -19,7 +19,7 @@
         {/if}
         {#if $dif?.difficulty?.value > 0}
             <span class="initiative-tracker-xp encounter-xp"
-                >{$dif?.difficulty?.value} {rpgSystem.valueUnit}</span
+                >{rpgSystem.formatDifficultyValue($dif?.difficulty?.value, true)}</span
             >
         {/if}
     </div>

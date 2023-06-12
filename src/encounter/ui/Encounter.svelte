@@ -223,7 +223,7 @@
                           <span class="paren left">(</span>
                           <span class="xp-container">
                               {#if difficulty.value > 0}
-                                  <span class="xp number">{difficulty.value}</span>
+                                  <span class="xp number">{rpgSystem.formatDifficultyValue(difficulty.value)}</span>
                                   <span class="xp text">{rpgSystem.valueUnit}</span>
                               {/if}
                           </span>

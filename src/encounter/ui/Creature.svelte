@@ -46,7 +46,7 @@
         <span class="xp-parent">
             <span class="paren left">&nbsp;(</span>
             <span class="xp-container">
-                <span class="xp number">{xp}</span>
+                <span class="xp number">{rpgSystem.formatDifficultyValue(xp)}</span>
                 <span class="xp text">{rpgSystem.valueUnit}</span>
             </span>
             <span class="paren right">)</span>

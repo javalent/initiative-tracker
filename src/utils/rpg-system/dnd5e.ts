@@ -1,6 +1,6 @@
 import type InitiativeTracker from "src/main";
 import { RpgSystem } from "./rpgSystem";
-import type { DifficultyLevel, GenericCreature, DifficultyThreshold } from "./index";
+import type { DifficultyLevel, GenericCreature, DifficultyThreshold } from ".";
 
 const XP_THRESHOLDS_PER_LEVEL: { [level: number]: { [threshold: string]: number} } = {
     1:  { daily: 300, easy: 25, medium: 50, hard: 75, deadly: 100 },
@@ -110,7 +110,7 @@ Threshold
       cssClass: displayName.toLowerCase(),
       value: adjustedXp,
       title: "Adjusted XP",
-      intermediateValues: [["Total XP", creatureXp.toLocaleString()]],
+      intermediateValues: [{label: "Total XP", value: creatureXp}],
     };
   }
 

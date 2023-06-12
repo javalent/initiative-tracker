@@ -2,6 +2,7 @@ import type { Creature } from "../creature";
 import type { SRDMonster } from "../../../index";
 import type InitiativeTracker from "../../main";
 import { Dnd5eRpgSystem } from "./dnd5e";
+import { Dnd5eLazyGmRpgSystem } from "./dnd5e-lazygm";
 import { RpgSystem } from "./rpgSystem";
 
 export type GenericCreature = Creature | SRDMonster;
@@ -34,7 +35,7 @@ export type DifficultyLevel = {
    */
   summary: string,
   /** Any intermediate values involved in the calculation that should be displayed */
-  intermediateValues: [string, string][]
+  intermediateValues: {label: string, value: number}[]
 };
 
 export type DifficultyThreshold = {
@@ -44,8 +45,11 @@ export type DifficultyThreshold = {
   minValue: number
 }
 
+export type IntermediateValues = { label: string, value: number }[]
+
 export enum RpgSystemSetting {
-  Dnd5e = "dnd5e"
+  Dnd5e = "dnd5e",
+  Dnd5eLazyGm = "dnd5e-lazygm"
 }
 
 
@@ -58,6 +62,7 @@ class UndefinedRpgSystem extends RpgSystem {}
 export function getRpgSystem(plugin: InitiativeTracker, settingId?: string): RpgSystem {
   switch (settingId ? settingId : plugin.data.rpgSystem) {
     case RpgSystemSetting.Dnd5e: return new Dnd5eRpgSystem(plugin);
+    case RpgSystemSetting.Dnd5eLazyGm: return new Dnd5eLazyGmRpgSystem(plugin);
   }
   return new UndefinedRpgSystem();
 }

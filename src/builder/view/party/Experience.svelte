@@ -33,15 +33,15 @@
                         <strong class="header">Difficulty</strong>
                         <span>{difficulty.displayName}</span>
                     </div>
-                    {#each difficulty.intermediateValues as [title, text]}
+                    {#each difficulty.intermediateValues as intermediate}
                         <div class="adjusted container">
-                            <strong class="header">{title}</strong>
-                            <span>{text}</span>
+                            <strong class="header">{intermediate.label}</strong>
+                            <span>{intermediate.value.toLocaleString()}</span>
                         </div>
                     {/each}
                     <div class="total container">
                         <strong class="header">{difficulty.title}</strong>
-                        <span>{difficulty.value.toLocaleString()}</span>
+                        <span>{rpgSystem.formatDifficultyValue(difficulty.value)}</span>
                     </div>
                 </div>
                 <div class="thresholds">
@@ -51,7 +51,7 @@
                                 {budget.displayName}
                             </strong>
                             <span class="experience-amount">
-                                {rpgSystem.formatDifficultyValue(budget.minValue)}
+                                {rpgSystem.formatDifficultyValue(budget.minValue, true)}
                             </span>
                         </div>
                     {/each}
@@ -62,7 +62,7 @@
                 {#each rpgSystem.getAdditionalDifficultyBudgets(playerLevels) as budget}
                     <h5 class="experience-name">{budget.displayName}</h5>
                     <span class="experience-amount">
-                        {rpgSystem.formatDifficultyValue(budget.minValue)}
+                        {rpgSystem.formatDifficultyValue(budget.minValue, true)}
                     </span>
                 {/each}
             </div>

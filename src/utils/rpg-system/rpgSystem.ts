@@ -37,9 +37,11 @@ export abstract class RpgSystem {
   }
 
   /** Returns the given difficulty value formatted with system-appropriate units, eg "800 XP". */
-  formatDifficultyValue(value: number): string {
-    return isNaN(value)
-        ? DEFAULT_UNDEFINED : `${value.toLocaleString()} ${this.valueUnit}`;
+  formatDifficultyValue(value: number, withUnits?: boolean): string {
+    if (isNaN(value)) return DEFAULT_UNDEFINED;
+    return withUnits
+        ? value.toLocaleString()
+        : `${value.toLocaleString()} ${this.valueUnit}`;
   }
 
   /**
