@@ -1,3 +1,7 @@
+import type InitiativeTracker from "src/main";
+import type { SRDMonster } from "index";
+import type { Creature } from "./creature";
+
 export * from "./constants";
 export * from "./icons";
 export * from "./conditions";
@@ -17,3 +21,13 @@ export const convertFraction = (s: string | number): number => {
     }
     return Number(split[0]) / Number(split[1]);
 };
+
+export function getFromCreatureOrBeastiary<T>(
+    plugin: InitiativeTracker,
+    creature: Creature | SRDMonster,
+    getter: (creature: Creature | SRDMonster | null) => T
+): T {
+    const fromBase = getter(creature);
+    if (fromBase) return fromBase;
+    return getter(plugin.bestiary.find(c => c.name == creature.name));
+}

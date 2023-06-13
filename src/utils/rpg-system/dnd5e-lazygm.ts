@@ -1,6 +1,6 @@
 import type InitiativeTracker from "src/main";
 import type { DifficultyLevel, GenericCreature, DifficultyThreshold } from ".";
-import { DEFAULT_UNDEFINED, convertFraction } from "src/utils";
+import { DEFAULT_UNDEFINED, convertFraction, getFromCreatureOrBeastiary } from "src/utils";
 import { RpgSystem } from "./rpgSystem";
 import { Dnd5eRpgSystem } from "./dnd5e";
 
@@ -25,10 +25,7 @@ export class Dnd5eLazyGmRpgSystem extends RpgSystem {
   }
 
   getCreatureDifficulty(creature: GenericCreature, _: number[]): number {
-      if (creature.cr) return convertFraction(creature.cr);
-      const existing = this.plugin.bestiary.find(c => c.name == creature.name); 
-      if (existing && existing.cr) return convertFraction(existing.cr);
-      return 0;
+      return convertFraction(getFromCreatureOrBeastiary(this.plugin, creature, c => c.cr));
   }
 
   getDifficultyThresholds(playerLevels: number[]): DifficultyThreshold[] {

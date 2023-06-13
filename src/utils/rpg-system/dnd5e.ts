@@ -1,6 +1,7 @@
-import type InitiativeTracker from "src/main";
 import { RpgSystem } from "./rpgSystem";
-import type { DifficultyLevel, GenericCreature, DifficultyThreshold } from ".";
+import { getFromCreatureOrBeastiary } from "..";
+import type InitiativeTracker from "src/main";
+import type { DifficultyLevel, GenericCreature, DifficultyThreshold, CreatureDifficulty } from ".";
 
 const XP_THRESHOLDS_PER_LEVEL: { [level: number]: { [threshold: string]: number} } = {
     1:  { daily: 300, easy: 25, medium: 50, hard: 75, deadly: 100 },
@@ -76,7 +77,8 @@ export class Dnd5eRpgSystem extends RpgSystem {
 
   getCreatureDifficulty(
       creature: GenericCreature,
-      playerLevels: number[]): number {
+      playerLevels: number[]
+  ): number {
     if (playerLevels.length == 0) return 0;
     return this.#getCreatureXp(creature) * playerLevels.length;
   }
@@ -143,12 +145,10 @@ Threshold
   }
 
   #getCreatureXp(creature: GenericCreature): number {
-    if (creature.xp) return creature.xp;
-    const existing = this.plugin.bestiary.find((c) => c.name == creature.name); 
-    if (existing && existing.cr && existing.cr in XP_PER_CR) {
-      return XP_PER_CR[existing.cr];
-    }
-    return 0;
+    const xp = getFromCreatureOrBeastiary(this.plugin, creature, c => c.xp);
+    if (xp) return xp;
+    const cr = getFromCreatureOrBeastiary(this.plugin, creature, c => c.cr);
+    return XP_PER_CR[cr] ?? 0;
   }
 
   #getXpMult(creatureCount: number) {
