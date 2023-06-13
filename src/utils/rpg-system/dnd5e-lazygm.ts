@@ -30,7 +30,7 @@ export class Dnd5eLazyGmRpgSystem extends RpgSystem {
   }
 
   getDifficultyThresholds(playerLevels: number[]): DifficultyThreshold[] {
-      const totalLevels = playerLevels.reduce((acc, lv) => acc + lv, 0);
+      const totalLevels = playerLevels.reduce((acc, lv) => acc + lv);
       const avgLevel = playerLevels.length > 0
           ? totalLevels / playerLevels.length : 0;
       return [{
@@ -48,15 +48,13 @@ export class Dnd5eLazyGmRpgSystem extends RpgSystem {
     const deadlyThreshold = this.getDifficultyThresholds(playerLevels)
         .first()?.minValue ?? 0;
     const displayName = crSum > deadlyThreshold ? "Deadly" : "Not Deadly";
-    // Get XP totals from the Dnd5e system. Use the intermediate value so we get
-    // non-adjusted XP.
     const xp = [...creatures].reduce((acc, [creature, count]) =>
         acc + this.dnd5eRpgSystem.getCreatureDifficulty(creature) * count, 0);
 
     const summary = `Encounter is ${displayName}
 Total XP: ${xp}
 Total CR: ${crSum}
-Total player levels: ${playerLevels.reduce((acc, lv) => acc + lv, 0)}
+Total levels: ${playerLevels.reduce((acc, lv) => acc + lv)}
 Deadly Threshold: ${deadlyThreshold}`;
 
     return {
