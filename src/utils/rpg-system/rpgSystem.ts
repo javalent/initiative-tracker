@@ -16,6 +16,14 @@ export abstract class RpgSystem {
     return 0;
   }
 
+  /** Returns additional information related to the difficulty of a creature relative to the given players. */
+  getAdditionalCreatureDifficultyStats(
+    creature: GenericCreature,
+    playerLevels: number[]
+  ): string[] {
+    return [];
+  }
+
   /** Returns information related to the difficulty of the encounter relative to the given players. */
   getEncounterDifficulty(
     creatures: Map<GenericCreature, number>,

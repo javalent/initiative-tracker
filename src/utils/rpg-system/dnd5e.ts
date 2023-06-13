@@ -1,7 +1,7 @@
 import { RpgSystem } from "./rpgSystem";
-import { getFromCreatureOrBeastiary } from "..";
+import { crToString, getFromCreatureOrBestiary } from "..";
 import type InitiativeTracker from "src/main";
-import type { DifficultyLevel, GenericCreature, DifficultyThreshold, CreatureDifficulty } from ".";
+import type { DifficultyLevel, GenericCreature, DifficultyThreshold } from ".";
 
 const XP_THRESHOLDS_PER_LEVEL: { [level: number]: { [threshold: string]: number} } = {
     1:  { daily: 300, easy: 25, medium: 50, hard: 75, deadly: 100 },
@@ -75,36 +75,49 @@ export class Dnd5eRpgSystem extends RpgSystem {
     this.displayName = "DnD 5e";
   }
 
-  getCreatureDifficulty(
+  getCreatureDifficulty(creature: GenericCreature, _?: number[]): number {
+    const xp = getFromCreatureOrBestiary(this.plugin, creature, c => c?.xp ?? 0);
+    if (xp) return xp;
+    const cr = getFromCreatureOrBestiary(this.plugin, creature, c => c?.cr ?? "0");
+    return XP_PER_CR[cr] ?? 0;
+  }
+
+  getAdditionalCreatureDifficultyStats(
       creature: GenericCreature,
-      playerLevels: number[]
-  ): number {
-    if (playerLevels.length == 0) return 0;
-    return this.#getCreatureXp(creature) * playerLevels.length;
+      _?: number[]
+  ): string[] {
+      const cr = getFromCreatureOrBestiary(
+          this.plugin, creature, c => c?.cr ?? 0);
+      return [`${crToString(cr)} CR`];
   }
 
   getEncounterDifficulty(
-      creatures: Map<GenericCreature, number>,
-      playerLevels: number[]) : DifficultyLevel {
-
+    creatures: Map<GenericCreature, number>,
+    playerLevels: number[]
+  ) : DifficultyLevel {
     const creatureXp = [...creatures].reduce(
-      (acc, [creature, count]) => acc + this.#getCreatureXp(creature) * count, 0);
+      (acc, [creature, count]) => acc + this.getCreatureDifficulty(creature) * count, 0);
     const creatureCount = [...creatures.values()].reduce((acc, cur) => acc + cur, 0);
     const mult = this.#getXpMult(creatureCount);
-    const adjustedXp = (playerLevels.length == 0 || creatureXp == 0 || creatureCount == 0)
+    const adjustedXp = (playerLevels.length == 0 || creatureCount == 0)
       ? 0 : creatureXp * mult;
 
     const thresholds = this.getDifficultyThresholds(playerLevels);
     const displayName = thresholds
       .reverse()  // Should now be in descending order
-      .find(threshold => adjustedXp >= threshold.minValue)?.displayName ?? "Trivial";
+      .find(threshold => adjustedXp >= threshold.minValue)?.displayName
+      ?? "Trivial";
+
+    const thresholdSummary = thresholds
+      .map(threshold => `${threshold.displayName}: ${threshold.minValue}`)
+      .join("\n");
 
     const summary = `Encounter is ${displayName}
 Total XP: ${creatureXp}
 Adjusted XP: ${adjustedXp} (x${mult})
 
 Threshold
-` + thresholds.map(threshold => `${threshold.displayName}: ${threshold.minValue}`).join("\n");
+${thresholdSummary}`;
 
     return {
       displayName,
@@ -125,7 +138,8 @@ Threshold
     };
     const clampedLevels = playerLevels.map(lv => Math.max(1, Math.min(lv, 20)));
     Object.keys(budget).forEach(key => {
-      budget[key] += clampedLevels.reduce((acc, lv) => acc + XP_THRESHOLDS_PER_LEVEL[lv][key], 0);
+      budget[key] += clampedLevels.reduce(
+        (acc, lv) => acc + XP_THRESHOLDS_PER_LEVEL[lv][key], 0);
     });
     return Object.entries(budget)
       .map(([name, value]) => ({
@@ -142,13 +156,6 @@ Threshold
         (acc, lv) => acc + XP_THRESHOLDS_PER_LEVEL[Math.max(1, Math.min(lv, 20))].daily,
         0)
     }];
-  }
-
-  #getCreatureXp(creature: GenericCreature): number {
-    const xp = getFromCreatureOrBeastiary(this.plugin, creature, c => c.xp);
-    if (xp) return xp;
-    const cr = getFromCreatureOrBeastiary(this.plugin, creature, c => c.cr);
-    return XP_PER_CR[cr] ?? 0;
   }
 
   #getXpMult(creatureCount: number) {

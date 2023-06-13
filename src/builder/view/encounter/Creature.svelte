@@ -3,7 +3,6 @@
     import { ExtraButtonComponent, setIcon } from "obsidian";
     import {
         convertFraction,
-        DEFAULT_UNDEFINED,
         FRIENDLY,
         getRpgSystem,
         HIDDEN
@@ -42,19 +41,6 @@
 
     export let count: number;
     export let creature: SRDMonster;
-    const convertedCR = (cr: string | number) => {
-        if (cr == undefined) return DEFAULT_UNDEFINED;
-        if (cr == "1/8") {
-            return "⅛";
-        }
-        if (cr == "1/4") {
-            return "¼";
-        }
-        if (cr == "1/2") {
-            return "½";
-        }
-        return cr;
-    };
     $: insignificant =
         "cr" in creature &&
         creature.cr &&
@@ -63,6 +49,8 @@
         "cr" in creature &&
         creature.cr &&
         convertFraction(creature.cr) > $average + 3;
+
+    $: playerLevels = $players.filter(p => p.enabled).map(p => p.level);
 
     const baby = (node: HTMLElement) => setIcon(node, "baby");
 
@@ -122,14 +110,14 @@
             />
         {/if}
     </div>
+    {#each rpgSystem.getAdditionalCreatureDifficultyStats(creature, playerLevels) as stat}
+        <div class="encounter-creature-context">
+            <span>{stat}</span>
+        </div>
+    {/each}
     <div class="encounter-creature-context">
         <span>
-            <Nullable str={`${convertedCR(creature.cr)} CR`} />
-        </span>
-    </div>
-    <div class="encounter-creature-context">
-        <span>
-            <Nullable str={rpgSystem.formatDifficultyValue(creature.xp, true)} />
+            <Nullable str={rpgSystem.formatDifficultyValue(rpgSystem.getCreatureDifficulty(creature, playerLevels), true)} />
         </span>
     </div>
     <div class="encounter-creature-controls">

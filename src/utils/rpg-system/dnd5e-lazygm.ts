@@ -1,31 +1,32 @@
 import type InitiativeTracker from "src/main";
 import type { DifficultyLevel, GenericCreature, DifficultyThreshold } from ".";
-import { DEFAULT_UNDEFINED, convertFraction, getFromCreatureOrBeastiary } from "src/utils";
+import { DEFAULT_UNDEFINED, convertFraction, crToString, getFromCreatureOrBestiary } from "src/utils";
 import { RpgSystem } from "./rpgSystem";
 import { Dnd5eRpgSystem } from "./dnd5e";
 
-const DECIMAL_TO_VULGAR_FRACTION: Record<string, string> = {
-    0.125: "⅛",
-    0.25: "¼",
-    0.375: "⅜",
-    0.5: "½",
-    0.625: "⅝",
-    0.75: "¾",
-    0.875: "⅞",
-} as const;
-
 export class Dnd5eLazyGmRpgSystem extends RpgSystem {
     plugin: InitiativeTracker;
+    dnd5eRpgSystem: Dnd5eRpgSystem;
 
   constructor(plugin: InitiativeTracker) {
       super();
       this.plugin = plugin;
       this.valueUnit = "CR";
       this.displayName = "DnD 5e Lazy GM";
+      this.dnd5eRpgSystem = new Dnd5eRpgSystem(plugin);
   }
 
-  getCreatureDifficulty(creature: GenericCreature, _: number[]): number {
-      return convertFraction(getFromCreatureOrBeastiary(this.plugin, creature, c => c.cr));
+  getCreatureDifficulty(creature: GenericCreature, _?: number[]): number {
+      return convertFraction(
+          getFromCreatureOrBestiary(this.plugin, creature, c => c?.cr ?? 0));
+  }
+
+  getAdditionalCreatureDifficultyStats(
+    creature: GenericCreature,
+    _?: number[]
+  ): string[] {
+      const xp = this.dnd5eRpgSystem.getCreatureDifficulty(creature);
+      return [this.dnd5eRpgSystem.formatDifficultyValue(xp, true)];
   }
 
   getDifficultyThresholds(playerLevels: number[]): DifficultyThreshold[] {
@@ -43,17 +44,14 @@ export class Dnd5eLazyGmRpgSystem extends RpgSystem {
     playerLevels: number[]
   ): DifficultyLevel {
     const crSum = [...creatures].reduce((acc, [creature, count]) =>
-      acc + this.getCreatureDifficulty(creature, playerLevels) * count, 0);
+        acc + this.getCreatureDifficulty(creature) * count, 0);
     const deadlyThreshold = this.getDifficultyThresholds(playerLevels)
         .first()?.minValue ?? 0;
     const displayName = crSum > deadlyThreshold ? "Deadly" : "Not Deadly";
     // Get XP totals from the Dnd5e system. Use the intermediate value so we get
     // non-adjusted XP.
-    const xp = new Dnd5eRpgSystem(this.plugin)
-      .getEncounterDifficulty(creatures, playerLevels)
-      .intermediateValues
-      .find(intermediate => intermediate.label == "Total XP")
-      ?.value ?? 0;
+    const xp = [...creatures].reduce((acc, [creature, count]) =>
+        acc + this.dnd5eRpgSystem.getCreatureDifficulty(creature) * count, 0);
 
     const summary = `Encounter is ${displayName}
 Total XP: ${xp}
@@ -73,18 +71,6 @@ Deadly Threshold: ${deadlyThreshold}`;
 
   formatDifficultyValue(value: number, withUnits?: boolean): string {
     if (!value) return DEFAULT_UNDEFINED;
-    console.log(value);
-    const decimalPart = value % 1;
-    const wholePart = Math.floor(value);
-    let fractionString = "";
-    if (decimalPart != 0 && decimalPart in DECIMAL_TO_VULGAR_FRACTION) {
-        fractionString = DECIMAL_TO_VULGAR_FRACTION[decimalPart];
-    } else {
-        fractionString = value.toString().slice(1);
-    }
-
-    const numString = (wholePart == 0 ? "" : wholePart.toString())
-        + fractionString;
-    return withUnits ? `CR ${numString}` : numString;
+    return crToString(value) + (withUnits ? " CR" : "");
   }
 }
