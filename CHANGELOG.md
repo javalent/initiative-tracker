@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [11.2.0](https://github.com/javalent/initiative-tracker/compare/11.1.7...11.2.0) (2023-06-28)
+
+
+### Features
+
+* Adds the Lazy GM additional difficulty calculation method + a scaffold for future difficulty methods. ([2c39c7b](https://github.com/javalent/initiative-tracker/commit/2c39c7b29e84d7ec7193887474783ace3c206c91))
+
 ## [11.1.7](https://github.com/javalent/initiative-tracker/compare/11.1.6...11.1.7) (2023-05-24)
 
 
