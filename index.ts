@@ -102,6 +102,7 @@ export interface InitiativeTrackerData {
     parties: Party[];
     defaultParty: string;
 
+    rpgSystem: string;
     canUseDiceRoll: boolean;
     initiative: string;
     modifier: string;
@@ -245,14 +246,6 @@ export interface BuilderGenericPlayer {
 
 export type BuilderPlayer = BuilderPartyPlayer | BuilderGenericPlayer;
 
-export interface ExperienceThreshold {
-    Easy: number;
-    Medium: number;
-    Hard: number;
-    Deadly: number;
-    Daily: number;
-}
-
 import type InitiativeTracker from "src/main";
 export declare function getId(): string;
 export declare class Creature {
@@ -280,7 +273,6 @@ export declare class Creature {
     display: string;
     friendly: boolean;
     "statblock-link": string;
-    getXP(plugin: InitiativeTracker): number;
     constructor(creature: HomebrewCreature, initiative?: number);
     get hpDisplay(): string;
     get initiative(): number;

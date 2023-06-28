@@ -2,10 +2,12 @@
     import { getContext } from "svelte/internal";
     import { tracker } from "../stores/tracker";
     import Difficulty from "./Difficulty.svelte";
+    import { getRpgSystem } from "src/utils";
 
     const { state, name, round, party, difficulty } = tracker;
 
     const plugin = getContext("plugin");
+    const rpgSystem = getRpgSystem(plugin);
 
     const dif = difficulty(plugin);
 </script>
@@ -15,9 +17,9 @@
         {#if $name && $name.length}
             <h2 class="initiative-tracker-name">{$name}</h2>
         {/if}
-        {#if $dif?.totalXp > 0}
+        {#if $dif?.difficulty?.value > 0}
             <span class="initiative-tracker-xp encounter-xp"
-                >{$dif?.totalXp} XP</span
+                >{rpgSystem.formatDifficultyValue($dif?.difficulty?.value, true)}</span
             >
         {/if}
     </div>

@@ -25,6 +25,7 @@ import {
     HP,
     INITIATIVE
 } from "../utils";
+import { RpgSystemSetting, getRpgSystem } from "../utils/rpg-system";
 import type { Condition, HomebrewCreature, InputValidate, Party } from "index";
 
 export default class InitiativeTrackerSettings extends PluginSettingTab {
@@ -535,6 +536,18 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         this.plugin.setBuilderIcon();
                     }
                 );
+            });
+        new Setting(additionalContainer)
+            .setName("XP System")
+            .setDesc("XP system to use for encounters")
+            .addDropdown((d) => {
+                Object.values(RpgSystemSetting)
+                  .forEach(system => d.addOption(system, getRpgSystem(this.plugin, system).displayName));
+                d.setValue(this.plugin.data.rpgSystem ?? RpgSystemSetting.Dnd5e);
+                d.onChange(async (v) => {
+                  this.plugin.data.rpgSystem = v;
+                  this.plugin.saveSettings();
+                });
             });
 
         const additional = additionalContainer.createDiv("additional");

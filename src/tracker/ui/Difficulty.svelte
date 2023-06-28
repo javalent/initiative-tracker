@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { formatDifficultyReport } from "src/utils/encounter-difficulty";
     import { tweened } from "svelte/motion";
     import { cubicOut } from "svelte/easing";
     import { getContext } from "svelte";
@@ -17,20 +16,16 @@
         easing: cubicOut
     });
 
-    let report: string = "";
     $: {
-        if ($dif) {
-            let progress =
-                $dif.adjustedXp / $dif.budget.deadly > 1
-                    ? 1
-                    : $dif.adjustedXp / $dif.budget.deadly;
-            difficultyBar.set(progress);
-            report = formatDifficultyReport($dif);
+        if ($dif.thresholds.last()) {
+            difficultyBar.set(
+                Math.min($dif.difficulty.value / $dif.thresholds.last().minValue, 1));
         }
     }
+    $: summary = $dif.difficulty.summary;
 </script>
 
-<div class="difficulty-bar-container" aria-label={report}>
+<div class="difficulty-bar-container" aria-label={summary}>
     <span>Easy</span>
     <span
         ><meter
