@@ -54,7 +54,7 @@ export class PF2eRpgSystem extends RpgSystem {
 		this.plugin = plugin
 		this.displayName = 'Pathfinder 2e'
 	}
-	getCreatureLevel(creature: GenericCreature, playerLevels?: number[]): number {
+	getCreatureDifficulty(creature: GenericCreature, playerLevels?: number[]): number {
 		const lvl = getFromCreatureOrBestiary(
 			this.plugin,
 			creature,
