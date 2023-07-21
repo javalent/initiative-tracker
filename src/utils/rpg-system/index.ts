@@ -11,7 +11,7 @@ export type GenericCreature = Creature | SRDMonster;
 export type DifficultyLevel = {
   /** Name of the difficulty level, eg "trivial". Used to display the difficulty level in encounters. */
   displayName: string,
-  /** The CSS class to apply when formatting the display name. Should map to DnD 5e thresholds (low, easy, medium, hard, extreme) 
+  /** The CSS class to apply when formatting the display name. Should map to DnD 5e thresholds (low, easy, medium, hard, extreme) + trivial
    *  so systems do not have have their own custom styling.
    */
   cssClass: string,
