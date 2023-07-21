@@ -70,7 +70,7 @@ export class PF2eRpgSystem extends RpgSystem {
 			this.plugin,
 			creature,
 			(c) => c?.level
-		).split(' ').slice(-1)
+		)?.split(' ').slice(-1)
 		if (lvl == null || lvl == undefined) return 0
 		const partyLvl = playerLevels?.length ?? 0 > 0 ?  playerLevels.reduce((a, b) => a + b) / playerLevels.length : 0
 
