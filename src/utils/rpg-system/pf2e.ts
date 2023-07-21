@@ -54,8 +54,17 @@ const PF2E_DND5E_DIFFICULTY_MAPPING: Record<string, string> = {
 	'extreme': 'deadly'
 }
 
-export class PF2eRpgSystem extends RpgSystem {
+export class PF2eRpgSystem extends RpgSystem {	
 	plugin: InitiativeTracker
+
+	public override SystemDifficulties: string[] = [
+		"Trivial",
+		"Low",
+		"Moderate",
+		"Severe",
+		"Extreme"
+	]
+
 	constructor(plugin: InitiativeTracker) {
 		super()
 		this.plugin = plugin
