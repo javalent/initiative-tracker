@@ -46,6 +46,14 @@ const XP_SIMPLE_HAZARD_DIFFERENCES: Record<string, number> = {
 	'4': 32,
 }
 
+const PF2E_DND5E_DIFFICULTY_MAPPING: Record<string, string> = {
+	'trivial': 'easy', //nothing to map to
+	'low': 'easy',
+	'moderate': 'medium',
+	'severe': 'hard',
+	'extreme': 'deadly'
+}
+
 export class PF2eRpgSystem extends RpgSystem {
 	plugin: InitiativeTracker
 	constructor(plugin: InitiativeTracker) {
@@ -53,6 +61,7 @@ export class PF2eRpgSystem extends RpgSystem {
 		this.plugin = plugin
 		this.displayName = 'Pathfinder 2e'
 	}
+
 	getCreatureDifficulty(
 		creature: GenericCreature,
 		playerLevels?: number[]
@@ -62,13 +71,10 @@ export class PF2eRpgSystem extends RpgSystem {
 			creature,
 			(c) => c?.level
 		)
-		if (lvl) return lvl ?? 0
+		if (lvl == null || lvl == undefined) return 0
 
 		const creature_differences = String(
-			-(
-				getFromCreatureOrBestiary(this.plugin, playerLevels, (p) => p?.level) -
-				lvl
-			)
+			lvl - playerLevels.reduce((a, b) => a + b) / playerLevels.length
 		)
 
 		return XP_CREATURE_DIFFERENCES[creature_differences] ?? 0
@@ -84,7 +90,7 @@ export class PF2eRpgSystem extends RpgSystem {
 			extreme: Math.floor(budget * 2),
 		}
 		return Object.entries(encounterBudget).map(([name, value]) => ({
-			displayName: (name.charAt(0).toUpperCase()),
+			displayName: name.charAt(0).toUpperCase() + name.slice(1),
 			minValue: value
 		})).sort((a, b) => a.minValue - b.minValue)
 	}
@@ -100,7 +106,7 @@ export class PF2eRpgSystem extends RpgSystem {
 		)
 
 		const thresholds = this.getDifficultyThresholds(playerLevels)
-		const displayName = thresholds.reverse().find(threshold => threshold.minValue)?.displayName ?? "Trivial"
+		const displayName = thresholds.find(threshold => creatureXp <= threshold.minValue)?.displayName ?? "Trivial"
 		const thresholdSummary = thresholds.map((threshold) => `${threshold.displayName}: ${threshold.minValue}`).join('\n')
 		const summary = `Encounter is ${displayName}
     Total XP: ${creatureXp}
@@ -110,7 +116,7 @@ export class PF2eRpgSystem extends RpgSystem {
 		return {
 			displayName,
 			summary,
-			cssClass: displayName.toLowerCase(),
+			cssClass: PF2E_DND5E_DIFFICULTY_MAPPING[displayName.toLowerCase()] ?? "easy",
 			value: 0,
 			title: "Adjusted XP",
 			intermediateValues: [{ label: "Total XP", value: creatureXp }],
