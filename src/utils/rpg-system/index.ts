@@ -3,6 +3,7 @@ import type { SRDMonster } from "../../../index";
 import type InitiativeTracker from "../../main";
 import { Dnd5eRpgSystem } from "./dnd5e";
 import { Dnd5eLazyGmRpgSystem } from "./dnd5e-lazygm";
+import { PF2eRpgSystem } from "./pf2e"
 import { RpgSystem } from "./rpgSystem";
 
 export type GenericCreature = Creature | SRDMonster;
@@ -49,7 +50,8 @@ export type IntermediateValues = { label: string, value: number }[]
 
 export enum RpgSystemSetting {
   Dnd5e = "dnd5e",
-  Dnd5eLazyGm = "dnd5e-lazygm"
+  Dnd5eLazyGm = "dnd5e-lazygm",
+  Pathfinder2e = "pathfinder2e"
 }
 
 
@@ -63,6 +65,7 @@ export function getRpgSystem(plugin: InitiativeTracker, settingId?: string): Rpg
   switch (settingId ? settingId : plugin.data.rpgSystem) {
     case RpgSystemSetting.Dnd5e: return new Dnd5eRpgSystem(plugin);
     case RpgSystemSetting.Dnd5eLazyGm: return new Dnd5eLazyGmRpgSystem(plugin);
+    case RpgSystemSetting.Pathfinder2e: return new PF2eRpgSystem(plugin);
   }
   return new UndefinedRpgSystem();
 }
