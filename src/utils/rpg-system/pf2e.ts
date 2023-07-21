@@ -82,11 +82,11 @@ export class PF2eRpgSystem extends RpgSystem {
 			moderate: budget,
 			severe: Math.floor(budget * 1.5),
 			extreme: Math.floor(budget * 2),
-    }
-    return Object.entries(encounterBudget).map(([name, value]) => ({
-      displayName: (name.charAt(0).toUpperCase()),
-      minValue: value
-    })).sort((a,b)=> a.minValue - b.minValue)
+		}
+		return Object.entries(encounterBudget).map(([name, value]) => ({
+			displayName: (name.charAt(0).toUpperCase()),
+			minValue: value
+		})).sort((a, b) => a.minValue - b.minValue)
 	}
 
 	getEncounterDifficulty(
@@ -97,23 +97,23 @@ export class PF2eRpgSystem extends RpgSystem {
 			(acc, [creature, count]) =>
 				acc + this.getCreatureDifficulty(creature) + count,
 			0
-    )
-    
-    const thresholds = this.getDifficultyThresholds(playerLevels)
-    const displayName = thresholds.reverse().find(threshold => threshold.minValue)?.displayName ?? "Trivial"
-    const thresholdSummary = thresholds.map((threshold) => `${threshold.displayName}: ${threshold.minValue}`).join('\n')
-    const summary = `Encounter is ${displayName}
+		)
+
+		const thresholds = this.getDifficultyThresholds(playerLevels)
+		const displayName = thresholds.reverse().find(threshold => threshold.minValue)?.displayName ?? "Trivial"
+		const thresholdSummary = thresholds.map((threshold) => `${threshold.displayName}: ${threshold.minValue}`).join('\n')
+		const summary = `Encounter is ${displayName}
     Total XP: ${creatureXp}
     Threshold
     ${thresholdSummary}`;
 
-    return {
-      displayName,
-      summary,
-      cssClass: displayName.toLowerCase(),
-      value: 0,
-      title: "Adjusted XP",
-      intermediateValues: [{label: "Total XP", value: creatureXp}],
-    };
+		return {
+			displayName,
+			summary,
+			cssClass: displayName.toLowerCase(),
+			value: 0,
+			title: "Adjusted XP",
+			intermediateValues: [{ label: "Total XP", value: creatureXp }],
+		};
 	}
 }
