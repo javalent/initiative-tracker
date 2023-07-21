@@ -1,7 +1,7 @@
 import { RpgSystem } from './rpgSystem'
 import { crToString, getFromCreatureOrBestiary } from '..'
 import type { DifficultyLevel, GenericCreature, DifficultyThreshold } from '.'
-import InitiativeTracker from '../../main'
+import type InitiativeTracker from '../../main'
 
 // level without proficiency variant
 // const xpVariantCreatureDifferences = new Map([
@@ -47,7 +47,7 @@ const XP_SIMPLE_HAZARD_DIFFERENCES: Record<string, number> = {
 }
 
 const PF2E_DND5E_DIFFICULTY_MAPPING: Record<string, string> = {
-	'trivial': 'easy', //nothing to map to
+	'trivial': 'trivial',
 	'low': 'easy',
 	'moderate': 'medium',
 	'severe': 'hard',
@@ -70,11 +70,12 @@ export class PF2eRpgSystem extends RpgSystem {
 			this.plugin,
 			creature,
 			(c) => c?.level
-		)
+		).split(' ').slice(-1)
 		if (lvl == null || lvl == undefined) return 0
+		const partyLvl = playerLevels?.length ?? 0 > 0 ?  playerLevels.reduce((a, b) => a + b) / playerLevels.length : 0
 
 		const creature_differences = String(
-			lvl - playerLevels.reduce((a, b) => a + b) / playerLevels.length
+			lvl - partyLvl
 		)
 
 		return XP_CREATURE_DIFFERENCES[creature_differences] ?? 0
@@ -101,7 +102,7 @@ export class PF2eRpgSystem extends RpgSystem {
 	): DifficultyLevel {
 		const creatureXp = [...creatures].reduce(
 			(acc, [creature, count]) =>
-				acc + this.getCreatureDifficulty(creature) + count,
+				acc + this.getCreatureDifficulty(creature, playerLevels) * count,
 			0
 		)
 
@@ -116,8 +117,8 @@ export class PF2eRpgSystem extends RpgSystem {
 		return {
 			displayName,
 			summary,
-			cssClass: PF2E_DND5E_DIFFICULTY_MAPPING[displayName.toLowerCase()] ?? "easy",
-			value: 0,
+			cssClass: PF2E_DND5E_DIFFICULTY_MAPPING[displayName.toLowerCase()] ?? "trivial",
+			value: creatureXp,
 			title: "Adjusted XP",
 			intermediateValues: [{ label: "Total XP", value: creatureXp }],
 		};
