@@ -54,10 +54,10 @@ const PF2E_DND5E_DIFFICULTY_MAPPING: Record<string, string> = {
 	'extreme': 'deadly'
 }
 
-export class PF2eRpgSystem extends RpgSystem {	
+export class Pathfinder2eRpgSystem extends RpgSystem {	
 	plugin: InitiativeTracker
 
-	public override SystemDifficulties: string[] = [
+	override systemDifficulties: [string, string, ...string[]] = [
 		"Trivial",
 		"Low",
 		"Moderate",
@@ -79,7 +79,7 @@ export class PF2eRpgSystem extends RpgSystem {
 			this.plugin,
 			creature,
 			(c) => c?.level
-		)?.split(' ').slice(-1)
+		)?.toString().split(' ').slice(-1)
 		if (lvl == null || lvl == undefined) return 0
 		const partyLvl = playerLevels?.length ?? 0 > 0 ?  playerLevels.reduce((a, b) => a + b) / playerLevels.length : 0
 
@@ -128,7 +128,7 @@ export class PF2eRpgSystem extends RpgSystem {
 			summary,
 			cssClass: PF2E_DND5E_DIFFICULTY_MAPPING[displayName.toLowerCase()] ?? "trivial",
 			value: creatureXp,
-			title: "Adjusted XP",
+			title: "Total XP",
 			intermediateValues: [{ label: "Total XP", value: creatureXp }],
 		};
 	}
