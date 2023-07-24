@@ -221,6 +221,9 @@
     .easy .difficulty-label {
         color: green;
     }
+    .trivial .difficulty-label {
+        color: #AAAAAA;
+    }
     .icons {
         display: flex;
     }

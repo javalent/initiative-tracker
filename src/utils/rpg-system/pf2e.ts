@@ -1,7 +1,7 @@
 import { RpgSystem } from './rpgSystem'
 import { crToString, getFromCreatureOrBestiary } from '..'
 import type { DifficultyLevel, GenericCreature, DifficultyThreshold } from '.'
-import InitiativeTracker from '../../main'
+import type InitiativeTracker from '../../main'
 
 // level without proficiency variant
 // const xpVariantCreatureDifferences = new Map([
@@ -46,13 +46,31 @@ const XP_SIMPLE_HAZARD_DIFFERENCES: Record<string, number> = {
 	'4': 32,
 }
 
-export class PF2eRpgSystem extends RpgSystem {
+const PF2E_DND5E_DIFFICULTY_MAPPING: Record<string, string> = {
+	'trivial': 'trivial',
+	'low': 'easy',
+	'moderate': 'medium',
+	'severe': 'hard',
+	'extreme': 'deadly'
+}
+
+export class Pathfinder2eRpgSystem extends RpgSystem {	
 	plugin: InitiativeTracker
+
+	override systemDifficulties: [string, string, ...string[]] = [
+		"Trivial",
+		"Low",
+		"Moderate",
+		"Severe",
+		"Extreme"
+	]
+
 	constructor(plugin: InitiativeTracker) {
 		super()
 		this.plugin = plugin
 		this.displayName = 'Pathfinder 2e'
 	}
+
 	getCreatureDifficulty(
 		creature: GenericCreature,
 		playerLevels?: number[]
@@ -61,14 +79,12 @@ export class PF2eRpgSystem extends RpgSystem {
 			this.plugin,
 			creature,
 			(c) => c?.level
-		)
-		if (lvl) return lvl ?? 0
+		)?.toString().split(' ').slice(-1)
+		if (lvl == null || lvl == undefined) return 0
+		const partyLvl = playerLevels?.length ?? 0 > 0 ?  playerLevels.reduce((a, b) => a + b) / playerLevels.length : 0
 
 		const creature_differences = String(
-			-(
-				getFromCreatureOrBestiary(this.plugin, playerLevels, (p) => p?.level) -
-				lvl
-			)
+			lvl - partyLvl
 		)
 
 		return XP_CREATURE_DIFFERENCES[creature_differences] ?? 0
@@ -82,11 +98,11 @@ export class PF2eRpgSystem extends RpgSystem {
 			moderate: budget,
 			severe: Math.floor(budget * 1.5),
 			extreme: Math.floor(budget * 2),
-    }
-    return Object.entries(encounterBudget).map(([name, value]) => ({
-      displayName: (name.charAt(0).toUpperCase()),
-      minValue: value
-    })).sort((a,b)=> a.minValue - b.minValue)
+		}
+		return Object.entries(encounterBudget).map(([name, value]) => ({
+			displayName: name.charAt(0).toUpperCase() + name.slice(1),
+			minValue: value
+		})).sort((a, b) => a.minValue - b.minValue)
 	}
 
 	getEncounterDifficulty(
@@ -95,25 +111,25 @@ export class PF2eRpgSystem extends RpgSystem {
 	): DifficultyLevel {
 		const creatureXp = [...creatures].reduce(
 			(acc, [creature, count]) =>
-				acc + this.getCreatureDifficulty(creature) + count,
+				acc + this.getCreatureDifficulty(creature, playerLevels) * count,
 			0
-    )
-    
-    const thresholds = this.getDifficultyThresholds(playerLevels)
-    const displayName = thresholds.reverse().find(threshold => threshold.minValue)?.displayName ?? "Trivial"
-    const thresholdSummary = thresholds.map((threshold) => `${threshold.displayName}: ${threshold.minValue}`).join('\n')
-    const summary = `Encounter is ${displayName}
+		)
+
+		const thresholds = this.getDifficultyThresholds(playerLevels)
+		const displayName = thresholds.find(threshold => creatureXp <= threshold.minValue)?.displayName ?? "Trivial"
+		const thresholdSummary = thresholds.map((threshold) => `${threshold.displayName}: ${threshold.minValue}`).join('\n')
+		const summary = `Encounter is ${displayName}
     Total XP: ${creatureXp}
     Threshold
     ${thresholdSummary}`;
 
-    return {
-      displayName,
-      summary,
-      cssClass: displayName.toLowerCase(),
-      value: 0,
-      title: "Adjusted XP",
-      intermediateValues: [{label: "Total XP", value: creatureXp}],
-    };
+		return {
+			displayName,
+			summary,
+			cssClass: PF2E_DND5E_DIFFICULTY_MAPPING[displayName.toLowerCase()] ?? "trivial",
+			value: creatureXp,
+			title: "Total XP",
+			intermediateValues: [{ label: "Total XP", value: creatureXp }],
+		};
 	}
 }

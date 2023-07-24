@@ -69,6 +69,13 @@ const XP_PER_CR: Record<string, number> = {
 export class Dnd5eRpgSystem extends RpgSystem {
   plugin: InitiativeTracker;
 
+  override systemDifficulties: [string, string, ...string[]] = [
+		"Easy",
+		"Medium",
+		"Hard",
+		"Deadly"
+	]
+
   constructor(plugin: InitiativeTracker) {
     super();
     this.plugin = plugin;

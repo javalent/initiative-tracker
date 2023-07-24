@@ -2,6 +2,8 @@
     import { tweened } from "svelte/motion";
     import { cubicOut } from "svelte/easing";
     import { getContext } from "svelte";
+    import { getRpgSystem } from "src/utils"
+    import type { RpgSystem } from "src/utils/rpg-system/rpgSystem";
     import type InitiativeTracker from "src/main";
 
     import { tracker } from "../stores/tracker";
@@ -10,6 +12,8 @@
     const plugin: InitiativeTracker = getContext("plugin");
 
     const dif = difficulty(plugin);
+
+    const rpgSystem: RpgSystem = getRpgSystem(plugin);
 
     const difficultyBar = tweened(0, {
         duration: 400,
@@ -26,7 +30,7 @@
 </script>
 
 <div class="difficulty-bar-container" aria-label={summary}>
-    <span>Easy</span>
+    <span>{rpgSystem.SystemDifficulties[0]}</span>
     <span
         ><meter
             class="difficulty-bar"
@@ -37,7 +41,7 @@
             value={$difficultyBar}
         /></span
     >
-    <span>Deadly</span>
+    <span>{rpgSystem.SystemDifficulties.slice(-1)}</span>
 </div>
 
 <style>
