@@ -13,6 +13,11 @@ export class Dnd5eLazyGmRpgSystem extends RpgSystem {
     plugin: InitiativeTracker;
     dnd5eRpgSystem: Dnd5eRpgSystem;
 
+    override systemDifficulties: [string, string, ...string[]] = [
+		"Not Deadly",
+		"Deadly"
+	]
+
     constructor(plugin: InitiativeTracker) {
         super();
         this.plugin = plugin;
