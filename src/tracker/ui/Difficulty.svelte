@@ -30,7 +30,7 @@
 </script>
 
 <div class="difficulty-bar-container" aria-label={summary}>
-    <span>{rpgSystem.SystemDifficulties[0]}</span>
+    <span>{rpgSystem.systemDifficulties[0]}</span>
     <span
         ><meter
             class="difficulty-bar"
@@ -41,7 +41,7 @@
             value={$difficultyBar}
         /></span
     >
-    <span>{rpgSystem.SystemDifficulties.slice(-1)}</span>
+    <span>{rpgSystem.systemDifficulties.slice(-1)}</span>
 </div>
 
 <style>
