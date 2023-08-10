@@ -11,7 +11,7 @@ import {
     BASE,
     CREATURE,
     CREATURE_TRACKER_VIEW,
-    INTIATIVE_TRACKER_VIEW
+    INITIATIVE_TRACKER_VIEW
 } from "../utils";
 
 import type InitiativeTracker from "../main";
@@ -39,10 +39,9 @@ export default class TrackerView extends ItemView {
             }
         });
         this.ui.$on("player-view", () => this.openPlayerView());
-        this.ui.$on("open-map", () => this.openInitiativeView());
     }
     getViewType() {
-        return INTIATIVE_TRACKER_VIEW;
+        return INITIATIVE_TRACKER_VIEW;
     }
     getDisplayText() {
         return "Initiative Tracker";
@@ -58,9 +57,7 @@ export default class TrackerView extends ItemView {
     get npcs(): Creature[] {
         return [];
     }
-    openInitiativeView() {
-        this.plugin.leaflet.openInitiativeView(this.pcs, this.npcs);
-    }
+
 
     //open player view
     playerViewOpened = false;

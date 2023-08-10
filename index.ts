@@ -107,7 +107,6 @@ export interface InitiativeTrackerData {
     initiative: string;
     modifier: string;
     sync: boolean;
-    leafletIntegration: boolean;
     playerMarker: string;
     monsterMarker: string;
     state: InitiativeViewState;

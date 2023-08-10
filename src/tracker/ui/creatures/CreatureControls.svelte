@@ -5,7 +5,6 @@
         ENABLE,
         HIDDEN,
         HP,
-        MAPMARKER,
         REMOVE,
         TAG
     } from "src/utils";
@@ -96,28 +95,6 @@
                                 creature,
                                 change: { enabled: true }
                             });
-                        });
-                });
-            }
-            if (plugin.data.leafletIntegration) {
-                menu.addItem((item) => {
-                    item.setIcon(MAPMARKER)
-                        .setTitle("Change Marker")
-                        .onClick((evt: MouseEvent) => {
-                            const markerMenu = new Menu();
-                            markerMenu.setNoIcon();
-                            for (let marker of plugin.leaflet.markerIcons) {
-                                markerMenu.addItem((item) => {
-                                    item.setTitle(marker.type);
-                                    item.onClick(() => {
-                                        tracker.updateCreatures({
-                                            creature,
-                                            change: { marker: marker.type }
-                                        });
-                                    });
-                                });
-                            }
-                            markerMenu.showAtMouseEvent(evt);
                         });
                 });
             }
