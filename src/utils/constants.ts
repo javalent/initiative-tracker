@@ -2,7 +2,7 @@ import type { InitiativeTrackerData } from "index";
 import { Platform } from "obsidian";
 import { Conditions } from "./conditions";
 
-export const INTIATIVE_TRACKER_VIEW = "initiative-tracker-view";
+export const INITIATIVE_TRACKER_VIEW = "initiative-tracker-view";
 export const PLAYER_VIEW_VIEW = "initiative-tracker-player-view";
 export const CREATURE_TRACKER_VIEW = "initiative-tracker-creature-view";
 
@@ -24,7 +24,6 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     initiative: "1d20 + %mod%",
     modifier: null,
     sync: false,
-    leafletIntegration: false,
     playerMarker: "default",
     monsterMarker: "default",
     state: {
@@ -61,7 +60,7 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
         showParty: true,
         showXP: true,
         sidebarIcon: true
-    }
+    },
 };
 
 

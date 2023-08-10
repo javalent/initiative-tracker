@@ -135,7 +135,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         new Setting(containerEl)
             .setName("Display Beginner Tips")
             .setDesc(
-                "Display instructions in the intiative tracker, helping you get used to the workflow."
+                "Display instructions in the initiative tracker, helping you get used to the workflow."
             )
             .addToggle((t) => {
                 t.setValue(this.plugin.data.beginnerTips).onChange(
@@ -1034,110 +1034,6 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 };
             });
-        new Setting(containerEl)
-            .setName("Integrate with Obsidian Leaflet")
-            .setDesc(
-                createFragment((e) => {
-                    e.createSpan({
-                        text: "Integrate with the Obsidian Leaflet plugin and display combats on a map."
-                    });
-
-                    if (!this.plugin.canUseLeaflet) {
-                        e.createEl("br");
-                        e.createEl("br");
-                        e.createSpan({
-                            attr: {
-                                style: `color: var(--text-error);`
-                            },
-                            text: "Requires  "
-                        });
-                        e.createEl("a", {
-                            text: "Obsidian Leaflet",
-                            href: "https://github.com/valentine195/obsidian-leaflet-plugin",
-                            cls: "external-link"
-                        });
-                        e.createSpan({
-                            attr: {
-                                style: `color: var(--text-error);`
-                            },
-                            text: " version 4.0.0 to modify."
-                        });
-                    }
-                })
-            )
-            .addToggle((t) => {
-                if (!this.plugin.canUseLeaflet) {
-                    t.setDisabled(true);
-                    this.plugin.data.leafletIntegration = false;
-                }
-                t.setValue(this.plugin.data.leafletIntegration);
-                t.onChange(async (v) => {
-                    this.plugin.data.leafletIntegration = v;
-                    await this.plugin.saveSettings();
-                    this._displayIntegrations(containerEl);
-                });
-            });
-
-        if (this.plugin.canUseLeaflet && this.plugin.data.leafletIntegration) {
-            new Setting(containerEl)
-                .setName("Default Player Marker Type")
-                .setDesc(
-                    createFragment((e) => {
-                        if (this.plugin.data.playerMarker) {
-                            const div = e.createDiv("marker-type-display");
-                            const inner = div.createDiv("marker-icon-display");
-
-                            const marker = this.plugin.leaflet.markerIcons.find(
-                                (icon) =>
-                                    icon.type == this.plugin.data.playerMarker
-                            );
-                            if (marker) {
-                                inner.innerHTML = marker.html;
-                            }
-                        }
-                    })
-                )
-                .addDropdown((drop) => {
-                    for (let marker of this.plugin.leaflet.markerIcons) {
-                        drop.addOption(marker.type, marker.type);
-                    }
-                    drop.setValue(this.plugin.data.playerMarker ?? "default");
-                    drop.onChange(async (v) => {
-                        this.plugin.data.playerMarker = v;
-                        await this.plugin.saveSettings();
-                        this._displayIntegrations(containerEl);
-                    });
-                });
-            new Setting(containerEl)
-                .setName("Default Monster Marker Type")
-                .setDesc(
-                    createFragment((e) => {
-                        if (this.plugin.data.monsterMarker) {
-                            const div = e.createDiv("marker-type-display");
-                            const inner = div.createDiv("marker-icon-display");
-
-                            const marker = this.plugin.leaflet.markerIcons.find(
-                                (icon) =>
-                                    icon.type == this.plugin.data.monsterMarker
-                            );
-                            if (marker) {
-                                inner.innerHTML = marker.html;
-                            }
-                        }
-                    })
-                )
-                .addDropdown((drop) => {
-                    for (let marker of this.plugin.leaflet.markerIcons) {
-                        drop.addOption(marker.type, marker.type);
-                    }
-                    drop.setValue(this.plugin.data.monsterMarker);
-                    drop.onChange(async (v) => {
-                        this.plugin.data.monsterMarker = v;
-                        await this.plugin.saveSettings();
-                        this._displayIntegrations(containerEl);
-                    });
-                });
-        }
     }
 }
 

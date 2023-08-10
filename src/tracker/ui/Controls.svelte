@@ -131,14 +131,6 @@
                 })
                 .setDisabled(Object.keys(plugin.data.encounters).length == 0);
         });
-        if ($data.leafletIntegration) {
-            menu.addSeparator();
-            menu.addItem((item) => {
-                item.setIcon(MAP)
-                    .setTitle("Open Leaflet Map")
-                    .onClick(() => dispatch("open-map"));
-            });
-        }
         menu.showAtMouseEvent(evt);
     };
 

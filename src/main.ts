@@ -12,7 +12,7 @@ import {
     Conditions,
     CREATURE_TRACKER_VIEW,
     DEFAULT_SETTINGS,
-    INTIATIVE_TRACKER_VIEW,
+    INITIATIVE_TRACKER_VIEW,
     registerIcons
 } from "./utils";
 
@@ -149,7 +149,7 @@ export default class InitiativeTracker extends Plugin {
     }
     get view() {
         const leaves = this.app.workspace.getLeavesOfType(
-            INTIATIVE_TRACKER_VIEW
+            INITIATIVE_TRACKER_VIEW
         );
         const leaf = leaves?.length ? leaves[0] : null;
         if (leaf && leaf.view && leaf.view instanceof TrackerView)
@@ -203,7 +203,7 @@ export default class InitiativeTracker extends Plugin {
         this.addSettingTab(new InitiativeTrackerSettings(this));
 
         this.registerView(
-            INTIATIVE_TRACKER_VIEW,
+            INITIATIVE_TRACKER_VIEW,
             (leaf: WorkspaceLeaf) => new TrackerView(leaf, this)
         );
         this.registerView(
@@ -494,7 +494,7 @@ export default class InitiativeTracker extends Plugin {
         await this.saveSettings();
         this.app.workspace.trigger("initiative-tracker:unload");
         this.app.workspace
-            .getLeavesOfType(INTIATIVE_TRACKER_VIEW)
+            .getLeavesOfType(INITIATIVE_TRACKER_VIEW)
             .forEach((leaf) => leaf.detach());
         this.app.workspace
             .getLeavesOfType(CREATURE_TRACKER_VIEW)
@@ -504,12 +504,12 @@ export default class InitiativeTracker extends Plugin {
 
     async addTrackerView() {
         if (
-            this.app.workspace.getLeavesOfType(INTIATIVE_TRACKER_VIEW)?.length
+            this.app.workspace.getLeavesOfType(INITIATIVE_TRACKER_VIEW)?.length
         ) {
             return;
         }
         await this.app.workspace.getRightLeaf(false).setViewState({
-            type: INTIATIVE_TRACKER_VIEW
+            type: INITIATIVE_TRACKER_VIEW
         });
     }
     get builder() {
@@ -580,15 +580,6 @@ export default class InitiativeTracker extends Plugin {
         );
 
         this.data = data;
-        if (
-            this.data.leafletIntegration &&
-            !this.data.players.every((p) => p.marker)
-        ) {
-            this.data.players = this.data.players.map((p) => {
-                p.marker = p.marker ?? this.data.playerMarker;
-                return p;
-            });
-        }
         if (this.data.statuses?.some((c) => !c.id)) {
             for (const condition of this.data.statuses) {
                 condition.id =
@@ -605,16 +596,6 @@ export default class InitiativeTracker extends Plugin {
     }
 
     async saveSettings() {
-        if (
-            this.data.leafletIntegration &&
-            !this.data.players.every((p) => p.marker)
-        ) {
-            this.data.players = this.data.players.map((p) => {
-                p.marker = p.marker ?? this.data.playerMarker;
-                return p;
-            });
-        }
-
         await this.saveData(this.data);
         tracker.setData(this.data);
     }
@@ -636,7 +617,7 @@ export default class InitiativeTracker extends Plugin {
         if (this.data.builder.sidebarIcon) {
             this._builderIcon = this.addRibbonIcon(
                 BUILDER_VIEW,
-                "Intiative Tracker Encounter Builder",
+                "Initiative Tracker Encounter Builder",
                 () => {
                     this.addBuilderView();
                 }
