@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.0.0](https://github.com/javalent/initiative-tracker/compare/11.3.1...12.0.0) (2023-08-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* As this is a removal of an existing feature, this is technically a breaking change.
+
+### Features
+
+* This removed the feature of Leaflet integration. However, this feature has been broken. ([ad30f98](https://github.com/javalent/initiative-tracker/commit/ad30f98d28b083249de5cbd5b03e335346d7e963))
+
+
+### Bug Fixes
+
+* correctly retrieve creatures from bestiary in encounters ([195d871](https://github.com/javalent/initiative-tracker/commit/195d871186d6fcd9fa12b109fd3fb3031ced8204))
+
 ## [11.3.1](https://github.com/javalent/initiative-tracker/compare/11.3.0...11.3.1) (2023-08-02)
 
 
