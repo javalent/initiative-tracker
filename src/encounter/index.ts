@@ -291,7 +291,7 @@ export class EncounterParser {
         }
 
         if (!name || typeof name != "string") return {};
-        let existing = this.plugin.bestiary.find((c) => c.name == name);
+        let existing = this.plugin.getCreatureFromBestiary(name);
         let creature = existing
             ? Creature.from(existing)
             : new Creature({ name });

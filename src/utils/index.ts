@@ -29,7 +29,7 @@ export function crToString(cr: string | number): string {
     const decimalPart = cr % 1;
     const wholePart = Math.floor(cr);
     if (decimalPart == 0) return wholePart.toString();
-    let str = (wholePart == 0) ? "" : wholePart.toString();
+    let str = wholePart == 0 ? "" : wholePart.toString();
     if (decimalPart in DECIMAL_TO_VULGAR_FRACTION) {
         str += DECIMAL_TO_VULGAR_FRACTION[decimalPart];
     } else {
@@ -45,5 +45,5 @@ export function getFromCreatureOrBestiary<T>(
 ): T {
     const fromBase = getter(creature);
     if (fromBase) return fromBase;
-    return getter(plugin.bestiary.find(c => c.name == creature.name));
+    return getter(plugin.getCreatureFromBestiary(creature.name));
 }

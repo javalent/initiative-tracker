@@ -7,7 +7,6 @@
         EXPAND,
         FORWARD,
         GROUP,
-        MAP,
         NEW,
         PLAY,
         REDO,
