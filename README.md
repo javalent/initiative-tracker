@@ -1,4 +1,4 @@
-> 🥇 Our documentation has moved ***[here](https://plugins.javalent.com/initiative-tracker)***.
+> 🥇 Our documentation has moved ***[here](https://plugins.javalent.com/it)***.
 >
 > <a href='https://www.buymeacoffee.com/valentine195' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=3' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 ---
@@ -37,7 +37,7 @@ creatures:
 - Add creatures to the encounter by name, dice roll or bestiary entry.
 - Launch the encounter by clicking on the play button, and start tracking initiative.
 
-Check out the **[plugin documentation](https://plugins.javalent.com/initiative-tracker)** for more detailed instructions and examples.
+Check out the **[plugin documentation](https://plugins.javalent.com/it)** for more detailed instructions and examples.
 
 ## Support
 
