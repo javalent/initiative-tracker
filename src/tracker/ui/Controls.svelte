@@ -82,6 +82,11 @@
                     .onClick((evt: MouseEvent) => {
                         /* menu.hide(); */
                         const partyMenu = new Menu().setNoIcon();
+                        partyMenu.addItem((item) => {
+                            item.setTitle("None").onClick(() => {
+                                tracker.setParty("", plugin);
+                            });
+                        });
                         for (const party of $data.parties) {
                             partyMenu.addItem((item) => {
                                 item.setTitle(party.name).onClick(() => {
