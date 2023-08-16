@@ -47,7 +47,17 @@ export class Creature {
     "statblock-link": string;
     cr: string | number;
     path: string;
-
+    setModifier(modifier: number[] | number) {
+        if (modifier) {
+            if (Array.isArray(modifier)) {
+                this.modifier = [...modifier];
+            }
+            if (!isNaN(Number(modifier))) {
+                this.modifier = Number(modifier);
+            }
+        }
+        this.modifier = this.modifier ?? 0;
+    }
     constructor(public creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;
         this.display = creature.display;
@@ -56,8 +66,7 @@ export class Creature {
                 ? (creature as Creature).initiative
                 : Number(initiative ?? 0);
         this.static = creature.static ?? false;
-        this.modifier = Number(creature.modifier ?? 0);
-
+        this.setModifier(creature.modifier);
         this.current_ac = this.ac = creature.ac ?? undefined;
         this.dirty_ac = false;
         this.max = this.current_max = creature.hp ? Number(creature.hp) : 0;
@@ -173,7 +182,8 @@ export class Creature {
 
     update(creature: HomebrewCreature) {
         this.name = creature.name;
-        this.modifier = Number(creature.modifier ?? 0);
+
+        this.setModifier(creature.modifier);
 
         this.current_max = this.max = creature.hp ? Number(creature.hp) : 0;
 

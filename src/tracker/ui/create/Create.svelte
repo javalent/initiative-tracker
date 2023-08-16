@@ -163,6 +163,10 @@
             .onChange((v) => (creature.friendly = v));
     };
 
+    $: modString = !isNaN(Number(creature.modifier))
+        ? creature.modifier
+        : JSON.stringify(creature.modifier);
+
     $: {
         try {
             creature.modifier = JSON.parse(`${modifier}`);
@@ -231,7 +235,7 @@
         <div>
             <label for="add-mod">Modifier</label>
             <input
-                bind:value={modifier}
+                bind:value={modString}
                 id="add-mod"
                 type="text"
                 name="add-mod"
