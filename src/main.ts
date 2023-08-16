@@ -22,6 +22,7 @@ import type {
     HomebrewCreature,
     InitiativeTrackerData,
     InitiativeViewState,
+    Party,
     SRDMonster
 } from "../index";
 import type { Plugins, StackRoller } from "obsidian-overload";
@@ -99,6 +100,9 @@ export default class InitiativeTracker extends Plugin {
     getPlayerByName(name: string) {
         if (!this.players.has(name)) return new Creature({ name });
         return Creature.from(this.players.get(name));
+    }
+    getPlayerNamesForParty(party: string): string[] {
+        return this.data.parties?.find((p) => p.name === party)?.players ?? [];
     }
     getPlayersForParty(party: string) {
         return (

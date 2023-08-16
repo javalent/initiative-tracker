@@ -64,10 +64,16 @@
             })
             .flat();
         const transformedCreatures: CreatureState[] = [];
-        for (const creature of [
-            ...plugin.getPlayersForParty(party),
-            ...creatures
-        ]) {
+        const combinedPlayers = [
+            ...plugin.getPlayerNamesForParty(party),
+            ...players
+        ];
+        const playersForEncounter: Creature[] = [];
+        for (const name of new Set(combinedPlayers)) {
+            playersForEncounter.push(plugin.getPlayerByName(name));
+        }
+
+        for (const creature of [...playersForEncounter, ...creatures]) {
             transformedCreatures.push(creature.toJSON());
         }
         tracker.new(plugin, {
@@ -194,7 +200,10 @@
                             >
                                 <CreatureComponent
                                     {creature}
-                                    xp={rpgSystem.getCreatureDifficulty(creature, playerLevels)}
+                                    xp={rpgSystem.getCreatureDifficulty(
+                                        creature,
+                                        playerLevels
+                                    )}
                                     shouldShowRoll={!allRolling && rollHP}
                                     {count}
                                 >
@@ -218,17 +227,25 @@
                         aria-label={difficulty.summary}
                         class={difficulty.cssClass}
                     >
-                      <strong class="difficulty-label">{difficulty.displayName}</strong>
-                      <span class="xp-parent difficulty">
-                          <span class="paren left">(</span>
-                          <span class="xp-container">
-                              {#if difficulty.value > 0}
-                                  <span class="xp number">{rpgSystem.formatDifficultyValue(difficulty.value)}</span>
-                                  <span class="xp text">{rpgSystem.valueUnit}</span>
-                              {/if}
-                          </span>
-                          <span class="paren right">)</span>
-                      </span>
+                        <strong class="difficulty-label"
+                            >{difficulty.displayName}</strong
+                        >
+                        <span class="xp-parent difficulty">
+                            <span class="paren left">(</span>
+                            <span class="xp-container">
+                                {#if difficulty.value > 0}
+                                    <span class="xp number"
+                                        >{rpgSystem.formatDifficultyValue(
+                                            difficulty.value
+                                        )}</span
+                                    >
+                                    <span class="xp text"
+                                        >{rpgSystem.valueUnit}</span
+                                    >
+                                {/if}
+                            </span>
+                            <span class="paren right">)</span>
+                        </span>
                     </span>
                 {/if}
             </div>
@@ -274,7 +291,7 @@
         color: green;
     }
     .trivial .difficulty-label {
-        color: #AAAAAA;
+        color: #aaaaaa;
     }
     .icons {
         display: flex;
