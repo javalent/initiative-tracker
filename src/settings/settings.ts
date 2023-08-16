@@ -1186,39 +1186,6 @@ class NewPlayerModal extends Modal {
                 });
             });
 
-        if (this.plugin.canUseLeaflet) {
-            const markerSetting = new Setting(contentEl)
-                .setName("Leaflet Marker")
-                .addDropdown((drop) => {
-                    for (let marker of this.plugin.leaflet.markerIcons) {
-                        drop.addOption(marker.type, marker.type);
-                    }
-                    drop.setValue(
-                        this.player.marker ??
-                            this.plugin.data.playerMarker ??
-                            "default"
-                    );
-                    drop.onChange(async (v) => {
-                        this.player.marker = v;
-                        this.display();
-                    });
-                });
-
-            if (this.player.marker) {
-                const div = createDiv("marker-type-display");
-                const inner = div.createDiv("marker-icon-display");
-
-                const marker = this.plugin.leaflet.markerIcons.find(
-                    (icon) => icon.type == this.player.marker
-                );
-                if (marker) {
-                    inner.innerHTML = marker.html;
-
-                    markerSetting.descEl.appendChild(div);
-                }
-            }
-        }
-
         let footerEl = contentEl.createDiv();
         let footerButtons = new Setting(footerEl);
         footerButtons.addButton((b) => {

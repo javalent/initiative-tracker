@@ -119,13 +119,14 @@ export default class InitiativeTracker extends Plugin {
         return this.statblocks?.settings?.version ?? { major: 0 };
     }
     get canUseLeaflet() {
-        return (
+        return false;
+        /* return (
             this.app.plugins.getPlugin("obsidian-leaflet-plugin") != null &&
             Number(
                 this.app.plugins.getPlugin("obsidian-leaflet-plugin").data
                     ?.version?.major >= 4
             )
-        );
+        ); */
     }
 
     get leaflet() {
