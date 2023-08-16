@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.1.0](https://github.com/javalent/initiative-tracker/compare/12.0.0...12.1.0) (2023-08-16)
+
+
+### Features
+
+* Adds Editor Suggestor for encounter blocks (close [#185](https://github.com/javalent/initiative-tracker/issues/185)) ([012b1eb](https://github.com/javalent/initiative-tracker/commit/012b1eb4c3f95eaa1547ddfe59a66d0b587f7228))
+* Can now sort initiatives by descendig or ascending ([#68](https://github.com/javalent/initiative-tracker/issues/68)) ([079b59c](https://github.com/javalent/initiative-tracker/commit/079b59c8a5d24bca96eb9ca1ab0cf1c8cda2afa1))
+* Copy encounter string to clipboard in Builder (close [#207](https://github.com/javalent/initiative-tracker/issues/207)) ([360ca03](https://github.com/javalent/initiative-tracker/commit/360ca03aa19ae500296be38e1bfc21905193a777))
+
+
+### Bug Fixes
+
+* Can set party to None in tracker menu ([268b661](https://github.com/javalent/initiative-tracker/commit/268b66108e90dc615e22c50d9b697784f04974ed))
+* fixes bug preventing adding players via the "Add Creature" button ([#197](https://github.com/javalent/initiative-tracker/issues/197)) ([3e5cc4d](https://github.com/javalent/initiative-tracker/commit/3e5cc4d7c7fc55ca42195ce7d794e5f6e74b8b83))
+* fixes display of suggestor for Obsidian 1.4+ ([1ba2348](https://github.com/javalent/initiative-tracker/commit/1ba234815af3bb092b9d04bbd9fb9b7c01808337))
+* fixes rolling dice for array-based modifiers (close [#196](https://github.com/javalent/initiative-tracker/issues/196)) ([e489766](https://github.com/javalent/initiative-tracker/commit/e48976659b5065b2818b7e2644b2b7a6ffa83b7e))
+* fully remove leaflet support (for now) ([51aed21](https://github.com/javalent/initiative-tracker/commit/51aed212bd1126331dcc3e91f3d6c3f2f475082a))
+* handle players added directly in encounters, not just through parties ([#197](https://github.com/javalent/initiative-tracker/issues/197)) ([4317e07](https://github.com/javalent/initiative-tracker/commit/4317e0741b707fee2b54627beb82666d5e9b8392))
+* improves player management in settings ([169cc7d](https://github.com/javalent/initiative-tracker/commit/169cc7d6c3ae564e96a007728f4f5e2d631cacf2))
+* Only set difficulty if the highest threshold is &gt; 0 ([#197](https://github.com/javalent/initiative-tracker/issues/197)) ([11c3db7](https://github.com/javalent/initiative-tracker/commit/11c3db755da187703b28ed503c75226750f15287))
+* Roll initiative for creatures added to encounters (close [#81](https://github.com/javalent/initiative-tracker/issues/81)) ([fefe218](https://github.com/javalent/initiative-tracker/commit/fefe2189f5a5e4417ec7226a7176362b9a4ad309))
+
 ## [12.0.0](https://github.com/javalent/initiative-tracker/compare/11.3.1...12.0.0) (2023-08-11)
 
 
