@@ -2,7 +2,7 @@
     import { tweened } from "svelte/motion";
     import { cubicOut } from "svelte/easing";
     import { getContext } from "svelte";
-    import { getRpgSystem } from "src/utils"
+    import { getRpgSystem } from "src/utils";
     import type { RpgSystem } from "src/utils/rpg-system/rpgSystem";
     import type InitiativeTracker from "src/main";
 
@@ -21,9 +21,13 @@
     });
 
     $: {
-        if ($dif.thresholds.last()) {
+        if ($dif.thresholds.last().minValue > 0) {
             difficultyBar.set(
-                Math.min($dif.difficulty.value / $dif.thresholds.last().minValue, 1));
+                Math.min(
+                    $dif.difficulty.value / $dif.thresholds.last().minValue,
+                    1
+                )
+            );
         }
     }
     $: summary = $dif.difficulty.summary;
