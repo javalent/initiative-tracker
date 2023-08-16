@@ -12,7 +12,10 @@ import type {
 import type { StackRoller } from "obsidian-overload";
 import { OVERFLOW_TYPE, getRpgSystem } from "src/utils";
 import type Logger from "../../logger/logger";
-import type { DifficultyLevel, DifficultyThreshold } from "src/utils/rpg-system";
+import type {
+    DifficultyLevel,
+    DifficultyThreshold
+} from "src/utils/rpg-system";
 
 type HPUpdate = {
     saved: boolean;
@@ -307,8 +310,7 @@ function createTracker() {
                 const creature = creatures.find((c) => c.name == name);
                 if (creature) {
                     if (!isNaN(Number(change.hp))) {
-                        creature.hp =
-                                change.hp;
+                        creature.hp = change.hp;
                     }
                     if (change.max) {
                         creature.current_max = Math.max(
@@ -625,6 +627,13 @@ function createTracker() {
                                 roller.rollSync();
                     }
                 }
+
+                for (let creature of items) {
+                    if (creature.static) continue;
+                    creature.initiative = plugin.getInitiativeValue(
+                        creature.modifier
+                    );
+                }
                 creatures.push(...items);
                 _logger?.log(
                     _logger?.join(items.map((c) => c.name)),
@@ -791,42 +800,50 @@ function createTracker() {
         updateState: () => update((c) => c),
 
         difficulty: (plugin: InitiativeTracker) =>
-            derived<Writable<Creature[]>, {difficulty: DifficultyLevel, thresholds: DifficultyThreshold[]}>(
-                creatures,
-                (values) => {
-                    const players: number[] = [];
-                    const creatureMap = new Map<Creature, number>();
-                    const rpgSystem = getRpgSystem(plugin);
-
-                    for (const creature of values) {
-                        if (!creature.enabled) continue;
-                        if (creature.friendly) continue;
-                        if (creature.player && creature.level) {
-                            players.push(creature.level);
-                            continue;
-                        }
-                        const stats = {
-                            name: creature.name,
-                            display: creature.display,
-                            ac: creature.ac,
-                            hp: creature.hp,
-                            modifier: creature.modifier,
-                            xp: creature.xp,
-                            hidden: creature.hidden
-                        };
-                        const existing = [...creatureMap].find(([c]) => equivalent(c, stats));
-                        if (!existing) {
-                            creatureMap.set(creature, 1);
-                          continue;
-                        }
-                        creatureMap.set(existing[0], existing[1] + 1);
-                    }
-                  return {
-                    difficulty: rpgSystem.getEncounterDifficulty(creatureMap, players),
-                    thresholds: rpgSystem.getDifficultyThresholds(players)
-                  };
+            derived<
+                Writable<Creature[]>,
+                {
+                    difficulty: DifficultyLevel;
+                    thresholds: DifficultyThreshold[];
                 }
-            )
+            >(creatures, (values) => {
+                const players: number[] = [];
+                const creatureMap = new Map<Creature, number>();
+                const rpgSystem = getRpgSystem(plugin);
+
+                for (const creature of values) {
+                    if (!creature.enabled) continue;
+                    if (creature.friendly) continue;
+                    if (creature.player && creature.level) {
+                        players.push(creature.level);
+                        continue;
+                    }
+                    const stats = {
+                        name: creature.name,
+                        display: creature.display,
+                        ac: creature.ac,
+                        hp: creature.hp,
+                        modifier: creature.modifier,
+                        xp: creature.xp,
+                        hidden: creature.hidden
+                    };
+                    const existing = [...creatureMap].find(([c]) =>
+                        equivalent(c, stats)
+                    );
+                    if (!existing) {
+                        creatureMap.set(creature, 1);
+                        continue;
+                    }
+                    creatureMap.set(existing[0], existing[1] + 1);
+                }
+                return {
+                    difficulty: rpgSystem.getEncounterDifficulty(
+                        creatureMap,
+                        players
+                    ),
+                    thresholds: rpgSystem.getDifficultyThresholds(players)
+                };
+            })
     };
 }
 
