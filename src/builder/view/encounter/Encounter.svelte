@@ -4,7 +4,8 @@
         Menu,
         Modal,
         Notice,
-        Setting
+        Setting,
+        stringifyYaml
     } from "obsidian";
 
     import Creature from "./Creature.svelte";
@@ -179,7 +180,7 @@
     };
     let exportIcon: ExtraButtonComponent;
     const exp = (node: HTMLElement) => {
-        exportIcon = new ExtraButtonComponent(node).setIcon("code");
+        exportIcon = new ExtraButtonComponent(node).setIcon("copy");
     };
     $: {
         if (exportIcon) {
@@ -188,7 +189,7 @@
                 exportIcon.setTooltip("");
             } else {
                 exportIcon.setDisabled(false);
-                exportIcon.setTooltip("Export Encounter to Note");
+                exportIcon.setTooltip("Copy Encounter Block");
             }
         }
     }
@@ -230,6 +231,39 @@
             .setIcon("eraser")
             .setTooltip("Clear Encounter");
     };
+    const copy = async () => {
+        const enc: {
+            name?: string;
+            players?: string[];
+            creatures?: { [key: number]: string }[];
+        } = {};
+        if ($name?.length) {
+            enc.name = $name;
+        }
+        if ($players?.length) {
+            enc.players = $players.map((p) => p.name);
+        }
+        if ($encounter?.size) {
+            enc.creatures = [...$encounter.entries()].map(([c, v]) => {
+                return {
+                    [Number(v)]: `${c.name}${c.friendly ? ", friendly" : ""}${
+                        c.hidden ? ", hidden" : ""
+                    }`
+                };
+            });
+        }
+        try {
+            await navigator.clipboard.writeText(
+                `\`\`\`encounter\n${stringifyYaml(enc)}\`\`\``
+            );
+            new Notice("Encounter saved to clipboard");
+        } catch (e) {
+            console.error(e);
+            new Notice(
+                "Could not save encounter, please check console for errors"
+            );
+        }
+    };
 </script>
 
 <div class="encounter-header">
@@ -247,7 +281,7 @@
         <div use:start />
         <div use:saveIcon on:click={save} />
         <div use:loadIcon on:click={load} />
-        <!-- <div use:exp /> -->
+        <div use:exp on:click={copy} />
         <!-- <div use:load /> -->
 
         <div
