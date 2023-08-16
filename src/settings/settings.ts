@@ -471,8 +471,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     .setIcon("trash")
                     .setTooltip("Delete")
                     .onClick(async () => {
-                        this.plugin.data.players =
-                            this.plugin.data.players.filter((p) => p != player);
+                        this.plugin.deletePlayer(player);
 
                         await this.plugin.saveSettings();
                         this._displayPlayers(additionalContainer);
@@ -541,12 +540,18 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             .setName("XP System")
             .setDesc("XP system to use for encounters")
             .addDropdown((d) => {
-                Object.values(RpgSystemSetting)
-                  .forEach(system => d.addOption(system, getRpgSystem(this.plugin, system).displayName));
-                d.setValue(this.plugin.data.rpgSystem ?? RpgSystemSetting.Dnd5e);
+                Object.values(RpgSystemSetting).forEach((system) =>
+                    d.addOption(
+                        system,
+                        getRpgSystem(this.plugin, system).displayName
+                    )
+                );
+                d.setValue(
+                    this.plugin.data.rpgSystem ?? RpgSystemSetting.Dnd5e
+                );
                 d.onChange(async (v) => {
-                  this.plugin.data.rpgSystem = v;
-                  this.plugin.saveSettings();
+                    this.plugin.data.rpgSystem = v;
+                    this.plugin.saveSettings();
                 });
             });
 
@@ -1079,11 +1084,11 @@ class NewPlayerModal extends Modal {
                     if (!metaData || !metaData.frontmatter) return;
                     const { ac, hp, modifier, level, name } =
                         metaData.frontmatter;
-                    this.player.name = name ? name : this.player.name;
-                    this.player.ac = ac;
-                    this.player.hp = hp;
-                    this.player.level = level;
-                    this.player.modifier = modifier;
+                    this.player.name = name ?? this.player.name;
+                    this.player.ac = ac ?? this.player.ac;
+                    this.player.hp = hp ?? this.player.hp;
+                    this.player.level = level ?? this.player.level;
+                    this.player.modifier = modifier ?? this.player.modifier;
                     this.player["statblock-link"] =
                         metaData.frontmatter["statblock-link"];
                     this.display();
