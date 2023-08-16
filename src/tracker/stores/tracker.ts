@@ -80,6 +80,9 @@ function createTracker() {
     const $party = writable<string | null>();
 
     const data = writable<InitiativeTrackerData>();
+    const descending = derived(data, (data) => {
+        return data.descending;
+    });
     let _settings: InitiativeTrackerData;
 
     const condensed = derived(creatures, (values) => {
@@ -96,10 +99,12 @@ function createTracker() {
     });
 
     let current_order: Creature[] = [];
-    const ordered = derived(condensed, (values) => {
+    const ordered = derived([condensed, data], ([values, data]) => {
         const sort = [...values];
         sort.sort((a, b) => {
-            return b.initiative - a.initiative;
+            return data.descending
+                ? b.initiative - a.initiative
+                : a.initiative - b.initiative;
         });
         current_order = sort;
         return sort;
@@ -503,6 +508,8 @@ function createTracker() {
         round: $round,
 
         name: $name,
+
+        sort: descending,
 
         party: $party,
         setParty: (party: string, plugin: InitiativeTracker) =>

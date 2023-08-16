@@ -56,13 +56,13 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     useLegacy: false,
     diplayPlayerHPValues: true,
     rollHP: false,
+    descending: true,
     builder: {
         showParty: true,
         showXP: true,
         sidebarIcon: true
-    },
+    }
 };
-
 
 export const OVERFLOW_TYPE: { [key: string]: string } = {
     ignore: "ignore",
@@ -77,5 +77,5 @@ export const DECIMAL_TO_VULGAR_FRACTION: Record<string, string> = {
     0.5: "½",
     0.625: "⅝",
     0.75: "¾",
-    0.875: "⅞",
+    0.875: "⅞"
 } as const;

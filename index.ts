@@ -123,7 +123,7 @@ export interface InitiativeTrackerData {
     diplayPlayerHPValues: boolean;
     rollHP: boolean;
     builder: BuilderState;
-
+    descending: boolean;
     version: number[];
 }
 

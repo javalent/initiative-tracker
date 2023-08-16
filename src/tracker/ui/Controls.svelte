@@ -20,7 +20,7 @@
 
     import { tracker } from "../stores/tracker";
 
-    const { state, data, logFile } = tracker;
+    const { state, data, logFile, sort } = tracker;
 
     const desktop = Platform.isDesktop;
 
@@ -115,6 +115,19 @@
                             : "Group Creatures"
                     );
                 });
+        });
+        menu.addItem((item) => {
+            item.setTitle($sort ? "Sort Ascending" : "Sort Descending").onClick(
+                async () => {
+                    plugin.data.descending = !plugin.data.descending;
+                    await plugin.saveSettings();
+                    item.setTitle(
+                        plugin.data.descending
+                            ? "Sort Ascending"
+                            : "Sort Descending"
+                    );
+                }
+            );
         });
 
         menu.addSeparator();
