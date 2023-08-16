@@ -247,7 +247,8 @@ body {
     margin-bottom: 1rem;
 }
 
-.initiative-tracker.suggestion-item, .initiative-tracker.suggestion-item > svg {
+.initiative-tracker.suggestion-item .name,
+.initiative-tracker.suggestion-item > svg {
     display: flex;
     align-items: center;
     gap: 0.25rem;

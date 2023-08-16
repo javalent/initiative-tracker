@@ -357,16 +357,17 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
         el: HTMLElement
     ) {
         let { item, match: matches } = result || {};
-        el.addClass("initiative-tracker");
-        if (item.player) {
-            setIcon(el, "user");
-        }
+        el.addClasses(["initiative-tracker", "mod-complex"]);
         let content = el.createDiv({
             cls: "suggestion-content icon initiative-tracker"
         });
+        let name = content.createDiv("name");
+        if (item.player) {
+            setIcon(name, "user");
+        }
         if (!item) {
             this.suggester.selectedItem = null;
-            content.setText(this.emptyStateText);
+            name.setText(this.emptyStateText);
             content.parentElement.addClass("is-selected");
             return;
         }
@@ -378,16 +379,16 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
             let match = matches.matches.find((m) => m[0] === i);
             if (match) {
                 let element = matchElements[matches.matches.indexOf(match)];
-                content.appendChild(element);
-                element.appendText(item.name.substring(match[0], match[1]));
+                name.appendChild(element);
+                name.appendText(item.name.substring(match[0], match[1]));
 
                 i += match[1] - match[0] - 1;
                 continue;
             }
 
-            content.appendText(item.name[i]);
+            name.appendText(item.name[i]);
         }
-        el.createDiv({
+        content.createDiv({
             cls: "suggestion-note",
             text: [item.source].flat().join(", ")
         });
