@@ -34,6 +34,7 @@ import TrackerView, { CreatureView } from "./tracker/view";
 import BuilderView from "./builder/view";
 import PlayerView from "./tracker/player-view";
 import { tracker } from "./tracker/stores/tracker";
+import { EncounterSuggester } from './encounter/editor-suggestor';
 declare module "obsidian" {
     interface App {
         plugins: {
@@ -238,6 +239,7 @@ export default class InitiativeTracker extends Plugin {
         this.addCommands();
         this.addEvents();
 
+        this.registerEditorSuggest(new EncounterSuggester(this));
         this.registerMarkdownCodeBlockProcessor("encounter", (src, el, ctx) => {
             const handler = new EncounterBlock(this, src, el);
             ctx.addChild(handler);
