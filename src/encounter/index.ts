@@ -154,10 +154,6 @@ export class EncounterParser {
                     )
             );
         }
-        console.log(
-            "🚀 ~ file: index.ts:158 ~ playersToReturn:",
-            playersToReturn
-        );
         return Array.from(new Set(playersToReturn));
     }
     async parseRawCreatures(rawMonsters: RawCreatureArray) {

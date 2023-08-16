@@ -186,6 +186,17 @@ export default class InitiativeTracker extends Plugin {
         let creature = this.getBaseCreatureFromBestiary(name);
         if (creature) return Creature.from(creature);
     }
+    getCreatureFromBestiaryByDefinition(
+        creature: SRDMonster | HomebrewCreature
+    ): Creature {
+        if (creature.player && this.playerCreatures.has(creature.name)) {
+            return this.playerCreatures.get(creature.name);
+        }
+        return (
+            this.getCreatureFromBestiary(creature.name) ??
+            Creature.from(creature)
+        );
+    }
     get statblock_players() {
         return this.statblock_creatures
             .filter((p) => p.player)
