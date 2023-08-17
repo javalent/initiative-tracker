@@ -46,7 +46,7 @@ export class EncounterSuggester extends EditorSuggest<string> {
                 );
                 break;
             case SuggestContext.Creatures:
-                suggestions = this.plugin.bestiary?.map((b) => b.name);
+                suggestions = this.plugin.bestiaryNames;
                 break;
             case SuggestContext.Party:
                 suggestions = this.plugin.data.parties?.map((p) => p.name);

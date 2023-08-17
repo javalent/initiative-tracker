@@ -34,7 +34,7 @@ import TrackerView, { CreatureView } from "./tracker/view";
 import BuilderView from "./builder/view";
 import PlayerView from "./tracker/player-view";
 import { tracker } from "./tracker/stores/tracker";
-import { EncounterSuggester } from './encounter/editor-suggestor';
+import { EncounterSuggester } from "./encounter/editor-suggestor";
 declare module "obsidian" {
     interface App {
         plugins: {
@@ -152,6 +152,16 @@ export default class InitiativeTracker extends Plugin {
     }
     get bestiary() {
         return this.statblock_creatures.filter((p) => !p.player);
+    }
+
+    get bestiaryNames(): string[] {
+        if (!this.app.plugins.getPlugin("obsidian-5e-statblocks")) return [];
+        return (
+            (this.app.plugins
+                .getPlugin("obsidian-5e-statblocks")
+                //@ts-ignore
+                ?.getBestiaryNames() as string[]) ?? []
+        );
     }
     get view() {
         const leaves = this.app.workspace.getLeavesOfType(
