@@ -365,9 +365,10 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
         if (item.player) {
             setIcon(name, "user");
         }
+        let text = name.createDiv("name-text");
         if (!item) {
             this.suggester.selectedItem = null;
-            name.setText(this.emptyStateText);
+            text.setText(this.emptyStateText);
             content.parentElement.addClass("is-selected");
             return;
         }
@@ -379,14 +380,14 @@ export class SRDMonsterSuggestionModal extends SuggestionModal<
             let match = matches.matches.find((m) => m[0] === i);
             if (match) {
                 let element = matchElements[matches.matches.indexOf(match)];
-                name.appendChild(element);
-                name.appendText(item.name.substring(match[0], match[1]));
+                text.appendChild(element);
+                element.appendText(item.name.substring(match[0], match[1]));
 
                 i += match[1] - match[0] - 1;
                 continue;
             }
 
-            name.appendText(item.name[i]);
+            text.appendText(item.name[i]);
         }
         content.createDiv({
             cls: "suggestion-note",

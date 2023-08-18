@@ -18,7 +18,6 @@ import type InitiativeTracker from "../main";
 
 import App from "./ui/App.svelte";
 import type { Creature } from "../utils/creature";
-import type { HomebrewCreature } from "index";
 import { PLAYER_VIEW_VIEW } from "../utils/constants";
 import type PlayerView from "./player-view";
 
@@ -57,7 +56,6 @@ export default class TrackerView extends ItemView {
     get npcs(): Creature[] {
         return [];
     }
-
 
     //open player view
     playerViewOpened = false;
@@ -146,6 +144,7 @@ export class CreatureView extends ItemView {
             await this.renderEmbed(creature.getStatblockLink());
         } else if (tryStatblockPlugin) {
             const statblock = this.plugin.statblocks.render(
+                //@ts-ignore
                 creature,
                 this.statblockEl,
                 creature.display
