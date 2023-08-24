@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.1.1](https://github.com/javalent/initiative-tracker/compare/12.1.0...12.1.1) (2023-08-24)
+
+
+### Bug Fixes
+
+* add `false` as an option for parties ([0651b84](https://github.com/javalent/initiative-tracker/commit/0651b84fd4d55484ea5f16459f649030d2cd1263))
+* fixes highlighting in creature suggester ([ee5f812](https://github.com/javalent/initiative-tracker/commit/ee5f812c204aeee55b25e92cbf4d31734a25aea7))
+* use statblock's bestiary names API vs transforming every time ([e7038d1](https://github.com/javalent/initiative-tracker/commit/e7038d16edd48fb40b3f9ddd700f796475f15c34))
+
 ## [12.1.0](https://github.com/javalent/initiative-tracker/compare/12.0.0...12.1.0) (2023-08-16)
 
 
