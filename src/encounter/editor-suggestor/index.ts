@@ -49,7 +49,7 @@ export class EncounterSuggester extends EditorSuggest<string> {
                 suggestions = this.plugin.bestiaryNames;
                 break;
             case SuggestContext.Party:
-                suggestions = this.plugin.data.parties?.map((p) => p.name);
+                suggestions = ["false", ...this.plugin.data.parties?.map((p) => p.name)];
                 break;
             case SuggestContext.RollHP:
                 suggestions = ["true", "false"];
