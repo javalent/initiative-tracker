@@ -22,6 +22,7 @@ export class Creature {
     modifier: number | number[];
     hp: number;
     hit_dice?: string;
+    rollHP?: boolean;
     temp: number;
     ac: number | string;
     current_ac: number | string;
@@ -73,6 +74,8 @@ export class Creature {
         this.note = creature.note;
         this.level = creature.level;
         this.player = creature.player;
+
+        this.rollHP = creature.rollHP;
 
         this.marker = creature.marker;
 
@@ -151,6 +154,7 @@ export class Creature {
         yield this.hidden;
         yield this.hit_dice;
         yield this.current_ac;
+        yield this.rollHP;
     }
 
     static new(creature: Creature) {
@@ -230,7 +234,8 @@ export class Creature {
             hidden: this.hidden,
             friendly: this.friendly,
             "statblock-link": this["statblock-link"],
-            hit_dice: this.hit_dice
+            hit_dice: this.hit_dice,
+            rollHP: this.rollHP
         };
     }
 

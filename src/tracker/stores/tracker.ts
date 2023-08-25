@@ -623,7 +623,9 @@ function createTracker() {
         ) =>
             updateAndSave((creatures) => {
                 if (plugin.canUseDiceRoller && roll) {
-                    for (const creature of items) {
+                    setCreatureHP(items, plugin);
+                    /* for (const creature of items) {
+                        if (!creature.rollHP) continue;
                         if (!creature?.hit_dice?.length) continue;
                         let roller = plugin.getRoller(
                             creature.hit_dice
@@ -632,7 +634,7 @@ function createTracker() {
                             creature.max =
                             creature.current_max =
                                 roller.rollSync();
-                    }
+                    } */
                 }
 
                 for (let creature of items) {
@@ -701,8 +703,9 @@ function createTracker() {
                     plugin.canUseDiceRoller &&
                     (state?.rollHP ?? plugin.data.rollHP)
                 ) {
-                    for (const creature of creatures) {
-                        if (creature.hit_dice?.length) {
+                    setCreatureHP(creatures, plugin);
+                    /* for (const creature of creatures) {
+                        if (creature.rollHP && creature.hit_dice?.length) {
                             let roller = plugin.getRoller(
                                 creature.hit_dice
                             ) as StackRoller;
@@ -711,7 +714,7 @@ function createTracker() {
                                 creature.current_max =
                                     roller.rollSync();
                         }
-                    }
+                    } */
                 }
 
                 if (state?.logFile) {
@@ -855,3 +858,12 @@ function createTracker() {
 }
 
 export const tracker = createTracker();
+
+function setCreatureHP(creatures: Creature[], plugin: InitiativeTracker) {
+    for (const creature of creatures) {
+        if (!creature.rollHP) continue;
+        if (!creature.hit_dice?.length) continue;
+        let roller = plugin.getRoller(creature.hit_dice) as StackRoller;
+        creature.hp = creature.max = creature.current_max = roller.rollSync();
+    }
+}

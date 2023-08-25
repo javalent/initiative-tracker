@@ -217,6 +217,7 @@ export interface HomebrewCreature {
     friendly?: boolean;
     active?: boolean;
     static?: boolean;
+    rollHP?: boolean;
     "statblock-link"?: string;
 }
 

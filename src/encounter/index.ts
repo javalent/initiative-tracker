@@ -33,6 +33,7 @@ interface CreatureStats {
     hidden: boolean;
     friendly?: boolean;
     static?: boolean;
+    rollHP?: boolean;
 }
 
 export const equivalent = (
@@ -87,9 +88,9 @@ export class EncounterParser {
         const players: string[] = this.parsePlayers(params);
         const hide = this.parseHide(params);
         const rawMonsters = params.creatures ?? [];
-        const rollHP = params.rollHP;
 
-        let creatures = await this.parseRawCreatures(rawMonsters);
+        const rollHP = params.rollHP ?? this.plugin.data.rollHP;
+        let creatures = await this.parseRawCreatures(rawMonsters, rollHP);
 
         const xp = params.xp ?? null;
         const playerLevels = players
@@ -156,12 +157,12 @@ export class EncounterParser {
         }
         return Array.from(new Set(playersToReturn));
     }
-    async parseRawCreatures(rawMonsters: RawCreatureArray) {
+    async parseRawCreatures(rawMonsters: RawCreatureArray, rollHP: boolean) {
         const creatureMap: Map<Creature, number | string> = new Map();
         if (rawMonsters && Array.isArray(rawMonsters)) {
             for (const raw of rawMonsters) {
                 const { creature, number = 1 } =
-                    this.parseRawCreature(raw) ?? {};
+                    this.parseRawCreature(raw, rollHP) ?? {};
                 if (!creature) continue;
 
                 const stats = {
@@ -172,7 +173,8 @@ export class EncounterParser {
                     modifier: creature.modifier,
                     xp: creature.xp,
                     hidden: creature.hidden,
-                    friendly: creature.friendly
+                    friendly: creature.friendly,
+                    rollHP: creature.rollHP
                 };
                 const existing = [...creatureMap].find(([c]) =>
                     equivalent(c, stats)
@@ -195,7 +197,7 @@ export class EncounterParser {
         }
         return creatureMap;
     }
-    parseRawCreature(raw: RawCreature) {
+    parseRawCreature(raw: RawCreature, globalRollHP: boolean) {
         if (!raw) return {};
         let monster: string | string[] | Record<string, any>,
             number: string | number = 1;
@@ -233,7 +235,8 @@ export class EncounterParser {
             mod: number,
             xp: number,
             hidden: boolean = false,
-            friendly: boolean = false;
+            friendly: boolean = false,
+            rollHP: boolean = globalRollHP;
 
         if (typeof monster == "string") {
             if (monster.match(/,\s+hidden/)) {
@@ -254,6 +257,9 @@ export class EncounterParser {
                 .split(/,\s?/)
                 .slice(1)
                 .map((v) => (isNaN(Number(v)) ? null : Number(v)));
+            if (hp) {
+                rollHP = false;
+            }
         } else if (Array.isArray(monster)) {
             if (typeof monster[0] == "string") {
                 //Hobgoblin, Jim
@@ -303,6 +309,7 @@ export class EncounterParser {
         creature.xp = xp ?? creature.xp;
         creature.hidden = hidden ?? creature.hidden;
         creature.friendly = friendly ?? creature.friendly;
+        creature.rollHP = rollHP ?? globalRollHP ?? creature.rollHP;
 
         return { creature, number };
     }
