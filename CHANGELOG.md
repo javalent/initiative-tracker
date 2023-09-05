@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.1.2](https://github.com/javalent/initiative-tracker/compare/12.1.1...12.1.2) (2023-08-25)
+
+
+### Bug Fixes
+
+* Creatures with HP specified will no longer roll HP ([8790517](https://github.com/javalent/initiative-tracker/commit/8790517f88d3f94e38e4477579e291a3bfcb81b7))
+
 ## [12.1.1](https://github.com/javalent/initiative-tracker/compare/12.1.0...12.1.1) (2023-08-24)
 
 
