@@ -257,9 +257,6 @@ export class EncounterParser {
                 .split(/,\s?/)
                 .slice(1)
                 .map((v) => (isNaN(Number(v)) ? null : Number(v)));
-            if (hp) {
-                rollHP = false;
-            }
         } else if (Array.isArray(monster)) {
             if (typeof monster[0] == "string") {
                 //Hobgoblin, Jim
@@ -296,6 +293,9 @@ export class EncounterParser {
             friendly = monster.friend || monster.ally || false;
         }
 
+        if (hp) {
+            rollHP = false;
+        }
         if (!name || typeof name != "string") return {};
         let existing = this.plugin.getCreatureFromBestiary(name);
         let creature = existing
