@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.1.3](https://github.com/javalent/initiative-tracker/compare/12.1.2...12.1.3) (2023-09-05)
+
+
+### Bug Fixes
+
+* Respect creature HP when given as array in encounters ([244fe03](https://github.com/javalent/initiative-tracker/commit/244fe03a1954f6081ac8a26b478441978d35bb6d))
+
 ## [12.1.2](https://github.com/javalent/initiative-tracker/compare/12.1.1...12.1.2) (2023-08-25)
 
 
