@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.1.4](https://github.com/javalent/initiative-tracker/compare/12.1.3...12.1.4) (2023-09-12)
+
+
+### Bug Fixes
+
+* Ignore creatures from FS that shouldn't be in bestiary. ([77d048d](https://github.com/javalent/initiative-tracker/commit/77d048d793c94f6d4b0d0cf332deeb1f943c727a))
+
 ## [12.1.3](https://github.com/javalent/initiative-tracker/compare/12.1.2...12.1.3) (2023-09-05)
 
 
