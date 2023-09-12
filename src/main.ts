@@ -151,7 +151,9 @@ export default class InitiativeTracker extends Plugin {
         ] as SRDMonster[];
     }
     get bestiary() {
-        return this.statblock_creatures.filter((p) => !p.player);
+        return this.statblock_creatures.filter(
+            (p) => !p.player && p.bestiary !== false
+        );
     }
 
     get bestiaryNames(): string[] {
