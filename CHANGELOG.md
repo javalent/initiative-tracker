@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.2.0](https://github.com/javalent/initiative-tracker/compare/12.1.4...12.2.0) (2023-09-19)
+
+
+### Features
+
+* Can now change how Player initiatives are rolled in the Tracker controls ([4fe45ff](https://github.com/javalent/initiative-tracker/commit/4fe45ff63a3774db1449be8aff7ec886e8fc8a96))
+
 ## [12.1.4](https://github.com/javalent/initiative-tracker/compare/12.1.3...12.1.4) (2023-09-12)
 
 
