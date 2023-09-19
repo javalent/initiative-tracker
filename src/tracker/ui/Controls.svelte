@@ -1,6 +1,10 @@
 <script lang="ts">
-    import { ExtraButtonComponent, type MenuItem, Platform } from "obsidian";
-
+    import {
+        ExtraButtonComponent,
+        type MenuItem,
+        Platform,
+        Menu
+    } from "obsidian";
     import {
         BACKWARD,
         DICE,
@@ -10,17 +14,15 @@
         NEW,
         PLAY,
         REDO,
+        RollPlayerInitiativeBehavior,
         SAVE,
         STOP
     } from "src/utils";
-
-    import { Menu } from "obsidian";
     import { createEventDispatcher, getContext } from "svelte";
     import type InitiativeTracker from "src/main";
-
     import { tracker } from "../stores/tracker";
 
-    const { state, data, logFile, sort } = tracker;
+    const { state, data, logFile, sort, party } = tracker;
 
     const desktop = Platform.isDesktop;
 
@@ -75,29 +77,6 @@
                 .setTitle("Re-roll Initiatives")
                 .onClick(() => tracker.roll(plugin));
         });
-        if ($data.parties && $data.parties.length) {
-            menu.addItem((item) => {
-                item.setIcon("switch")
-                    .setTitle("Switch Party")
-                    .onClick((evt: MouseEvent) => {
-                        /* menu.hide(); */
-                        const partyMenu = new Menu().setNoIcon();
-                        partyMenu.addItem((item) => {
-                            item.setTitle("None").onClick(() => {
-                                tracker.setParty("", plugin);
-                            });
-                        });
-                        for (const party of $data.parties) {
-                            partyMenu.addItem((item) => {
-                                item.setTitle(party.name).onClick(() => {
-                                    tracker.setParty(party.name, plugin);
-                                });
-                            });
-                        }
-                        partyMenu.showAtMouseEvent(evt);
-                    });
-            });
-        }
         menu.addItem((item) => {
             item.setIcon(GROUP)
                 .setTitle(
@@ -129,8 +108,93 @@
                 }
             );
         });
+        menu.addSeparator();
+
+        if ($data.parties && $data.parties.length) {
+            menu.addItem((item) => {
+                const partyMenu = item
+                    .setIcon("switch")
+                    .setTitle("Switch Party")
+                    .setSubmenu();
+                partyMenu.addItem((item) => {
+                    item.setTitle("None")
+                        .onClick(() => {
+                            tracker.setParty("", plugin);
+                        })
+                        .setChecked(!$party || $party == "");
+                });
+                for (const p of $data.parties) {
+                    partyMenu.addItem((item) => {
+                        item.setTitle(p.name)
+                            .onClick(() => {
+                                tracker.setParty(p.name, plugin);
+                            })
+                            .setChecked($party == p.name);
+                    });
+                }
+            });
+        }
+        menu.addItem((item) => {
+            const partyMenu = item
+                .setIcon("switch")
+                .setTitle("Party Rolling Behavior")
+                .setSubmenu();
+
+            partyMenu.addItem((item) => {
+                item.setTitle("Always Roll")
+                    .onClick(async () => {
+                        plugin.data.rollPlayerInitiatives =
+                            RollPlayerInitiativeBehavior.Always;
+                        await plugin.saveSettings();
+                    })
+                    .setChecked(
+                        plugin.data.rollPlayerInitiatives ==
+                            RollPlayerInitiativeBehavior.Always
+                    );
+            });
+            partyMenu.addItem((item) => {
+                item.setTitle("Never Roll")
+                    .onClick(async () => {
+                        plugin.data.rollPlayerInitiatives =
+                            RollPlayerInitiativeBehavior.Never;
+                        await plugin.saveSettings();
+                    })
+                    .setChecked(
+                        plugin.data.rollPlayerInitiatives ==
+                            RollPlayerInitiativeBehavior.Never
+                    );
+            });
+            partyMenu.addItem((item) => {
+                item.setTitle("Set to Zero")
+                    .onClick(async () => {
+                        plugin.data.rollPlayerInitiatives =
+                            RollPlayerInitiativeBehavior.SetToZero;
+                        await plugin.saveSettings();
+                    })
+                    .setChecked(
+                        plugin.data.rollPlayerInitiatives ==
+                            RollPlayerInitiativeBehavior.SetToZero
+                    );
+            });
+        });
 
         menu.addSeparator();
+        menu.addItem((item) => {
+            const load = item
+                .setIcon("open-elsewhere-glyph")
+                .setTitle("Load Encounter")
+                .setDisabled(Object.keys(plugin.data.encounters).length == 0)
+                .setSubmenu()
+                .setNoIcon();
+
+            for (const encounter of Object.keys(plugin.data.encounters)) {
+                load.addItem((item) => {
+                    item.setTitle(encounter).onClick(() => {
+                        tracker.new(plugin, plugin.data.encounters[encounter]);
+                    });
+                });
+            }
+        });
         menu.addItem((item) => {
             item.setIcon(SAVE)
                 .setTitle("Save Encounter")
@@ -138,16 +202,7 @@
                     dispatch("save");
                 });
         });
-        let load: MenuItem;
-        menu.addItem((item) => {
-            load = item
-                .setIcon("open-elsewhere-glyph")
-                .setTitle("Load Encounter")
-                .onClick(() => {
-                    dispatch("load");
-                })
-                .setDisabled(Object.keys(plugin.data.encounters).length == 0);
-        });
+
         menu.showAtMouseEvent(evt);
     };
 

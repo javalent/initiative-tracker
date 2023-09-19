@@ -47,6 +47,11 @@ declare module "obsidian" {
     interface Workspace {
         on(...args: EventsOnArgs): EventRef;
     }
+
+    interface MenuItem {
+        setSubmenu: () => Menu;
+        submenu: Menu;
+    }
 }
 
 export default class InitiativeTracker extends Plugin {

@@ -125,6 +125,8 @@ export interface InitiativeTrackerData {
     builder: BuilderState;
     descending: boolean;
     version: number[];
+
+    rollPlayerInitiatives: RollPlayerInitiativeBehavior;
 }
 
 export interface BuilderState {
@@ -246,7 +248,7 @@ export interface BuilderGenericPlayer {
 
 export type BuilderPlayer = BuilderPartyPlayer | BuilderGenericPlayer;
 
-import type InitiativeTracker from "src/main";
+import type { RollPlayerInitiativeBehavior } from "src/utils";
 export declare function getId(): string;
 export declare class Creature {
     creature: HomebrewCreature;

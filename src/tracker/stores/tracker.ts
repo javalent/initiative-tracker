@@ -10,7 +10,11 @@ import type {
     UpdateLogMessage
 } from "../../../index";
 import type { StackRoller } from "obsidian-overload";
-import { OVERFLOW_TYPE, getRpgSystem } from "src/utils";
+import {
+    OVERFLOW_TYPE,
+    RollPlayerInitiativeBehavior,
+    getRpgSystem
+} from "src/utils";
 import type Logger from "../../logger/logger";
 import type {
     DifficultyLevel,
@@ -290,6 +294,34 @@ function createTracker() {
             creature.number = prior?.length ? Math.max(...prior) + 1 : 1;
         }
     };
+
+    function rollIntiative(
+        plugin: InitiativeTracker,
+        creatures: Creature[]
+    ): Creature[] {
+        for (let creature of creatures) {
+            if (creature.static && creature.initiative) continue;
+            creature.active = false;
+            if (
+                creature.player &&
+                plugin.data.rollPlayerInitiatives ==
+                    RollPlayerInitiativeBehavior.Never
+            )
+                continue;
+            if (
+                creature.player &&
+                plugin.data.rollPlayerInitiatives ==
+                    RollPlayerInitiativeBehavior.SetToZero
+            ) {
+                creature.initiative = 0;
+            } else {
+                creature.initiative = plugin.getInitiativeValue(
+                    creature.modifier
+                );
+            }
+        }
+        return creatures;
+    }
 
     return {
         subscribe,
@@ -637,12 +669,7 @@ function createTracker() {
                     } */
                 }
 
-                for (let creature of items) {
-                    if (creature.static) continue;
-                    creature.initiative = plugin.getInitiativeValue(
-                        creature.modifier
-                    );
-                }
+                rollIntiative(plugin, creatures);
                 creatures.push(...items);
                 _logger?.log(
                     _logger?.join(items.map((c) => c.name)),
@@ -672,13 +699,7 @@ function createTracker() {
         updateAndSave: () => updateAndSave((c) => c),
         roll: (plugin: InitiativeTracker) =>
             updateAndSave((creatures) => {
-                for (let creature of creatures) {
-                    if (creature.static) continue;
-                    creature.initiative = plugin.getInitiativeValue(
-                        creature.modifier
-                    );
-                    creature.active = false;
-                }
+                rollIntiative(plugin, creatures);
                 return creatures;
             }),
         new: (plugin: InitiativeTracker, state?: InitiativeViewState) =>
@@ -690,13 +711,7 @@ function createTracker() {
                     ? state.creatures.map((c) => Creature.fromJSON(c, plugin))
                     : creatures.filter((c) => c.player);
                 if (!state || state?.roll) {
-                    for (let creature of creatures) {
-                        if (creature.static && creature.initiative) continue;
-                        creature.initiative = plugin.getInitiativeValue(
-                            creature.modifier
-                        );
-                        creature.active = false;
-                    }
+                    rollIntiative(plugin, creatures);
                 }
                 setNumbers(creatures);
                 if (

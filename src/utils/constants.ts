@@ -12,6 +12,12 @@ export const DEFAULT_UNDEFINED = "–";
 
 export const META_MODIFIER = Platform.isMacOS ? "Meta" : "Control";
 
+export enum RollPlayerInitiativeBehavior {
+    Always,
+    Never,
+    SetToZero
+}
+
 export const DEFAULT_SETTINGS: InitiativeTrackerData = {
     players: [],
     parties: [],
@@ -61,7 +67,8 @@ export const DEFAULT_SETTINGS: InitiativeTrackerData = {
         showParty: true,
         showXP: true,
         sidebarIcon: true
-    }
+    },
+    rollPlayerInitiatives: RollPlayerInitiativeBehavior.Always
 };
 
 export const OVERFLOW_TYPE: { [key: string]: string } = {

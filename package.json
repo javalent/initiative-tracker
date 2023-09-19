@@ -37,7 +37,7 @@
         "esbuild-svelte": "^0.6.0",
         "fast-copy": "^3.0.1",
         "jest": "^29.5.0",
-        "obsidian": "^1.4.0",
+        "obsidian": "^1.4.11",
         "obsidian-overload": "^1.41.0",
         "standard-version": "^9.3.2",
         "svelte": "^3.49.0",
