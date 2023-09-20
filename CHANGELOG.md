@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.2.3](https://github.com/javalent/initiative-tracker/compare/12.2.2...12.2.3) (2023-09-20)
+
+
+### Bug Fixes
+
+* beep boop ([bf9cc08](https://github.com/javalent/initiative-tracker/commit/bf9cc08fefd71ed58f4f8e94b7b211eb56301a45))
+
 ## [12.2.2](https://github.com/javalent/initiative-tracker/compare/12.2.1...12.2.2) (2023-09-20)
 
 
