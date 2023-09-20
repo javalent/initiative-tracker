@@ -20,7 +20,7 @@
             }}
             on:blur={function (evt) {
                 const value = this.value;
-                if (isNaN(Number(value)) || Number(value) < 1) {
+                if (isNaN(Number(value))) {
                     new Notice("Enter a valid initiative.");
                     this.value = `${initiative}`;
                     return;
@@ -36,7 +36,9 @@
                     this.blur();
                     return;
                 }
-                if (!/^(\d*\.?\d*|Backspace|Delete|Arrow\w+)$/.test(evt.key)) {
+                if (
+                    !/^(-?\d*\.?\d*|Backspace|Delete|Arrow\w+)$/.test(evt.key)
+                ) {
                     evt.preventDefault();
                     return false;
                 }
