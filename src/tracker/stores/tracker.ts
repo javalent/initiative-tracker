@@ -707,9 +707,34 @@ function createTracker() {
                 $round.set(state?.round ?? 1);
                 $state.set(state?.state ?? false);
                 $name.set(state?.name ?? null);
-                creatures = state?.creatures
+
+                if (!state?.creatures) {
+                    /**
+                     * New encounter button was clicked, only maintain the players.
+                     */
+                    creatures = creatures.filter((c) => c.player);
+                } else {
+                    /**
+                     * Encounter is being started. Keep any pre-existing players that are incoming.
+                     */
+                    const tempCreatureArray: Creature[] = [];
+                    for (const creature of state.creatures) {
+                        const existingPlayer = creatures.find(
+                            (c) => c.player && c.id === creature.id
+                        );
+                        if (existingPlayer) {
+                            tempCreatureArray.push(existingPlayer);
+                        } else {
+                            tempCreatureArray.push(
+                                Creature.fromJSON(creature, plugin)
+                            );
+                        }
+                    }
+                    creatures = tempCreatureArray;
+                }
+                /* creatures = state?.creatures
                     ? state.creatures.map((c) => Creature.fromJSON(c, plugin))
-                    : creatures.filter((c) => c.player);
+                    : creatures.filter((c) => c.player); */
                 if (!state || state?.roll) {
                     rollIntiative(plugin, creatures);
                 }
