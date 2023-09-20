@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.2.2](https://github.com/javalent/initiative-tracker/compare/12.2.1...12.2.2) (2023-09-20)
+
+
+### Bug Fixes
+
+* Respect never rolling initiative when launching encounter ([1ab1271](https://github.com/javalent/initiative-tracker/commit/1ab1271ec8a77d500a85e612152b504e36a9abc6))
+
 ## [12.2.1](https://github.com/javalent/initiative-tracker/compare/12.2.0...12.2.1) (2023-09-20)
 
 
