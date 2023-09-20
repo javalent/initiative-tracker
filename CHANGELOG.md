@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.2.1](https://github.com/javalent/initiative-tracker/compare/12.2.0...12.2.1) (2023-09-20)
+
+
+### Bug Fixes
+
+* Allow negative initiatives ([7c6eb4c](https://github.com/javalent/initiative-tracker/commit/7c6eb4c849916f4f4a9b39217e2a7987521d2967))
+
 ## [12.2.0](https://github.com/javalent/initiative-tracker/compare/12.1.4...12.2.0) (2023-09-19)
 
 
