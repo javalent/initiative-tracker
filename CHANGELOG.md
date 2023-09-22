@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.2.4](https://github.com/javalent/initiative-tracker/compare/12.2.3...12.2.4) (2023-09-22)
+
+
+### Bug Fixes
+
+* fixes setting max hp from notes ([300860d](https://github.com/javalent/initiative-tracker/commit/300860d38b729bd408360b99c8b5fbb4b4251405))
+
 ## [12.2.3](https://github.com/javalent/initiative-tracker/compare/12.2.2...12.2.3) (2023-09-20)
 
 
