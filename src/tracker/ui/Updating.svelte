@@ -10,7 +10,7 @@
 
     import { tracker } from "../stores/tracker";
     const { updating, updateTarget } = tracker;
-    import { Writable, writable } from "svelte/store";
+    import { type Writable, writable } from "svelte/store";
 
     const plugin = getContext<InitiativeTracker>("plugin");
     const hpIcon = (node: HTMLElement) => {
@@ -50,9 +50,9 @@
                     ...(plugin.data.statuses.find((s) => s.name == status) ?? {
                         name: status,
                         id: getId(),
-                        description: "",
-                    }),
-                },
+                        description: ""
+                    })
+                }
             ];
             status = null;
         }

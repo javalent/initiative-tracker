@@ -1,12 +1,12 @@
 <script lang="ts">
     import {
-        BuiltFilterStore,
-        FilterLayoutItem,
+        type BuiltFilterStore,
+        type FilterLayoutItem,
         FilterType,
-        LayoutItem,
-        OptionsFilterStore,
-        RangeFilterStore,
-        StringFilterStore
+        type LayoutItem,
+        type OptionsFilterStore,
+        type RangeFilterStore,
+        type StringFilterStore
     } from "src/builder/stores/filter/filter";
     import { getContext } from "svelte";
     import Range from "./Range.svelte";

@@ -7,10 +7,10 @@
     import Encounter from "./encounter/Encounter.svelte";
     import PartyExperience from "./party/PartyExperience.svelte";
     import {
-        BuiltFilterStore,
+        type BuiltFilterStore,
         createFilterStore
     } from "../stores/filter/filter";
-    import { BuiltTableStore, createTable } from "../stores/table/table";
+    import { type BuiltTableStore, createTable } from "../stores/table/table";
     import type { SRDMonster } from "index";
 
     export let plugin: InitiativeTracker;

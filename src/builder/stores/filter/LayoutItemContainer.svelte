@@ -1,8 +1,8 @@
 <script lang="ts">
     import { ExtraButtonComponent, setIcon } from "obsidian";
     import {
-        BuiltFilterStore,
-        Filter,
+        type BuiltFilterStore,
+        type Filter,
         FilterType
     } from "src/builder/stores/filter/filter";
     import { createEventDispatcher, getContext } from "svelte";

@@ -6,7 +6,7 @@
         Setting,
         TextComponent
     } from "obsidian";
-    import { Filter, FilterType } from "./filter";
+    import { type Filter, FilterType } from "./filter";
     import copy from "fast-copy";
     import { createEventDispatcher } from "svelte";
     import DraggableField from "./DraggableField.svelte";

@@ -3,6 +3,8 @@
     "compilerOptions": {
         "baseUrl": ".",
         "inlineSources": true,
+        "strictPropertyInitialization": false,
+        "strictNullChecks": false,
         "module": "ESNext",
         "target": "ESNext",
         "allowJs": true,

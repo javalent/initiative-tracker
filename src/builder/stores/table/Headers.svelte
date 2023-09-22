@@ -4,7 +4,7 @@
     import { NAME_HEADER, TableHeader } from "./table";
     import { ButtonComponent, Setting, setIcon } from "obsidian";
     import { createEventDispatcher } from "svelte";
-    import { SortFunctions, TableHeaderState } from "index";
+    import { SortFunctions, type TableHeaderState } from "index";
     import { SORT_NUMBER, SORT_STRING } from "src/utils";
     import { EditModal } from "./edit-modal";
     import { getId } from "src/utils/creature";

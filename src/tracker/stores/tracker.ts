@@ -1,6 +1,12 @@
 import { Creature, getId } from "src/utils/creature";
 import type InitiativeTracker from "../../main";
-import { derived, get, Updater, Writable, writable } from "svelte/store";
+import {
+    derived,
+    get,
+    type Updater,
+    type Writable,
+    writable
+} from "svelte/store";
 import { equivalent } from "../../encounter";
 import { Platform, TFile } from "obsidian";
 import type {
@@ -38,6 +44,9 @@ type CreatureUpdate = {
     status?: Condition[];
     hidden?: boolean;
     enabled?: boolean;
+    //this is so dirty
+    set_hp?: number;
+    set_max_hp?: number;
 };
 type CreatureUpdates = { creature: Creature; change: CreatureUpdate };
 const modifier = Platform.isMacOS ? "Meta" : "Control";
@@ -187,6 +196,12 @@ function createTracker() {
                 ) {
                     creature.hp = creature.current_max;
                 }
+            }
+            if (change.set_hp) {
+                creature.hp = change.set_hp;
+            }
+            if (change.set_max_hp) {
+                creature.current_max = creature.max = change.set_max_hp;
             }
             if (change.ac) {
                 creature.current_ac = creature.ac = change.ac;

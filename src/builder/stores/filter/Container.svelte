@@ -1,10 +1,10 @@
 <script lang="ts">
     import { createEventDispatcher, setContext } from "svelte/internal";
     import {
-        BuiltFilterStore,
+        type BuiltFilterStore,
         DEFAULT_NEW_FILTER,
-        Filter,
-        FilterLayout
+        type Filter,
+        type FilterLayout
     } from "./filter";
     import Filters from "./Filters.svelte";
     import { ButtonComponent, Setting } from "obsidian";

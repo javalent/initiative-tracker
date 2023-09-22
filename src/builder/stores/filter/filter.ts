@@ -1,15 +1,15 @@
 import copy from "fast-copy";
 import type { SRDMonster } from "index";
-import { prepareSimpleSearch, SearchResult } from "obsidian";
+import { prepareSimpleSearch, type SearchResult } from "obsidian";
 import type InitiativeTracker from "src/main";
 import { convertFraction } from "src/utils";
 import { getId } from "src/utils/creature";
 import {
     derived,
     get,
-    Readable,
-    Updater,
-    Writable,
+    type Readable,
+    type Updater,
+    type Writable,
     writable
 } from "svelte/store";
 

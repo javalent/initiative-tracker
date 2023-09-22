@@ -1,5 +1,5 @@
 import {
-    FrontMatterCache,
+    type FrontMatterCache,
     Notice,
     parseYaml,
     Plugin,
@@ -359,7 +359,7 @@ export default class InitiativeTracker extends Plugin {
                                 tracker.updateCreatures({
                                     creature,
                                     change: {
-                                        max: player.hp,
+                                        set_max_hp: player.hp,
                                         ac: player.ac
                                     }
                                 });
@@ -515,7 +515,7 @@ export default class InitiativeTracker extends Plugin {
                     } catch (e) {
                         new Notice(
                             "There was an issue launching the encounter.\n\n" +
-                                e.message
+                                (e as Error).message
                         );
                         console.error(e);
                         return;
