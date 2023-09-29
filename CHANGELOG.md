@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.2.6](https://github.com/javalent/initiative-tracker/compare/12.2.5...12.2.6) (2023-09-29)
+
+
+### Bug Fixes
+
+* :bug: Correctly number first instance of a creature when adding more ([6424b23](https://github.com/javalent/initiative-tracker/commit/6424b2312432662b377548a7107a7f09b48e81f3))
+
 ## [12.2.5](https://github.com/javalent/initiative-tracker/compare/12.2.4...12.2.5) (2023-09-29)
 
 
