@@ -8,7 +8,7 @@ import {
     writable
 } from "svelte/store";
 import { equivalent } from "../../encounter";
-import { Platform, TFile } from "obsidian";
+import { Events, Platform, TFile } from "obsidian";
 import type {
     Condition,
     InitiativeTrackerData,
@@ -102,9 +102,12 @@ function createTracker() {
         if (_settings.condense) {
             values.forEach((creature, _, arr) => {
                 const equiv = arr.filter((c) => equivalent(c, creature));
+                const initiatives = equiv.map((i) => i.initiative);
+                const initiative =
+                    initiatives[Math.floor(Math.random() * initiatives.length)];
                 equiv.forEach((eq) => {
                     if (eq.static) return;
-                    eq.initiative = Math.max(...equiv.map((i) => i.initiative));
+                    eq.initiative = initiative;
                 });
             });
         }
@@ -671,21 +674,25 @@ function createTracker() {
             updateAndSave((creatures) => {
                 if (plugin.canUseDiceRoller && roll) {
                     setCreatureHP(items, plugin);
-                    /* for (const creature of items) {
-                        if (!creature.rollHP) continue;
-                        if (!creature?.hit_dice?.length) continue;
-                        let roller = plugin.getRoller(
-                            creature.hit_dice
-                        ) as StackRoller;
-                        creature.hp =
-                            creature.max =
-                            creature.current_max =
-                                roller.rollSync();
-                    } */
                 }
 
-                rollIntiative(plugin, creatures);
                 creatures.push(...items);
+                const toRoll: Creature[] = [];
+                if (!_settings.condense) {
+                    toRoll.push(...items);
+                } else {
+                    for (const creature of items) {
+                        const existing = current_order.find((c) =>
+                            equivalent(c, creature)
+                        );
+                        if (existing) {
+                            creature.initiative = existing.initiative;
+                        } else {
+                            toRoll.push(creature);
+                        }
+                    }
+                }
+                rollIntiative(plugin, toRoll);
                 _logger?.log(
                     _logger?.join(items.map((c) => c.name)),
                     "added to the combat."
@@ -920,5 +927,390 @@ function setCreatureHP(creatures: Creature[], plugin: InitiativeTracker) {
         if (!creature.hit_dice?.length) continue;
         let roller = plugin.getRoller(creature.hit_dice) as StackRoller;
         creature.hp = creature.max = creature.current_max = roller.rollSync();
+    }
+}
+
+/* export const tracker = new Tracker(); */
+//TODO
+class Tracker {
+    #bus = new Events();
+
+    #data: InitiativeTrackerData;
+    #initiativeCallback: (modifier: number) => number;
+    #initialized = false;
+    /**
+     * Initialize the tracker. The main plugin should be
+     * the only thing to call this.
+     */
+    public initialize(
+        data: InitiativeTrackerData,
+        logger: Logger,
+        initiativeCallback: (modifier: number) => number
+    ) {
+        this.#data = data;
+        this.#initiativeCallback = initiativeCallback;
+        this.#logger = logger;
+        this.#initialized = true;
+        this.#bus.trigger("initialized");
+    }
+    async isInitialized(): Promise<void> {
+        return new Promise((resolve) => {
+            if (this.#initialized) resolve();
+            this.#bus.on("initialized", () => resolve());
+        });
+    }
+
+    /** All creatures in the encounter. Includes players. */
+    #creatures = writable<Creature[]>([]);
+    /** All creatures, ordered by initiative. */
+    ordered = derived(this.#creatures, (values) => {
+        const sort = [...values];
+        sort.sort((a, b) => {
+            return this.#data.descending
+                ? b.initiative - a.initiative
+                : a.initiative - b.initiative;
+        });
+        this.#current_order = sort;
+        return sort;
+    });
+    /** Static, non-store list. Populated during the order store update. */
+    #current_order: Creature[] = [];
+    /** Just players. */
+    #players = derived(this.#creatures, (creatures) =>
+        creatures.filter((c) => c.player)
+    );
+    /** Just combatants. */
+    #combatants = derived(this.#creatures, (creatures) =>
+        creatures.filter((c) => !c.player)
+    );
+    /** Enemies. */
+    #enemies = derived(this.#combatants, (combatants) =>
+        combatants.filter((c) => !c.friendly)
+    );
+    /** Allies */
+    #allies = derived(this.#combatants, (combatants) =>
+        combatants.filter((c) => c.friendly)
+    );
+
+    /** Encounter state. */
+    round = writable(1);
+    active = writable(false);
+    getState() {
+        return get(this.active);
+    }
+    setState(state: boolean) {
+        this.active.set(state);
+        if (state) {
+            if (!this.#logger.logging) {
+                this.#logger.new({
+                    name: get(this.name)!,
+                    players: this.#current_order.filter((c) => c.player),
+                    creatures: this.#current_order.filter((c) => !c.player),
+                    round: get(this.round)
+                });
+            } else {
+                this.tryLog(`Combat re-started`);
+            }
+        } else {
+            this.tryLog("Combat stopped");
+        }
+        this.#updateAndSave((creatures) => {
+            if (creatures.length && !creatures.find((c) => c.active)) {
+                this.#current_order[0].active = true;
+            }
+            return creatures;
+        });
+    }
+    name = writable<string | null>();
+    party = writable<string | null>();
+    getEncounterState(): InitiativeViewState {
+        return {
+            creatures: get(this.#creatures).map((c) => c.toJSON()),
+            state: get(this.active),
+            name: get(this.name)!,
+            round: get(this.round),
+            logFile: this.#logger?.getLogFile() ?? null,
+            rollHP: false
+        };
+    }
+    /**
+     * The svelte store contract.
+     * Expose the creature store, so this class can be
+     * used directly as the creature store in svelte files.
+     */
+    subscribe = this.#creatures.subscribe;
+    set = this.#creatures.set;
+    update = this.#creatures.update;
+    #updateAndSave(updater: Updater<Creature[]>) {
+        this.update(updater);
+        app.workspace.trigger(
+            "initiative-tracker:save-state",
+            this.getEncounterState()
+        );
+    }
+
+    new(state: InitiativeViewState) {}
+    add(roll: boolean = this.#data.rollHP, ...items: Creature[]) {}
+    remove(...items: Creature[]) {}
+
+    /**
+     * Logging
+     */
+    #logger: Logger;
+    tryLog(...msg: string[]) {
+        if (this.#logger) {
+            this.#logger.log(...msg);
+        }
+    }
+
+    /** Creature updates */
+    updating = writable<Map<Creature, HPUpdate>>(new Map());
+    updateTarget = writable<"ac" | "hp">();
+    updateCreatures(...updates: CreatureUpdates[]) {
+        this.#updateAndSave((creatures) => {
+            return this.performCreatureUpdate(creatures, ...updates);
+        });
+    }
+    performCreatureUpdate(
+        creatures: Creature[],
+        ...updates: CreatureUpdates[]
+    ) {
+        for (const { creature, change } of updates) {
+            if (change.initiative) {
+                creature.initiative = Number(change.initiative);
+                this.tryLog(
+                    `${creature.getName()} initiative changed to ${
+                        creature.initiative
+                    }`
+                );
+            }
+            if (change.name) {
+                creature.name = change.name;
+                creature.number = 0;
+            }
+            if (change.hp) {
+                // Reduce temp HP first
+                change.hp = Number(change.hp);
+                if (change.hp < 0 && creature.temp > 0) {
+                    const remaining = creature.temp + change.hp;
+                    creature.temp = Math.max(0, remaining);
+                    change.hp = Math.min(0, remaining);
+                }
+                // Clamp HP at 0 if clamp is enabled in settings
+                if (this.#data.clamp && creature.hp + change.hp < 0) {
+                    change.hp = -creature.hp;
+                }
+                // Handle overflow healing according to settings
+                if (
+                    change.hp > 0 &&
+                    change.hp + creature.hp > creature.current_max
+                ) {
+                    switch (this.#data.hpOverflow) {
+                        case OVERFLOW_TYPE.ignore:
+                            change.hp = Math.max(
+                                creature.current_max - creature.hp,
+                                0
+                            );
+                            break;
+                        case OVERFLOW_TYPE.temp:
+                            // Gives temp a value, such that it will be set later
+                            change.temp =
+                                change.hp -
+                                Math.min(creature.current_max - creature.hp, 0);
+                            change.hp -= change.temp;
+                            break;
+                        case OVERFLOW_TYPE.current:
+                            break;
+                    }
+                }
+                creature.hp += change.hp;
+                if (this.#data.autoStatus && creature.hp <= 0) {
+                    const unc = this.#data.statuses.find(
+                        (s) => s.id == this.#data.unconsciousId
+                    );
+                    if (unc) creature.status.add(unc);
+                }
+            }
+            if (change.max) {
+                creature.current_max = Math.max(
+                    0,
+                    creature.current_max + change.max
+                );
+                if (
+                    creature.hp >= creature.current_max &&
+                    this.#data.hpOverflow !== OVERFLOW_TYPE.current
+                ) {
+                    creature.hp = creature.current_max;
+                }
+            }
+            if (change.set_hp) {
+                creature.hp = change.set_hp;
+            }
+            if (change.set_max_hp) {
+                creature.current_max = creature.max = change.set_max_hp;
+            }
+            if (change.ac) {
+                creature.current_ac = creature.ac = change.ac;
+            }
+            if (change.temp) {
+                let baseline = 0;
+                if (this.#data.additiveTemp) {
+                    baseline = creature.temp;
+                }
+                if (change.temp > 0) {
+                    creature.temp = Math.max(
+                        creature.temp,
+                        baseline + change.temp
+                    );
+                } else {
+                    creature.temp = Math.max(0, creature.temp + change.temp);
+                }
+            }
+            if (change.marker) {
+                creature.marker = change.marker;
+            }
+            if (change.status?.length) {
+                for (const status of change.status) {
+                    if ([...creature.status].find((s) => s.id == status.id)) {
+                        creature.status = new Set(
+                            [...creature.status].filter(
+                                (s) => s.id != status.id
+                            )
+                        );
+                        this.tryLog(
+                            `${creature.name} relieved of status ${status.name}`
+                        );
+                    } else {
+                        creature.status.add(status);
+                    }
+                }
+            }
+            if ("hidden" in change) {
+                creature.hidden = change.hidden!;
+                this.tryLog(
+                    `${creature.getName()} ${
+                        creature.hidden ? "hidden" : "revealed"
+                    }`
+                );
+            }
+            if ("enabled" in change) {
+                creature.enabled = change.enabled!;
+                this.tryLog(
+                    `${creature.getName()} ${
+                        creature.enabled ? "enabled" : "disabled"
+                    }`
+                );
+            }
+            if (!creatures.includes(creature)) {
+                creatures.push(creature);
+            }
+        }
+        return creatures;
+    }
+    setUpdate(creature: Creature, evt: MouseEvent) {
+        this.updating.update((creatures) => {
+            if (creatures.has(creature)) {
+                creatures.delete(creature);
+            } else {
+                creatures.set(creature, {
+                    saved: evt.getModifierState("Shift"),
+                    resist: evt.getModifierState(modifier),
+                    customMod: evt.getModifierState("Alt") ? "2" : "1"
+                });
+            }
+            return creatures;
+        });
+    }
+    doUpdate(toAddString: string, statuses: Condition[], ac: string) {
+        this.updating.update((updatingCreatures) => {
+            const messages: UpdateLogMessage[] = [];
+            const updates: CreatureUpdates[] = [];
+
+            updatingCreatures.forEach((entry, creature) => {
+                const roundHalf = !toAddString.includes(".");
+                const change: CreatureUpdate = {};
+                const modifier =
+                    (entry.saved ? 0.5 : 1) *
+                    (entry.resist ? 0.5 : 1) *
+                    Number(entry.customMod);
+                const name = [creature.name];
+                if (creature.number > 0) {
+                    name.push(`${creature.number}`);
+                }
+                const message: UpdateLogMessage = {
+                    name: name.join(" "),
+                    hp: null,
+                    temp: false,
+                    max: false,
+                    status: null,
+                    saved: false,
+                    unc: false,
+                    ac: null,
+                    ac_add: false
+                };
+
+                if (toAddString.charAt(0) == "t") {
+                    let toAdd = Number(toAddString.slice(1));
+                    message.hp = toAdd;
+                    message.temp = true;
+                    change.temp = toAdd;
+                } else {
+                    const maxHpDamage = toAddString.charAt(0) === "m";
+                    let toAdd = Number(toAddString.slice(+maxHpDamage));
+                    toAdd =
+                        -1 *
+                        Math.sign(toAdd) *
+                        Math.max(Math.abs(toAdd) * modifier, 1);
+                    toAdd = roundHalf ? Math.trunc(toAdd) : toAdd;
+                    message.hp = toAdd;
+                    if (maxHpDamage) {
+                        message.max = true;
+                        change.max = toAdd;
+                    }
+                    change.hp = toAdd;
+                    if (creature.hp <= 0) {
+                        message.unc = true;
+                    }
+                }
+                if (statuses.length) {
+                    message.status = statuses.map((s) => s.name);
+                    if (!entry.saved) {
+                        change.status = [...statuses];
+                    } else {
+                        message.saved = true;
+                    }
+                }
+                if (ac) {
+                    if (ac.charAt(0) == "+" || ac.charAt(0) == "-") {
+                        const current_ac = parseInt(
+                            String(creature.current_ac)
+                        );
+                        if (isNaN(current_ac)) {
+                            creature.current_ac = creature.current_ac + ac;
+                        } else {
+                            creature.current_ac = current_ac + parseInt(ac);
+                        }
+                        message.ac_add = true;
+                    } else {
+                        creature.current_ac = ac.slice(
+                            Number(ac.charAt(0) == "\\")
+                        );
+                    }
+                    message.ac = ac.slice(Number(ac.charAt(0) == "\\"));
+                }
+                messages.push(message);
+                updates.push({ creature, change });
+            });
+            this.#logger?.logUpdate(messages);
+            this.updateCreatures(...updates);
+            updatingCreatures.clear();
+            return updatingCreatures;
+        });
+    }
+    clearUpdate() {
+        this.updating.update((updates) => {
+            updates.clear();
+            return updates;
+        });
     }
 }
