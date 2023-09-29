@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.2.5](https://github.com/javalent/initiative-tracker/compare/12.2.4...12.2.5) (2023-09-29)
+
+
+### Bug Fixes
+
+* 🐛 Improves grouped creature initiative rolling logic ([97cd5e7](https://github.com/javalent/initiative-tracker/commit/97cd5e78624a1595f2c5f3e0ef7a26e9cfbf55f3))
+* 🚸 Adds "Roll Initiative" button to Tracker table ([61fbe47](https://github.com/javalent/initiative-tracker/commit/61fbe47bfa7506de4e164f2d5d9fac20dd0b0f01))
+
 ## [12.2.4](https://github.com/javalent/initiative-tracker/compare/12.2.3...12.2.4) (2023-09-22)
 
 
