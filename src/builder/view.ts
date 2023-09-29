@@ -1,5 +1,4 @@
-import type { ExperienceThreshold } from "index";
-import { ItemView, ViewStateResult, WorkspaceLeaf } from "obsidian";
+import { ItemView, type ViewStateResult, WorkspaceLeaf } from "obsidian";
 import type InitiativeTracker from "src/main";
 import { BUILDER_VIEW } from "../utils";
 

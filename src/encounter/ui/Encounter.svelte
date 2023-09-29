@@ -8,7 +8,7 @@
     import { tracker } from "src/tracker/stores/tracker";
     import type { CreatureState } from "index";
     import CreatureComponent from "./Creature.svelte";
-    import { setContext } from "svelte/internal";
+    import { setContext } from "svelte";
 
     export let plugin: InitiativeTracker;
 
