@@ -292,9 +292,9 @@ function createTracker() {
         trySave();
     }
 
-    const setNumbers = (list: Creature[], sublist: Creature[] = list) => {
-        for (let i = 0; i < sublist.length; i++) {
-            const creature = sublist[i];
+    const setNumbers = (list: Creature[]) => {
+        for (let i = 0; i < list.length; i++) {
+            const creature = list[i];
             if (
                 creature.player ||
                 list.filter((c) => c.name == creature.name).length == 1
@@ -309,6 +309,7 @@ function createTracker() {
                         : c.name == creature.name
                 )
                 .map((c) => c.number);
+
             creature.number = prior?.length ? Math.max(...prior) + 1 : 1;
         }
     };
@@ -697,7 +698,7 @@ function createTracker() {
                     _logger?.join(items.map((c) => c.name)),
                     "added to the combat."
                 );
-                setNumbers(creatures, items);
+                setNumbers(creatures);
                 return creatures;
             }),
         remove: (...items: Creature[]) =>
