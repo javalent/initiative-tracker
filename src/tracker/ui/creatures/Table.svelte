@@ -1,15 +1,19 @@
 <script lang="ts">
-    import { setIcon } from "obsidian";
+    import { ExtraButtonComponent, setIcon } from "obsidian";
 
     import CreatureTemplate from "./Creature.svelte";
 
-    import { AC, HP, META_MODIFIER } from "src/utils";
+    import { AC, DICE, HP, META_MODIFIER } from "src/utils";
     import { Creature, getId } from "src/utils/creature";
     import { createEventDispatcher } from "svelte";
     import { dndzone } from "svelte-dnd-action";
     import { flip } from "svelte/animate";
 
     import { tracker } from "../../stores/tracker";
+    import type InitiativeTracker from "src/main";
+    import { getContext } from "svelte";
+
+    const plugin = getContext<InitiativeTracker>("plugin");
     const { state, ordered } = tracker;
 
     $: items = [...$ordered].map((c) => {
@@ -26,12 +30,12 @@
     };
     const flipDurationMs = 300;
     function handleDndConsider(
-        e: CustomEvent<GenericDndEvent<{ creature: Creature; id: string }>>
+        e: CustomEvent<GenericDndEvent<{ creature: Creature; id: string }[]>>
     ) {
         items = e.detail.items;
     }
     function handleDndFinalize(
-        e: CustomEvent<GenericDndEvent<{ creature: Creature; id: string }>>
+        e: CustomEvent<GenericDndEvent<{ creature: Creature; id: string }[]>>
     ) {
         if (e.detail.items.length > 1) {
             let dropped = e.detail.items.find(
@@ -52,12 +56,21 @@
         items = e.detail.items;
         $tracker = [...items.map(({ creature }) => creature)];
     }
+
+    const diceIcon = (node: HTMLElement) => {
+        new ExtraButtonComponent(node).setIcon(DICE);
+    };
 </script>
 
 <table class="initiative-tracker-table">
     {#if $ordered.length}
         <thead class="tracker-table-header">
-            <th style="width:10%" />
+            <td
+                style="width: 10%;"
+                use:diceIcon
+                aria-label="Re-Roll Initiatives"
+                on:click={(evt) => tracker.roll(plugin)}
+            />
             <th class="left" style="width:55%">Name</th>
             <th style="width:15%" use:hpIcon class="center" />
             <th style="width:15%" use:acIcon class="center" />
@@ -73,7 +86,6 @@
             on:consider={handleDndConsider}
             on:finalize={handleDndFinalize}
         >
-        
             {#each items as { creature, id } (id)}
                 <tr
                     class="draggable initiative-tracker-creature"
