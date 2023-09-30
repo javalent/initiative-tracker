@@ -3,6 +3,7 @@ import type { SRDMonster } from "../../../index";
 import type InitiativeTracker from "../../main";
 import { Dnd5eRpgSystem } from "./dnd5e";
 import { Dnd5eLazyGmRpgSystem } from "./dnd5e-lazygm";
+import { Dnd5eCr2SimpleRpgSystem } from "./dnd5e-cr2-simple";
 import { Pathfinder2eRpgSystem } from "./pf2e"
 import { RpgSystem } from "./rpgSystem";
 import { DEFAULT_UNDEFINED } from "../constants";
@@ -54,6 +55,7 @@ export type IntermediateValues = { label: string, value: number }[]
 export enum RpgSystemSetting {
   Dnd5e = "dnd5e",
   Dnd5eLazyGm = "dnd5e-lazygm",
+  Dnd5eCR2Simple = "dnd5e-cr2-simple",
   Pathfinder2e = "pathfinder2e"
 }
 
@@ -70,6 +72,7 @@ export function getRpgSystem(plugin: InitiativeTracker, settingId?: string): Rpg
   switch (settingId ? settingId : plugin.data.rpgSystem) {
     case RpgSystemSetting.Dnd5e: return new Dnd5eRpgSystem(plugin);
     case RpgSystemSetting.Dnd5eLazyGm: return new Dnd5eLazyGmRpgSystem(plugin);
+    case RpgSystemSetting.Dnd5eCR2Simple: return new Dnd5eCr2SimpleRpgSystem(plugin);
     case RpgSystemSetting.Pathfinder2e: return new Pathfinder2eRpgSystem(plugin);
   }
   return new UndefinedRpgSystem();
