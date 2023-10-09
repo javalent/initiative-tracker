@@ -1,6 +1,4 @@
 import {
-    Component,
-    MarkdownPostProcessorContext,
     MarkdownRenderChild,
     Notice,
     parseYaml

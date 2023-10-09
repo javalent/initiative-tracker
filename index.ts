@@ -1,5 +1,6 @@
 import "obsidian";
 import type { Spell, Trait, ability } from "obsidian-overload";
+import type { API } from "src/api/api";
 import type { Filter, FilterLayout } from "src/builder/stores/filter/filter";
 
 //      CUSTOM EVENTS
@@ -302,3 +303,9 @@ export type TableHeaderState = {
     type: SortFunctions;
     func?: string;
 };
+
+declare global {
+    interface Window {
+        InitiativeTracker?: API;
+    }
+}

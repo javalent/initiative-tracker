@@ -35,6 +35,7 @@ import BuilderView from "./builder/view";
 import PlayerView from "./tracker/player-view";
 import { tracker } from "./tracker/stores/tracker";
 import { EncounterSuggester } from "./encounter/editor-suggestor";
+import { API } from "./api/api"
 declare module "obsidian" {
     interface App {
         plugins: {
@@ -55,6 +56,7 @@ declare module "obsidian" {
 }
 
 export default class InitiativeTracker extends Plugin {
+    api = new API(this);
     public data: InitiativeTrackerData;
     public tracker = tracker;
     playerCreatures: Map<string, Creature> = new Map();
