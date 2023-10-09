@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.3.0](https://github.com/javalent/initiative-tracker/compare/12.2.6...12.3.0) (2023-10-09)
+
+
+### Features
+
+* Add DnD 5e Cr2.0 Simple XP Calculation System ([#230](https://github.com/javalent/initiative-tracker/issues/230)) ([f369cad](https://github.com/javalent/initiative-tracker/commit/f369cad6171e16ac00ef128511cc49cdea156229))
+* Basic API started ([a136eb1](https://github.com/javalent/initiative-tracker/commit/a136eb1ee5bb812f342520d463905be33d3e2d75))
+
 ## [12.2.6](https://github.com/javalent/initiative-tracker/compare/12.2.5...12.2.6) (2023-09-29)
 
 
