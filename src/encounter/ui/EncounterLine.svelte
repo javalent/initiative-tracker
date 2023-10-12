@@ -26,7 +26,7 @@
                 creatureMap.set(creature, roller.result);
             });
             rollerMap.set(creature, roller);
-            roller.roll();
+            roller.rollSync();
         } else {
             creatureMap.set(creature, number);
         }
@@ -156,7 +156,7 @@
 
 <style>
     .creature-name {
-         cursor: pointer;
+        cursor: pointer;
     }
     .encounter-line {
         display: flex;

@@ -15,7 +15,6 @@ export class API {
         creatures: HomebrewCreature[],
         rollHP: boolean = this.plugin.data.rollHP
     ) {
-        console.log("🚀 ~ file: api.ts:18 ~ creatures:", creatures);
         if (!creatures || !Array.isArray(creatures) || !creatures.length) {
             throw new Error("Creatures must be an array.");
         }

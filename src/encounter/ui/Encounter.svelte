@@ -37,7 +37,7 @@
                 creatureMap = creatureMap;
             });
             rollerMap.set(creature, roller);
-            roller.roll();
+            roller.rollSync();
         } else {
             creatureMap.set(creature, number);
         }

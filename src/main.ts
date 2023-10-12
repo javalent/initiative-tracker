@@ -35,7 +35,7 @@ import BuilderView from "./builder/view";
 import PlayerView from "./tracker/player-view";
 import { tracker } from "./tracker/stores/tracker";
 import { EncounterSuggester } from "./encounter/editor-suggestor";
-import { API } from "./api/api"
+import { API } from "./api/api";
 declare module "obsidian" {
     interface App {
         plugins: {
@@ -99,8 +99,10 @@ export default class InitiativeTracker extends Plugin {
                 dice = dice.replace(`%mod${i + 1}%`, `${modifier[i]}`);
             }
         }
+        console.log("🚀 ~ file: main.ts:103 ~ dice:", dice);
         const roller = this.getRoller(dice);
         const initiative = roller.rollSync();
+        console.log("🚀 ~ file: main.ts:104 ~ initiative:", initiative);
         if (isNaN(initiative)) return defaultIfNoResult;
         return initiative;
     }
