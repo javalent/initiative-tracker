@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.3.1](https://github.com/javalent/initiative-tracker/compare/12.3.0...12.3.1) (2023-10-12)
+
+
+### Bug Fixes
+
+* Fixes issue with Dice Roller integration (close [#232](https://github.com/javalent/initiative-tracker/issues/232)) ([3888416](https://github.com/javalent/initiative-tracker/commit/3888416b4527c4f27c90854b3261897bc5373c94))
+
 ## [12.3.0](https://github.com/javalent/initiative-tracker/compare/12.2.6...12.3.0) (2023-10-09)
 
 
