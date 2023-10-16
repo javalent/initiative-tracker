@@ -611,7 +611,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         b.setIcon("trash").onClick(async () => {
                             this.plugin.removeEncounter(name);
                             await this.plugin.saveSettings();
-                            this._displayParties(additionalContainer);
+                            this._displayBuilder(additionalContainer);
                         });
                     });
             }
