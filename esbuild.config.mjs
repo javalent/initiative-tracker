@@ -35,7 +35,10 @@ const parameters = {
             compilerOptions: { css: true },
             preprocess: sveltePreprocess(),
             filterWarnings: (warning) => {
-                return warning.code != "a11y-click-events-have-key-events";
+                if (warning.code.toLowerCase().startsWith("a11y-")) {
+                    return false;
+                }
+                return true;
             }
         })
     ],

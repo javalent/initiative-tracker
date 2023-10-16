@@ -41,6 +41,12 @@ declare module "obsidian" {
         plugins: {
             getPlugin<T extends keyof Plugins>(plugin: T): Plugins[T];
         };
+        commands: {
+            commands: { [id: string]: Command };
+            findCommand(id: string): Command;
+            executeCommandById(id: string): void;
+            listCommands(): Command[];
+        };
     }
     interface WorkspaceItem {
         containerEl: HTMLElement;
@@ -163,6 +169,42 @@ export default class InitiativeTracker extends Plugin {
         return this.statblock_creatures.filter(
             (p) => !p.player && p.bestiary !== false
         );
+    }
+
+    addEncounter(name: string, encounter: InitiativeViewState) {
+        this.data.encounters[name] = encounter;
+        this.registerCommand(name);
+    }
+    removeEncounter(name: string) {
+        delete this.data.encounters[name];
+        this.unregisterCommandsFor(name);
+    }
+
+    registerCommand(encounter: string) {
+        this.addCommand({
+            id: `start-${encounter}`,
+            name: `Start ${encounter}`,
+            checkCallback: (checking) => {
+                // checking if the command should appear in the Command Palette
+                if (checking) {
+                    // make sure the active view is a MarkdownView.
+                    return encounter in this.data.encounters;
+                }
+                if (!(encounter in this.data.encounters)) return;
+                tracker.new(this, this.data.encounters[encounter]);
+            }
+        });
+    }
+    unregisterCommandsFor(encounter: string) {
+        if (
+            this.app.commands.findCommand(
+                `initiative-tracker:start-${encounter}`
+            )
+        ) {
+            delete this.app.commands.commands[
+                `initiative-tracker:start-${encounter}`
+            ];
+        }
     }
 
     get bestiaryNames(): string[] {
@@ -470,6 +512,10 @@ export default class InitiativeTracker extends Plugin {
                 }
             }
         });
+
+        for (const encounter in this.data.encounters) {
+            this.registerCommand(encounter);
+        }
     }
 
     addEvents() {

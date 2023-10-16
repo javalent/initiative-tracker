@@ -129,7 +129,7 @@
                         )
                         .flat()
                 ];
-                plugin.data.encounters[encName] = {
+                plugin.addEncounter(encName, {
                     creatures: [...creatures.map((c) => c.toJSON())],
                     state: false,
                     name: encName,
@@ -138,7 +138,7 @@
                     rollHP: plugin.data.rollHP,
                     logFile: null,
                     timestamp: Date.now()
-                };
+                });
                 plugin.saveSettings();
                 new Notice(`Encounter "${encName}" saved.`);
                 modal.close();

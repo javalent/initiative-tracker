@@ -28,7 +28,7 @@
             .setIcon("trash")
             .setTooltip("Delete Encounter")
             .onClick(() => {
-                delete plugin.data.encounters[encounter];
+                plugin.removeEncounter(encounter);
                 encounters = plugin.data.encounters;
             });
     };

@@ -34,12 +34,12 @@
                 ) {
                     checking = true;
                 } else {
-                    plugin.data.encounters[encounterName] = {
+                    plugin.addEncounter(encounterName, {
                         ...tracker.getEncounterState(),
                         name: encounterName,
                         rollHP: plugin.data.rollHP,
                         timestamp: Date.now()
-                    };
+                    });
                     await plugin.saveSettings();
                     dispatch("cancel");
                 }
