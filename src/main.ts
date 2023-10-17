@@ -708,7 +708,7 @@ export default class InitiativeTracker extends Plugin {
                 }
             );
         } else {
-            this._builderIcon.detach();
+            this._builderIcon?.detach();
         }
     }
 }
