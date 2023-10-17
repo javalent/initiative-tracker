@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.4.0](https://github.com/javalent/initiative-tracker/compare/12.3.1...12.4.0) (2023-10-16)
+
+
+### Features
+
+* Commands will now be registered to start each saved encounter ([15887b0](https://github.com/javalent/initiative-tracker/commit/15887b0748250558af55d2ba6ba8dd6db874c9a9))
+
+
+### Bug Fixes
+
+* Fixes issues with deleting encounters from settings ([69a9d94](https://github.com/javalent/initiative-tracker/commit/69a9d94385580c7ba1a8fa78cdaad47458f1e95a))
+
 ## [12.3.1](https://github.com/javalent/initiative-tracker/compare/12.3.0...12.3.1) (2023-10-12)
 
 
