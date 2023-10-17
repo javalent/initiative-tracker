@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.4.2](https://github.com/javalent/initiative-tracker/compare/12.4.1...12.4.2) (2023-10-17)
+
+
+### Bug Fixes
+
+* Fixes issue where the encounter builder ribbon icon could cause the plugin to not load ([6534c87](https://github.com/javalent/initiative-tracker/commit/6534c8711fc03a7ca905d774b94cdb62bcf26fbe))
+
 ## [12.4.1](https://github.com/javalent/initiative-tracker/compare/12.4.0...12.4.1) (2023-10-17)
 
 
