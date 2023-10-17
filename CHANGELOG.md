@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.4.1](https://github.com/javalent/initiative-tracker/compare/12.4.0...12.4.1) (2023-10-17)
+
+
+### Bug Fixes
+
+* Party size is now taken into account when calculating 5e difficulties ([9e8bdde](https://github.com/javalent/initiative-tracker/commit/9e8bdde5f86de9fcd294ed3ed4f819636f4465d3))
+
 ## [12.4.0](https://github.com/javalent/initiative-tracker/compare/12.3.1...12.4.0) (2023-10-16)
 
 
