@@ -105,7 +105,7 @@ export class Dnd5eRpgSystem extends RpgSystem {
     const creatureXp = [...creatures].reduce(
       (acc, [creature, count]) => acc + this.getCreatureDifficulty(creature) * count, 0);
     const creatureCount = [...creatures.values()].reduce((acc, cur) => acc + cur, 0);
-    const mult = this.#getXpMult(creatureCount);
+    const mult = this.#getXpMult(creatureCount, playerLevels.length);
     const adjustedXp = (playerLevels.length == 0 || creatureCount == 0)
       ? 0 : creatureXp * mult;
 
@@ -165,12 +165,36 @@ ${thresholdSummary}`;
     }];
   }
 
-  #getXpMult(creatureCount: number) {
-    if (creatureCount >= 15) return 4;
-    if (creatureCount >= 11) return 3;
-    if (creatureCount >= 7) return 2.5;
-    if (creatureCount >= 3) return 2;
-    if (creatureCount >= 2) return 1.5;
-    return 1;
-  }
+    #getXpMult(creatureCount: number, playerCount: number) {
+        const mults = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5];
+        let index = 1;
+        if (playerCount < 3) {
+            index++;
+        } else if (playerCount > 5) {
+            index--;
+        }
+        switch (true) {
+            case creatureCount >= 15: {
+                index += 5;
+                break;
+            }
+            case creatureCount >= 11: {
+                index += 4;
+                break;
+            }
+            case creatureCount >= 7: {
+                index += 3;
+                break;
+            }
+            case creatureCount >= 3: {
+                index += 2;
+                break;
+            }
+            case creatureCount >= 2: {
+                index += 1;
+                break;
+            }
+        }
+        return mults[Math.min(index, mults.length - 1)];
+    }
 }
