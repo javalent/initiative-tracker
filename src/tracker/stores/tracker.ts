@@ -674,7 +674,7 @@ function createTracker() {
         ) =>
             updateAndSave((creatures) => {
                 if (plugin.canUseDiceRoller && roll) {
-                    setCreatureHP(items, plugin);
+                    setCreatureHP(items, plugin, roll);
                 }
 
                 creatures.push(...items);
@@ -922,9 +922,13 @@ function createTracker() {
 
 export const tracker = createTracker();
 
-function setCreatureHP(creatures: Creature[], plugin: InitiativeTracker) {
+function setCreatureHP(
+    creatures: Creature[],
+    plugin: InitiativeTracker,
+    rollHP = false
+) {
     for (const creature of creatures) {
-        if (!creature.rollHP) continue;
+        if (!creature.rollHP && !rollHP) continue;
         if (!creature.hit_dice?.length) continue;
         let roller = plugin.getRoller(creature.hit_dice) as StackRoller;
         creature.hp = creature.max = creature.current_max = roller.rollSync();
