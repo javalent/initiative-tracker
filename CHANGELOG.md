@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.4.3](https://github.com/javalent/initiative-tracker/compare/12.4.2...12.4.3) (2024-01-11)
+
+
+### Bug Fixes
+
+* Creatures will roll for HP correctly when added through the UI ([e6198f1](https://github.com/javalent/initiative-tracker/commit/e6198f1272f20bdf9c5096a37b56c3536b48325a))
+* fixes party level calculation for pf2e system ([005f7ec](https://github.com/javalent/initiative-tracker/commit/005f7ec1b40e5eeb637e562a9a5d8738ce89c990))
+* removed logs ([21a6acc](https://github.com/javalent/initiative-tracker/commit/21a6acc5f364409baa18a69d803fbc14e1c99289))
+
 ## [12.4.2](https://github.com/javalent/initiative-tracker/compare/12.4.1...12.4.2) (2023-10-17)
 
 
