@@ -105,10 +105,8 @@ export default class InitiativeTracker extends Plugin {
                 dice = dice.replace(`%mod${i + 1}%`, `${modifier[i]}`);
             }
         }
-        console.log("🚀 ~ file: main.ts:103 ~ dice:", dice);
         const roller = this.getRoller(dice);
         const initiative = roller.rollSync();
-        console.log("🚀 ~ file: main.ts:104 ~ initiative:", initiative);
         if (isNaN(initiative)) return defaultIfNoResult;
         return initiative;
     }
