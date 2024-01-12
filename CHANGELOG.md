@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.4.4](https://github.com/javalent/initiative-tracker/compare/12.4.3...12.4.4) (2024-01-12)
+
+
+### Bug Fixes
+
+* fix error caused by no player level being set ([d8639ec](https://github.com/javalent/initiative-tracker/commit/d8639ec667a8ad44c1a025b96e4b2d46a4bcde82))
+
 ## [12.4.3](https://github.com/javalent/initiative-tracker/compare/12.4.2...12.4.3) (2024-01-11)
 
 
