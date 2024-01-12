@@ -190,13 +190,16 @@ ${thresholdSummary}`;
         return [
             {
                 displayName: "Daily Budget",
-                minValue: playerLevels.reduce(
-                    (acc, lv) =>
-                        acc +
-                        XP_THRESHOLDS_PER_LEVEL[Math.max(1, Math.min(lv, 20))]
-                            .daily,
-                    0
-                )
+                minValue: playerLevels
+                    .filter((l) => l && l > 0)
+                    .reduce(
+                        (acc, lv) =>
+                            acc +
+                            XP_THRESHOLDS_PER_LEVEL[
+                                Math.max(1, Math.min(lv, 20))
+                            ].daily,
+                        0
+                    )
             }
         ];
     }
