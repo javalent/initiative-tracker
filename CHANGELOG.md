@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.4.5](https://github.com/javalent/initiative-tracker/compare/12.4.4...12.4.5) (2024-01-12)
+
+
+### Bug Fixes
+
+* ignore null player levels when finding daily budget ([48dc637](https://github.com/javalent/initiative-tracker/commit/48dc63750dc6046be1fbd6db8b3fcbc7e074a5c2))
+
 ## [12.4.4](https://github.com/javalent/initiative-tracker/compare/12.4.3...12.4.4) (2024-01-12)
 
 
