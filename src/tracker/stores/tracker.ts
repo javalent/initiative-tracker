@@ -741,11 +741,24 @@ function createTracker() {
                      * Encounter is being started. Keep any pre-existing players that are incoming.
                      */
                     const tempCreatureArray: Creature[] = [];
+
+                    const party = get($party);
+                    const players = new Map(
+                        [
+                            ...(party ? plugin.getPlayersForParty(party) : []),
+                            ...creatures.filter((p) => p.player)
+                        ].map((c) => [c.id, c])
+                    ).values();
                     for (const creature of state.creatures) {
-                        const existingPlayer = creatures.find(
-                            (c) => c.player && c.id === creature.id
-                        );
-                        if (existingPlayer) {
+                        /* const ; */
+                        let existingPlayer: Creature | null = null;
+                        if (
+                            creature.player &&
+                            (existingPlayer = creatures.find(
+                                (c) => c.player && c.id === creature.id
+                            )) &&
+                            existingPlayer != null
+                        ) {
                             tempCreatureArray.push(existingPlayer);
                         } else {
                             tempCreatureArray.push(
@@ -753,11 +766,17 @@ function createTracker() {
                             );
                         }
                     }
+                    for (const player of players) {
+                        if (
+                            !tempCreatureArray.find(
+                                (p) => p.player && p.id == player.id
+                            )
+                        ) {
+                            tempCreatureArray.push(player);
+                        }
+                    }
                     creatures = tempCreatureArray;
                 }
-                /* creatures = state?.creatures
-                    ? state.creatures.map((c) => Creature.fromJSON(c, plugin))
-                    : creatures.filter((c) => c.player); */
                 if (!state || state?.roll) {
                     rollIntiative(plugin, creatures);
                 }
@@ -767,17 +786,6 @@ function createTracker() {
                     (state?.rollHP ?? plugin.data.rollHP)
                 ) {
                     setCreatureHP(creatures, plugin);
-                    /* for (const creature of creatures) {
-                        if (creature.rollHP && creature.hit_dice?.length) {
-                            let roller = plugin.getRoller(
-                                creature.hit_dice
-                            ) as StackRoller;
-                            creature.hp =
-                                creature.max =
-                                creature.current_max =
-                                    roller.rollSync();
-                        }
-                    } */
                 }
 
                 if (state?.logFile) {
