@@ -13,8 +13,6 @@
 
     const dif = difficulty(plugin);
 
-    const rpgSystem: RpgSystem = getRpgSystem(plugin);
-
     const difficultyBar = tweened(0, {
         duration: 400,
         easing: cubicOut
@@ -34,7 +32,7 @@
 </script>
 
 <div class="difficulty-bar-container" aria-label={summary}>
-    <span>{rpgSystem.systemDifficulties[0]}</span>
+    <span>{$dif.labels?.[0] ?? ""}</span>
     <span
         ><meter
             class="difficulty-bar"
@@ -45,7 +43,7 @@
             value={$difficultyBar}
         /></span
     >
-    <span>{rpgSystem.systemDifficulties.slice(-1)}</span>
+    <span>{$dif.labels?.last() ?? ""}</span>
 </div>
 
 <style>

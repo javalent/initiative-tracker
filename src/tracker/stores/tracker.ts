@@ -881,13 +881,7 @@ function createTracker() {
         updateState: () => update((c) => c),
 
         difficulty: (plugin: InitiativeTracker) =>
-            derived<
-                Writable<Creature[]>,
-                {
-                    difficulty: DifficultyLevel;
-                    thresholds: DifficultyThreshold[];
-                }
-            >(creatures, (values) => {
+            derived([creatures, data], ([values]) => {
                 const players: number[] = [];
                 const creatureMap = new Map<Creature, number>();
                 const rpgSystem = getRpgSystem(plugin);
@@ -922,7 +916,8 @@ function createTracker() {
                         creatureMap,
                         players
                     ),
-                    thresholds: rpgSystem.getDifficultyThresholds(players)
+                    thresholds: rpgSystem.getDifficultyThresholds(players),
+                    labels: rpgSystem.systemDifficulties
                 };
             })
     };
