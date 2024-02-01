@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.5.0](https://github.com/javalent/initiative-tracker/compare/12.4.5...12.5.0) (2024-02-01)
+
+
+### Features
+
+* Add Dnd 5e 'Flee, Mortals!' XP System ([#248](https://github.com/javalent/initiative-tracker/issues/248)) ([761375c](https://github.com/javalent/initiative-tracker/commit/761375c3032f77bfca08e09ae789018b597ec6c6))
+
+
+### Bug Fixes
+
+* Difficulty displays will now update when XP system is changed ([03f786d](https://github.com/javalent/initiative-tracker/commit/03f786d5db05314cd6893b67224060aaa5a06740))
+* respect players & party when launching encounters via API ([146215f](https://github.com/javalent/initiative-tracker/commit/146215f5233e88d2e189444bcfbf04f6db9bb088))
+
 ## [12.4.5](https://github.com/javalent/initiative-tracker/compare/12.4.4...12.4.5) (2024-01-12)
 
 
