@@ -143,7 +143,7 @@ export class CreatureView extends ItemView {
         ) {
             await this.renderEmbed(creature.getStatblockLink());
         } else if (tryStatblockPlugin) {
-            const statblock = this.plugin.statblocks.render(
+            const statblock = window.FantasyStatblocks.render(
                 //@ts-ignore
                 creature,
                 this.statblockEl,

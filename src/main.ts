@@ -25,7 +25,7 @@ import type {
     Party,
     SRDMonster
 } from "../index";
-import type { Plugins, StackRoller } from "obsidian-overload";
+/* import type { Plugins, StackRoller } from "obsidian-overload"; */
 import InitiativeTrackerSettings from "./settings/settings";
 import { EncounterBlock, EncounterParser } from "./encounter";
 import EncounterLine from "./encounter/ui/EncounterLine.svelte";
@@ -36,6 +36,10 @@ import PlayerView from "./tracker/player-view";
 import { tracker } from "./tracker/stores/tracker";
 import { EncounterSuggester } from "./encounter/editor-suggestor";
 import { API } from "./api/api";
+
+import type { Plugins, StackRoller } from "obsidian-overload";
+import "fantasy-statblocks";
+
 declare module "obsidian" {
     interface App {
         plugins: {
@@ -91,6 +95,8 @@ export default class InitiativeTracker extends Plugin {
     }
 
     getInitiativeValue(modifier: number | number[] = 0): number {
+        console.log("🚀 ~ file: main.ts:94 ~ modifier:", modifier);
+
         const defaultIfNoResult =
             Math.floor(Math.random() * 19 + 1) +
             [modifier].flat().reduce((a, b) => a + b, 0);
@@ -105,6 +111,7 @@ export default class InitiativeTracker extends Plugin {
                 dice = dice.replace(`%mod${i + 1}%`, `${modifier[i]}`);
             }
         }
+        console.log("🚀 ~ file: main.ts:104 ~ dice:", dice);
         const roller = this.getRoller(dice);
         const initiative = roller.rollSync();
         if (isNaN(initiative)) return defaultIfNoResult;
@@ -127,15 +134,6 @@ export default class InitiativeTracker extends Plugin {
         );
     }
 
-    get canUseStatBlocks() {
-        return this.app.plugins.getPlugin("obsidian-5e-statblocks") != null;
-    }
-    get statblocks() {
-        return this.app.plugins.getPlugin("obsidian-5e-statblocks");
-    }
-    get statblockVersion() {
-        return this.statblocks?.settings?.version ?? { major: 0 };
-    }
     get canUseLeaflet() {
         return false;
         /* return (
@@ -153,15 +151,15 @@ export default class InitiativeTracker extends Plugin {
         }
     }
 
+    get canUseStatBlocks() {
+        return "FantasyStatblocks" in window;
+    }
+    get statblockVersion() {
+        return window.FantasyStatblocks?.getVersion() ?? { major: 0 };
+    }
     get statblock_creatures() {
-        if (!this.app.plugins.getPlugin("obsidian-5e-statblocks")) return [];
-        return [
-            ...Array.from(
-                this.app.plugins
-                    .getPlugin("obsidian-5e-statblocks")
-                    .bestiary?.values() ?? []
-            )
-        ] as SRDMonster[];
+        if (!window.FantasyStatblocks) return [];
+        return window.FantasyStatblocks.getBestiaryCreatures() as SRDMonster[];
     }
     get bestiary() {
         return this.statblock_creatures.filter(
@@ -206,13 +204,8 @@ export default class InitiativeTracker extends Plugin {
     }
 
     get bestiaryNames(): string[] {
-        if (!this.app.plugins.getPlugin("obsidian-5e-statblocks")) return [];
-        return (
-            (this.app.plugins
-                .getPlugin("obsidian-5e-statblocks")
-                //@ts-ignore
-                ?.getBestiaryNames() as string[]) ?? []
-        );
+        if (!window.FantasyStatblocks) return [];
+        return window.FantasyStatblocks.getBestiaryNames();
     }
     get view() {
         const leaves = this.app.workspace.getLeavesOfType(
@@ -238,8 +231,11 @@ export default class InitiativeTracker extends Plugin {
     getBaseCreatureFromBestiary(name: string) {
         /** Check statblocks */
         try {
-            if (this.canUseStatBlocks && this.statblocks.hasCreature(name)) {
-                return this.statblocks.getCreatureFromBestiary(name);
+            if (
+                this.canUseStatBlocks &&
+                window.FantasyStatblocks.hasCreature(name)
+            ) {
+                return window.FantasyStatblocks.getCreatureFromBestiary(name);
             }
         } catch (e) {}
         return null;
