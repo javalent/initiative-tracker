@@ -3,10 +3,11 @@
         ExtraButtonComponent,
         ButtonComponent,
         Notice,
-        ToggleComponent
+        ToggleComponent,
+        TextComponent
     } from "obsidian";
 
-    import { createEventDispatcher, onMount } from "svelte";
+    import { onMount } from "svelte";
 
     import { DICE } from "src/utils";
     import { SRDMonsterSuggestionModal } from "src/utils/suggester";
@@ -15,6 +16,7 @@
     import type { Writable } from "svelte/store";
     import { equivalent } from "src/encounter";
     import { confirmWithModal } from "./modal";
+    import Nullable from "src/builder/view/Nullable.svelte";
 
     let creature: Creature = new Creature({});
     export let amount = 1;
@@ -29,7 +31,7 @@
     });
 
     let modifier = JSON.stringify(creature.modifier ?? 0);
-
+    const prior = modifier;
     const saveButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Add Creature")
@@ -39,7 +41,30 @@
                     new Notice("Enter a name!");
                     return;
                 }
+
+                console.log(
+                    "🚀 ~ file: Create.svelte:47 ~ modifier:",
+                    modifier
+                );
+                try {
+                    creature.modifier = JSON.parse(`${modifier}`);
+                } catch (e) {
+                    console.warn(
+                        "Initiative Tracker: Non-parseable modifier provided to creature."
+                    );
+                    creature.modifier = JSON.parse(prior);
+                }
                 if (!creature.modifier) {
+                    creature.modifier = JSON.parse(prior);
+                }
+                if (
+                    (Array.isArray(creature.modifier) &&
+                        !creature.modifier.every((m) => !isNaN(Number(m)))) ||
+                    isNaN(Number(creature.modifier))
+                ) {
+                    console.warn(
+                        "Initiative Tracker: Non-numeric modifier provided to creature."
+                    );
                     creature.modifier = 0;
                 }
                 if (
@@ -123,20 +148,32 @@
                 );
             });
     };
-    let nameInput: HTMLInputElement, displayNameInput: HTMLInputElement;
+    let nameInput: TextComponent, displayNameInput: HTMLInputElement;
+    const name = (node: HTMLElement) => {
+        nameInput = new TextComponent(node)
+            .setValue(creature.name)
+            .onChange((v) => (creature.name = v));
+    };
     let modal: SRDMonsterSuggestionModal;
     const createModal = () => {
-        modal = new SRDMonsterSuggestionModal(plugin, nameInput);
-        modal.onClose = async () => {
-            if (modal.creature) {
-                creature = Creature.from(modal.creature);
+        modal = new SRDMonsterSuggestionModal(
+            plugin.app,
+            nameInput,
+            plugin.bestiary
+        );
+        modal.onSelect(async (selected) => {
+            if (selected.item) {
+                creature = Creature.from(selected.item);
 
                 creature.initiative = await plugin.getInitiativeValue(
                     creature.modifier
                 );
+                nameInput.setValue(creature.name);
             }
-        };
+            modal.close();
+        });
     };
+
     onMount(() => {
         if (isEditing) {
             setImmediate(() => {
@@ -162,33 +199,13 @@
             .setValue(creature.friendly)
             .onChange((v) => (creature.friendly = v));
     };
-
-    $: modString = !isNaN(Number(creature.modifier))
-        ? creature.modifier
-        : JSON.stringify(creature.modifier);
-
-    $: {
-        try {
-            creature.modifier = JSON.parse(`${modifier}`);
-        } catch (e) {}
-    }
 </script>
 
 <div class="initiative-tracker-editor">
     <div class="create-new">
         <div>
             <label for="add-name">Creature</label>
-            <input
-                bind:this={nameInput}
-                bind:value={creature.name}
-                on:focus={function () {
-                    if (modal) modal.open();
-                }}
-                id="add-name"
-                type="text"
-                name="name"
-                tabindex="0"
-            />
+            <div use:name id="add-name" />
         </div>
         <div>
             <label for="add-display">Display Name</label>
@@ -235,7 +252,7 @@
         <div>
             <label for="add-mod">Modifier</label>
             <input
-                bind:value={modString}
+                bind:value={modifier}
                 id="add-mod"
                 type="text"
                 name="add-mod"

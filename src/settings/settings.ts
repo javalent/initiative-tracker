@@ -12,11 +12,8 @@ import {
 
 import type InitiativeTracker from "../main";
 
-import {
-    FileSuggestionModal,
-    FolderSuggestionModal,
-    PlayerSuggestionModal
-} from "../utils/suggester";
+import { PlayerSuggestionModal } from "../utils/suggester";
+import { FileInputSuggest, FolderInputSuggest } from "obsidian-utilities";
 import {
     AC,
     Conditions,
@@ -326,19 +323,16 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 let folders = this.app.vault
                     .getAllLoadedFiles()
                     .filter((f) => f instanceof TFolder);
-                const modal = new FolderSuggestionModal(
+                const modal = new FolderInputSuggest(
                     this.app,
                     t,
                     folders as TFolder[]
                 );
-                modal.onClose = t.inputEl.onblur = async () => {
-                    const v = t.inputEl.value?.trim()
-                        ? t.inputEl.value.trim()
-                        : "/";
-                    this.plugin.data.logFolder = normalizePath(v);
+                modal.onSelect(async ({ item }) => {
+                    this.plugin.data.logFolder = normalizePath(item.path);
                     await this.plugin.saveSettings();
                     this.display();
-                };
+                });
             });
     }
     private _displayPlayers(additionalContainer: HTMLDetailsElement) {
@@ -1070,16 +1064,16 @@ class NewPlayerModal extends Modal {
             .setDesc("Link player to a note in your vault.")
             .addText((t) => {
                 t.setValue(this.player.note ?? "");
-                const modal = new FileSuggestionModal(this.app, t);
-                modal.onClose = async () => {
-                    if (!modal.file) return;
-                    const metaData = this.app.metadataCache.getFileCache(
-                        modal.file
-                    );
 
-                    this.player.note = modal.file.basename;
-                    this.player.path = modal.file.path;
-                    this.player.name = modal.file.basename;
+                let files = this.app.vault.getFiles();
+                const modal = new FileInputSuggest(this.app, t, files);
+                modal.onSelect(async ({ item: file }) => {
+                    if (!file) return;
+                    const metaData = this.app.metadataCache.getFileCache(file);
+
+                    this.player.note = file.basename;
+                    this.player.path = file.path;
+                    this.player.name = file.basename;
 
                     if (!metaData || !metaData.frontmatter) return;
                     const { ac, hp, modifier, level, name } =
@@ -1092,7 +1086,7 @@ class NewPlayerModal extends Modal {
                     this.player["statblock-link"] =
                         metaData.frontmatter["statblock-link"];
                     this.display();
-                };
+                });
             });
 
         let nameInput: InputValidate,
@@ -1472,7 +1466,12 @@ class PartyModal extends Modal {
             .setName("Add Player to Party")
             .addText((t) => {
                 playerText = t;
-                new PlayerSuggestionModal(this.plugin, t, this.party);
+                const modal = new PlayerSuggestionModal(this.plugin.app, t, [
+                    ...this.plugin.players.values()
+                ]).onSelect(({ item }) => {
+                    t.setValue(item.name);
+                    modal.close();
+                });
             })
             .addExtraButton((b) =>
                 b.setIcon("plus-with-circle").onClick(() => {

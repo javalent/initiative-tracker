@@ -92,7 +92,7 @@
     </div>
     <div class="buttons">
         <div use:cancel />
-        <div use:add disabled={!$adding.length && !isEditing} />
+        <div use:add class:disabled={!$adding.length && !isEditing} />
     </div>
 </div>
 
@@ -113,7 +113,7 @@
         gap: 0.5rem;
     }
 
-    div[disabled="true"] > :global(button) {
+    div.disabled > :global(button) {
         cursor: not-allowed;
     }
     .creator-list {
