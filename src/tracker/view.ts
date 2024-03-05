@@ -133,16 +133,13 @@ export class CreatureView extends ItemView {
             return;
         }
 
-        const tryStatblockPlugin =
-            this.plugin.canUseStatBlocks &&
-            this.plugin.statblockVersion?.major >= 2;
-
         if (
             creature["statblock-link"] &&
-            (this.plugin.data.preferStatblockLink || !tryStatblockPlugin)
+            (this.plugin.data.preferStatblockLink ||
+                !this.plugin.canUseStatBlocks)
         ) {
             await this.renderEmbed(creature.getStatblockLink());
-        } else if (tryStatblockPlugin) {
+        } else if (this.plugin.canUseStatBlocks) {
             const statblock = window.FantasyStatblocks.render(
                 //@ts-ignore
                 creature,

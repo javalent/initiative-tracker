@@ -44,6 +44,7 @@ declare module "obsidian" {
     interface App {
         plugins: {
             getPlugin<T extends keyof Plugins>(plugin: T): Plugins[T];
+            enabledPlugins: Set<string>;
         };
         commands: {
             commands: { [id: string]: Command };
@@ -151,8 +152,11 @@ export default class InitiativeTracker extends Plugin {
         }
     }
 
-    get canUseStatBlocks() {
-        return "FantasyStatblocks" in window;
+    get canUseStatBlocks(): boolean {
+        if (this.app.plugins.enabledPlugins.has("obsidian-5e-statblocks")) {
+            return (window["FantasyStatblocks"]?.getVersion()?.major ?? 0) >= 4;
+        } 
+        return false;
     }
     get statblockVersion() {
         return window.FantasyStatblocks?.getVersion() ?? { major: 0 };
@@ -270,6 +274,18 @@ export default class InitiativeTracker extends Plugin {
     async onload() {
         registerIcons();
 
+        if (this.app.plugins.enabledPlugins.has("obsidian-5e-statblocks")) {
+            if (!this.canUseStatBlocks) {
+                new Notice(
+                    createFragment((e) => {
+                        e.createEl("p", {
+                            text: `Initiative Tracker v${this.manifest.version} requires Fantasy Statblocks v4.0.0 or later.`
+                        });
+                        e.createEl("span", { text: "Please update Fantasy Statblocks to use the Fantasy Statblocks integration."})
+                    })
+                );
+            }
+        }
         await this.loadSettings();
 
         this.setBuilderIcon();
