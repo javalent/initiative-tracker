@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.0](https://github.com/javalent/initiative-tracker/compare/12.5.0...13.0.0) (2024-03-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* switch to new Fantasy Statblocks API
+
+### Features
+
+* Switch to Fantasy Statblocks API ([a993447](https://github.com/javalent/initiative-tracker/commit/a993447c948596f59e3a426bb4dc824ba4625dfd))
+* switch to new Fantasy Statblocks API ([28c8363](https://github.com/javalent/initiative-tracker/commit/28c836321dd5432f8c830b4c5a2c1a8ddeb7229f))
+
+
+### Bug Fixes
+
+* No longer unload views when plugin is unloaded ([fedc639](https://github.com/javalent/initiative-tracker/commit/fedc6397c9b2f49477fb0bb1f557778c9e16794f))
+* Notify users of new FS version requirement. ([9ea056e](https://github.com/javalent/initiative-tracker/commit/9ea056e93fc379623b5bed191bc96a482ce96ba8))
+* remove logs ([f84a61c](https://github.com/javalent/initiative-tracker/commit/f84a61c1433752164022fa5d91c8c7df9cbcee91))
+* Switch to centrally managed input suggesters ([f5e536e](https://github.com/javalent/initiative-tracker/commit/f5e536ee2b4abe73c9b6268aac9c517cf2bfe8b7))
+
 ## [12.5.0](https://github.com/javalent/initiative-tracker/compare/12.4.5...12.5.0) (2024-02-01)
 
 
