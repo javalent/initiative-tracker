@@ -12,6 +12,7 @@
     import type InitiativeTracker from "src/main";
     import Ajv from "ajv";
     import schema from "../../stores/filter/filter-schema.json";
+    import type { BuilderState } from "obsidian-overload";
 
     const table = getContext<BuiltTableStore>("table");
     const { sortDir, allHeaders } = table;
@@ -62,7 +63,7 @@
                     const ajv = new Ajv();
 
                     // validate is a type guard for MyData - type is inferred from schema type
-                    const validate = ajv.compile(schema);
+                    const validate = ajv.compile<BuilderState>(schema);
                     const input = createEl("input", {
                         attr: {
                             type: "file",

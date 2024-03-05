@@ -4,7 +4,8 @@ import {
     parseYaml,
     Plugin,
     TFile,
-    WorkspaceLeaf
+    WorkspaceLeaf,
+    setIcon
 } from "obsidian";
 
 import {
@@ -153,9 +154,10 @@ export default class InitiativeTracker extends Plugin {
     }
 
     get canUseStatBlocks(): boolean {
+        return true;
         if (this.app.plugins.enabledPlugins.has("obsidian-5e-statblocks")) {
             return (window["FantasyStatblocks"]?.getVersion()?.major ?? 0) >= 4;
-        } 
+        }
         return false;
     }
     get statblockVersion() {
@@ -281,7 +283,9 @@ export default class InitiativeTracker extends Plugin {
                         e.createEl("p", {
                             text: `Initiative Tracker v${this.manifest.version} requires Fantasy Statblocks v4.0.0 or later.`
                         });
-                        e.createEl("span", { text: "Please update Fantasy Statblocks to use the Fantasy Statblocks integration."})
+                        e.createEl("span", {
+                            text: "Please update Fantasy Statblocks to use the Fantasy Statblocks integration."
+                        });
                     })
                 );
             }
@@ -314,14 +318,49 @@ export default class InitiativeTracker extends Plugin {
 
         this.registerEditorSuggest(new EncounterSuggester(this));
         this.registerMarkdownCodeBlockProcessor("encounter", (src, el, ctx) => {
-            const handler = new EncounterBlock(this, src, el);
-            ctx.addChild(handler);
+            if (
+                this.canUseStatBlocks &&
+                !window["FantasyStatblocks"].isResolved()
+            ) {
+                el.addClasses(["waiting-for-bestiary", "is-loading"]);
+                const loading = el.createEl("p", {
+                    text: "Waiting for Fantasy Statblocks Bestiary..."
+                });
+                window["FantasyStatblocks"].onResolved(() => {
+                    el.removeClasses(["waiting-for-bestiary", "is-loading"]);
+                    loading.detach();
+                    const handler = new EncounterBlock(this, src, el);
+                    ctx.addChild(handler);
+                });
+            } else {
+                const handler = new EncounterBlock(this, src, el);
+                ctx.addChild(handler);
+            }
         });
         this.registerMarkdownCodeBlockProcessor(
             "encounter-table",
             (src, el, ctx) => {
-                const handler = new EncounterBlock(this, src, el, true);
-                ctx.addChild(handler);
+                if (
+                    this.canUseStatBlocks &&
+                    !window["FantasyStatblocks"].isResolved()
+                ) {
+                    el.addClasses(["waiting-for-bestiary", "is-loading"]);
+                    const loading = el.createEl("p", {
+                        text: "Waiting for Fantasy Statblocks Bestiary..."
+                    });
+                    window["FantasyStatblocks"].onResolved(() => {
+                        el.removeClasses([
+                            "waiting-for-bestiary",
+                            "is-loading"
+                        ]);
+                        loading.detach();
+                        const handler = new EncounterBlock(this, src, el, true);
+                        ctx.addChild(handler);
+                    });
+                } else {
+                    const handler = new EncounterBlock(this, src, el, true);
+                    ctx.addChild(handler);
+                }
             }
         );
 
@@ -337,25 +376,67 @@ export default class InitiativeTracker extends Plugin {
             if (!codes.length) return;
 
             for (const code of codes) {
-                const definitions = code.innerText.replace(`encounter:`, "");
-
-                const creatures = parseYaml("[" + definitions.trim() + "]");
-                const parser = new EncounterParser(this);
-                const parsed = await parser.parse({ creatures });
-
-                if (!parsed || !parsed.creatures || !parsed.creatures.size)
-                    continue;
-
                 const target = createSpan("initiative-tracker-encounter-line");
-                new EncounterLine({
-                    target,
-                    props: {
-                        ...parsed,
-                        plugin: this
-                    }
-                });
 
                 code.replaceWith(target);
+
+                const buildEncounter = async () => {
+                    const definitions = code.innerText.replace(
+                        `encounter:`,
+                        ""
+                    );
+
+                    const creatures = parseYaml("[" + definitions.trim() + "]");
+                    const parser = new EncounterParser(this);
+                    const parsed = await parser.parse({ creatures });
+
+                    if (
+                        !parsed ||
+                        !parsed.creatures ||
+                        !parsed.creatures.size
+                    ) {
+                        target.setText("No creatures found.");
+                        return;
+                    }
+                    new EncounterLine({
+                        target,
+                        props: {
+                            ...parsed,
+                            plugin: this
+                        }
+                    });
+                };
+                if (
+                    true
+                    /* this.canUseStatBlocks &&
+                    !window["FantasyStatblocks"].isResolved() */
+                ) {
+                    const loading = target.createSpan(
+                        "waiting-for-bestiary inline"
+                    );
+                    const delay = Math.floor(200 * Math.random());
+                    console.log("🚀 ~ file: main.ts:417 ~ duration:", delay);
+
+                    setIcon(
+                        loading.createDiv({
+                            cls: "icon",
+                            attr: {
+                                style: `animation-delay: ${delay}ms`
+                            }
+                        }),
+                        "loader-2"
+                    );
+                    loading.createEl("em", {
+                        text: "Loading Bestiary..."
+                    });
+                    window["FantasyStatblocks"].onResolved(() => {
+                        el.removeClasses(["waiting-for-bestiary", "inline"]);
+                        loading.detach();
+                        buildEncounter();
+                    });
+                } else {
+                    buildEncounter();
+                }
             }
         });
 

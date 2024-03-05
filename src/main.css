@@ -253,3 +253,40 @@ body {
     align-items: center;
     gap: 0.25rem;
 }
+
+.waiting-for-bestiary.is-loading {
+    display: flex;
+    justify-content: center;
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+.waiting-for-bestiary.inline {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--font-small);
+    --icon-size: var(--icon-s);
+}
+
+.waiting-for-bestiary.inline .icon {
+    display: flex;
+    align-items: center;
+    animation: rotation 1s ease infinite;
+}
+
+
+@keyframes rotation {
+    0% {
+        transform: scale(1) rotate(-60deg);
+    }
+    20% {
+        transform: /* scale(1.1)  */ rotate(-90deg);
+    }
+    50% {
+        transform: /* scale(0.9)  */ rotate(690deg);
+    }
+    100% {
+        transform: /* scale(1) */ rotate(660deg);
+    }
+}

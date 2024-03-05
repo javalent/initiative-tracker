@@ -1,6 +1,6 @@
 import { ItemView, type ViewStateResult, WorkspaceLeaf } from "obsidian";
 import type InitiativeTracker from "src/main";
-import { BUILDER_VIEW } from "../utils";
+import { BUILDER_VIEW, buildLoader } from "../utils";
 
 import Builder from "./view/Builder.svelte";
 import { encounter } from "./stores/encounter";
@@ -37,15 +37,36 @@ export default class BuilderView extends ItemView {
     }
     ui: Builder;
     async onOpen() {
-        this.ui = new Builder({
-            target: this.contentEl,
-            props: {
-                plugin: this.plugin
-            }
-        });
+
+        if (
+            this.plugin.canUseStatBlocks &&
+            !window["FantasyStatblocks"].isResolved()
+        ) {
+            this.contentEl.addClasses(["waiting-for-bestiary", "is-loading"]);
+            const loading = this.contentEl.createEl("p", {
+                text: "Waiting for Fantasy Statblocks Bestiary..."
+            });
+            window["FantasyStatblocks"].onResolved(() => {
+                this.contentEl.removeClasses(["waiting-for-bestiary", "is-loading"]);
+                loading.detach();
+                this.ui = new Builder({
+                    target: this.contentEl,
+                    props: {
+                        plugin: this.plugin
+                    }
+                });
+            });
+        } else {
+            this.ui = new Builder({
+                target: this.contentEl,
+                props: {
+                    plugin: this.plugin
+                }
+            });
+        }
     }
     async onClose() {
-        this.ui.$destroy();
+        this.ui?.$destroy();
     }
     getDisplayText(): string {
         return "Encounter Builder";

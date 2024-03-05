@@ -121,20 +121,21 @@
     <span>
         {#if creatures.size}
             {#each [...creatures] as [creature, count], index}
-                <span aria-label={label(creature)}>
-                    {joiner(index, creatures.size)}
-                    <strong use:rollerEl={creature} />&nbsp;
-                    <span
+                <span aria-label={label(creature)}
+                    >{joiner(index, creatures.size)}<strong
+                        use:rollerEl={creature}
+                    /> <span
                         class="creature-name"
                         on:click={() => plugin.openCombatant(creature)}
-                    >
-                        {#if creature.display && creature.display != creature.name}
-                            {creature.display}{count == 1 ? "" : "s"} ({creature.name})
-                        {:else}
-                            {creature.name}{count == 1 ? "" : "s"}
-                        {/if}
-                    </span>
-                </span>
+                        >{#if creature.display && creature.display != creature.name}{creature.display}{count ==
+                            1
+                                ? ""
+                                : "s"} ({creature.name}){:else}{creature.name}{count ==
+                            1
+                                ? ""
+                                : "s"}{/if}</span
+                    ></span
+                >
             {/each}
         {:else}
             -

@@ -2,6 +2,7 @@ import type InitiativeTracker from "src/main";
 import type { SRDMonster } from "index";
 import type { Creature } from "./creature";
 import { DECIMAL_TO_VULGAR_FRACTION } from "./constants";
+import { setIcon } from "obsidian";
 
 export * from "./constants";
 export * from "./icons";
@@ -47,3 +48,14 @@ export function getFromCreatureOrBestiary<T>(
     if (fromBase) return fromBase;
     return getter(plugin.getCreatureFromBestiary(creature.name));
 }
+
+export const buildLoader = (text: string): HTMLDivElement => {
+    const loading = createDiv({
+        cls: "is-loading"
+    });
+    setIcon(loading.createDiv("spinner"), "loader-2");
+    loading.createEl("em", {
+        text
+    });
+    return loading;
+};
