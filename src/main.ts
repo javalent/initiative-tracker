@@ -97,8 +97,6 @@ export default class InitiativeTracker extends Plugin {
     }
 
     getInitiativeValue(modifier: number | number[] = 0): number {
-        console.log("🚀 ~ file: main.ts:94 ~ modifier:", modifier);
-
         const defaultIfNoResult =
             Math.floor(Math.random() * 19 + 1) +
             [modifier].flat().reduce((a, b) => a + b, 0);
@@ -113,7 +111,6 @@ export default class InitiativeTracker extends Plugin {
                 dice = dice.replace(`%mod${i + 1}%`, `${modifier[i]}`);
             }
         }
-        console.log("🚀 ~ file: main.ts:104 ~ dice:", dice);
         const roller = this.getRoller(dice);
         const initiative = roller.rollSync();
         if (isNaN(initiative)) return defaultIfNoResult;
@@ -415,7 +412,6 @@ export default class InitiativeTracker extends Plugin {
                         "waiting-for-bestiary inline"
                     );
                     const delay = Math.floor(200 * Math.random());
-                    console.log("🚀 ~ file: main.ts:417 ~ duration:", delay);
 
                     setIcon(
                         loading.createDiv({

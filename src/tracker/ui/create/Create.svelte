@@ -41,11 +41,6 @@
                     new Notice("Enter a name!");
                     return;
                 }
-
-                console.log(
-                    "🚀 ~ file: Create.svelte:47 ~ modifier:",
-                    modifier
-                );
                 try {
                     creature.modifier = JSON.parse(`${modifier}`);
                 } catch (e) {
