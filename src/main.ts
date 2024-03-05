@@ -572,12 +572,6 @@ export default class InitiativeTracker extends Plugin {
     async onunload() {
         await this.saveSettings();
         this.app.workspace.trigger("initiative-tracker:unload");
-        this.app.workspace
-            .getLeavesOfType(INITIATIVE_TRACKER_VIEW)
-            .forEach((leaf) => leaf.detach());
-        this.app.workspace
-            .getLeavesOfType(CREATURE_TRACKER_VIEW)
-            .forEach((leaf) => leaf.detach());
         console.log("Initiative Tracker unloaded");
     }
 
