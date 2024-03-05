@@ -1,4 +1,4 @@
-import { Updater, derived, get, writable } from "svelte/store";
+import { type Updater, derived, get, writable } from "svelte/store";
 import {
     type SRDMonster,
     SortFunctions,

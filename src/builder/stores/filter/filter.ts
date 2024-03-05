@@ -96,7 +96,7 @@ const createRangeFilter: FilterFactory<RangeFilter> = (filter) => {
 
         reset: () => set([...filter.options]),
 
-        compare: (value: number) => {
+        compare: (value: number | string) => {
             if (get(isDefault)) return true;
             const values = get(store);
             return (
@@ -122,8 +122,9 @@ const createOptionsFilter: FilterFactory<OptionsFilter> = (filter) => {
         subscribe,
         set,
         reset: () => set([]),
-        compare: (value: string) => {
+        compare: (value: number | string) => {
             if (get(isDefault)) return true;
+            if (typeof value === "number") return false;
             const values = get(store);
             return values.includes(value);
         },
@@ -149,8 +150,9 @@ const createStringFilter: FilterFactory<StringFilter> = (filter) => {
         subscribe,
         set,
         reset: () => set(DEFAULT_STRING),
-        compare: (value: string) => {
+        compare: (value: number | string) => {
             if (get(isDefault)) return true;
+            if (typeof value === "number") return false;
             return get(isDefault) || search(value) != null;
         },
         update,
