@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.1](https://github.com/javalent/initiative-tracker/compare/13.0.0...13.0.1) (2024-03-08)
+
+
+### Bug Fixes
+
+* Improves Fantasy Statblocks bestiary resolution behavior ([a1a3d07](https://github.com/javalent/initiative-tracker/commit/a1a3d075c973953202c611fdb22b9979215105f6))
+* Properly unload FS resolve event ([17aa794](https://github.com/javalent/initiative-tracker/commit/17aa79472190defcf684fb333fea852b9ccce694))
+
 ## [13.0.0](https://github.com/javalent/initiative-tracker/compare/12.5.0...13.0.0) (2024-03-05)
 
 
