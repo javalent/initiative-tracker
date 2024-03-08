@@ -413,9 +413,8 @@ export default class InitiativeTracker extends Plugin {
                     });
                 };
                 if (
-                    true
-                    /* this.canUseStatBlocks &&
-                    !window["FantasyStatblocks"].isResolved() */
+                    this.canUseStatBlocks &&
+                    !window["FantasyStatblocks"].isResolved()
                 ) {
                     const loading = target.createSpan(
                         "waiting-for-bestiary inline"
