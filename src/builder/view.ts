@@ -37,7 +37,6 @@ export default class BuilderView extends ItemView {
     }
     ui: Builder;
     async onOpen() {
-
         if (
             this.plugin.canUseStatBlocks &&
             !window["FantasyStatblocks"].isResolved()
@@ -46,8 +45,11 @@ export default class BuilderView extends ItemView {
             const loading = this.contentEl.createEl("p", {
                 text: "Waiting for Fantasy Statblocks Bestiary..."
             });
-            window["FantasyStatblocks"].onResolved(() => {
-                this.contentEl.removeClasses(["waiting-for-bestiary", "is-loading"]);
+            const unload = window["FantasyStatblocks"].onResolved(() => {
+                this.contentEl.removeClasses([
+                    "waiting-for-bestiary",
+                    "is-loading"
+                ]);
                 loading.detach();
                 this.ui = new Builder({
                     target: this.contentEl,
@@ -55,6 +57,7 @@ export default class BuilderView extends ItemView {
                         plugin: this.plugin
                     }
                 });
+                unload();
             });
         } else {
             this.ui = new Builder({

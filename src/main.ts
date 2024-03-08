@@ -323,11 +323,12 @@ export default class InitiativeTracker extends Plugin {
                 const loading = el.createEl("p", {
                     text: "Waiting for Fantasy Statblocks Bestiary..."
                 });
-                window["FantasyStatblocks"].onResolved(() => {
+                const unload = window["FantasyStatblocks"].onResolved(() => {
                     el.removeClasses(["waiting-for-bestiary", "is-loading"]);
                     loading.detach();
                     const handler = new EncounterBlock(this, src, el);
                     ctx.addChild(handler);
+                    unload();
                 });
             } else {
                 const handler = new EncounterBlock(this, src, el);
@@ -345,15 +346,23 @@ export default class InitiativeTracker extends Plugin {
                     const loading = el.createEl("p", {
                         text: "Waiting for Fantasy Statblocks Bestiary..."
                     });
-                    window["FantasyStatblocks"].onResolved(() => {
-                        el.removeClasses([
-                            "waiting-for-bestiary",
-                            "is-loading"
-                        ]);
-                        loading.detach();
-                        const handler = new EncounterBlock(this, src, el, true);
-                        ctx.addChild(handler);
-                    });
+                    const unload = window["FantasyStatblocks"].onResolved(
+                        () => {
+                            el.removeClasses([
+                                "waiting-for-bestiary",
+                                "is-loading"
+                            ]);
+                            loading.detach();
+                            const handler = new EncounterBlock(
+                                this,
+                                src,
+                                el,
+                                true
+                            );
+                            ctx.addChild(handler);
+                            unload();
+                        }
+                    );
                 } else {
                     const handler = new EncounterBlock(this, src, el, true);
                     ctx.addChild(handler);
@@ -425,11 +434,17 @@ export default class InitiativeTracker extends Plugin {
                     loading.createEl("em", {
                         text: "Loading Bestiary..."
                     });
-                    window["FantasyStatblocks"].onResolved(() => {
-                        el.removeClasses(["waiting-for-bestiary", "inline"]);
-                        loading.detach();
-                        buildEncounter();
-                    });
+                    const unload = window["FantasyStatblocks"].onResolved(
+                        () => {
+                            el.removeClasses([
+                                "waiting-for-bestiary",
+                                "inline"
+                            ]);
+                            loading.detach();
+                            buildEncounter();
+                            unload();
+                        }
+                    );
                 } else {
                     buildEncounter();
                 }
