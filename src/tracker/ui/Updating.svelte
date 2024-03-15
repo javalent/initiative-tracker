@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type { Condition, UpdateLogMessage } from "index";
-    import { ExtraButtonComponent, setIcon } from "obsidian";
+    import type { Condition } from "index";
+    import { ExtraButtonComponent, TextComponent, setIcon } from "obsidian";
     import type InitiativeTracker from "src/main";
     import { AC, HP, REMOVE, TAG } from "src/utils";
     import { ConditionSuggestionModal } from "src/utils/suggester";
@@ -10,7 +10,7 @@
 
     import { tracker } from "../stores/tracker";
     const { updating, updateTarget } = tracker;
-    import { type Writable, writable } from "svelte/store";
+    import { writable } from "svelte/store";
 
     const plugin = getContext<InitiativeTracker>("plugin");
     const hpIcon = (node: HTMLElement) => {
@@ -55,27 +55,34 @@
                 }
             ];
             status = null;
-        }
-    };
-    let modal: ConditionSuggestionModal;
-    const suggestConditions = (node: HTMLInputElement) => {
-        if (!modal) {
-            modal = new ConditionSuggestionModal(
-                plugin.data.statuses
-                    .filter((s) => !$statuses.find((a) => a.id == s.id))
-                    .map((s) => s.name),
-                node
-            );
-            modal.onClose = () => {
-                status = modal.condition;
-                node.focus();
-            };
-        } else {
             modal.items = plugin.data.statuses
                 .filter((s) => !$statuses.find((a) => a.id == s.id))
                 .map((s) => s.name);
+            conditionText.setValue("");
         }
-        modal.open();
+    };
+
+    let modal: ConditionSuggestionModal;
+    let conditionText: TextComponent;
+    const conditionDiv = (node: HTMLElement) => {
+        conditionText = new TextComponent(node);
+        conditionText.onChange((v) => (status = v));
+        createModal();
+    };
+    const createModal = () => {
+        modal = new ConditionSuggestionModal(
+            plugin.app,
+            conditionText,
+            plugin.data.statuses
+                .filter((s) => !$statuses.find((a) => a.id == s.id))
+                .map((s) => s.name)
+        );
+        modal.onSelect(async ({ item }) => {
+            status = item;
+            conditionText.setValue(item);
+
+            modal.close();
+        });
     };
     function init(el: HTMLInputElement, target: "hp" | "ac") {
         if ($updateTarget == target) el.focus();
@@ -86,6 +93,7 @@
         } else {
             tracker.clearUpdate();
         }
+
         damage = null;
         status = null;
         ac = null;
@@ -153,30 +161,7 @@
                                 aria-label="Apply status effect to creatures that fail their saving throw"
                                 style="margin: 0 0.2rem 0 0.7rem"
                             />
-                            <input
-                                type="text"
-                                bind:value={status}
-                                on:focus={function (evt) {
-                                    suggestConditions(this);
-                                }}
-                                on:keydown={function (evt) {
-                                    if (["Enter", "Escape"].includes(evt.key)) {
-                                        if (evt.key == "Enter" && status) {
-                                            addStatus();
-                                            modal.items = plugin.data.statuses
-                                                .filter(
-                                                    (s) =>
-                                                        !$statuses.find(
-                                                            (a) => a.id == s.id
-                                                        )
-                                                )
-                                                .map((s) => s.name);
-                                        } else {
-                                            performUpdate(evt.key == "Enter");
-                                        }
-                                    }
-                                }}
-                            />
+                            <div use:conditionDiv />
                         </div>
                         <div
                             use:addStatusIcon
