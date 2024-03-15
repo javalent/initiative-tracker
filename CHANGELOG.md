@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.2](https://github.com/javalent/initiative-tracker/compare/13.0.1...13.0.2) (2024-03-15)
+
+
+### Bug Fixes
+
+* Fixes Condition suggester not appearing ([aa2384b](https://github.com/javalent/initiative-tracker/commit/aa2384b75c60c524c889a212204db8406f8a8ef1))
+
 ## [13.0.1](https://github.com/javalent/initiative-tracker/compare/13.0.0...13.0.1) (2024-03-08)
 
 
