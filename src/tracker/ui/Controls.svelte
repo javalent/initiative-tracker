@@ -111,12 +111,13 @@
         menu.addSeparator();
 
         if ($data.parties && $data.parties.length) {
-            menu.addItem((item) => {
-                const partyMenu = item
-                    .setIcon("switch")
-                    .setTitle("Switch Party")
-                    .setSubmenu();
-                partyMenu.addItem((item) => {
+            if (Platform.isMobile) {
+                menu.addItem((item) => {
+                    /* const partyMenu =  */ item.setIcon("switch")
+                        .setTitle("Switch Party")
+                        .setIsLabel(true);
+                });
+                menu.addItem((item) => {
                     item.setTitle("None")
                         .onClick(() => {
                             tracker.setParty("", plugin);
@@ -124,7 +125,7 @@
                         .setChecked(!$party || $party == "");
                 });
                 for (const p of $data.parties) {
-                    partyMenu.addItem((item) => {
+                    menu.addItem((item) => {
                         item.setTitle(p.name)
                             .onClick(() => {
                                 tracker.setParty(p.name, plugin);
@@ -132,15 +133,38 @@
                             .setChecked($party == p.name);
                     });
                 }
-            });
+            } else {
+                menu.addItem((item) => {
+                    const partyMenu = item
+                        .setIcon("switch")
+                        .setTitle("Switch Party")
+                        .setSubmenu();
+                    partyMenu.addItem((item) => {
+                        item.setTitle("None")
+                            .onClick(() => {
+                                tracker.setParty("", plugin);
+                            })
+                            .setChecked(!$party || $party == "");
+                    });
+                    for (const p of $data.parties) {
+                        partyMenu.addItem((item) => {
+                            item.setTitle(p.name)
+                                .onClick(() => {
+                                    tracker.setParty(p.name, plugin);
+                                })
+                                .setChecked($party == p.name);
+                        });
+                    }
+                });
+            }
         }
-        menu.addItem((item) => {
-            const partyMenu = item
-                .setIcon("switch")
-                .setTitle("Party Rolling Behavior")
-                .setSubmenu();
-
-            partyMenu.addItem((item) => {
+        if (Platform.isMobile) {
+            menu.addItem((item) => {
+                item.setIcon("dice")
+                    .setTitle("Party Rolling Behavior")
+                    .setIsLabel(true);
+            });
+            menu.addItem((item) => {
                 item.setTitle("Always Roll")
                     .onClick(async () => {
                         plugin.data.rollPlayerInitiatives =
@@ -152,7 +176,7 @@
                             RollPlayerInitiativeBehavior.Always
                     );
             });
-            partyMenu.addItem((item) => {
+            menu.addItem((item) => {
                 item.setTitle("Never Roll")
                     .onClick(async () => {
                         plugin.data.rollPlayerInitiatives =
@@ -164,7 +188,7 @@
                             RollPlayerInitiativeBehavior.Never
                     );
             });
-            partyMenu.addItem((item) => {
+            menu.addItem((item) => {
                 item.setTitle("Set to Zero")
                     .onClick(async () => {
                         plugin.data.rollPlayerInitiatives =
@@ -176,7 +200,51 @@
                             RollPlayerInitiativeBehavior.SetToZero
                     );
             });
-        });
+        } else {
+            menu.addItem((item) => {
+                const partyMenu = item
+                    .setIcon("dice")
+                    .setTitle("Party Rolling Behavior")
+                    .setSubmenu();
+
+                partyMenu.addItem((item) => {
+                    item.setTitle("Always Roll")
+                        .onClick(async () => {
+                            plugin.data.rollPlayerInitiatives =
+                                RollPlayerInitiativeBehavior.Always;
+                            await plugin.saveSettings();
+                        })
+                        .setChecked(
+                            plugin.data.rollPlayerInitiatives ==
+                                RollPlayerInitiativeBehavior.Always
+                        );
+                });
+                partyMenu.addItem((item) => {
+                    item.setTitle("Never Roll")
+                        .onClick(async () => {
+                            plugin.data.rollPlayerInitiatives =
+                                RollPlayerInitiativeBehavior.Never;
+                            await plugin.saveSettings();
+                        })
+                        .setChecked(
+                            plugin.data.rollPlayerInitiatives ==
+                                RollPlayerInitiativeBehavior.Never
+                        );
+                });
+                partyMenu.addItem((item) => {
+                    item.setTitle("Set to Zero")
+                        .onClick(async () => {
+                            plugin.data.rollPlayerInitiatives =
+                                RollPlayerInitiativeBehavior.SetToZero;
+                            await plugin.saveSettings();
+                        })
+                        .setChecked(
+                            plugin.data.rollPlayerInitiatives ==
+                                RollPlayerInitiativeBehavior.SetToZero
+                        );
+                });
+            });
+        }
 
         menu.addSeparator();
         menu.addItem((item) => {
