@@ -39,17 +39,10 @@
 
     let saving = false;
     let loading = false;
-    let legacy = false,
-        editing: Creature;
     const editOrAdd = (creature?: Creature) => {
-        if (plugin.data.useLegacy) {
-            legacy = true;
-            editing = creature;
-        } else {
-            const modal = new AddCreatureModal(plugin, creature);
-            modal.onClose = () => {};
-            modal.open();
-        }
+        const modal = new AddCreatureModal(plugin, creature);
+        modal.onClose = () => {};
+        modal.open();
     };
     const addButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setTooltip("Add Creature").setIcon(ADD);
@@ -95,15 +88,6 @@
         <SaveEncounter on:cancel={() => (saving = false)} />
     {:else if loading}
         <LoadEncounter on:cancel={() => (loading = false)} />
-    {:else if legacy}
-        <Legacy
-            {plugin}
-            creature={editing}
-            on:close={() => {
-                legacy = false;
-                editing = null;
-            }}
-        />
     {:else}
         <div class="add-creature-container">
             <div class="context-container">
