@@ -4,7 +4,7 @@
     import Initiative from "./Initiative.svelte";
     import CreatureControls from "./CreatureControls.svelte";
     import Status from "./Status.svelte";
-    import { setIcon } from "obsidian";
+    import { Platform, setIcon } from "obsidian";
     import { tracker } from "../../stores/tracker";
     import { createEventDispatcher } from "svelte";
 
@@ -56,7 +56,7 @@
 <td class="initiative-container" on:click={(e) => e.stopPropagation()}>
     <Initiative
         initiative={creature.initiative}
-        modifier={[creature.modifier].flat().reduce((a,b)=> a+b,0)}
+        modifier={[creature.modifier].flat().reduce((a, b) => a + b, 0)}
         on:click={(e) => e.stopPropagation()}
         on:initiative={(e) => {
             tracker.updateCreatures({
@@ -108,6 +108,7 @@
 
 <td
     class="center hp-container creature-adder"
+    class:mobile={Platform.isMobile}
     on:click|stopPropagation={(evt) => {
         const prev = $updateTarget;
         $updateTarget = "hp";
@@ -122,6 +123,7 @@
 
 <td
     class="center ac-container creature-adder"
+    class:mobile={Platform.isMobile}
     on:click|stopPropagation={(evt) => {
         const prev = $updateTarget;
         $updateTarget = "ac";
@@ -190,5 +192,8 @@
     }
     .dirty-ac {
         font-weight: var(--font-bold);
+    }
+    .mobile {
+        font-size: smaller;
     }
 </style>
