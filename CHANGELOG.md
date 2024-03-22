@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.3](https://github.com/javalent/initiative-tracker/compare/13.0.2...13.0.3) (2024-03-22)
+
+
+### Bug Fixes
+
+* Fixes IT menus on mobile ([bfb2312](https://github.com/javalent/initiative-tracker/commit/bfb23123445362eb37010276729009adbfeddadd))
+* Improves Add Creature experience on mobile ([5a20e10](https://github.com/javalent/initiative-tracker/commit/5a20e105f74079ce271ccf3a63e0c4546d71555c))
+* Removes legacy creator option ([d8f6cdb](https://github.com/javalent/initiative-tracker/commit/d8f6cdb2b31fd2b0cf88e7e449079bab8fd21916))
+* Slightly decreases font size on mobile for better readability ([54abd6f](https://github.com/javalent/initiative-tracker/commit/54abd6f94a1df1b4f89a701af5d7f4cecce06b2f))
+
 ## [13.0.2](https://github.com/javalent/initiative-tracker/compare/13.0.1...13.0.2) (2024-03-15)
 
 
