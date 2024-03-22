@@ -4,7 +4,8 @@
         ButtonComponent,
         Notice,
         ToggleComponent,
-        TextComponent
+        TextComponent,
+        Platform
     } from "obsidian";
 
     import { onMount } from "svelte";
@@ -29,6 +30,12 @@
         if (!c) return;
         creature = c;
     });
+
+    $: {
+        if (Platform.isMobile) {
+            $adding.splice(0, 1, [creature, amount]);
+        }
+    }
 
     let modifier = JSON.stringify(creature.modifier ?? 0);
     const prior = modifier;
@@ -293,7 +300,7 @@
             />
         </div>
     </div>
-    {#if !isEditing}
+    {#if !isEditing && !Platform.isMobile}
         <div class="context-buttons">
             <div use:cancelButton class="add-button cancel-button" />
             {#if $editing}
