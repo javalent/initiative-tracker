@@ -247,22 +247,42 @@
         }
 
         menu.addSeparator();
-        menu.addItem((item) => {
-            const load = item
-                .setIcon("open-elsewhere-glyph")
-                .setTitle("Load Encounter")
-                .setDisabled(Object.keys(plugin.data.encounters).length == 0)
-                .setSubmenu()
-                .setNoIcon();
+        if (!Platform.isMobile) {
+            menu.addItem((item) => {
+                const load = item
+                    .setIcon("open-elsewhere-glyph")
+                    .setTitle("Load Encounter")
+                    .setDisabled(
+                        Object.keys(plugin.data.encounters).length == 0
+                    )
+                    .setSubmenu()
+                    .setNoIcon();
 
+                for (const encounter of Object.keys(plugin.data.encounters)) {
+                    load.addItem((item) => {
+                        item.setTitle(encounter).onClick(() => {
+                            tracker.new(
+                                plugin,
+                                plugin.data.encounters[encounter]
+                            );
+                        });
+                    });
+                }
+            });
+        } else {
+            menu.addItem((item) => {
+                item.setIcon("open-elsewhere-glyph")
+                    .setTitle("Load Encounter")
+                    .setIsLabel(true);
+            });
             for (const encounter of Object.keys(plugin.data.encounters)) {
-                load.addItem((item) => {
+                menu.addItem((item) => {
                     item.setTitle(encounter).onClick(() => {
                         tracker.new(plugin, plugin.data.encounters[encounter]);
                     });
                 });
             }
-        });
+        }
         menu.addItem((item) => {
             item.setIcon(SAVE)
                 .setTitle("Save Encounter")
