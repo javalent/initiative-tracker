@@ -1,8 +1,4 @@
-import {
-    MarkdownRenderChild,
-    Notice,
-    parseYaml
-} from "obsidian";
+import { MarkdownRenderChild, Notice, parseYaml } from "obsidian";
 import type InitiativeTracker from "../main";
 import { Creature } from "../utils/creature";
 
@@ -82,8 +78,11 @@ export class EncounterParser {
     constructor(public plugin: InitiativeTracker) {}
     async parse(params: EncounterParameters): Promise<ParsedParams> {
         const name = params.name;
-        const party = params.party ?? this.plugin.data.defaultParty;
         const players: string[] = this.parsePlayers(params);
+        const party =
+            params.party ?? players.length
+                ? null
+                : this.plugin.data.defaultParty;
         const hide = this.parseHide(params);
         const rawMonsters = params.creatures ?? [];
 
@@ -119,19 +118,19 @@ export class EncounterParser {
         return [];
     }
     parsePlayers(params: EncounterParameters) {
-        const partyName = params.party ?? this.plugin.data.defaultParty;
         const playersToReturn: string[] = [];
         const players = params.players;
-        if (
-            partyName &&
-            this.plugin.data.parties.find(
-                (p) => p.name.toLowerCase() == partyName.toLowerCase()
-            )
-        ) {
-            const party = this.plugin.data.parties.find(
-                (p) => p.name.toLowerCase() == partyName.toLowerCase()
-            );
-            playersToReturn.push(...party.players);
+        if (params.party) {
+            if (
+                this.plugin.data.parties.find(
+                    (p) => p.name.toLowerCase() == params.party.toLowerCase()
+                )
+            ) {
+                const party = this.plugin.data.parties.find(
+                    (p) => p.name.toLowerCase() == params.party.toLowerCase()
+                );
+                playersToReturn.push(...party.players);
+            }
         }
         if (players == "none" || players == false) {
             playersToReturn.splice(0, playersToReturn.length);
@@ -139,7 +138,6 @@ export class EncounterParser {
             playersToReturn.push(
                 ...[...this.plugin.players.values()].map((p) => p.name)
             );
-        } else if (!players && !params.party) {
         } else if (typeof players == "string") {
             playersToReturn.push(players);
         } else if (Array.isArray(players)) {
@@ -153,6 +151,22 @@ export class EncounterParser {
                     )
             );
         }
+        if (!playersToReturn.length) {
+            let partyName = this.plugin.defaultParty?.name;
+
+            if (
+                partyName &&
+                this.plugin.data.parties.find(
+                    (p) => p.name.toLowerCase() == partyName.toLowerCase()
+                )
+            ) {
+                const party = this.plugin.data.parties.find(
+                    (p) => p.name.toLowerCase() == partyName.toLowerCase()
+                );
+                playersToReturn.push(...party.players);
+            }
+        }
+
         return Array.from(new Set(playersToReturn));
     }
     async parseRawCreatures(rawMonsters: RawCreatureArray, rollHP: boolean) {

@@ -18,6 +18,7 @@
     export let creatures: Map<Creature, number | string> = new Map();
     export let players: string[];
     export let party: string = null;
+
     export let hide: string[] = [];
 
     export let rollHP: boolean = plugin.data.rollHP;
@@ -65,9 +66,10 @@
             .flat();
         const transformedCreatures: CreatureState[] = [];
         const combinedPlayers = [
-            ...plugin.getPlayerNamesForParty(party),
+            ...(party ? plugin.getPlayerNamesForParty(party) : []),
             ...players
         ];
+
         const playersForEncounter: Creature[] = [];
         for (const name of new Set(combinedPlayers)) {
             playersForEncounter.push(plugin.getPlayerByName(name));
