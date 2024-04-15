@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.4](https://github.com/javalent/initiative-tracker/compare/13.0.3...13.0.4) (2024-03-23)
+
+
+### Bug Fixes
+
+* Fixes load encounter submenu on mobile ([e6f33ac](https://github.com/javalent/initiative-tracker/commit/e6f33ac64ef532de5c894930cc4626bd26d67a2b))
+
 ## [13.0.3](https://github.com/javalent/initiative-tracker/compare/13.0.2...13.0.3) (2024-03-22)
 
 
