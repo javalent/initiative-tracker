@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.5](https://github.com/javalent/initiative-tracker/compare/13.0.4...13.0.5) (2024-04-15)
+
+
+### Bug Fixes
+
+* Encounter blocks will less greedily add the default party if players are explicitly defined ([eb4a59a](https://github.com/javalent/initiative-tracker/commit/eb4a59a5d1becda8ba659abe6238e0470ae7d987))
+* Encounters copied from the Encounter Builder no longer include disabled players in the output (close [#265](https://github.com/javalent/initiative-tracker/issues/265)) ([fd045ac](https://github.com/javalent/initiative-tracker/commit/fd045ac75bf9acf731bf3876cac9f757191e48ec))
+
 ## [13.0.4](https://github.com/javalent/initiative-tracker/compare/13.0.3...13.0.4) (2024-03-23)
 
 
