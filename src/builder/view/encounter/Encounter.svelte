@@ -241,7 +241,7 @@
             enc.name = $name;
         }
         if ($players?.length) {
-            enc.players = $players.map((p) => p.name);
+            enc.players = $players.filter((p) => p.enabled).map((p) => p.name);
         }
         if ($encounter?.size) {
             enc.creatures = [...$encounter.entries()].map(([c, v]) => {
