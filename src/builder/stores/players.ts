@@ -1,5 +1,5 @@
 import { derived, get, writable } from "svelte/store";
-import type { CreatureState } from "../../../index";
+import type { CreatureState } from "src/types/creatures";
 
 export const playerCount = writable(0);
 
@@ -10,7 +10,7 @@ export interface Player extends Partial<CreatureState> {
     enabled: boolean;
     count: number;
 }
-interface GenericPlayer extends Partial<CreatureState> {
+export interface GenericPlayer extends Partial<CreatureState> {
     level: number;
     isPlayer: false;
     enabled: boolean;

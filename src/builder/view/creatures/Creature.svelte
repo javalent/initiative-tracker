@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { SRDMonster } from "index";
+    import type { SRDMonster } from "src/types/creatures";
     import { ExtraButtonComponent, setIcon } from "obsidian";
     import { getContext } from "svelte";
     import { encounter } from "../../stores/encounter";

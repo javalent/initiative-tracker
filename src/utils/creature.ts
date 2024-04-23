@@ -1,9 +1,7 @@
-import type {
-    Condition,
-    CreatureState,
-    HomebrewCreature,
-    SRDMonster
-} from "index";
+import type { Condition } from "src/types/creatures";
+import type { HomebrewCreature } from "src/types/creatures";
+import type { SRDMonster } from "src/types/creatures";
+import type { CreatureState } from "src/types/creatures";
 import { Conditions } from ".";
 import { DEFAULT_UNDEFINED } from "./constants";
 import type InitiativeTracker from "src/main";

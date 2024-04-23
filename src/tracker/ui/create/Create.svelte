@@ -1,7 +1,6 @@
 <script lang="ts">
     import {
         ExtraButtonComponent,
-        ButtonComponent,
         Notice,
         ToggleComponent,
         TextComponent,
@@ -17,7 +16,6 @@
     import type { Writable } from "svelte/store";
     import { equivalent } from "src/encounter";
     import { confirmWithModal } from "./modal";
-    import Nullable from "src/builder/view/Nullable.svelte";
 
     let creature: Creature = new Creature({});
     export let amount = 1;

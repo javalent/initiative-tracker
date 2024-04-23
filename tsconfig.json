@@ -7,14 +7,14 @@
         "strictNullChecks": false,
         "module": "ESNext",
         "target": "ESNext",
-        "allowJs": true,
         "noImplicitAny": true,
         "moduleResolution": "node",
         "importHelpers": true,
         "resolveJsonModule": true,
-        "types": ["node", "svelte", "jest"],
+        "types": ["node", "svelte"],
         "lib": ["dom", "esnext", "scripthost"],
         "experimentalDecorators": true
     },
-    "include": ["src/*", "@types"]
+    "include": ["./src/**/*"],
+    "exclude": ["./dist"]
 }

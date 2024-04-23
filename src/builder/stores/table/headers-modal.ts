@@ -1,7 +1,7 @@
 import { Modal } from "obsidian";
 
 import Headers from "./Headers.svelte";
-import type { TableHeaderState } from "../../../..";
+import type { TableHeaderState } from "src/builder/builder.types";
 import copy from "fast-copy";
 
 export class HeadersModal extends Modal {

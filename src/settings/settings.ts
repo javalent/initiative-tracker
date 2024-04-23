@@ -23,7 +23,10 @@ import {
     INITIATIVE
 } from "../utils";
 import { RpgSystemSetting, getRpgSystem } from "../utils/rpg-system";
-import type { Condition, HomebrewCreature, InputValidate, Party } from "index";
+import type { Party } from "./settings.types";
+import type { InputValidate } from "./settings.types";
+import type { Condition } from "src/types/creatures";
+import type { HomebrewCreature } from "src/types/creatures";
 
 export default class InitiativeTrackerSettings extends PluginSettingTab {
     constructor(private plugin: InitiativeTracker) {
@@ -444,10 +447,6 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                             await this.plugin.updatePlayer(
                                 player,
                                 modal.player
-                            );
-                            this.plugin.app.workspace.trigger(
-                                "initiative-tracker:creature-updated-in-settings",
-                                player
                             );
 
                             this._displayPlayers(additionalContainer);

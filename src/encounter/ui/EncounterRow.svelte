@@ -3,11 +3,15 @@
 
     import type InitiativeTracker from "src/main";
     import { tracker } from "src/tracker/stores/tracker";
-    import { DEFAULT_UNDEFINED, getRpgSystem, RANDOM_HP, START_ENCOUNTER } from "src/utils";
+    import {
+        DEFAULT_UNDEFINED,
+        getRpgSystem,
+        RANDOM_HP,
+        START_ENCOUNTER
+    } from "src/utils";
     import { Creature } from "src/utils/creature";
     import CreatureComponent from "./Creature.svelte";
-
-    import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
+    import type { StackRoller } from "@javalent/dice-roller";
     import { setContext } from "svelte";
 
     export let name: string = "Encounter";
@@ -150,7 +154,10 @@
                         <li aria-label={label(creature)}>
                             <CreatureComponent
                                 {creature}
-                                xp={rpgSystem.getCreatureDifficulty(creature, playerLevels)}
+                                xp={rpgSystem.getCreatureDifficulty(
+                                    creature,
+                                    playerLevels
+                                )}
                                 shouldShowRoll={rollHP}
                                 {count}
                             >
@@ -222,7 +229,7 @@
         color: green;
     }
     .trivial .difficulty-label {
-        color: #AAAAAA;
+        color: #aaaaaa;
     }
     .icons {
         display: flex;

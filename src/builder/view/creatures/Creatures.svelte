@@ -12,7 +12,7 @@
     import type InitiativeTracker from "src/main";
     import Ajv from "ajv";
     import schema from "../../stores/filter/filter-schema.json";
-    import type { BuilderState } from "obsidian-overload";
+    import type { BuilderState } from "src/builder/builder.types";
 
     const table = getContext<BuiltTableStore>("table");
     const { sortDir, allHeaders } = table;
