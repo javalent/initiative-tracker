@@ -15,7 +15,6 @@ import type {
     InitiativeViewState,
     UpdateLogMessage
 } from "../../../index";
-import type { StackRoller } from "obsidian-overload";
 import {
     OVERFLOW_TYPE,
     RollPlayerInitiativeBehavior,
@@ -26,6 +25,7 @@ import type {
     DifficultyLevel,
     DifficultyThreshold
 } from "src/utils/rpg-system";
+import type { StackRoller } from "@javalent/dice-roller";
 
 type HPUpdate = {
     saved: boolean;

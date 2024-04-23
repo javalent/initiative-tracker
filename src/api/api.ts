@@ -1,7 +1,6 @@
-import type { HomebrewCreature } from "obsidian-overload";
 import type InitiativeTracker from "../main";
 import { tracker } from "../tracker/stores/tracker";
-import { type InitiativeViewState } from "../..";
+import { type HomebrewCreature, type InitiativeViewState } from "../..";
 import { Creature } from "src/utils/creature";
 
 export class API {

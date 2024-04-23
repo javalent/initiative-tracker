@@ -15,9 +15,8 @@
     import { START_ENCOUNTER } from "src/utils";
     import { getContext } from "svelte";
     import { tracker } from "src/tracker/stores/tracker";
-    import type { CreatureState } from "index";
+    import type { CreatureState, SRDMonster } from "index";
     import { writable } from "svelte/store";
-    import type { SRDMonster } from "obsidian-overload";
 
     const { players } = encounter;
 

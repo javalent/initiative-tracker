@@ -1,55 +1,6 @@
 import "obsidian";
-import type { Spell, Trait, ability } from "obsidian-overload";
 import type { API } from "src/api/api";
 import type { Filter, FilterLayout } from "src/builder/stores/filter/filter";
-
-//      CUSTOM EVENTS
-// ------------------------
-// Convert tuple to arguments of Event.on
-type OnArgs<T> = T extends [infer A, ...infer B]
-    ? A extends string
-        ? [name: A, callback: (...args: B) => any]
-        : never
-    : never;
-export type TrackerEvents =
-    | [name: "initiative-tracker:state-change", state: TrackerViewState]
-    | [name: "initiative-tracker:players-updated", pcs: Creature[]]
-    | [name: "initiative-tracker:creatures-added", npcs: Creature[]]
-    | [
-          name: "initiative-tracker:creature-added-at-location",
-          creature: Creature,
-          latlng: any
-      ]
-    | [name: "initiative-tracker:add-creature-here", latlng: any]
-    | [name: "initiative-tracker:creature-updated", creature: Creature]
-    | [
-          name: "initiative-tracker:creature-updated-in-settings",
-          creature: Creature
-      ]
-    | [name: "initiative-tracker:creatures-removed", npcs: Creature[]]
-    | [name: "initiative-tracker:new-encounter", state: TrackerViewState]
-    | [name: "initiative-tracker:reset-encounter", state: TrackerViewState]
-    | [name: "initiative-tracker:active-change", creature: Creature]
-    | [name: "initiative-tracker:unload"]
-    | [name: "initiative-tracker:apply-damage", creature: Creature]
-    | [name: "initiative-tracker:add-status", creature: Creature]
-    | [
-          name: "initiative-tracker:enable-disable",
-          creature: Creature,
-          enable: boolean
-      ]
-    | [name: "initiative-tracker:remove", creature: Creature]
-    | [name: "initiative-tracker:closed"]
-    | [name: "initiative-tracker:should-save"]
-    | [name: "initiative-tracker:save-state", state?: InitiativeViewState]
-    /** This event can be used to start an event by sending an object with a name, HP, AC, and initiative modifier at minimum. */
-    | [
-          name: "initiative-tracker:start-encounter",
-          creatures: HomebrewCreature[]
-      ]
-    | [name: "initiative-tracker:stop-viewing", creatures: HomebrewCreature[]];
-
-export type EventsOnArgs = OnArgs<TrackerEvents>;
 
 export interface TrackerViewState {
     state: boolean;
@@ -178,7 +129,6 @@ export interface SRDMonster {
     hit_dice?: string;
     speed: string;
     stats: [number, number, number, number, number, number];
-    saves?: { [K in ability]?: number }[];
     skillsaves?: { [key: string]: number }[];
     damage_vulnerabilities: string;
     damage_resistances: string;
@@ -187,11 +137,6 @@ export interface SRDMonster {
     senses: string;
     languages: string;
     cr: string | number;
-    traits?: Trait[];
-    spells?: Spell[];
-    actions?: Trait[];
-    legendary_actions?: Trait[];
-    reactions?: Trait[];
     monster?: string;
     source?: string | string[];
     friendly?: boolean;

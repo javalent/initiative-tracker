@@ -1,11 +1,11 @@
 import { ItemView, type ViewStateResult, WorkspaceLeaf } from "obsidian";
 import type InitiativeTracker from "src/main";
-import { BUILDER_VIEW, buildLoader } from "../utils";
+import { BUILDER_VIEW } from "../utils";
 
 import Builder from "./view/Builder.svelte";
 import { encounter } from "./stores/encounter";
 import { get } from "svelte/store";
-import type { SRDMonster } from "obsidian-overload";
+import type { SRDMonster } from "index";
 
 interface BuilderContext {
     plugin: InitiativeTracker;

@@ -19,14 +19,11 @@ import {
 
 import { PLAYER_VIEW_VIEW } from "./utils/constants";
 import type {
-    EventsOnArgs,
     HomebrewCreature,
     InitiativeTrackerData,
     InitiativeViewState,
-    Party,
     SRDMonster
 } from "../index";
-/* import type { Plugins, StackRoller } from "obsidian-overload"; */
 import InitiativeTrackerSettings from "./settings/settings";
 import { EncounterBlock, EncounterParser } from "./encounter";
 import EncounterLine from "./encounter/ui/EncounterLine.svelte";
@@ -38,34 +35,8 @@ import { tracker } from "./tracker/stores/tracker";
 import { EncounterSuggester } from "./encounter/editor-suggestor";
 import { API } from "./api/api";
 
-import type { Plugins, StackRoller } from "obsidian-overload";
 import "fantasy-statblocks";
-
-declare module "obsidian" {
-    interface App {
-        plugins: {
-            getPlugin<T extends keyof Plugins>(plugin: T): Plugins[T];
-            enabledPlugins: Set<string>;
-        };
-        commands: {
-            commands: { [id: string]: Command };
-            findCommand(id: string): Command;
-            executeCommandById(id: string): void;
-            listCommands(): Command[];
-        };
-    }
-    interface WorkspaceItem {
-        containerEl: HTMLElement;
-    }
-    interface Workspace {
-        on(...args: EventsOnArgs): EventRef;
-    }
-
-    interface MenuItem {
-        setSubmenu: () => Menu;
-        submenu: Menu;
-    }
-}
+import type { StackRoller } from "@javalent/dice-roller";
 
 export default class InitiativeTracker extends Plugin {
     api = new API(this);
@@ -75,17 +46,12 @@ export default class InitiativeTracker extends Plugin {
     watchers: Map<TFile, HomebrewCreature> = new Map();
     getRoller(str: string) {
         if (!this.canUseDiceRoller) return;
-        const roller = this.app.plugins
-            .getPlugin("obsidian-dice-roller")
-            .getRollerSync(str, "statblock");
+        const roller = window.DiceRoller.getRollerSync(str, "statblock");
         return roller as StackRoller;
     }
     get canUseDiceRoller() {
-        if (this.app.plugins.getPlugin("obsidian-dice-roller") != null) {
-            if (
-                !this.app.plugins.getPlugin("obsidian-dice-roller")
-                    .getRollerSync
-            ) {
+        if (window.DiceRoller != null) {
+            if (!window.DiceRoller.getRollerSync) {
                 new Notice(
                     "Please update Dice Roller to the latest version to use with Initiative Tracker."
                 );
@@ -133,25 +99,7 @@ export default class InitiativeTracker extends Plugin {
         );
     }
 
-    get canUseLeaflet() {
-        return false;
-        /* return (
-            this.app.plugins.getPlugin("obsidian-leaflet-plugin") != null &&
-            Number(
-                this.app.plugins.getPlugin("obsidian-leaflet-plugin").data
-                    ?.version?.major >= 4
-            )
-        ); */
-    }
-
-    get leaflet() {
-        if (this.canUseLeaflet) {
-            return this.app.plugins.getPlugin("obsidian-leaflet-plugin");
-        }
-    }
-
     get canUseStatBlocks(): boolean {
-        return true;
         if (this.app.plugins.enabledPlugins.has("obsidian-5e-statblocks")) {
             return (window["FantasyStatblocks"]?.getVersion()?.major ?? 0) >= 4;
         }

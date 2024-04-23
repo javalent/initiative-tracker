@@ -4,11 +4,11 @@
 
     import { Creature } from "src/utils/creature";
     import type InitiativeTracker from "src/main";
-    import type { StackRoller } from "../../../../obsidian-dice-roller/src/roller";
     import { tracker } from "src/tracker/stores/tracker";
     import type { CreatureState } from "index";
     import CreatureComponent from "./Creature.svelte";
     import { setContext } from "svelte";
+    import type { StackRoller } from "@javalent/dice-roller";
 
     export let plugin: InitiativeTracker;
 
