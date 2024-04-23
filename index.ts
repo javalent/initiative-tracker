@@ -120,27 +120,15 @@ export interface CreatureState extends HomebrewCreature {
 
 export interface SRDMonster {
     name: string;
-    size: string;
-    type: string;
-    subtype: string;
-    alignment: string;
     ac: number;
     hp: number;
     hit_dice?: string;
-    speed: string;
-    stats: [number, number, number, number, number, number];
-    skillsaves?: { [key: string]: number }[];
-    damage_vulnerabilities: string;
-    damage_resistances: string;
-    damage_immunities: string;
-    condition_immunities: string;
-    senses: string;
-    languages: string;
     cr: string | number;
     monster?: string;
-    source?: string | string[];
     friendly?: boolean;
     hidden?: boolean;
+    bestiary?: boolean;
+    player?: boolean;
 
     [key: string]: any;
 }
