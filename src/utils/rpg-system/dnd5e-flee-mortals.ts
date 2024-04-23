@@ -96,7 +96,7 @@ export class Dnd5eFleeMortalsRpgSystem extends RpgSystem {
   }
 
   isMinion(creature: GenericCreature) {
-    return "traits" in creature && creature.traits?.find(trait => trait.name === "Minion");
+    return "traits" in creature && creature.traits?.find((trait: any) => trait.name === "Minion");
   }
 
   getAveragePlayerLevel(playerLevels: number[]): number {

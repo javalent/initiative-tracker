@@ -172,7 +172,7 @@ ${thresholdSummary}`;
             .map((lv) => Math.max(1, Math.min(lv, 20)));
         Object.keys(budget).forEach((key) => {
             budget[key] += clampedLevels.reduce(
-                (acc, lv) => acc + XP_THRESHOLDS_PER_LEVEL[lv]?.[key] ?? 0,
+                (acc, lv) => acc + (XP_THRESHOLDS_PER_LEVEL[lv]?.[key] ?? 0),
                 0
             );
         });

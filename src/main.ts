@@ -179,14 +179,16 @@ export default class InitiativeTracker extends Plugin {
         return this.data.parties.find((p) => p.name == this.data.defaultParty);
     }
 
-    getBaseCreatureFromBestiary(name: string) {
+    getBaseCreatureFromBestiary(name: string): SRDMonster {
         /** Check statblocks */
         try {
             if (
                 this.canUseStatBlocks &&
                 window.FantasyStatblocks.hasCreature(name)
             ) {
-                return window.FantasyStatblocks.getCreatureFromBestiary(name);
+                return window.FantasyStatblocks.getCreatureFromBestiary(
+                    name
+                ) as SRDMonster;
             }
         } catch (e) {}
         return null;

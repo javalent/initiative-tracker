@@ -1,4 +1,4 @@
-import type { InitiativeViewState, SRDMonster } from "../../../index";
+import type { SRDMonster } from "../../../index";
 import { writable } from "svelte/store";
 import { players } from "./players";
 function createEncounter() {

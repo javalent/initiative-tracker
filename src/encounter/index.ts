@@ -142,7 +142,7 @@ export class EncounterParser {
             playersToReturn.push(players);
         } else if (Array.isArray(players)) {
             playersToReturn.push(
-                ...([...this.plugin.players.values()] ?? [])
+                ...[...(this.plugin.players.values() ?? [])]
                     .map((p) => p.name)
                     .filter((p) =>
                         (players as string[])

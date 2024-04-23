@@ -10,7 +10,7 @@ export interface Player extends Partial<CreatureState> {
     enabled: boolean;
     count: number;
 }
-interface GenericPlayer extends Partial<CreatureState> {
+export interface GenericPlayer extends Partial<CreatureState> {
     level: number;
     isPlayer: false;
     enabled: boolean;

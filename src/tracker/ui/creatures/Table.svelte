@@ -97,7 +97,7 @@
                     data-hp={creature.hp}
                     data-hp-max={creature.current_max}
                     data-hp-percent={Math.round(
-                        ((creature.hp ?? 0) / creature.max) * 100 ?? 0
+                        ((creature.hp ?? 0) / creature.max) * 100
                     )}
                     on:click={(e) => {
                         dispatch("open-combatant", creature);
