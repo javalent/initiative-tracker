@@ -35,7 +35,7 @@ import { tracker } from "./tracker/stores/tracker";
 import { EncounterSuggester } from "./encounter/editor-suggestor";
 import { API } from "./api/api";
 
-import "fantasy-statblocks";
+import "@javalent/fantasy-statblocks";
 import type { StackRoller } from "@javalent/dice-roller";
 
 export default class InitiativeTracker extends Plugin {
