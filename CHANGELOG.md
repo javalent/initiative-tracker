@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.6](https://github.com/javalent/initiative-tracker/compare/13.0.5...13.0.6) (2024-04-23)
+
+
+### Bug Fixes
+
+* Remove obsidian-overload package ([775fe52](https://github.com/javalent/initiative-tracker/commit/775fe523d0717708bbad329d2c8ce50890dbbf3c))
+* Switch to `[@javalent](https://github.com/javalent)` scoped FS module ([c8eeb33](https://github.com/javalent/initiative-tracker/commit/c8eeb33756aa988057988684a5c3bcf09eaeaa1a))
+
 ## [13.0.5](https://github.com/javalent/initiative-tracker/compare/13.0.4...13.0.5) (2024-04-15)
 
 
