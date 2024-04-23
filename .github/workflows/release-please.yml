@@ -25,6 +25,7 @@ jobs:
               id: release
               with:
                   command: manifest
+                  release-type: node
 
     upload-build:
         runs-on: ubuntu-latest
@@ -95,16 +96,3 @@ jobs:
         with:
             name: Initiative Tracker
             repo: initiative-tracker
-            
-    publish:
-        needs: release-please
-        if: ${{ needs.release-please.outputs.release_created }}
-        uses: javalent/workflows/.github/workflows/publish.yml@main
-        secrets: inherit
-
-    upgrade-overload:
-        needs: publish
-        uses: javalent/obsidian-overload/.github/workflows/upgrade.yml@main
-        secrets: inherit
-        with:
-            module: initiative-tracker
