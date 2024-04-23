@@ -11,10 +11,9 @@
         createFilterStore
     } from "../stores/filter/filter";
     import { type BuiltTableStore, createTable } from "../stores/table/table";
-    import type { SRDMonster } from "index";
 
     export let plugin: InitiativeTracker;
-    let original = plugin.bestiary as SRDMonster[];
+    let original = plugin.bestiary;
     const table = createTable(plugin, [...original]);
 
     setContext<BuiltTableStore>("table", table);
