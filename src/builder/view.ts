@@ -5,7 +5,7 @@ import { BUILDER_VIEW } from "../utils";
 import Builder from "./view/Builder.svelte";
 import { encounter } from "./stores/encounter";
 import { get } from "svelte/store";
-import type { SRDMonster } from "index";
+import type { SRDMonster } from "src/types/creatures";
 
 interface BuilderContext {
     plugin: InitiativeTracker;

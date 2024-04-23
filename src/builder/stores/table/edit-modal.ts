@@ -1,4 +1,4 @@
-import { type TableHeaderState, SortFunctions } from "../../../../index";
+import { type TableHeaderState, SortFunctions } from "src/builder/builder.types";
 import { Modal, Setting, TextAreaComponent } from "obsidian";
 import { EditorView } from "@codemirror/view";
 import { editorFromTextArea } from "../../../utils/editor/index";

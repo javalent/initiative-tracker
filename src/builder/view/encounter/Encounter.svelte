@@ -15,7 +15,7 @@
     import { START_ENCOUNTER } from "src/utils";
     import { getContext } from "svelte";
     import { tracker } from "src/tracker/stores/tracker";
-    import type { CreatureState, SRDMonster } from "index";
+    import type { CreatureState, SRDMonster } from "src/types/creatures";
     import { writable } from "svelte/store";
 
     const { players } = encounter;

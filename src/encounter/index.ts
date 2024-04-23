@@ -397,14 +397,12 @@ export class EncounterBlock extends MarkdownRenderChild {
                 );
             }
         }
-        this.registerEvent(
-            this.plugin.app.workspace.on("initiative-tracker:unload", () => {
-                this.containerEl.empty();
-                this.containerEl.createEl("pre").createEl("code", {
-                    text: `\`\`\`encounter\n${this.src}\`\`\``
-                });
-            })
-        );
+        this.plugin.register(() => {
+            this.containerEl.empty();
+            this.containerEl.createEl("pre").createEl("code", {
+                text: `\`\`\`encounter\n${this.src}\`\`\``
+            });
+        });
     }
     async postprocessTable() {
         const encounterSource = this.src.split("---") ?? [];
@@ -438,13 +436,11 @@ export class EncounterBlock extends MarkdownRenderChild {
                 }
             });
         }
-        this.registerEvent(
-            this.plugin.app.workspace.on("initiative-tracker:unload", () => {
-                this.containerEl.empty();
-                this.containerEl.createEl("pre").createEl("code", {
-                    text: `\`\`\`encounter-table\n${this.src}\`\`\``
-                });
-            })
-        );
+        this.plugin.register(() => {
+            this.containerEl.empty();
+            this.containerEl.createEl("pre").createEl("code", {
+                text: `\`\`\`encounter-table\n${this.src}\`\`\``
+            });
+        });
     }
 }

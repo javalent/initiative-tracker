@@ -1,9 +1,9 @@
 import { type Updater, derived, get, writable } from "svelte/store";
 import {
-    type SRDMonster,
     SortFunctions,
     type TableHeaderState
-} from "../../../../index";
+} from "src/builder/builder.types";
+import { type SRDMonster } from "src/types/creatures";
 import { convertFraction } from "../../../utils";
 import type InitiativeTracker from "../../../main";
 import { Modal } from "obsidian";

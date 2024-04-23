@@ -1,5 +1,5 @@
 import type { Creature } from "../creature";
-import type { SRDMonster } from "../../../index";
+import type { SRDMonster } from "src/types/creatures";
 import type InitiativeTracker from "../../main";
 import { Dnd5eRpgSystem } from "./dnd5e";
 import { Dnd5eLazyGmRpgSystem } from "./dnd5e-lazygm";

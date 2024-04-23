@@ -98,7 +98,7 @@ export class CreatureView extends ItemView {
                     app.workspace.trigger(
                         "link-hover",
                         {}, //hover popover, but don't need
-                        ev.target, //targetEl
+                        ev.target as HTMLElement, //targetEl
                         (ev.target as HTMLAnchorElement).dataset.href, //linkText
                         "initiative-tracker " //source
                     ),

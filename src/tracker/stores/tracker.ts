@@ -9,12 +9,10 @@ import {
 } from "svelte/store";
 import { equivalent } from "../../encounter";
 import { Events, Platform, TFile } from "obsidian";
-import type {
-    Condition,
-    InitiativeTrackerData,
-    InitiativeViewState,
-    UpdateLogMessage
-} from "../../../index";
+import type { UpdateLogMessage } from "src/logger/logger.types";
+import type { Condition } from "src/types/creatures";
+import type { InitiativeTrackerData } from "src/settings/settings.types";
+import type { InitiativeViewState } from "../view.types";
 import {
     OVERFLOW_TYPE,
     RollPlayerInitiativeBehavior,

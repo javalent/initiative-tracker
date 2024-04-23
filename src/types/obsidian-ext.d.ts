@@ -1,4 +1,5 @@
 import "obsidian";
+import type { HomebrewCreature } from "src/types/creatures";
 
 declare module "obsidian" {
     interface App {
@@ -16,85 +17,13 @@ declare module "obsidian" {
         containerEl: HTMLElement;
     }
     interface Workspace {
-        on(
-            name: "initiative-tracker:state-change",
-            callback: (state: TrackerViewState) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:players-updated",
-            callback: (pcs: Creature[]) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:creatures-added",
-            callback: (npcs: Creature[]) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:creature-added-at-location",
-            callback: (creature: Creature, latlng: any) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:add-creature-here",
-            callback: (latlng: any) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:creature-updated",
-            callback: (creature: Creature) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:creature-updated-in-settings",
-            callback: (creature: Creature) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:creatures-removed",
-            callback: (npcs: Creature[]) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:new-encounter",
-            callback: (state: TrackerViewState) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:reset-encounter",
-            callback: (state: TrackerViewState) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:active-change",
-            callback: (creature: Creature) => void
-        ): EventRef;
-        on(name: "initiative-tracker:unload", callback: () => void): EventRef;
-        on(
-            name: "initiative-tracker:apply-damage",
-            callback: (creature: Creature) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:add-status",
-            callback: (creature: Creature) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:enable-disable",
-            callback: (creature: Creature, enable: boolean) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:remove",
-            callback: (creature: Creature) => void
-        ): EventRef;
-        on(name: "initiative-tracker:closed", callback: () => void): EventRef;
-        on(
-            name: "initiative-tracker:should-save",
-            callback: () => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:save-state",
-            callback: (state?: InitiativeViewState) => void
-        ): EventRef;
-        /** This event can be used to start an event by sending an object with a name, HP, AC, and initiative modifier at minimum. */
-        on(
-            name: "initiative-tracker:start-encounter",
-            callback: (creatures: HomebrewCreature[]) => void
-        ): EventRef;
-        on(
-            name: "initiative-tracker:stop-viewing",
-            callback: (creatures: HomebrewCreature[]) => void
-        ): EventRef;
+        trigger(
+            name: "link-hover",
+            popover: any, //hover popover, but don't need
+            target: HTMLElement, //targetEl
+            note: string, //linkText
+            source: string //source
+        ): void;
     }
 
     interface MenuItem {

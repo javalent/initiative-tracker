@@ -18,12 +18,10 @@ import {
 } from "./utils";
 
 import { PLAYER_VIEW_VIEW } from "./utils/constants";
-import type {
-    HomebrewCreature,
-    InitiativeTrackerData,
-    InitiativeViewState,
-    SRDMonster
-} from "../index";
+import type { InitiativeTrackerData } from "./settings/settings.types";
+import type { InitiativeViewState } from "./tracker/view.types";
+import type { HomebrewCreature } from "./types/creatures";
+import type { SRDMonster } from "./types/creatures";
 import InitiativeTrackerSettings from "./settings/settings";
 import { EncounterBlock, EncounterParser } from "./encounter";
 import EncounterLine from "./encounter/ui/EncounterLine.svelte";
@@ -628,7 +626,7 @@ export default class InitiativeTracker extends Plugin {
 
     async onunload() {
         await this.saveSettings();
-        this.app.workspace.trigger("initiative-tracker:unload");
+        this.app.workspace.trigger("initiative-tracker:unloaded");
         console.log("Initiative Tracker unloaded");
     }
 

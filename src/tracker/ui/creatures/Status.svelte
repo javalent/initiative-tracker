@@ -1,9 +1,9 @@
 <script lang="ts">
     import { ExtraButtonComponent, setIcon } from "obsidian";
+    import type { Condition } from "src/types/creatures";
     import { createEventDispatcher } from "svelte";
+    
     const dispatch = createEventDispatcher();
-
-    import type { Condition } from "index";
 
     export let status: Condition;
     if (isNaN(status.amount) || status.amount < 0) {

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { Condition } from "index";
     import { ExtraButtonComponent, TextComponent, setIcon } from "obsidian";
     import type InitiativeTracker from "src/main";
     import { AC, HP, REMOVE, TAG } from "src/utils";
@@ -11,6 +10,7 @@
     import { tracker } from "../stores/tracker";
     const { updating, updateTarget } = tracker;
     import { writable } from "svelte/store";
+    import type { Condition } from "src/types/creatures";
 
     const plugin = getContext<InitiativeTracker>("plugin");
     const hpIcon = (node: HTMLElement) => {

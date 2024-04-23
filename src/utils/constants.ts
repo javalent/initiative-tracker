@@ -1,4 +1,4 @@
-import type { InitiativeTrackerData } from "index";
+import type { InitiativeTrackerData } from "src/settings/settings.types";
 import { Platform } from "obsidian";
 import { Conditions } from "./conditions";
 

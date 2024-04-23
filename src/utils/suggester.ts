@@ -1,7 +1,8 @@
 import type { FuzzyMatch } from "obsidian";
 import { FuzzyInputSuggest } from "obsidian-utilities";
 
-import type { HomebrewCreature, SRDMonster } from "../../index";
+import type { HomebrewCreature } from "src/types/creatures";
+import type { SRDMonster } from "src/types/creatures";
 import type { Creature } from "./creature";
 
 export class SRDMonsterSuggestionModal extends FuzzyInputSuggest<
