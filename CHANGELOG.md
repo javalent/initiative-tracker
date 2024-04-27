@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.7](https://github.com/javalent/initiative-tracker/compare/13.0.6...13.0.7) (2024-04-27)
+
+
+### Bug Fixes
+
+* Removes outdated message about Fantasy Statblocks compatibility ([8e85b58](https://github.com/javalent/initiative-tracker/commit/8e85b5878eba3efc75046bf110d6c70844d92f7a))
+
 ## [13.0.6](https://github.com/javalent/initiative-tracker/compare/13.0.5...13.0.6) (2024-04-23)
 
 
