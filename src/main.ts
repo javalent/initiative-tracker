@@ -221,20 +221,6 @@ export default class InitiativeTracker extends Plugin {
     async onload() {
         registerIcons();
 
-        if (this.app.plugins.enabledPlugins.has("obsidian-5e-statblocks")) {
-            if (!this.canUseStatBlocks) {
-                new Notice(
-                    createFragment((e) => {
-                        e.createEl("p", {
-                            text: `Initiative Tracker v${this.manifest.version} requires Fantasy Statblocks v4.0.0 or later.`
-                        });
-                        e.createEl("span", {
-                            text: "Please update Fantasy Statblocks to use the Fantasy Statblocks integration."
-                        });
-                    })
-                );
-            }
-        }
         await this.loadSettings();
 
         this.setBuilderIcon();
