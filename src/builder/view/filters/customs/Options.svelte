@@ -7,7 +7,7 @@
 
 <div class="multiselect-container">
     <Multiselect
-        options={filter.options}
+        options={filter.options.flat()}
         bind:selected={$filter}
         outerDivClass="multiselect-dropdown"
         placeholder={filter.text}
