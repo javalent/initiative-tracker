@@ -62,13 +62,17 @@ export default class TrackerView extends ItemView {
     getExistingPlayerView(): PlayerView | undefined {
         const existing =
             this.plugin.app.workspace.getLeavesOfType(PLAYER_VIEW_VIEW);
+
         if (existing.length) {
             return existing[0].view as PlayerView;
         }
     }
     async getPlayerView(): Promise<PlayerView> {
         const existing = this.getExistingPlayerView();
-        if (existing) return existing;
+        if (existing) {
+            this.app.workspace.revealLeaf(existing.leaf);
+            return existing;
+        }
 
         const leaf = this.app.workspace.getLeaf("window");
         await leaf.setViewState({
