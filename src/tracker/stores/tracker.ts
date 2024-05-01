@@ -94,10 +94,10 @@ function createTracker() {
     const descending = derived(data, (data) => {
         return data.descending;
     });
-    let _settings: InitiativeTrackerData;
+    let _settings: InitiativeTrackerData | null;
 
     const condensed = derived(creatures, (values) => {
-        if (_settings.condense) {
+        if (_settings?.condense) {
             values.forEach((creature, _, arr) => {
                 const equiv = arr.filter((c) => equivalent(c, creature));
                 const initiatives = equiv.map((i) => i.initiative);
