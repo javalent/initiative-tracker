@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.9](https://github.com/javalent/initiative-tracker/compare/13.0.8...13.0.9) (2024-05-01)
+
+
+### Bug Fixes
+
+* If an existing player view is found, reveal it ([2dda097](https://github.com/javalent/initiative-tracker/commit/2dda0978fe38cba9f7cdc82e0eff144ad104181b))
+* Properly check for settings being initialized in the tracker before attempting to access data ([e7b4bd2](https://github.com/javalent/initiative-tracker/commit/e7b4bd242ea4cdecc7098b75032d183ee5c53a9f))
+
 ## [13.0.8](https://github.com/javalent/initiative-tracker/compare/13.0.7...13.0.8) (2024-04-28)
 
 
