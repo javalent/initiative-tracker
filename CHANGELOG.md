@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.8](https://github.com/javalent/initiative-tracker/compare/13.0.7...13.0.8) (2024-04-28)
+
+
+### Bug Fixes
+
+* Fixes issue preventing encounter builder filters to open if an Options filter was present ([d2a5c03](https://github.com/javalent/initiative-tracker/commit/d2a5c03f046d84cbc1accee97032572231bcc77a))
+
 ## [13.0.7](https://github.com/javalent/initiative-tracker/compare/13.0.6...13.0.7) (2024-04-27)
 
 
