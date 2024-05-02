@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.10](https://github.com/javalent/initiative-tracker/compare/13.0.9...13.0.10) (2024-05-02)
+
+
+### Bug Fixes
+
+* Creatures not in bestiary now render correctly in Combatant ([cebb672](https://github.com/javalent/initiative-tracker/commit/cebb672bedbce29cb8208d2dc9a7afdb33d276d2))
+
 ## [13.0.9](https://github.com/javalent/initiative-tracker/compare/13.0.8...13.0.9) (2024-05-01)
 
 
