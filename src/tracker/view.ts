@@ -145,8 +145,7 @@ export class CreatureView extends ItemView {
             await this.renderEmbed(creature.getStatblockLink());
         } else if (this.plugin.canUseStatBlocks) {
             const statblock = window.FantasyStatblocks.render(
-                //@ts-ignore
-                creature,
+                creature.creature,
                 this.statblockEl,
                 creature.display
             );
