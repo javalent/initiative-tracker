@@ -122,10 +122,13 @@ const createOptionsFilter: FilterFactory<OptionsFilter> = (filter) => {
         subscribe,
         set,
         reset: () => set([]),
-        compare: (value: number | string) => {
+        compare: (value: number | string | Array<string>) => {
             if (get(isDefault)) return true;
             if (typeof value === "number") return false;
             const values = get(store);
+            if (Array.isArray(value)) {
+                return value.some((v) => values.includes(v));
+            }
             return values.includes(value);
         },
         update,
@@ -211,7 +214,13 @@ function getDerivedFilterOptions(
                             break;
                         }
                         case FilterType.Options: {
-                            options.get(filter).add(creature[field]);
+                            if (Array.isArray(creature[field])) {
+                                for (const value of creature[field]) {
+                                    options.get(filter).add(value);
+                                }
+                            } else if (typeof creature[field] === "string") {
+                                options.get(filter).add(creature[field]);
+                            }
                             break;
                         }
                         case FilterType.Search: {
