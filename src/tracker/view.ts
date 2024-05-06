@@ -158,6 +158,12 @@ export class CreatureView extends ItemView {
     }
 
     async renderEmbed(embedLink: string) {
+        if (
+            this.plugin.canUseStatBlocks &&
+            window.FantasyStatblocks.isStatblockLink?.(embedLink)
+        ) {
+            embedLink = window.FantasyStatblocks.parseStatblockLink(embedLink);
+        }
         if (/\[.+\]\(.+\)/.test(embedLink)) {
             //md
             [, embedLink] = embedLink.match(/\[.+?\]\((.+?)\)/);
@@ -167,28 +173,32 @@ export class CreatureView extends ItemView {
         }
 
         const { path, subpath } = parseLinktext(embedLink);
+
         const file = this.app.metadataCache.getFirstLinkpathDest(path, "/");
-        const fileContent = await app.vault.cachedRead(file);
 
         let content = `Oops! Something is wrong with your statblock-link:<br />${embedLink}`;
-        if (subpath && fileContent) {
-            const cache = app.metadataCache.getFileCache(file);
-            const subpathResult = resolveSubpath(cache, subpath);
-            if (subpathResult) {
-                content = fileContent.slice(
-                    subpathResult.start.offset,
-                    subpathResult.end.offset
-                );
+        if (file) {
+            const fileContent = await this.app.vault.cachedRead(file);
+            if (subpath && fileContent) {
+                const cache = app.metadataCache.getFileCache(file);
+                const subpathResult = resolveSubpath(cache, subpath);
+                if (subpathResult) {
+                    content = fileContent.slice(
+                        subpathResult.start.offset,
+                        subpathResult.end.offset
+                    );
+                }
+            } else if (fileContent) {
+                content = fileContent;
             }
-        } else if (fileContent) {
-            content = fileContent;
         }
 
-        await MarkdownRenderer.renderMarkdown(
+        await MarkdownRenderer.render(
+            this.app,
             content,
             this.statblockEl.createDiv("markdown-rendered"),
             path,
-            null
+            this
         );
     }
 

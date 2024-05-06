@@ -16,7 +16,7 @@
         "@codemirror/language": "^6.9.1",
         "@codemirror/search": "^6.5.3",
         "@javalent/dice-roller": "^10.5.7",
-        "@javalent/fantasy-statblocks": "^4.2.2",
+        "@javalent/fantasy-statblocks": "^4.4.0",
         "@tsconfig/svelte": "^5.0.2",
         "@types/node": "^20.6.3",
         "ajv": "^8.12.0",
