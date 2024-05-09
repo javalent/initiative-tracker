@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.11](https://github.com/javalent/initiative-tracker/compare/13.0.10...13.0.11) (2024-05-09)
+
+
+### Bug Fixes
+
+* Check for Statblock-style links and transform them before parsing the `statblock-link` property ([8bc3ae5](https://github.com/javalent/initiative-tracker/commit/8bc3ae56bee16176e209c2e70b734e39f1285154))
+* Fixes error where values specified as a list in a creature were not being filtered correctly in the encounter builder ([a395715](https://github.com/javalent/initiative-tracker/commit/a3957151c2e041bbf62607cade6a3a0c335ed616))
+* Normalize derived options in Encounter Builder options filters ([27c4d92](https://github.com/javalent/initiative-tracker/commit/27c4d92fc7e95e4ae10502dc17744b0931822c55))
+
 ## [13.0.10](https://github.com/javalent/initiative-tracker/compare/13.0.9...13.0.10) (2024-05-02)
 
 
