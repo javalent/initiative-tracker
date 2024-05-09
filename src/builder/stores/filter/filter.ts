@@ -109,6 +109,10 @@ const createRangeFilter: FilterFactory<RangeFilter> = (filter) => {
     };
 };
 
+function normalize(str: string): string {
+    if (typeof str !== "string") return str;
+    return str.toLowerCase();
+}
 const createOptionsFilter: FilterFactory<OptionsFilter> = (filter) => {
     const store = writable<string[]>([]);
     const { subscribe, set, update } = store;
@@ -127,9 +131,9 @@ const createOptionsFilter: FilterFactory<OptionsFilter> = (filter) => {
             if (typeof value === "number") return false;
             const values = get(store);
             if (Array.isArray(value)) {
-                return value.some((v) => values.includes(v));
+                return value.some((v) => values.includes(normalize(v)));
             }
-            return values.includes(value);
+            return values.includes(normalize(value));
         },
         update,
         filter,
@@ -216,10 +220,12 @@ function getDerivedFilterOptions(
                         case FilterType.Options: {
                             if (Array.isArray(creature[field])) {
                                 for (const value of creature[field]) {
-                                    options.get(filter).add(value);
+                                    options.get(filter).add(normalize(value));
                                 }
                             } else if (typeof creature[field] === "string") {
-                                options.get(filter).add(creature[field]);
+                                options
+                                    .get(filter)
+                                    .add(normalize(creature[field]));
                             }
                             break;
                         }
