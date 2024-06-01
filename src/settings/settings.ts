@@ -865,7 +865,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                         }
                     })
                 )
-                .setDesc(status.description)
+                .setDesc(status.description ?? "")
                 .addExtraButton((b) =>
                     b.setIcon("pencil").onClick(() => {
                         const modal = new StatusModal(this.plugin, status);
