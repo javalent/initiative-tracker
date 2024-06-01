@@ -122,11 +122,12 @@ export class Pathfinder2eRpgSystem extends RpgSystem {
                 this.getCreatureDifficulty(creature, playerLevels) * count,
             0
         );
-
         const thresholds = this.getDifficultyThresholds(playerLevels);
+
         const displayName =
-            thresholds.find((threshold) => creatureXp <= threshold.minValue)
+            thresholds.findLast((threshold) => creatureXp >= threshold.minValue)
                 ?.displayName ?? "Trivial";
+
         const thresholdSummary = thresholds
             .map(
                 (threshold) => `${threshold.displayName}: ${threshold.minValue}`
