@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.12](https://github.com/javalent/initiative-tracker/compare/13.0.11...13.0.12) (2024-06-02)
+
+
+### Bug Fixes
+
+* Fixes PF2e system difficulty threshold calculation ([bc8ebad](https://github.com/javalent/initiative-tracker/commit/bc8ebad7fa458dec34fbca733ba06adb1c5527c3))
+* Fixes status descriptions displaying "null" if no description was set ([d1c44f6](https://github.com/javalent/initiative-tracker/commit/d1c44f625c2d7f57d66319336e010fce6b53979f))
+* Fixes Statuses not being logged correctly when starting a log file ([82a8faf](https://github.com/javalent/initiative-tracker/commit/82a8faf42b851500a584a1ea47889c1f7703b163))
+* Starting a new encounter from an Encounter block now correctly creates a new log file ([c6756ce](https://github.com/javalent/initiative-tracker/commit/c6756cec4cb0c3a33e4a8d86b9abc011b9556f23))
+
 ## [13.0.11](https://github.com/javalent/initiative-tracker/compare/13.0.10...13.0.11) (2024-05-09)
 
 
