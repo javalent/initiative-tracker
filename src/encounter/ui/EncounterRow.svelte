@@ -76,6 +76,7 @@
                     round: 1,
                     state: false,
                     logFile: null,
+                    newLog: true,
                     roll: true,
                     rollHP
                 });

@@ -791,7 +791,7 @@ function createTracker() {
                         $logFile.set(_logger.getFile());
                     });
                 }
-                if (!state && _logger) {
+                if (!state && _logger || state?.newLog) {
                     _logger.logging = false;
                     $logFile.set(null);
                 }

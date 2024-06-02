@@ -15,6 +15,7 @@ export interface InitiativeViewState {
     name: string;
     round: number;
     logFile: string;
+    newLog?: boolean;
     roll?: boolean;
     rollHP?: boolean;
     timestamp?: number;

@@ -85,7 +85,8 @@
             state: false,
             logFile: null,
             roll: true,
-            rollHP
+            rollHP,
+            newLog: true
         });
         plugin.app.workspace.revealLeaf(view.leaf);
     };
