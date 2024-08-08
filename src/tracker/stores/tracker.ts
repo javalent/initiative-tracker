@@ -15,6 +15,7 @@ import type { InitiativeTrackerData } from "src/settings/settings.types";
 import type { InitiativeViewState } from "../view.types";
 import {
     OVERFLOW_TYPE,
+    RESOLVE_TIES,
     RollPlayerInitiativeBehavior,
     getRpgSystem
 } from "src/utils";
@@ -116,6 +117,21 @@ function createTracker() {
     const ordered = derived([condensed, data], ([values, data]) => {
         const sort = [...values];
         sort.sort((a, b) => {
+            if (a.initiative == b.initiative) {
+                switch (_settings.resolveTies) {
+                    case RESOLVE_TIES.random:
+                        return Math.random() < 0.5 ? 1 : -1;
+                    case RESOLVE_TIES.playerFirst:
+                    case RESOLVE_TIES.npcFirst:
+                        const aPlayer = a.player ? 1 : 0;
+                        const bPlayer = b.player ? 1 : 0;
+                        if (_settings.resolveTies == RESOLVE_TIES.playerFirst) {
+                            return bPlayer - aPlayer
+                        } else {
+                            return aPlayer - bPlayer
+                        }
+                }
+            }
             return data.descending
                 ? b.initiative - a.initiative
                 : a.initiative - b.initiative;
