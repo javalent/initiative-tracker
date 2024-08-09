@@ -96,7 +96,7 @@ function createTracker() {
         return data.descending;
     });
     let _settings: InitiativeTrackerData | null;
-
+    
     const condensed = derived(creatures, (values) => {
         if (_settings?.condense) {
             values.forEach((creature, _, arr) => {
@@ -117,24 +117,40 @@ function createTracker() {
     const ordered = derived([condensed, data], ([values, data]) => {
         const sort = [...values];
         sort.sort((a, b) => {
-            if (a.initiative == b.initiative) {
-                switch (_settings.resolveTies) {
-                    case RESOLVE_TIES.random:
-                        return Math.random() < 0.5 ? 1 : -1;
-                    case RESOLVE_TIES.playerFirst:
-                    case RESOLVE_TIES.npcFirst:
-                        const aPlayer = a.player ? 1 : 0;
-                        const bPlayer = b.player ? 1 : 0;
-                        if (_settings.resolveTies == RESOLVE_TIES.playerFirst) {
-                            return bPlayer - aPlayer
-                        } else {
-                            return aPlayer - bPlayer
-                        }
-                }
-            }
-            return data.descending
+            /* Order creatures in this order:
+               1. By initiative
+               2. By manual order (drag & drop)
+               3. According to the resolveTies setting */
+            if (a.initiative != b.initiative) {
+                return data.descending
                 ? b.initiative - a.initiative
                 : a.initiative - b.initiative;
+            }
+            
+            if (
+                a.manualOrder !== null && a.manualOrder !== undefined && 
+                b.manualOrder !== null && b.manualOrder !== undefined && 
+                a.manualOrder !== b.manualOrder
+            ) {
+                const aOrder = a.manualOrder || 0;
+                const bOrder = b.manualOrder || 0;
+                return aOrder - bOrder;
+            }
+            
+            switch (_settings.resolveTies) {
+                case RESOLVE_TIES.random:
+                    return Math.random() < 0.5 ? 1 : -1;
+                case RESOLVE_TIES.playerFirst:
+                case RESOLVE_TIES.npcFirst:
+                    const aPlayer = a.player ? 1 : 0;
+                    const bPlayer = b.player ? 1 : 0;
+                    if (_settings.resolveTies == RESOLVE_TIES.playerFirst) {
+                        return bPlayer - aPlayer
+                    } else {
+                        return aPlayer - bPlayer
+                    }
+            }
+            
         });
         current_order = sort;
         return sort;
@@ -352,6 +368,7 @@ function createTracker() {
                     creature.modifier
                 );
             }
+            creature.manualOrder = null;
         }
         return creatures;
     }
