@@ -791,7 +791,7 @@ function createTracker() {
                         $logFile.set(_logger.getFile());
                     });
                 }
-                if (!state && _logger || state?.newLog) {
+                if ((!state && _logger) || state?.newLog) {
                     _logger.logging = false;
                     $logFile.set(null);
                 }
@@ -931,7 +931,8 @@ function setCreatureHP(
     for (const creature of creatures) {
         if (!creature.rollHP && !rollHP) continue;
         if (!creature.hit_dice?.length) continue;
-        let roller = plugin.getRoller(creature.hit_dice) as StackRoller;
+        let roller = plugin.getRoller(creature.hit_dice);
+        if (!roller) continue;
         creature.hp = creature.max = creature.current_max = roller.rollSync();
     }
 }

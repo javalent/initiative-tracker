@@ -45,7 +45,8 @@ export default class InitiativeTracker extends Plugin {
     getRoller(str: string) {
         if (!this.canUseDiceRoller) return;
         const roller = window.DiceRoller.getRoller(str, "statblock");
-        return roller as StackRoller;
+        if (roller.isNone()) return null;
+        return roller.unwrap() as StackRoller;
     }
     get canUseDiceRoller() {
         if (window.DiceRoller != null) {
@@ -76,7 +77,7 @@ export default class InitiativeTracker extends Plugin {
             }
         }
         const roller = this.getRoller(dice);
-        const initiative = roller.rollSync();
+        const initiative = roller?.rollSync() ?? defaultIfNoResult;
         if (isNaN(initiative)) return defaultIfNoResult;
         return initiative;
     }

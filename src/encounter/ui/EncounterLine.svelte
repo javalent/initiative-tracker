@@ -20,12 +20,16 @@
     for (let [creature, count] of creatures) {
         let number: number = Number(count);
         if (plugin.canUseDiceRoller) {
-            let roller = plugin.getRoller(`${count}`) as StackRoller;
-            roller.on("new-result", () => {
-                creatureMap.set(creature, roller.result);
-            });
-            rollerMap.set(creature, roller);
-            roller.rollSync();
+            let roller = plugin.getRoller(`${count}`);
+            if (!roller) {
+                creatureMap.set(creature, number);
+            } else {
+                roller.on("new-result", () => {
+                    creatureMap.set(creature, roller.result);
+                });
+                rollerMap.set(creature, roller);
+                roller.rollSync();
+            }
         } else {
             creatureMap.set(creature, number);
         }
@@ -56,7 +60,7 @@
             round: 1,
             logFile: null,
             newLog: true,
-            roll: true,
+            roll: true
         });
         plugin.app.workspace.revealLeaf(view.leaf);
     };
@@ -124,7 +128,8 @@
                 <span aria-label={label(creature)}
                     >{joiner(index, creatures.size)}<strong
                         use:rollerEl={creature}
-                    /> <span
+                    />
+                    <span
                         class="creature-name"
                         on:click={() => plugin.openCombatant(creature)}
                         >{#if creature.display && creature.display != creature.name}{creature.display}{count ==

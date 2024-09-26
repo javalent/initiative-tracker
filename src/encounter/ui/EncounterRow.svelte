@@ -33,13 +33,17 @@
     for (let [creature, count] of creatures) {
         let number: number = Number(count);
         if (plugin.canUseDiceRoller) {
-            let roller = plugin.getRoller(`${count}`) as StackRoller;
-            roller.on("new-result", () => {
-                creatureMap.set(creature, roller.result);
-                creatureMap = creatureMap;
-            });
-            rollerMap.set(creature, roller);
-            roller.rollSync();
+            let roller = plugin.getRoller(`${count}`);
+            if (!roller) {
+                creatureMap.set(creature, number);
+            } else {
+                roller.on("new-result", () => {
+                    creatureMap.set(creature, roller.result);
+                    creatureMap = creatureMap;
+                });
+                rollerMap.set(creature, roller);
+                roller.rollSync();
+            }
         } else {
             creatureMap.set(creature, number);
         }
