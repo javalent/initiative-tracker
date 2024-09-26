@@ -44,12 +44,12 @@ export default class InitiativeTracker extends Plugin {
     watchers: Map<TFile, HomebrewCreature> = new Map();
     getRoller(str: string) {
         if (!this.canUseDiceRoller) return;
-        const roller = window.DiceRoller.getRollerSync(str, "statblock");
+        const roller = window.DiceRoller.getRoller(str, "statblock");
         return roller as StackRoller;
     }
     get canUseDiceRoller() {
         if (window.DiceRoller != null) {
-            if (!window.DiceRoller.getRollerSync) {
+            if (!window.DiceRoller.getRoller) {
                 new Notice(
                     "Please update Dice Roller to the latest version to use with Initiative Tracker."
                 );
