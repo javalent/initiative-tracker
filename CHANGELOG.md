@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.15](https://github.com/javalent/initiative-tracker/compare/13.0.14...13.0.15) (2024-09-27)
+
+
+### Bug Fixes
+
+* Encounters now allow creatures to be set to zero ([f9b5f6c](https://github.com/javalent/initiative-tracker/commit/f9b5f6cfba6e5234f0b570139a7a19ed079b3492))
+
 ## [13.0.14](https://github.com/javalent/initiative-tracker/compare/13.0.13...13.0.14) (2024-09-26)
 
 
