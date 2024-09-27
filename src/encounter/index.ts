@@ -238,8 +238,8 @@ export class EncounterParser {
             number = 1;
         }
         if (!isNaN(Number(number))) number = Number(number);
-        if (!number || (typeof number == "number" && number < 1)) number = 1;
-
+        if (number != 0 && !number) number = 1;
+        if (typeof number == "number" && number < 1) number = 0;
         let name: string,
             display: string,
             hp: number,
