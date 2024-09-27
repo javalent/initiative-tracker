@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.14](https://github.com/javalent/initiative-tracker/compare/13.0.13...13.0.14) (2024-09-26)
+
+
+### Bug Fixes
+
+* Fixes issue preventing encounters containing dice rollers from rendering ([68f3de7](https://github.com/javalent/initiative-tracker/commit/68f3de7d1021328b67268174594b236c26adc23a))
+
 ## [13.0.13](https://github.com/javalent/initiative-tracker/compare/13.0.12...13.0.13) (2024-09-26)
 
 
