@@ -45,8 +45,8 @@ export default class InitiativeTracker extends Plugin {
     getRoller(str: string) {
         if (!this.canUseDiceRoller) return;
         const roller = window.DiceRoller.getRoller(str, "statblock");
-        if (roller.isNone()) return null;
-        return roller.unwrap() as StackRoller;
+        if (roller === null) return null;
+        return roller as StackRoller;
     }
     get canUseDiceRoller() {
         if (window.DiceRoller != null) {
