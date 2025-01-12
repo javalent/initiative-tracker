@@ -908,7 +908,8 @@ function createTracker() {
                     thresholds: rpgSystem.getDifficultyThresholds(players),
                     labels: rpgSystem.systemDifficulties
                 };
-            })
+            }),
+        dragEnabled: writable<boolean>(true)
     };
 }
 
