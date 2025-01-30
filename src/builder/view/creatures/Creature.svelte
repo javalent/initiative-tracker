@@ -30,7 +30,10 @@
             return "";
         }
         if (property == null) return ``;
-        if (typeof property == "string") return property;
+        if (typeof property == "string") {
+            const re = /\\?<\w+\\?>/gi;
+            return property.replaceAll(re, '');
+        }
         if (typeof property == "number") return `${property}`;
         if (Array.isArray(property)) {
             ret.push(

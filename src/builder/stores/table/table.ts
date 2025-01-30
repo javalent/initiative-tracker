@@ -29,6 +29,28 @@ export class TableHeader {
                 return (a: Record<string, any>, b: Record<string, any>) =>
                     (a[this.field] ?? "").localeCompare(b[this.field] ?? "");
             }
+            case SortFunctions.PF_LEVEL: {
+                return (a: Record<string, any>, b: Record<string, any>) => {
+                    const re = /(^[a-zA-Z]+) (\d+)$/gi;
+                    const a_match = a.match(re);
+                    const b_match = b.match(re);
+
+                    if(!a_match && !b_match){
+                        return 0;
+                    } else if (!a_match) {
+                        return 1;
+                    }  else if (!b_match) {
+                        return -1;
+                    } else if(parseInt(a_match[2]) < parseInt(b_match[2])) {
+                        return -1;
+                    } else if (parseInt(a_match[2]) == parseInt(b_match[2])) {
+                        return a_match[1].localCompare(b_match[2]);
+                    } else {
+                        return 1;
+                    }
+                }
+                    
+            }
             case SortFunctions.CONVERT_FRACTION: {
                 return (a: Record<string, any>, b: Record<string, any>) =>
                     convertFraction(a[this.field] ?? 0) -
@@ -73,24 +95,9 @@ export class TableHeader {
 
 export const DEFAULT_HEADERS: TableHeaderState[] = [
     {
-        text: "CR",
-        field: "cr",
-        type: SortFunctions.CONVERT_FRACTION
-    },
-    {
-        text: "Type",
-        field: "type",
-        type: SortFunctions.LOCAL_COMPARE
-    },
-    {
-        text: "Size",
-        field: "size",
-        type: SortFunctions.LOCAL_COMPARE
-    },
-    {
-        text: "Alignment",
-        field: "alignment",
-        type: SortFunctions.LOCAL_COMPARE
+        text: "Level",
+        field: "level",
+        type: SortFunctions.PF_LEVEL
     }
 ];
 
