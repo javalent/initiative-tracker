@@ -4,7 +4,7 @@ import {
     type TableHeaderState
 } from "src/builder/builder.types";
 import { type SRDMonster } from "src/types/creatures";
-import { convertFraction } from "../../../utils";
+import { convertFraction, PF2LevelToNumber} from "../../../utils";
 import type InitiativeTracker from "../../../main";
 import { Modal } from "obsidian";
 import copy from "fast-copy";
@@ -29,32 +29,37 @@ export class TableHeader {
                 return (a: Record<string, any>, b: Record<string, any>) =>
                     (a[this.field] ?? "").localeCompare(b[this.field] ?? "");
             }
-            case SortFunctions.PF_LEVEL: {
-                return (a: Record<string, any>, b: Record<string, any>) => {
-                    const re = /(^[a-zA-Z]+) (\d+)$/gi;
-                    const a_match = a.match(re);
-                    const b_match = b.match(re);
-
-                    if(!a_match && !b_match){
-                        return 0;
-                    } else if (!a_match) {
-                        return 1;
-                    }  else if (!b_match) {
-                        return -1;
-                    } else if(parseInt(a_match[2]) < parseInt(b_match[2])) {
-                        return -1;
-                    } else if (parseInt(a_match[2]) == parseInt(b_match[2])) {
-                        return a_match[1].localCompare(b_match[2]);
-                    } else {
-                        return 1;
-                    }
-                }
-                    
-            }
             case SortFunctions.CONVERT_FRACTION: {
                 return (a: Record<string, any>, b: Record<string, any>) =>
                     convertFraction(a[this.field] ?? 0) -
                     convertFraction(b[this.field] ?? 0);
+            }
+            case SortFunctions.PF2_LEVEL: {
+                return (a: Record<string, any>, b: Record<string, any>) => {
+                    const [a_level, a_type] = PF2LevelToNumber(a[this.field]);
+                    const [b_level, b_type] = PF2LevelToNumber(b[this.field]);
+                    
+                    if (a_level == b_level) {
+                        return a_type.localeCompare(b_type);
+                    }
+                    return ((a_level ?? 0) - (b_level ?? 0));
+                }
+            }
+            case SortFunctions.PF2_TYPE: {
+                return (a: Record<string, any>, b: Record<string, any>) => {
+                    const [a_level, a_type] = PF2LevelToNumber(a[this.field]);
+                    const [b_level, b_type] = PF2LevelToNumber(b[this.field]);
+                    
+                    if (a_type == b_type) {
+                        return ((a_level ?? 0) - (b_level ?? 0));
+                    }
+                    return a_type.localeCompare(b_type);
+                }
+            }
+            case SortFunctions.PF2_TRAIT: {
+                return (a: Record<string, any>, b: Record<string, any>) => {
+                    return 1;
+                }
             }
             case SortFunctions.CUSTOM: {
                 return new Function("a", "b", this.func!) as (
@@ -97,7 +102,7 @@ export const DEFAULT_HEADERS: TableHeaderState[] = [
     {
         text: "Level",
         field: "level",
-        type: SortFunctions.PF_LEVEL
+        type: SortFunctions.PF2_LEVEL
     }
 ];
 
