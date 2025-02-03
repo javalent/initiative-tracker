@@ -16,7 +16,7 @@ import {
 export enum FilterType {
     Range,
     PF2_Level_Range, 
-    PF2_Creature_Type,
+    PF2_Monster_Type,
     Search,
     Options, 
     PF2_Trait
@@ -37,8 +37,8 @@ interface PF2_Level_RangeFilter extends BaseFilter {
     type: FilterType.PF2_Level_Range;
     options: [number, number];
 }
-interface PF2_Creature_TypeFilter extends BaseFilter {
-    type: FilterType.PF2_Creature_Type;
+interface PF2_Monster_TypeFilter extends BaseFilter {
+    type: FilterType.PF2_Monster_Type;
     options: string;
 }
 interface OptionsFilter extends BaseFilter {
@@ -53,7 +53,7 @@ interface PF2_TraitFilter extends BaseFilter {
     type: FilterType.PF2_Trait;
     options: string;
 }
-export type Filter = RangeFilter | PF2_Level_RangeFilter | OptionsFilter | StringFilter | PF2_TraitFilter | PF2_Creature_TypeFilter;
+export type Filter = RangeFilter | PF2_Level_RangeFilter | OptionsFilter | StringFilter | PF2_TraitFilter | PF2_Monster_TypeFilter;
 export const DEFAULT_NEW_FILTER: Filter = {
     type: FilterType.Search,
     fields: [],
@@ -81,9 +81,9 @@ export interface PF2_Level_RangeFilterStore
     extends BaseFilterStore<PF2_Level_RangeFilter, number | string> {
     type: FilterType.PF2_Level_Range;
 }
-export interface PF2_Creature_TypeFilterStore
-    extends BaseFilterStore<PF2_Creature_TypeFilter, number | string> {
-    type: FilterType.PF2_Creature_Type;
+export interface PF2_Monster_TypeFilterStore
+    extends BaseFilterStore<PF2_Monster_TypeFilter, number | string> {
+    type: FilterType.PF2_Monster_Type;
 }
 export interface OptionsFilterStore
     extends BaseFilterStore<OptionsFilter, number | string> {
@@ -98,7 +98,7 @@ export interface PF2_TraitFilterStore
     type: FilterType.PF2_Trait;
 }
 
-type FilterStore = RangeFilterStore | PF2_Level_RangeFilterStore | OptionsFilterStore | StringFilterStore | PF2_TraitFilterStore | PF2_Creature_TypeFilterStore;
+type FilterStore = RangeFilterStore | PF2_Level_RangeFilterStore | OptionsFilterStore | StringFilterStore | PF2_TraitFilterStore | PF2_Monster_TypeFilterStore;
 
 type FilterFactory<T extends Filter> = (filter: T) => FilterStore;
 
@@ -171,7 +171,7 @@ const createPF2_Level_RangeFilter: FilterFactory<PF2_Level_RangeFilter> = (filte
     };
 };
 
-const createPF2_Creature_TypeFilter: FilterFactory<PF2_Creature_TypeFilter> = (filter) => {
+const createPF2_Monster_TypeFilter: FilterFactory<PF2_Monster_TypeFilter> = (filter) => {
     let DEFAULT_STRING: string = "";
     const store = writable<string>(DEFAULT_STRING);
     const { subscribe, set, update } = store;
@@ -292,8 +292,8 @@ function getFilterStore(filter: Filter) {
             return createRangeFilter(filter);
         case FilterType.PF2_Level_Range:
             return createPF2_Level_RangeFilter(filter);
-        case FilterType.PF2_Creature_Type:
-            return createPF2_Creature_TypeFilter(filter);
+        case FilterType.PF2_Monster_Type:
+            return createPF2_Monster_TypeFilter(filter);
         case FilterType.Search:
             return createStringFilter(filter);
         case FilterType.PF2_Trait:
@@ -379,7 +379,7 @@ function getDerivedFilterOptions(
                             break;
                         }
                         case FilterType.Search:
-                        case FilterType.PF2_Creature_Type:
+                        case FilterType.PF2_Monster_Type:
                         case FilterType.PF2_Trait:
                             continue;
                     }
@@ -619,7 +619,7 @@ export const DEFAULT_FILTERS: Filter[] = [
         derive: true
     },
     {
-        type: FilterType.PF2_Creature_Type,
+        type: FilterType.PF2_Monster_Type,
         text: "Type",
         fields: ["level"],
         options: "",

@@ -31,7 +31,7 @@
                 return setIcon(node, "sliders-horizontal");
             case FilterType.PF2_Trait:
                 return setIcon(node, "search");
-            case FilterType.PF2_Creature_Type:
+            case FilterType.PF2_Monster_Type:
             return setIcon(node, "search");
         }
 

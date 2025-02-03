@@ -31,7 +31,7 @@
             d.addOption(`${FilterType.Options}`, "Options");
             d.addOption(`${FilterType.Search}`, "Search");
             d.addOption(`${FilterType.PF2_Level_Range}`, "PF2 - Level");
-            d.addOption(`${FilterType.PF2_Creature_Type}`, "PF2 - Monster type");
+            d.addOption(`${FilterType.PF2_Monster_Type}`, "PF2 - Monster type");
             d.addOption(`${FilterType.PF2_Trait}`, "PF2 - Traits");
             d.setValue(`${filter.type}`).onChange((v) => {
                 filter.type = Number(v);
@@ -48,7 +48,7 @@
                     case FilterType.PF2_Level_Range:
                         filter.options = [-1, 25];
                         break;
-                    case FilterType.PF2_Creature_Type:
+                    case FilterType.PF2_Monster_Type:
                         filter.options = "";
                         break;
                     case FilterType.PF2_Trait:
