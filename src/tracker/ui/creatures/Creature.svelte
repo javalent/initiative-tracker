@@ -196,4 +196,16 @@
     .mobile {
         font-size: smaller;
     }
+    /* .bruised {
+        color: yellow;
+    }
+    .bloodied {
+        color: orange;
+    }
+    .near-death {
+        color: red;
+    }
+    .defeated {
+        text-decoration: line-through;
+    } */
 </style>

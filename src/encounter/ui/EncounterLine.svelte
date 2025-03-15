@@ -38,7 +38,7 @@
     const openButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node).setIcon(START_ENCOUNTER);
     };
-    const open = async () => {
+    const open = async () => { // does not work right
         if (!plugin.view) {
             await plugin.addTrackerView();
         }
@@ -69,7 +69,7 @@
         new ExtraButtonComponent(node).setIcon("plus-with-circle");
     };
 
-    const add = async (evt: MouseEvent) => {
+    const add = async (evt: MouseEvent) => { // works right 
         if (!plugin.view) {
             await plugin.addTrackerView();
         }

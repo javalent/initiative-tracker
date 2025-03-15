@@ -3,6 +3,7 @@ export interface CreatureState extends HomebrewCreature {
     enabled: boolean;
     currentMaxHP: number;
     currentHP: number;
+    image: string;
     tempHP: number;
     currentAC: number | string;
     initiative: number;
@@ -14,6 +15,7 @@ export interface CreatureState extends HomebrewCreature {
 }
 export interface SRDMonster {
     name: string;
+    image?: string;
     ac: number;
     hp: number;
     hit_dice?: string;
@@ -28,6 +30,7 @@ export interface SRDMonster {
 }
 export interface HomebrewCreature {
     name?: string;
+    image?: string;
     display?: string;
     hp?: number;
     ac?: number | string;

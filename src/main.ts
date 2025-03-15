@@ -384,13 +384,21 @@ export default class InitiativeTracker extends Plugin {
                 }
             }
         });
-
         this.playerCreatures = new Map(
             this.data.players.map((p) => [p.name, Creature.from(p)])
         );
 
         this.app.workspace.onLayoutReady(async () => {
+            const players = await Promise.all(
+                this.data.players.map(async (p) => {
+                    const file = await this.app.metadataCache.getFirstLinkpathDest(p.note, "");
+                    const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter
+                    return [p.name, Creature.from({...p, image: frontmatter.image})]
+                })
+            )
+            this.playerCreatures = new Map(players)
             this.addTrackerView();
+
             //Update players from < 7.2
             for (const player of this.data.players) {
                 if (player.path) continue;
@@ -420,12 +428,13 @@ export default class InitiativeTracker extends Plugin {
                         this.app.metadataCache.getFileCache(file)?.frontmatter;
                     if (!frontmatter) return;
                     for (let player of players) {
-                        const { ac, hp, modifier, level, name } = frontmatter;
+                        const { ac, hp, modifier, level, name, image } = frontmatter;
                         player.ac = ac;
                         player.hp = hp;
                         player.modifier = modifier;
                         player.level = level;
                         player.name = name ? name : player.name;
+                        player.image = image
                         player["statblock-link"] =
                             frontmatter["statblock-link"];
 

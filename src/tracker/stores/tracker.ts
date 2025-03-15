@@ -733,7 +733,7 @@ function createTracker() {
                     /**
                      * New encounter button was clicked, only maintain the players.
                      */
-                    creatures = creatures.filter((c) => c.player);
+                    creatures = creatures.filter((c) => c.player).map((c) => plugin.getPlayerByName(c.name));
                 } else {
                     /**
                      * Encounter is being started. Keep any pre-existing players that are incoming.
@@ -757,11 +757,16 @@ function createTracker() {
                             )) &&
                             existingPlayer != null
                         ) {
+                            existingPlayer = plugin.getPlayerByName(creature.name)
                             tempCreatureArray.push(existingPlayer);
                         } else {
-                            tempCreatureArray.push(
-                                Creature.fromJSON(creature, plugin)
-                            );
+                            if (creature.player) {
+                                tempCreatureArray.push(plugin.getPlayerByName(creature.name));
+                            } else {
+                                tempCreatureArray.push(
+                                    Creature.fromJSON(creature, plugin)
+                                );
+                            }
                         }
                     }
                     for (const player of players) {
@@ -770,7 +775,9 @@ function createTracker() {
                                 (p) => p.player && p.id == player.id
                             )
                         ) {
-                            tempCreatureArray.push(player);
+                            tempCreatureArray.push(
+                                plugin.getPlayerByName(player.name)
+                            );
                         }
                     }
                     creatures = tempCreatureArray;

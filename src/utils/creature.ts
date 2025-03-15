@@ -14,9 +14,18 @@ export function getId() {
     });
 }
 
+const getHpStatus = (hp: number, max: number) => {
+    if (hp <= 0) return "text-decoration: line-through;";  // Check defeated first
+    if (hp < max * 0.2) return "color: red;"; // Less than 20% HP
+    if (hp < max * 0.5) return "color: yellow;";  // Less than 50% HP
+    if (hp < max * 0.75) return "color: aqua;";  // Less than 75% HP
+    return "";  // 75% or more HP
+};
+
 export class Creature {
     active: boolean;
     name: string;
+    image: string;
     modifier: number | number[];
     hp: number;
     hit_dice?: string;
@@ -59,6 +68,7 @@ export class Creature {
     }
     constructor(public creature: HomebrewCreature, initiative: number = 0) {
         this.name = creature.name;
+        this.image = creature.image;
         this.display = creature.display;
         this.initiative =
             "initiative" in creature
@@ -104,13 +114,14 @@ export class Creature {
         }
     }
     get hpDisplay() {
+        const hpStatus = getHpStatus(this.hp + this.temp, this.current_max)
         if (this.current_max) {
             const tempMods =
                 this.temp > 0
-                    ? `aria-label="Temp HP: ${this.temp}" style="font-weight:bold"`
-                    : "";
+                    ? `aria-label="Temp HP: ${this.temp}" style="font-weight:bold;${hpStatus}"`
+                    : `style="${hpStatus}"`;
             return `
-                <span ${tempMods}>${this.hp + this.temp}</span><span>/${
+                <span ${tempMods}>${this.hp + this.temp}</span><span style="${hpStatus}">/${
                 this.current_max
             }</span>
             `;
@@ -153,6 +164,7 @@ export class Creature {
         yield this.hit_dice;
         yield this.current_ac;
         yield this.rollHP;
+        yield this.image;
     }
 
     static new(creature: Creature) {
@@ -233,7 +245,8 @@ export class Creature {
             friendly: this.friendly,
             "statblock-link": this["statblock-link"],
             hit_dice: this.hit_dice,
-            rollHP: this.rollHP
+            rollHP: this.rollHP,
+            image: this.image,
         };
     }
 
@@ -268,6 +281,7 @@ export class Creature {
         }
         creature.status = new Set(statuses);
         creature.active = state.active;
+        creature.image = state.image;
         return creature;
     }
 }

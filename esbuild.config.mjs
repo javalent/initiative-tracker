@@ -13,9 +13,8 @@ if you want to view the source, please visit the github repository of this plugi
 */
 `;
 
-const prod = process.argv[2] === "production";
-
-const dir = prod ? "./" : process.env.OUTDIR;
+const prod = process.env.NODE_ENV === "production";
+const dir = "./dist";
 
 const parameters = {
     banner: {
