@@ -35,9 +35,19 @@
                         tracker.setUpdate(creature, e);
                     });
             });
+            if (creature.hp != creature.current_max) {
+                menu.addItem((item) => {
+                    item.setIcon("undo")
+                        .setTitle("Reset HP")
+                        .onClick((e: MouseEvent) => {
+                            creature.hp = creature.current_max;
+                            tracker.updateAndSave();
+                        })
+                });
+            }
             if (creature.current_ac != creature.ac) {
                 menu.addItem((item) => {
-                    item.setIcon(HP)
+                    item.setIcon("undo")
                         .setTitle("Reset AC")
                         .onClick((e: MouseEvent) => {
                             creature.current_ac = creature.ac;
