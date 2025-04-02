@@ -35,16 +35,36 @@
                         tracker.setUpdate(creature, e);
                     });
             });
-            if (creature.hp != creature.current_max) {
-                menu.addItem((item) => {
-                    item.setIcon("undo")
-                        .setTitle("Reset HP")
-                        .onClick((e: MouseEvent) => {
-                            creature.hp = creature.current_max;
-                            tracker.updateAndSave();
-                        })
+            if (creature.hp != creature.current_max || creature.current_max != creature.max) {
+                const resetHpItem = menu.addItem((item) => {
+                    item.setTitle("Reset HP").setIcon("undo");
+                    
+                    const resetHpMenu = item.setSubmenu();
+                    
+                    if (creature.hp != creature.current_max) {
+                        resetHpMenu.addItem((item) => {
+                            item.setIcon("fold-vertical")
+                                .setTitle("Reset HP to current max")
+                                .onClick((e: MouseEvent) => {
+                                    creature.hp = creature.current_max;
+                                    tracker.updateAndSave();
+                                })
+                        });
+                    }
+                    if (creature.current_max != creature.max) {
+                        resetHpMenu.addItem((item) => {
+                            item.setIcon("tent")
+                                .setTitle("Reset max HP")
+                                .onClick((e: MouseEvent) => {
+                                    creature.current_max = creature.max;
+                                    creature.hp = creature.max;
+                                    tracker.updateAndSave();
+                                })
+                        });
+                    }
                 });
             }
+            
             if (creature.current_ac != creature.ac) {
                 menu.addItem((item) => {
                     item.setIcon("undo")
