@@ -8,6 +8,7 @@
     import { createEventDispatcher } from "svelte";
 
     import { tracker } from "../stores/tracker";
+    import { statusDisplay } from "src/utils/conditions";
     const { state, ordered, data } = tracker;
 
     const hpIcon = (node: HTMLElement) => {
@@ -47,13 +48,6 @@
     const friendIcon = (node: HTMLElement) => {
         setIcon(node, FRIENDLY);
     };
-    const statusDisplay = (status: Status) => {
-        if (status.hasAmount) {
-            return status.name + " (" + status.amount + ")";
-        } else {
-            return status.name;
-        }
-    }
 </script>
 
 <table class="initiative-tracker-table" transition:fade>
@@ -88,7 +82,7 @@
                     {/if}
                 </td>
                 <td class="center">
-                    {[...creature.status].map((s) => statusDisplay(s)).join(", ")}
+                    {[...creature.status.values()].map((s) => statusDisplay(s)).join(", ")}
                 </td>
             </tr>
         {/each}
