@@ -59,7 +59,7 @@ export class Creature {
         this.modifier = this.modifier ?? 0;
     }
     addCondition(condition: Condition) {
-        this.status.set(condition.name, condition);
+        this.status.set(condition.name, structuredClone(condition));
     }
     removeCondition(condition: Condition) {
         this.status.delete(condition.name);
