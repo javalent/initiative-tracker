@@ -262,19 +262,22 @@ export class Creature {
         creature.hp = state.currentHP;
         creature.current_ac = state.currentAC;
         let statuses = new Map<string, Condition>();
-        if (Array.isArray(status.status)) {
+        if (Array.isArray(state.status)) {
             // Old style state saving, array of status names (supports loading existing data when upgrading the plugin)
             for (const status of state.status) {
                 const existing = Conditions.find(({ name }) => status == name);
+                let newStatus;
                 if (existing) {
-                    statuses[existing.name] = existing;
+                    newStatus = existing;
                 } else {
-                    statuses[status] = {
+                    newStatus = {
                         name: status,
                         description: null,
                         id: getId()
                     };
                 }
+                
+                statuses.set(newStatus.name, newStatus);
             }
         } else {
             // New style state saving, saves data about condition in an object
