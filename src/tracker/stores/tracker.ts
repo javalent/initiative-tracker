@@ -267,11 +267,21 @@ function createTracker() {
             if (change.update_status?.length) {
                 for (const status of change.update_status) {
                     creature.addCondition(status);
+                    const message: UpdateLogMessage = {
+                        name: creature.name,
+                        update_status: status,
+                    };
+                    _logger?.logUpdate([message]);
                 }
             }
             if (change.remove_status?.length) {
                 for (const status of change.remove_status) {
                     creature.removeCondition(status);
+                    const message: UpdateLogMessage = {
+                        name: creature.name,
+                        remove_status: [status],
+                    };
+                    _logger?.logUpdate([message]);
                 }
             }
             if ("hidden" in change) {

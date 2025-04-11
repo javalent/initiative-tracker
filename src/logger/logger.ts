@@ -224,6 +224,15 @@ export default class Logger {
                     perCreature.push(`took ${status.join(" and ")} status`);
                 }
             }
+            if (message.update_status) {
+                if (perCreature.length) {
+                    perCreature.push("and");
+                } else {
+                    perCreature.push(message.name);
+                }
+                // Tracker always sends status updates individually, so message creation is a bit easier
+                perCreature.push(`changed status ${message.update_status.name} to ${statusDisplay(message.update_status)}`);
+            }
             if (message.remove_status) {
                 if (perCreature.length) {
                     perCreature.push("and");
@@ -241,7 +250,7 @@ export default class Logger {
                 } else {
                     status = [message.remove_status[0]];
                 }
-                perCreature.push(`relieved of ${status.join(" and ")} status`);
+                perCreature.push(`relieved of ${status.map(s => s.name).join(" and ")} status`);
             }
             toLog.push(perCreature.join(" "));
         }
