@@ -6,7 +6,8 @@
         HIDDEN,
         HP,
         REMOVE,
-        TAG
+        TAG,
+        REDO
     } from "src/utils";
     import type { Creature } from "src/utils/creature";
     import type TrackerView from "src/tracker/view";
@@ -37,7 +38,7 @@
             });
             if (creature.hp != creature.current_max || creature.current_max != creature.max) {
                 const resetHpItem = menu.addItem((item) => {
-                    item.setTitle("Reset HP").setIcon("undo");
+                    item.setTitle("Reset HP").setIcon(REDO);
                     
                     const resetHpMenu = item.setSubmenu();
                     
