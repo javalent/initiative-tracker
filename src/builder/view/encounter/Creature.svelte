@@ -1,12 +1,7 @@
 <script lang="ts">
     import type { SRDMonster } from "src/types/creatures";
     import { ExtraButtonComponent, setIcon } from "obsidian";
-    import {
-        convertFraction,
-        FRIENDLY,
-        getRpgSystem,
-        HIDDEN
-    } from "src/utils";
+    import { convertFraction, FRIENDLY, getRpgSystem, HIDDEN } from "src/utils";
     import { encounter } from "../../stores/encounter";
     import Nullable from "../Nullable.svelte";
     import { getContext } from "svelte";
@@ -50,7 +45,7 @@
         creature.cr &&
         convertFraction(creature.cr) > $average + 3;
 
-    $: playerLevels = $players.filter(p => p.enabled).map(p => p.level);
+    $: playerLevels = $players.filter((p) => p.enabled).map((p) => p.level);
 
     const baby = (node: HTMLElement) => setIcon(node, "baby");
 
@@ -117,14 +112,22 @@
     {/each}
     <div class="encounter-creature-context">
         <span>
-            <Nullable str={rpgSystem.formatDifficultyValue(rpgSystem.getCreatureDifficulty(creature, playerLevels), true)} />
+            <Nullable
+                str={rpgSystem.formatDifficultyValue(
+                    rpgSystem.getCreatureDifficulty(creature, playerLevels),
+                    true
+                )}
+            />
         </span>
     </div>
     <div class="encounter-creature-controls">
         <div use:hide on:click={() => (creature.hidden = !creature.hidden)} />
         <div
             use:friend
-            on:click={() => (creature.friendly = !creature.friendly)}
+            on:click={() => {
+                creature.friendly = !creature.friendly;
+                encounter.update(creature);
+            }}
         />
         <div use:del on:click={() => encounter.delete(creature)} />
     </div>

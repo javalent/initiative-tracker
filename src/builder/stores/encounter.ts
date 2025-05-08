@@ -41,7 +41,12 @@ function createEncounter() {
                 }
                 return monsters;
             }),
-        empty: () => set(new Map())
+        empty: () => set(new Map()),
+        update: (creature: SRDMonster) =>
+            update((monsters) => {
+                monsters.set(creature, monsters.get(creature) ?? 1);
+                return monsters;
+            })
     };
 }
 

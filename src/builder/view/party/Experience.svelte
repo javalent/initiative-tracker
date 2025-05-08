@@ -10,8 +10,23 @@
     const open = plugin.data.builder.showXP;
     const rpgSystem = getRpgSystem(plugin);
 
-    $: playerLevels = $players.filter(p => p.enabled).map(p => p.level)
-    $: difficulty = rpgSystem.getEncounterDifficulty($encounter, playerLevels)
+    $: enc = new Map(
+        [...$encounter.entries()].map(([m, c]) =>
+            m.friendly ? [m, 0] : [m, c]
+        )
+    );
+    let filtered = 0;
+    $: {
+        filtered = 0;
+        for (const [monster, count] of enc) {
+            if (count === 0) {
+                filtered += $encounter.get(monster) ?? 0;
+            }
+        }
+    }
+
+    $: playerLevels = $players.filter((p) => p.enabled).map((p) => p.level);
+    $: difficulty = rpgSystem.getEncounterDifficulty(enc, playerLevels);
 </script>
 
 <div class="xp-container">
@@ -20,13 +35,22 @@
         on:toggle={() =>
             (plugin.data.builder.showXP = !plugin.data.builder.showXP)}
     >
-        <h5 slot="title">
-            Experience
-            {#if plugin.data.rpgSystem != RpgSystemSetting.Dnd5e}
-                ({rpgSystem.displayName})
+        <div class="title-container" slot="title">
+            <h5 class="title">Experience</h5>
+            <span>
+                {#if plugin.data.rpgSystem != RpgSystemSetting.Dnd5e}
+                    ({rpgSystem.displayName})
+                {/if}
+            </span>
+            {#if filtered > 0}
+                <span class="filtered"
+                    >Filtering {filtered} allied creature{filtered > 1
+                        ? "s"
+                        : ""}</span
+                >
             {/if}
-        </h5>
-        <div slot="content">
+        </div>
+        <div class="content" slot="content">
             <div class="xp">
                 <div class="encounter-difficulty">
                     <div class="difficulty container">
@@ -41,17 +65,26 @@
                     {/each}
                     <div class="total container">
                         <strong class="header">{difficulty.title}</strong>
-                        <span>{rpgSystem.formatDifficultyValue(difficulty.value)}</span>
+                        <span
+                            >{rpgSystem.formatDifficultyValue(
+                                difficulty.value
+                            )}</span
+                        >
                     </div>
                 </div>
                 <div class="thresholds">
                     {#each rpgSystem.getDifficultyThresholds(playerLevels) as budget}
-                        <div class="experience-threshold {budget.displayName.toLowerCase()} container">
+                        <div
+                            class="experience-threshold {budget.displayName.toLowerCase()} container"
+                        >
                             <strong class="experience-name header">
                                 {budget.displayName}
                             </strong>
                             <span class="experience-amount">
-                                {rpgSystem.formatDifficultyValue(budget.minValue, true)}
+                                {rpgSystem.formatDifficultyValue(
+                                    budget.minValue,
+                                    true
+                                )}
                             </span>
                         </div>
                     {/each}
@@ -71,6 +104,23 @@
 </div>
 
 <style scoped>
+    .title-container {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 0.1rem;
+    }
+    .title {
+        margin-bottom: 0;
+    }
+    .content {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 0.25rem;
+    }
+    .filtered {
+        font-size: smaller;
+        color: var(--text-muted);
+    }
     .xp-container {
         margin-left: auto;
     }
