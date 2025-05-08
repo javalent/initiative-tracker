@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.17](https://github.com/javalent/initiative-tracker/compare/13.0.16...13.0.17) (2025-05-08)
+
+
+### Bug Fixes
+
+* add condition on select ([efe69d4](https://github.com/javalent/initiative-tracker/commit/efe69d4746f0cf5f743d3d5e327373457b7bf34d))
+* add linter settings & revert accidental lint ([3e18bf8](https://github.com/javalent/initiative-tracker/commit/3e18bf80fbd9a5fbfc5ed4f4fbe439dad9f3d633))
+* Filter out allied creatures in the encounter builder until a more permanent solution is found (lol) ([0a0e124](https://github.com/javalent/initiative-tracker/commit/0a0e12444deea510c46f1599859138cb941b156b))
+* reapplying conditions won't remove them ([8238807](https://github.com/javalent/initiative-tracker/commit/823880765f829e24cd1a844bbd0e4e1225694c00))
+
 ## [13.0.16](https://github.com/javalent/initiative-tracker/compare/13.0.15...13.0.16) (2024-10-04)
 
 
