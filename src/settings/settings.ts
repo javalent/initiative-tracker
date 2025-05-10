@@ -331,7 +331,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                     this.display();
                 });
             });
-            new Setting(additionalContainer)
+        new Setting(additionalContainer)
             .setName("Resolve Initiative Ties")
             .setDesc(
                 "Define what happens if two creatures have the same initiative."
@@ -340,7 +340,9 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 d.addOption(RESOLVE_TIES.playerFirst, "Player first");
                 d.addOption(RESOLVE_TIES.npcFirst, "NPC first");
                 d.addOption(RESOLVE_TIES.random, "Random");
-                d.setValue(this.plugin.data.resolveTies ?? RESOLVE_TIES.playerFirst);
+                d.setValue(
+                    this.plugin.data.resolveTies ?? RESOLVE_TIES.playerFirst
+                );
                 d.onChange(async (v) => {
                     this.plugin.data.resolveTies = v;
                     this.plugin.saveSettings();
@@ -952,11 +954,11 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
             await this.plugin.saveSettings();
         }
         new Setting(containerEl)
-            .setName("Sync Monsters from TTRPG Statblocks")
+            .setName("Sync Monsters from Fantasy Statblocks")
             .setDesc(
                 createFragment((e) => {
                     e.createSpan({
-                        text: "Homebrew creatures saved to the TTRPG Statblocks plugin will be available to use."
+                        text: "Homebrew creatures saved to the Fantasy Statblocks plugin will be available to use."
                     });
                     if (!this.plugin.canUseStatBlocks) {
                         e.createEl("br");
@@ -965,7 +967,7 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                             text: "Install and enable the "
                         });
                         e.createEl("a", {
-                            text: "TTRPG Statblocks",
+                            text: "Fantasy Statblocks",
                             href: "obsidian://show-plugin?id=obsidian-5e-statblocks"
                         });
                         e.createSpan({
@@ -1089,8 +1091,14 @@ class NewPlayerModal extends Modal {
                     this.player.name = name ?? this.player.name;
                     this.player.ac = parseInt(ac ?? this.player.ac, 10);
                     this.player.hp = parseInt(hp ?? this.player.hp, 10);
-                    this.player.level = parseInt(level ?? this.player.level, 10);
-                    this.player.modifier = parseInt(modifier ?? this.player.modifier, 10);
+                    this.player.level = parseInt(
+                        level ?? this.player.level,
+                        10
+                    );
+                    this.player.modifier = parseInt(
+                        modifier ?? this.player.modifier,
+                        10
+                    );
                     this.player["statblock-link"] =
                         metaData.frontmatter["statblock-link"];
                     this.display();
