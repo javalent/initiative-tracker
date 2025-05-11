@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.18](https://github.com/javalent/initiative-tracker/compare/13.0.17...13.0.18) (2025-05-11)
+
+
+### Bug Fixes
+
+* Update name of Fantasy Statblocks in settings ([f501053](https://github.com/javalent/initiative-tracker/commit/f501053af75e6593b7a5e6dee4e5d52c5383a4f4))
+
 ## [13.0.17](https://github.com/javalent/initiative-tracker/compare/13.0.16...13.0.17) (2025-05-08)
 
 
