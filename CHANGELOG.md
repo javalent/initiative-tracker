@@ -3,7 +3,12 @@
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
 ## [13.1.0](https://github.com/Tarrayna/initiative-tracker/compare/v9.6.1...v13.1.0) (2025-05-16)
-
+* Add support for D&D 2024 rules 
+  * Updated XP thresholds for levels 1-20
+  * Updated Challenge Rating XP values
+  * Changed difficulty categories from "easy/medium/hard/deadly" to "low/moderate/high"
+  * Removed XP multipliers for creature count as per 2024 rules
+  * Removed daily XP budget in favor of cleaner encounter calculations
 
 ### ⚠ BREAKING CHANGES
 
