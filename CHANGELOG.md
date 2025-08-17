@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.18](https://github.com/javalent/initiative-tracker/compare/13.0.17...13.0.18) (2025-08-17)
+
+
+### Bug Fixes
+
+* Fixes misspelling of Bloody in CR2.0 ([1cd43e9](https://github.com/javalent/initiative-tracker/commit/1cd43e96959543cb47a6b035954a3837813359a8))
+* Fixes some instances of the encounter builder not loading for some XP systems ([1cd43e9](https://github.com/javalent/initiative-tracker/commit/1cd43e96959543cb47a6b035954a3837813359a8))
+* Update name of Fantasy Statblocks in settings ([f501053](https://github.com/javalent/initiative-tracker/commit/f501053af75e6593b7a5e6dee4e5d52c5383a4f4))
+
 ## [13.0.17](https://github.com/javalent/initiative-tracker/compare/13.0.16...13.0.17) (2025-05-08)
 
 
