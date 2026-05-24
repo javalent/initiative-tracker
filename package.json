@@ -5,7 +5,8 @@
     "types": "./dist/index.d.ts",
     "scripts": {
         "build": "node esbuild.config.mjs production && tsc --project tsconfig.json --emitDeclarationOnly --declaration --declarationMap --outdir ./dist",
-        "dev": "node esbuild.config.mjs"
+        "dev": "node esbuild.config.mjs",
+        "test": "vitest run"
     },
     "keywords": [],
     "author": "",
@@ -33,6 +34,7 @@
         "svelte-multiselect": "^10.3.0",
         "svelte-preprocess": "^5.0.4",
         "tslib": "^2.6.2",
-        "typescript": "^5.4.5"
+        "typescript": "^5.4.5",
+        "vitest": "1.6.1"
     }
 }

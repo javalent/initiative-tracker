@@ -10,7 +10,7 @@ import {
 import { equivalent } from "../../encounter";
 import { Events, Platform, TFile } from "obsidian";
 import type { UpdateLogMessage } from "src/logger/logger.types";
-import type { Condition } from "src/types/creatures";
+import type { Condition, CreatureUpdate } from "src/types/creatures";
 import type { InitiativeTrackerData } from "src/settings/settings.types";
 import type { InitiativeViewState } from "../view.types";
 import {
@@ -30,23 +30,6 @@ type HPUpdate = {
     saved: boolean;
     resist: boolean;
     customMod: "2" | "1";
-};
-type CreatureUpdate = {
-    hp?: number;
-    ac?: number | string;
-    current_ac?: number | string;
-    initiative?: number;
-    name?: string;
-    marker?: string;
-    temp?: number;
-    max?: number;
-    status?: Condition[];
-    remove_status?: Condition[];
-    hidden?: boolean;
-    enabled?: boolean;
-    //this is so dirty
-    set_hp?: number;
-    set_max_hp?: number;
 };
 type CreatureUpdates = { creature: Creature; change: CreatureUpdate };
 const modifier = Platform.isMacOS ? "Meta" : "Control";
@@ -368,6 +351,99 @@ function createTracker() {
         return creatures;
     }
 
+    /**
+     * Applies an external (sync-style) update to a creature.
+     * HP fields are treated as absolute values, not deltas.
+     * Shared by `updateCreatureByName` and `updateCreatureById`.
+     */
+    function applyExternalUpdate(creature: Creature, change: CreatureUpdate) {
+        if (!isNaN(Number(change.hp))) {
+            creature.hp = change.hp!;
+        }
+        if (change.set_hp != null) {
+            creature.hp = change.set_hp;
+        }
+        if (change.set_max_hp != null) {
+            creature.current_max = creature.max = Math.max(0, change.set_max_hp);
+            if (creature.hp > creature.current_max) {
+                creature.hp = creature.current_max;
+            }
+        }
+        if (change.max) {
+            creature.current_max = Math.max(
+                0,
+                creature.current_max + change.max
+            );
+            if (
+                creature.hp >= creature.current_max &&
+                _settings?.hpOverflow !== OVERFLOW_TYPE.current
+            ) {
+                creature.hp = creature.current_max;
+            }
+        }
+        if (change.temp) {
+            let baseline = 0;
+            if (_settings?.additiveTemp) {
+                baseline = creature.temp;
+            }
+            if (change.temp > 0) {
+                creature.temp = Math.max(
+                    creature.temp,
+                    baseline + change.temp
+                );
+            } else {
+                creature.temp = Math.max(0, creature.temp + change.temp);
+            }
+        }
+        if (change.marker) {
+            creature.marker = change.marker;
+        }
+        if (
+            typeof change.ac === "string" ||
+            !isNaN(Number(change.ac))
+        ) {
+            creature.ac = creature.current_ac = change.ac!;
+        }
+        if (
+            typeof change.current_ac === "string" ||
+            !isNaN(Number(change.current_ac))
+        ) {
+            creature.current_ac = change.current_ac!;
+        }
+        if (!isNaN(Number(change.initiative))) {
+            creature.initiative = change.initiative!;
+        }
+        if (typeof change.name === "string") {
+            creature.name = change.name;
+        }
+        if ("hidden" in change) {
+            creature.hidden = change.hidden!;
+        }
+        if ("enabled" in change) {
+            creature.enabled = change.enabled!;
+        }
+        if (Array.isArray(change.status) && change.status.length) {
+            for (const status of change.status) {
+                if (typeof status === "string") {
+                    const cond = _settings?.statuses.find(
+                        (c) => c.name === status
+                    ) ?? { name: status, description: "", id: getId() };
+                    creature.addCondition(cond);
+                } else if (
+                    typeof status === "object" &&
+                    status.name?.length
+                ) {
+                    creature.addCondition(status as Condition);
+                }
+            }
+        }
+        if (Array.isArray(change.remove_status) && change.remove_status.length) {
+            for (const status of change.remove_status) {
+                creature.removeCondition(status);
+            }
+        }
+    }
+
     return {
         subscribe,
         set,
@@ -389,90 +465,37 @@ function createTracker() {
         updateCreatures,
         updateCreatureByName: (name: string, change: CreatureUpdate) =>
             updateAndSave((creatures) => {
-                const creature = creatures.find((c) => c.name == name);
-                if (creature) {
-                    if (!isNaN(Number(change.hp))) {
-                        creature.hp = change.hp;
-                    }
-                    if (change.max) {
-                        creature.current_max = Math.max(
-                            0,
-                            creature.current_max + change.max
-                        );
-                        if (
-                            creature.hp >= creature.current_max &&
-                            _settings.hpOverflow !== OVERFLOW_TYPE.current
-                        ) {
-                            creature.hp = creature.current_max;
-                        }
-                    }
-                    if (change.temp) {
-                        let baseline = 0;
-                        if (_settings.additiveTemp) {
-                            baseline = creature.temp;
-                        }
-                        if (change.temp > 0) {
-                            creature.temp = Math.max(
-                                creature.temp,
-                                baseline + change.temp
-                            );
-                        } else {
-                            creature.temp = Math.max(
-                                0,
-                                creature.temp + change.temp
-                            );
-                        }
-                    }
-                    if (change.marker) {
-                        creature.marker = change.marker;
-                    }
-                    if (
-                        typeof change.ac == "string" ||
-                        !isNaN(Number(change.ac))
-                    ) {
-                        creature.ac = creature.current_ac = change.ac;
-                    }
-                    if (
-                        typeof change.current_ac == "string" ||
-                        !isNaN(Number(change.current_ac))
-                    ) {
-                        creature.current_ac = change.ac;
-                    }
-                    if (!isNaN(Number(change.initiative))) {
-                        creature.initiative = change.initiative;
-                    }
-                    if (typeof change.name == "string") {
-                        creature.name = change.name;
-                    }
-                    if ("hidden" in change) {
-                        creature.hidden = change.hidden;
-                    }
-                    if ("enabled" in change) {
-                        creature.enabled = change.enabled;
-                    }
-                    if (Array.isArray(change.status) && change.status?.length) {
-                        for (const status of change.status) {
-                            if (typeof status == "string") {
-                                let cond = _settings.statuses.find(
-                                    (c) => c.name == status
-                                ) ?? {
-                                    name: status,
-                                    description: "",
-                                    id: getId()
-                                };
-                                creature.addCondition(cond);
-                            } else if (
-                                typeof status == "object" &&
-                                status.name?.length
-                            ) {
-                                creature.addCondition(status as Condition);
-                            }
-                        }
-                    }
-                }
-
+                const creature = creatures.find((c) => c.name === name);
+                if (creature) applyExternalUpdate(creature, change);
                 return creatures;
             }),
+        updateCreatureById: (id: string, change: CreatureUpdate): boolean => {
+            let found = false;
+            updateAndSave((creatures) => {
+                const creature = creatures.find((c) => c.id === id);
+                if (creature) {
+                    applyExternalUpdate(creature, change);
+                    found = true;
+                }
+                return creatures;
+            });
+            return found;
+        },
+        removeCreatureById: (id: string): boolean => {
+            let removed = false;
+            updateAndSave((creatures) => {
+                const idx = creatures.findIndex((c) => c.id === id);
+                if (idx !== -1) {
+                    _logger?.log(
+                        `${creatures[idx].getName()} removed from the combat.`
+                    );
+                    creatures.splice(idx, 1);
+                    removed = true;
+                }
+                return creatures;
+            });
+            return removed;
+        },
 
         players: derived(ordered, (creatures) =>
             creatures.filter((c) => c.player)
