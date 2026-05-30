@@ -18,6 +18,7 @@
     import { confirmWithModal } from "./modal";
 
     let creature: Creature = new Creature({});
+    let modifier = JSON.stringify(creature.modifier);
     export let amount = 1;
     export let plugin: InitiativeTracker;
     export let adding: Writable<Array<[Creature, number]>>;
@@ -27,6 +28,7 @@
     editing.subscribe((c) => {
         if (!c) return;
         creature = c;
+        modifier = JSON.stringify(creature.modifier);
     });
 
     $: {
@@ -35,8 +37,29 @@
         }
     }
 
-    let modifier = JSON.stringify(creature.modifier ?? 0);
-    const prior = modifier;
+    const tryUpdateCreatureModifier = () => {
+        let parsed_modifier: number | number[] | undefined;
+        try {
+            parsed_modifier = JSON.parse(`${modifier}`);
+        } catch (e) {
+            console.warn(
+                "Initiative Tracker: Non-parseable modifier provided to creature."
+            );
+        }
+        if (
+            (Array.isArray(parsed_modifier) &&
+                !parsed_modifier.every((m) => !isNaN(Number(m)))) ||
+            isNaN(Number(parsed_modifier))
+        ) {
+            console.warn(
+                "Initiative Tracker: Non-numeric modifier provided to creature."
+            );
+            modifier = JSON.stringify(creature.modifier);
+        } else {
+            creature.modifier = parsed_modifier;
+        }
+    }
+
     const saveButton = (node: HTMLElement) => {
         new ExtraButtonComponent(node)
             .setTooltip("Add Creature")
@@ -46,27 +69,9 @@
                     new Notice("Enter a name!");
                     return;
                 }
-                try {
-                    creature.modifier = JSON.parse(`${modifier}`);
-                } catch (e) {
-                    console.warn(
-                        "Initiative Tracker: Non-parseable modifier provided to creature."
-                    );
-                    creature.modifier = JSON.parse(prior);
-                }
-                if (!creature.modifier) {
-                    creature.modifier = JSON.parse(prior);
-                }
-                if (
-                    (Array.isArray(creature.modifier) &&
-                        !creature.modifier.every((m) => !isNaN(Number(m)))) ||
-                    isNaN(Number(creature.modifier))
-                ) {
-                    console.warn(
-                        "Initiative Tracker: Non-numeric modifier provided to creature."
-                    );
-                    creature.modifier = 0;
-                }
+
+                tryUpdateCreatureModifier();
+
                 if (
                     creature.initiative <= 0 ||
                     creature.initiative == null ||
@@ -88,6 +93,7 @@
                 $adding = $adding;
                 $editing = null;
                 creature = new Creature({});
+                modifier = JSON.stringify(creature.modifier);
             });
     };
     const editButton = (node: HTMLElement) => {
@@ -99,9 +105,9 @@
                     new Notice("Enter a name!");
                     return;
                 }
-                if (!creature.modifier) {
-                    creature.modifier = 0;
-                }
+
+                tryUpdateCreatureModifier();
+
                 if (
                     creature.initiative <= 0 ||
                     creature.initiative == null ||
@@ -128,6 +134,7 @@
                 $adding = $adding;
                 $editing = null;
                 creature = new Creature({});
+                modifier = JSON.stringify(creature.modifier);
             });
     };
     const cancelButton = (node: HTMLElement) => {
@@ -136,6 +143,7 @@
             .setIcon("reset")
             .onClick(() => {
                 creature = new Creature({});
+                modifier = JSON.stringify(creature.modifier);
             });
     };
     const diceButton = (node: HTMLElement) => {
@@ -143,6 +151,7 @@
             .setIcon(DICE)
             .setTooltip("Roll Initiative")
             .onClick(async () => {
+                tryUpdateCreatureModifier();
                 creature.initiative = await plugin.getInitiativeValue(
                     creature.modifier
                 );
@@ -164,6 +173,7 @@
         modal.onSelect(async (selected) => {
             if (selected.item) {
                 creature = Creature.from(selected.item);
+                modifier = JSON.stringify(creature.modifier);
 
                 creature.initiative = await plugin.getInitiativeValue(
                     creature.modifier
