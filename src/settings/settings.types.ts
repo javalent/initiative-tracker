@@ -7,6 +7,7 @@ import type { BuilderState } from "src/builder/builder.types";
 export interface InitiativeTrackerData {
     beginnerTips: boolean;
     displayDifficulty: boolean;
+    displayDifficultyInTracker: boolean;
     preferStatblockLink: boolean;
     statuses: Condition[];
     unconsciousId: string;

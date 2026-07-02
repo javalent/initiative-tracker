@@ -161,6 +161,19 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
                 );
             });
         new Setting(containerEl)
+            .setName("Display Encounter Difficulty in Tracker")
+            .setDesc(
+                "Display the encounter difficulty bar at the top of the initiative tracker view."
+            )
+            .addToggle((t) => {
+                t.setValue(
+                    this.plugin.data.displayDifficultyInTracker
+                ).onChange(async (v) => {
+                    this.plugin.data.displayDifficultyInTracker = v;
+                    await this.plugin.saveSettings();
+                });
+            });
+        new Setting(containerEl)
             .setName("Roll Equivalent Creatures Together")
             .setDesc(
                 "Equivalent creatures (same Name and AC) will roll the same initiative by default."
