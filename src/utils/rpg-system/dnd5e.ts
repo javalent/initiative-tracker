@@ -28,7 +28,7 @@ const XP_THRESHOLDS_PER_LEVEL: {
     20: { daily: 40000, easy: 2800, medium: 5700, hard: 8500, deadly: 12700 }
 };
 
-const XP_PER_CR: Record<string, number> = {
+export const XP_PER_CR: Record<string, number> = {
     "0": 0,
     "0.125": 25,
     "1/8": 25,

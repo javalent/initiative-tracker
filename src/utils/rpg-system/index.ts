@@ -2,6 +2,7 @@ import type { Creature } from "../creature";
 import type { SRDMonster } from "src/types/creatures";
 import type InitiativeTracker from "../../main";
 import { Dnd5eRpgSystem } from "./dnd5e";
+import { Dnd55eRpgSystem } from "./dnd5e-55";
 import { Dnd5eLazyGmRpgSystem } from "./dnd5e-lazygm";
 import { Dnd5eCr2SimpleRpgSystem } from "./dnd5e-cr2-simple";
 import { Dnd5eFleeMortalsRpgSystem } from "./dnd5e-flee-mortals";
@@ -55,6 +56,7 @@ export type IntermediateValues = { label: string, value: number }[]
 
 export enum RpgSystemSetting {
   Dnd5e = "dnd5e",
+  Dnd55e = "dnd5e-55",
   Dnd5eLazyGm = "dnd5e-lazygm",
   Dnd5eCR2Simple = "dnd5e-cr2-simple",
   Dnd5eFleeMortals = "dnd5e-flee-mortals",
@@ -73,6 +75,7 @@ class UndefinedRpgSystem extends RpgSystem {
 export function getRpgSystem(plugin: InitiativeTracker, settingId?: string): RpgSystem {
   switch (settingId ? settingId : plugin.data.rpgSystem) {
     case RpgSystemSetting.Dnd5e: return new Dnd5eRpgSystem(plugin);
+    case RpgSystemSetting.Dnd55e: return new Dnd55eRpgSystem(plugin);
     case RpgSystemSetting.Dnd5eLazyGm: return new Dnd5eLazyGmRpgSystem(plugin);
     case RpgSystemSetting.Dnd5eCR2Simple: return new Dnd5eCr2SimpleRpgSystem(plugin);
     case RpgSystemSetting.Dnd5eFleeMortals: return new Dnd5eFleeMortalsRpgSystem(plugin);
