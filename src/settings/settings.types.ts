@@ -7,6 +7,8 @@ import type { BuilderState } from "src/builder/builder.types";
 export interface InitiativeTrackerData {
     beginnerTips: boolean;
     displayDifficulty: boolean;
+    /** When true, open the Initiative Tracker side leaf on vault startup. */
+    showLeafOnStartup: boolean;
     preferStatblockLink: boolean;
     statuses: Condition[];
     unconsciousId: string;

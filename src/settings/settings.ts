@@ -135,6 +135,19 @@ export default class InitiativeTrackerSettings extends PluginSettingTab {
         containerEl.empty();
         new Setting(containerEl).setHeading().setName("Basic Settings");
         new Setting(containerEl)
+            .setName("Open Initiative Tracker on Startup")
+            .setDesc(
+                "The tracker can always be opened using the command from the command palette."
+            )
+            .addToggle((t) => {
+                t.setValue(this.plugin.data.showLeafOnStartup).onChange(
+                    async (v) => {
+                        this.plugin.data.showLeafOnStartup = v;
+                        await this.plugin.saveSettings();
+                    }
+                );
+            });
+        new Setting(containerEl)
             .setName("Display Beginner Tips")
             .setDesc(
                 "Display instructions in the initiative tracker, helping you get used to the workflow."

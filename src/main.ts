@@ -396,7 +396,7 @@ export default class InitiativeTracker extends Plugin {
         );
 
         this.app.workspace.onLayoutReady(async () => {
-            this.addTrackerView();
+            this.addTrackerView(true);
             //Update players from < 7.2
             for (const player of this.data.players) {
                 if (player.path) continue;
@@ -629,7 +629,10 @@ export default class InitiativeTracker extends Plugin {
         console.log("Initiative Tracker unloaded");
     }
 
-    async addTrackerView() {
+    async addTrackerView(startup = false) {
+        if (startup && !this.data.showLeafOnStartup) {
+            return;
+        }
         if (
             this.app.workspace.getLeavesOfType(INITIATIVE_TRACKER_VIEW)?.length
         ) {
