@@ -5,6 +5,7 @@ import { Dnd5eRpgSystem } from "./dnd5e";
 import { Dnd5eLazyGmRpgSystem } from "./dnd5e-lazygm";
 import { Dnd5eCr2SimpleRpgSystem } from "./dnd5e-cr2-simple";
 import { Dnd5eFleeMortalsRpgSystem } from "./dnd5e-flee-mortals";
+import { Dnd552024RpgSystem } from "./dnd55_2024";
 import { Pathfinder2eRpgSystem } from "./pf2e"
 import { RpgSystem } from "./rpgSystem";
 import { DEFAULT_UNDEFINED } from "../constants";
@@ -58,6 +59,7 @@ export enum RpgSystemSetting {
   Dnd5eLazyGm = "dnd5e-lazygm",
   Dnd5eCR2Simple = "dnd5e-cr2-simple",
   Dnd5eFleeMortals = "dnd5e-flee-mortals",
+  Dnd552024 = "dnd55-2024",
   Pathfinder2e = "pathfinder2e"
 }
 
@@ -76,6 +78,7 @@ export function getRpgSystem(plugin: InitiativeTracker, settingId?: string): Rpg
     case RpgSystemSetting.Dnd5eLazyGm: return new Dnd5eLazyGmRpgSystem(plugin);
     case RpgSystemSetting.Dnd5eCR2Simple: return new Dnd5eCr2SimpleRpgSystem(plugin);
     case RpgSystemSetting.Dnd5eFleeMortals: return new Dnd5eFleeMortalsRpgSystem(plugin);
+    case RpgSystemSetting.Dnd552024: return new Dnd552024RpgSystem(plugin);
     case RpgSystemSetting.Pathfinder2e: return new Pathfinder2eRpgSystem(plugin);
   }
   return new UndefinedRpgSystem();
